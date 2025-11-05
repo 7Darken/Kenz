@@ -1,0 +1,18 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" rx="64" fill="url(#paint0_radial)"/>
+  <g filter="url(#filter0_f)">
+    <path d="M160 360C160 250 250 160 360 160C470 160 560 250 560 360" stroke="#A855F7" stroke-width="40" stroke-linecap="round"/>
+  </g>
+  <path d="M140 330L220 330L260 230L320 430L380 270L420 330L500 330" stroke="#F8FAFC" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="220" cy="330" r="12" fill="#F8FAFC"/>
+  <circle cx="420" cy="330" r="12" fill="#F8FAFC"/>
+  <defs>
+    <filter id="filter0_f" x="80" y="80" width="560" height="360" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(180 160) rotate(45) scale(520)">
+      <stop stop-color="#0B1226"/>
+      <stop offset="1" stop-color="#040510"/>
+    </radialGradient>
+  </defs>
+</svg>

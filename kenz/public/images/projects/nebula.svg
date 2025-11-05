@@ -1,0 +1,22 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" rx="64" fill="url(#paint0_radial)"/>
+  <g filter="url(#filter0_f)">
+    <circle cx="210" cy="210" r="140" fill="#6366F1" fill-opacity="0.45"/>
+  </g>
+  <g filter="url(#filter1_f)">
+    <circle cx="450" cy="380" r="160" fill="#EC4899" fill-opacity="0.35"/>
+  </g>
+  <path d="M160 340C160 248.513 234.513 174 326 174H420C475.228 174 520 218.772 520 274C520 329.228 475.228 374 420 374H358C327.624 374 302.8 398.824 302.8 429.2C302.8 459.576 277.976 484.4 247.6 484.4C217.224 484.4 192.4 459.576 192.4 429.2V404C192.4 369.729 164.271 341.6 130 341.6H160V340Z" stroke="#EEF2FF" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <filter id="filter0_f" x="10" y="10" width="400" height="400" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+    <filter id="filter1_f" x="190" y="120" width="520" height="520" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="70"/>
+    </filter>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 120) rotate(45) scale(520)">
+      <stop stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#040510"/>
+    </radialGradient>
+  </defs>
+</svg>

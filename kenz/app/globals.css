@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-full: 9999px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #111827;
+  --card: #f8fafc;
+  --muted: #6b728080;
+  --border: #e2e8f0;
+  --accent: #2563eb;
+  --accent-soft: #2563eb33;
+  --accent-foreground: #ffffff;
+  --gradient-start: #2563eb;
+  --gradient-end: #2563eb;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #050505;
+  --foreground: #f8fafc;
+  --card: #111827;
+  --muted: #cbd5f580;
+  --border: #1f2937;
+  --accent: #3b82f6;
+  --accent-soft: #3b82f633;
+  --accent-foreground: #0b1120;
+  --gradient-start: #3b82f6;
+  --gradient-end: #3b82f6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.prose-gradient {
+  background: linear-gradient(120deg, var(--gradient-start), var(--gradient-end));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}

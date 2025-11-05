@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="url(#paint0_radial_kenz)"/>
+  <g filter="url(#filter0_f_kenz)">
+    <circle cx="156" cy="148" r="120" fill="#6366F1" fill-opacity="0.35"/>
+  </g>
+  <g filter="url(#filter1_f_kenz)">
+    <circle cx="380" cy="360" r="140" fill="#22D3EE" fill-opacity="0.3"/>
+  </g>
+  <g filter="url(#filter2_f_kenz)">
+    <circle cx="300" cy="120" r="90" fill="#EC4899" fill-opacity="0.25"/>
+  </g>
+  <g filter="url(#filter3_f_kenz)">
+    <ellipse cx="256" cy="380" rx="150" ry="70" fill="#0F172A" fill-opacity="0.35"/>
+  </g>
+  <path d="M167.5 213C167.5 188.252 187.252 168.5 212 168.5H226.5C236.441 168.5 245.052 161.58 247.301 151.936L250.28 139.208C256.188 114.201 277.792 96 303.567 96C329.023 96 350.443 113.738 356.73 138.32L360.313 152.169C362.895 162.316 371.96 169.5 382.411 169.5H388.5C413.248 169.5 433 189.252 433 214V239.5C433 248.06 431.473 256.564 428.488 264.627L417.937 292.903C411.249 310.737 399.245 326.032 383.301 337.144C359.121 354.039 329.255 363.5 299.5 363.5H268.5C238.287 363.5 208.713 353.827 184.428 336.042C167.473 323.509 155.074 305.843 148.63 285.514L140.463 259.777C138.833 254.55 138 249.117 138 243.651V213H167.5Z" fill="#F8FAFC"/>
+  <path d="M214 251C214 224.386 235.386 203 262 203H293C319.614 203 341 224.386 341 251V262C341 288.614 319.614 310 293 310H262C235.386 310 214 288.614 214 262V251Z" fill="#0F172A"/>
+  <path d="M264 252C264 242.059 272.059 234 282 234C291.941 234 300 242.059 300 252C300 261.941 291.941 270 282 270C272.059 270 264 261.941 264 252Z" fill="#F8FAFC"/>
+  <path d="M230 252C230 242.059 238.059 234 248 234C257.941 234 266 242.059 266 252C266 261.941 257.941 270 248 270C238.059 270 230 261.941 230 252Z" fill="#F8FAFC"/>
+  <path d="M248 260C252.418 260 256 256.418 256 252C256 247.582 252.418 244 248 244C243.582 244 240 247.582 240 252C240 256.418 243.582 260 248 260Z" fill="#0F172A"/>
+  <path d="M282 260C286.418 260 290 256.418 290 252C290 247.582 286.418 244 282 244C277.582 244 274 247.582 274 252C274 256.418 277.582 260 282 260Z" fill="#0F172A"/>
+  <path d="M247 296C247 289.373 252.373 284 259 284H286C292.627 284 298 289.373 298 296C298 301.523 294.053 306.293 288.66 307.573C277.365 310.274 264.635 310.274 253.34 307.573C247.947 306.293 244 301.523 244 296H247Z" fill="#0EA5E9"/>
+  <defs>
+    <filter id="filter0_f_kenz" x="-4" y="-12" width="320" height="320" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+    <filter id="filter1_f_kenz" x="200" y="180" width="360" height="360" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="55"/>
+    </filter>
+    <filter id="filter2_f_kenz" x="170" y="-10" width="260" height="260" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="40"/>
+    </filter>
+    <filter id="filter3_f_kenz" x="86" y="290" width="340" height="180" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+    <radialGradient id="paint0_radial_kenz" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 104) rotate(45) scale(500)">
+      <stop stop-color="#0B1226"/>
+      <stop offset="1" stop-color="#040510"/>
+    </radialGradient>
+  </defs>
+</svg>
