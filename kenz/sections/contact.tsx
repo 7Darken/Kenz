@@ -18,7 +18,7 @@ const contacts = [
 
 export function ContactSection() {
   return (
-    <section id="contact" className="relative pb-24">
+    <section id="contact" className="relative w-full pb-24">
       <motion.div
         className="flex flex-col gap-12"
         initial="initial"
@@ -35,7 +35,7 @@ export function ContactSection() {
         <motion.div variants={fadeInUp} className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
           <Card>
             <form className="flex flex-col gap-5" action="#" method="post">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <Input name="name" placeholder="Full name" required />
                 <Input name="email" type="email" placeholder="Work email" required />
               </div>

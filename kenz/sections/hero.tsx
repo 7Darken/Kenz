@@ -75,7 +75,11 @@ const HeroContainer = styled(motion.section)`
 
 const BackgroundLayer = styled(motion.div)`
   position: absolute;
-  inset: -12% -14vw -18% -14vw;
+  top: -12%;
+  bottom: -18%;
+  left: 50%;
+  width: min(100vw, calc(100% + 28vw));
+  transform: translateX(-50%);
   z-index: -10;
   pointer-events: none;
   mask-image: radial-gradient(130% 115% at 50% 52%, rgba(0, 0, 0, 0.95) 52%, transparent 95%);
@@ -99,14 +103,20 @@ const GridWrapper = styled.div`
   pointer-events: none;
   bottom: -65%;
   left: 50%;
-  width: max(200%, 160vw);
+  width: 100vw;
   height: 140%;
-  transform: translateX(-50%);
+  transform-origin: center bottom;
+  transform: translateX(-50%) scale(1.65);
   opacity: 0.94;
 
   @media (min-width: 640px) {
     bottom: -58%;
     height: 155%;
+    transform: translateX(-50%) scale(1.45);
+  }
+
+  @media (min-width: 1024px) {
+    transform: translateX(-50%) scale(1.25);
   }
 `;
 

@@ -26,7 +26,7 @@ const badges = ["Next.js", "TypeScript", "Node & Edge runtimes", "React Native",
 
 export function AboutSection() {
   return (
-    <section id="about" className="relative pb-24">
+    <section id="about" className="relative w-full pb-24">
       <motion.div
         className="flex flex-col gap-12"
         initial="initial"
@@ -40,18 +40,18 @@ export function AboutSection() {
           description="I help founders and product teams craft future-ready experiences — from strategy to shippable software. My background spans CTO roles, realtime collaboration suites, AI platforms, and high-growth fintech."
         />
 
-        <motion.div variants={fadeInUp} className="grid gap-6 md:grid-cols-3">
+        <motion.div variants={fadeInUp} className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {values.map((value) => (
-            <Card key={value.title} subdued className="h-full">
+            <Card key={value.title} subdued className="h-full text-center sm:text-left">
               <h3 className="text-lg font-semibold text-[var(--foreground)]">{value.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{value.description}</p>
             </Card>
           ))}
         </motion.div>
 
-        <motion.div variants={fadeInUp} className="flex flex-col gap-4">
+        <motion.div variants={fadeInUp} className="flex flex-col gap-4 text-center sm:text-left">
           <h3 className="text-sm font-semibold uppercase tracking-[0.3em] text-[var(--muted)]">Toolkit</h3>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
             {badges.map((badge) => (
               <Tag key={badge}>{badge}</Tag>
             ))}

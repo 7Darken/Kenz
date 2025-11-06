@@ -1,0 +1,22 @@
+{
+  "name": "Kenz Portfolio",
+  "short_name": "Kenz",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "description": "Kenz en Bien. Toujours dans le bon. Créateur de contenu, ingénieur développeur d'application pour aider et facilité le quotidien des gens. Oui, on peut dire philanthrope.",
+  "icons": [
+    {
+      "src": "/images/KzLogo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/KzLogo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

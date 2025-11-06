@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kenz.dev"),
+  metadataBase: new URL("https://kenzenbien.fr"),
   title: "Kenz.",
   description:
-    "Full stack engineer specializing in immersive product experiences, realtime architectures and delightful interfaces.",
+    "Kenz en Bien. Toujours dans le bon. Créateur de contenu, ingénieur développeur d'application pour aider et facilité le quotidien des gens. Oui, on peut dire philanthrope.",
   icons: {
     icon: [
       { url: "/images/KzLogo.png", type: "image/png", sizes: "32x32" },
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Kenz.",
     description:
-      "Explore projects, philosophy and contact details for Kenz, a full stack engineer crafting future-ready products.",
-    url: "https://kenz.dev",
-    siteName: "Kenz Portfolio",
+      "Kenz en Bien. Toujours dans le bon. Créateur de contenu, ingénieur développeur d'application pour aider et facilité le quotidien des gens. Oui, on peut dire philanthrope.",
+    url: "https://kenzenbien.fr",
+    siteName: "Kenz.",
     images: [
       {
         url: "/og-cover.png",
@@ -49,9 +49,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kenz · Full Stack Developer Portfolio",
+    title: "Kenz.",
     description: "Full stack engineer crafting modern SaaS, fintech and AI products.",
-    creator: "@kenzdev",
+    creator: "@kenzEnBien",
     images: ["/og-cover.png"],
   },
   keywords: [
@@ -73,7 +73,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden`}>
         <ThemeProvider>
           <div className="relative mx-auto min-h-screen w-full max-w-[1200px] px-4 pb-16 pt-6 sm:px-8 lg:px-10">
             <SiteHeader />

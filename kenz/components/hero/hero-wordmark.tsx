@@ -95,6 +95,7 @@ const WordmarkContainer = styled(motion.div)`
 
 const TitleText = styled.span`
   display: block;
+  box-sizing: border-box;
   background: linear-gradient(
     180deg,
     var(--foreground) 0%,
@@ -111,17 +112,19 @@ const TitleText = styled.span`
 `;
 
 const Description = styled(motion.p)`
+  box-sizing: border-box;
   max-width: 32rem;
   color: var(--muted);
   font-size: clamp(0.95rem, 1vw + 0.85rem, 1.15rem);
   line-height: 1.6;
- padding-left: 2rem;
+  padding-left: 2rem;
   @media (min-width: 640px) {
     margin-top: 1rem;
   }
 `;
 
 const SocialBar = styled(motion.div)`
+  box-sizing: border-box;
   margin-top: 1.5rem;
   display: inline-flex;
   flex-wrap: wrap;
