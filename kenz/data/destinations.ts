@@ -1,39 +1,81 @@
-export interface Destination {
+export type Destination = {
+  id: number;
+  slug: string;
   name: string;
+  country: string;
   description: string;
   imageUrl: string;
-  slug: string;
+  stats: {
+    label: string;
+    value: string;
+  }[];
+  gallery?: string[];
 }
 
 export const destinations: Destination[] = [
   {
-    name: "Chine",
-    description: "Temples ancestraux, futurisme hypnotique et cuisine d'exception sur ",
-    imageUrl: "/images/destinations/chine.png",
-    slug: "chine",
+    id: 1,
+    slug: 'japon',
+    name: 'Tokyo & Kyoto',
+    country: 'Japon',
+    description: 'Une immersion entre tradition millénaire et futurisme néon. Des temples zen aux quartiers électriques d\'Akihabara.',
+    imageUrl: '/images/destinations/Japon.png',
+    stats: [
+      { label: 'Durée', value: '3 semaines' },
+      { label: 'Saison', value: 'Printemps' },
+      { label: 'Vibe', value: 'Cyberpunk' }
+    ]
   },
   {
-    name: "Malaisie",
-    description: "Souks colorés, montagnes de l'Atlas et dunes dorées: une mosaïque ",
-    imageUrl: "/images/destinations/malaisie.png",
-    slug: "malaisie",
+    id: 2,
+    slug: 'islande',
+    name: 'South Coast',
+    country: 'Islande',
+    description: 'Terre de glace et de feu. Cascades géantes, plages de sable noir et aurores boréales.',
+    imageUrl: '/images/destinations/Islande.png',
+    stats: [
+      { label: 'Durée', value: '10 jours' },
+      { label: 'Saison', value: 'Hiver' },
+      { label: 'Vibe', value: 'Nature' }
+    ]
   },
   {
-    name: "Islande",
-    description: "Geysers, volcans et aurores boréales au cœur d'une nature brute et mystique.",
-    imageUrl: "/images/destinations/islande.png",
-    slug: "islande",
+    id: 3,
+    slug: 'chine',
+    name: 'Shanghai & Beijing',
+    country: 'Chine',
+    description: 'La grandeur de la Grande Muraille et la modernité vertigineuse des gratte-ciels.',
+    imageUrl: '/images/destinations/Chine.png',
+    stats: [
+      { label: 'Durée', value: '2 semaines' },
+      { label: 'Saison', value: 'Automne' },
+      { label: 'Vibe', value: 'Urbain' }
+    ]
   },
   {
-    name: "Corée du sud",
-    description: "Plages turquoise, jungle luxuriante et street-food épicée pour une immersion",
-    imageUrl: "/images/destinations/Coree.png",
-    slug: "coree-du-sud",
+    id: 4,
+    slug: 'coree',
+    name: 'Seoul',
+    country: 'Corée du Sud',
+    description: 'K-Pop, Street Food et Palais Royaux. Une ville qui ne dort jamais.',
+    imageUrl: '/images/destinations/Coree.png',
+    stats: [
+      { label: 'Durée', value: '2 semaines' },
+      { label: 'Saison', value: 'Été' },
+      { label: 'Vibe', value: 'Dynamique' }
+    ]
   },
   {
-    name: "Japon",
-    description: "Plages turquoise, jungle luxuriante et street-food épicée pour une immersion",
-    imageUrl: "/images/destinations/japon.png",
-    slug: "japon",
+    id: 5,
+    slug: 'malaisie',
+    name: 'Kuala Lumpur',
+    country: 'Malaisie',
+    description: 'Un melting-pot culturel au cœur de l\'Asie du Sud-Est. Tours Petronas et jungle urbaine.',
+    imageUrl: '/images/destinations/Malaisie.png',
+    stats: [
+      { label: 'Durée', value: '1 semaine' },
+      { label: 'Saison', value: 'Toute l\'année' },
+      { label: 'Vibe', value: 'Tropical' }
+    ]
   }
-];
+]

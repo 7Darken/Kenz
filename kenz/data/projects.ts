@@ -54,10 +54,12 @@ export const projects: Project[] = [
         title: "App Store",
         icon: "/images/icons/Apple_logo_white.png",
       },
-      { label: "Tiktok",
+      {
+        label: "Tiktok",
         href: "https://kenz.blog/nebula",
         title: "+1 abonnés",
-        icon: "/images/icons/tiktok_white.png", },
+        icon: "/images/icons/tiktok_white.png",
+      },
     ],
     detail: {
       headline: "La cuisine virale devient réellement accessible",
@@ -94,7 +96,6 @@ export const projects: Project[] = [
           accentColor: "#60a5fa",
         },
       ],
-      tags: ["App mobile", "React Native", "NestJS", "AI ingredients"],
     },
   },
   {
@@ -107,17 +108,19 @@ export const projects: Project[] = [
     thumbnail: "/images/projects/Zenko.png",
     glowColor: "#944f29",
     liveUrl: "https://orbit.app",
-     socials: [
+    socials: [
       {
         label: "Télécharger sur",
         href: "https://apps.apple.com/ch/app/zenko/id6753706200?l=fr-FR",
         title: "App Store",
         icon: "/images/icons/Apple_logo_white.png",
       },
-      { label: "Tiktok",
+      {
+        label: "Tiktok",
         href: "https://www.tiktok.com/@7kinze",
         title: "+10K abonnés",
-        icon: "/images/icons/tiktok_white.png", },
+        icon: "/images/icons/tiktok_white.png",
+      },
     ],
     detail: {
       headline: "Ton copilote de voyage personnalisé",
@@ -154,7 +157,6 @@ export const projects: Project[] = [
           accentColor: "#4ade80",
         },
       ],
-      tags: ["Travel", "AI", "Next.js", "Cloudflare Workers"],
     },
   },
 
