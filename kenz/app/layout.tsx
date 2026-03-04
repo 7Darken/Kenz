@@ -1,32 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Bodoni_Moda } from "next/font/google";
-import { Providers } from "@/components/Providers";
-import Navbar from "@/components/Navbar";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
-  display: "swap",
-});
-
-const bodoni = Bodoni_Moda({
-  subsets: ["latin"],
-  variable: "--font-bodoni",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kenzenbien.fr"),
   title: "Kenz | Mobile Developer & Content Creator",
   description:
-    "Portfolio of Kenz - Mobile Developer and Travel Content Creator. Discover my apps and adventures.",
+    "Portfolio of Kenz - Mobile Developer, Travel Content Creator and Digital Explorer. Discover my apps and adventures.",
   icons: {
     icon: [
       { url: "/images/KzLogo.png", type: "image/png", sizes: "32x32" },
@@ -44,11 +23,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${bodoni.variable}`}>
-        <Providers>
-          <Navbar />
-          {children}
-        </Providers>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="font-body">
+        {children}
       </body>
     </html>
   );

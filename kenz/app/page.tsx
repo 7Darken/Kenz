@@ -1,31 +1,28 @@
 'use client'
 
-
-import Hero from '@/components/Hero'
-import About from '@/components/About'
-import MobileApps from '@/components/MobileApps'
-import TravelShowcase from '@/components/TravelShowcase'
-import Socials from '@/components/Socials'
-import Footer from '@/components/Footer'
-import ContentCreation from '@/components/ContentCreation'
-import styled from 'styled-components'
-
-const Main = styled.main`
-  width: 100%;
-  min-height: 100vh;
-  background: ${props => props.theme.colors.background};
-  color: ${props => props.theme.colors.text};
-`
+import { useState } from 'react'
+import LoadingScreen from '@/components/LoadingScreen'
+import NavbarNew from '@/components/NavbarNew'
+import HeroNew from '@/components/HeroNew'
+import SelectedWorks from '@/components/SelectedWorks'
+import Journal from '@/components/Journal'
+import Explorations from '@/components/Explorations'
+import Stats from '@/components/Stats'
+import ContactFooter from '@/components/ContactFooter'
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true)
+
   return (
-    <Main>
-      <Hero />
-      <About />
-      <MobileApps />
-      <TravelShowcase />
-      <Socials />
-      <Footer />
-    </Main>
+    <main>
+      {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
+      <NavbarNew />
+      <HeroNew />
+      <SelectedWorks />
+      <Journal />
+      <Explorations />
+      <Stats />
+      <ContactFooter />
+    </main>
   )
 }
