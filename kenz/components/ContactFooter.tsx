@@ -18,7 +18,6 @@ export default function ContactFooter() {
   const marqueeRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  // HLS video (flipped)
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -38,7 +37,6 @@ export default function ContactFooter() {
     loadHls()
   }, [])
 
-  // GSAP Marquee
   useEffect(() => {
     if (!marqueeRef.current) return
     const ctx = gsap.context(() => {
@@ -53,7 +51,7 @@ export default function ContactFooter() {
   }, [])
 
   return (
-    <section id="contact" className="relative bg-bg pt-16 md:pt-20 pb-8 md:pb-12 overflow-hidden">
+    <section id="contact" className="relative bg-bg pt-12 sm:pt-16 md:pt-20 pb-6 sm:pb-8 md:pb-12 overflow-hidden">
       {/* Background Video (flipped) */}
       <div className="absolute inset-0 overflow-hidden" style={{ transform: 'scaleY(-1)' }}>
         <video
@@ -65,54 +63,53 @@ export default function ContactFooter() {
           className="absolute top-1/2 left-1/2 min-w-full min-h-full object-cover -translate-x-1/2 -translate-y-1/2"
         />
       </div>
-      {/* Overlays */}
       <div className="absolute inset-0 bg-black/60" />
-      <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-bg to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-bg to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-b from-bg to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-bg to-transparent" />
 
       <div className="relative z-10">
         {/* Marquee */}
-        <div className="overflow-hidden mb-16">
+        <div className="overflow-hidden mb-10 sm:mb-16">
           <div ref={marqueeRef} className="whitespace-nowrap">
-            <span className="text-5xl md:text-7xl lg:text-8xl font-display italic text-text-primary/10">
+            <span className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-display italic text-text-primary/10">
               {MARQUEE_TEXT.repeat(10)}
             </span>
           </div>
         </div>
 
         {/* CTA */}
-        <div className="text-center px-6 mb-16">
+        <div className="text-center px-4 sm:px-6 mb-10 sm:mb-16">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-sm md:text-base text-muted max-w-md mx-auto mb-8"
+            className="text-xs sm:text-sm md:text-base text-muted max-w-md mx-auto mb-6 sm:mb-8"
           >
             Tu as un projet en tête ? Je suis toujours ouvert aux nouvelles idées et collaborations.
           </motion.p>
           <motion.a
             href="mailto:contact@kenzenbien.fr"
             whileTap={{ scale: 0.97 }}
-            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-bg border-2 border-stroke rounded-full text-text-primary transition-all duration-300 hover:border-transparent"
+            className="group relative inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-bg border-2 border-stroke rounded-full text-text-primary text-sm sm:text-base transition-all duration-300 hover:border-transparent"
           >
             <span className="absolute inset-[-2px] rounded-full accent-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
             contact@kenzenbien.fr
-            <span className="text-sm">↗</span>
+            <span className="text-xs sm:text-sm">↗</span>
           </motion.a>
         </div>
 
         {/* Footer Bar */}
-        <div className="max-w-[1200px] mx-auto px-6 md:px-10 lg:px-16">
-          <div className="border-t border-stroke pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16">
+          <div className="border-t border-stroke pt-6 sm:pt-8 flex flex-col gap-4 sm:gap-0 sm:flex-row items-center justify-between">
             {/* Social links */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
               {SOCIALS.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-muted hover:text-text-primary hover:-translate-y-0.5 transition-all duration-200"
+                  className="text-xs sm:text-sm text-muted hover:text-text-primary hover:-translate-y-0.5 transition-all duration-200"
                 >
                   {social.label}
                 </a>
@@ -121,11 +118,11 @@ export default function ContactFooter() {
 
             {/* Available indicator */}
             <div className="flex items-center gap-2">
-              <span className="relative flex h-3 w-3">
+              <span className="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+                <span className="relative inline-flex rounded-full h-full w-full bg-green-500" />
               </span>
-              <span className="text-sm text-muted">Available for projects</span>
+              <span className="text-xs sm:text-sm text-muted">Available for projects</span>
             </div>
           </div>
         </div>
