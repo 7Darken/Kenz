@@ -44,7 +44,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
   const overviewItems = detail.overview ?? [];
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary">
+    <div className="min-h-screen bg-bg text-text-primary overflow-x-hidden">
       {/* Back nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 md:pt-6 px-4">
         <Link

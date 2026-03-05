@@ -12,15 +12,10 @@
   --font-display: 'Instrument Serif', serif;
 }
 
-/* === Base Styles === */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* === Base === */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -29,6 +24,9 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* === Accent Gradient === */
@@ -36,20 +34,17 @@ body {
   background: linear-gradient(90deg, #89AACC 0%, #4E85BF 100%);
 }
 
-/* === Custom Scrollbar === */
+/* === Scrollbar === */
 ::-webkit-scrollbar {
   width: 6px;
 }
-
 ::-webkit-scrollbar-track {
   background: hsl(0 0% 4%);
 }
-
 ::-webkit-scrollbar-thumb {
   background: hsl(0 0% 20%);
   border-radius: 3px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(0 0% 30%);
 }
@@ -60,45 +55,23 @@ body {
   color: hsl(0 0% 96%);
 }
 
-/* === Custom Animations === */
+/* === Animations === */
 @keyframes scroll-down {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  30% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(200%);
-    opacity: 0;
-  }
+  0% { transform: translateY(-100%); opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(200%); opacity: 0; }
 }
 
 @keyframes role-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .animate-scroll-down {
@@ -112,4 +85,10 @@ body {
 .animate-gradient-shift {
   animation: gradient-shift 6s ease infinite;
   background-size: 200% 200%;
+}
+
+/* === Responsive helpers === */
+.break-word {
+  word-break: break-word;
+  overflow-wrap: break-word;
 }

@@ -42,16 +42,16 @@ export default function NavbarNew() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 sm:pt-4 md:pt-6 px-3 sm:px-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 sm:pt-4 md:pt-6 px-3 sm:px-4" style={{ maxWidth: '100vw' }}>
       <div
-        className={`inline-flex items-center rounded-full backdrop-blur-md border border-white/10 bg-surface/80 px-2 py-2 transition-shadow duration-300 ${
+        className={`inline-flex items-center rounded-full backdrop-blur-md border border-white/10 bg-surface/80 px-1.5 sm:px-2 py-1.5 sm:py-2 transition-shadow duration-300 max-w-full ${
           scrolled ? 'shadow-lg shadow-black/20' : ''
         }`}
       >
         {/* Logo */}
         <button
           onClick={() => scrollTo('#home', 'Home')}
-          className="group relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform duration-300"
+          className="group relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 hover:scale-110 transition-transform duration-300"
         >
           <div className="absolute inset-0 rounded-full accent-gradient group-hover:[background:linear-gradient(270deg,#89AACC_0%,#4E85BF_100%)]" />
           <div className="absolute inset-[1.5px] rounded-full bg-bg flex items-center justify-center">

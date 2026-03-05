@@ -74,10 +74,10 @@ export default function Journal() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
               viewport={{ once: true, margin: '-50px' }}
-              className="group flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 p-3 sm:p-4 bg-surface/30 hover:bg-surface border border-stroke rounded-2xl sm:rounded-[40px] transition-colors duration-300 cursor-pointer"
+              className="group flex flex-row items-center gap-3 sm:gap-6 p-3 sm:p-4 bg-surface/30 hover:bg-surface border border-stroke rounded-2xl sm:rounded-[40px] transition-colors duration-300 cursor-pointer overflow-hidden"
             >
               {/* Image */}
-              <div className="relative w-16 h-16 sm:w-[80px] sm:h-[80px] md:w-[100px] md:h-[100px] rounded-full overflow-hidden shrink-0 border-2 border-stroke group-hover:border-muted transition-colors duration-300 self-center sm:self-auto">
+              <div className="relative w-12 h-12 sm:w-[80px] sm:h-[80px] md:w-[100px] md:h-[100px] rounded-full overflow-hidden shrink-0 border-2 border-stroke group-hover:border-muted transition-colors duration-300">
                 <Image
                   src={entry.image}
                   alt={entry.title}
@@ -88,30 +88,30 @@ export default function Journal() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 min-w-0 text-center sm:text-left">
-                <h3 className="text-sm sm:text-lg md:text-2xl font-medium text-text-primary transition-transform duration-300 group-hover:translate-x-1 line-clamp-2">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm sm:text-base md:text-xl lg:text-2xl font-medium text-text-primary transition-transform duration-300 group-hover:translate-x-1 truncate sm:whitespace-normal sm:line-clamp-2">
                   {entry.title}
                 </h3>
                 {/* Meta - mobile inline */}
-                <div className="flex items-center justify-center sm:hidden gap-2 text-xs text-muted mt-1">
+                <div className="flex items-center sm:hidden gap-2 text-[10px] text-muted mt-0.5">
                   <span>{entry.readTime}</span>
-                  <span className="w-1 h-1 rounded-full bg-muted" />
+                  <span className="w-0.5 h-0.5 rounded-full bg-muted" />
                   <span>{entry.date}</span>
                 </div>
               </div>
 
               {/* Dotted separator (desktop) */}
-              <div className="hidden md:block flex-grow h-px bg-stroke/30" />
+              <div className="hidden lg:block flex-grow h-px bg-stroke/30" />
 
               {/* Meta - desktop */}
-              <div className="hidden sm:flex items-center gap-3 text-xs sm:text-sm text-muted shrink-0">
+              <div className="hidden sm:flex items-center gap-3 text-xs md:text-sm text-muted shrink-0 whitespace-nowrap">
                 <span>{entry.readTime}</span>
                 <span className="w-1 h-1 rounded-full bg-muted" />
                 <span>{entry.date}</span>
               </div>
 
               {/* Arrow */}
-              <div className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-stroke items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-text-primary group-hover:text-bg group-hover:border-text-primary">
+              <div className="hidden sm:flex w-8 h-8 md:w-10 md:h-10 rounded-full border border-stroke items-center justify-center shrink-0 transition-all duration-300 group-hover:bg-text-primary group-hover:text-bg group-hover:border-text-primary">
                 <span className="text-xs sm:text-sm">→</span>
               </div>
             </motion.div>

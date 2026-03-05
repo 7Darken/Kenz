@@ -111,7 +111,7 @@ export default function HeroNew() {
       </div>
 
       {/* Scroll Indicator - hidden on very small screens */}
-      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 sm:gap-3 hidden sm:flex">
+      <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 hidden sm:flex flex-col items-center gap-2 sm:gap-3">
         <span className="text-[10px] sm:text-xs text-muted uppercase tracking-[0.2em]">SCROLL</span>
         <div className="relative w-px h-8 sm:h-10 bg-stroke overflow-hidden">
           <div className="absolute inset-x-0 h-3 accent-gradient animate-scroll-down" />

@@ -90,11 +90,11 @@ export default function ContactFooter() {
           <motion.a
             href="mailto:contact@kenzenbien.fr"
             whileTap={{ scale: 0.97 }}
-            className="group relative inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-bg border-2 border-stroke rounded-full text-text-primary text-sm sm:text-base transition-all duration-300 hover:border-transparent"
+            className="group relative inline-flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-4 bg-bg border-2 border-stroke rounded-full text-text-primary text-xs sm:text-sm md:text-base transition-all duration-300 hover:border-transparent max-w-full"
           >
             <span className="absolute inset-[-2px] rounded-full accent-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10" />
-            contact@kenzenbien.fr
-            <span className="text-xs sm:text-sm">↗</span>
+            <span className="truncate">contact@kenzenbien.fr</span>
+            <span className="text-xs sm:text-sm shrink-0">↗</span>
           </motion.a>
         </div>
 
@@ -102,14 +102,14 @@ export default function ContactFooter() {
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16">
           <div className="border-t border-stroke pt-6 sm:pt-8 flex flex-col gap-4 sm:gap-0 sm:flex-row items-center justify-between">
             {/* Social links */}
-            <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
+            <div className="flex items-center gap-3 sm:gap-5 md:gap-6 flex-wrap justify-center">
               {SOCIALS.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs sm:text-sm text-muted hover:text-text-primary hover:-translate-y-0.5 transition-all duration-200"
+                  className="text-[11px] sm:text-xs md:text-sm text-muted hover:text-text-primary hover:-translate-y-0.5 transition-all duration-200"
                 >
                   {social.label}
                 </a>

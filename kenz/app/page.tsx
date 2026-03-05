@@ -14,7 +14,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
 
   return (
-    <main>
+    <main className="overflow-x-hidden w-full">
       {isLoading && <LoadingScreen onComplete={() => setIsLoading(false)} />}
       <NavbarNew />
       <HeroNew />

@@ -39,11 +39,9 @@ const PROJECTS = [
   },
 ]
 
-const COL_SPANS = ['md:col-span-7', 'md:col-span-5', 'md:col-span-5', 'md:col-span-7']
-
 export default function SelectedWorks() {
   return (
-    <section id="work" className="bg-bg py-10 sm:py-12 md:py-16">
+    <section id="work" className="bg-bg py-10 sm:py-12 md:py-16 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 md:px-10 lg:px-16">
         {/* Header */}
         <motion.div
@@ -81,20 +79,20 @@ export default function SelectedWorks() {
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-4 sm:gap-5 md:gap-6">
-          {PROJECTS.map((project, i) => (
+          {PROJECTS.map((project, i) => {
+            const mdSpan = i === 0 || i === 3 ? 'md:col-span-7' : 'md:col-span-5'
+            return (
             <motion.div
               key={project.slug}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
               viewport={{ once: true, margin: '-50px' }}
-              className={`col-span-1 ${COL_SPANS[i]} sm:col-span-1`}
+              className={`${mdSpan}`}
             >
               <Link
                 href={project.href}
-                className={`group relative block bg-surface border border-stroke rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3] ${
-                  i === 1 || i === 2 ? 'md:aspect-auto md:h-full md:min-h-[280px]' : ''
-                }`}
+                className="group relative block bg-surface border border-stroke rounded-2xl sm:rounded-3xl overflow-hidden aspect-[4/3]"
               >
                 {/* Background image */}
                 <Image
@@ -126,7 +124,8 @@ export default function SelectedWorks() {
                 </div>
               </Link>
             </motion.div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
