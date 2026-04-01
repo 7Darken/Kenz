@@ -10,7 +10,6 @@ const stats = [
   { value: 12000, suffix: '+', label: 'Téléchargements', prefix: '' },
   { value: 3, suffix: '', label: 'Apps publiées', prefix: '' },
   { value: 4.9, suffix: '/5', label: 'Note App Store', prefix: '' },
-  { value: 2, suffix: ' ans', label: "D'expérience", prefix: '' },
 ]
 
 /* ── Animated Counter ── */
