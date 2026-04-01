@@ -1,103 +1,127 @@
 'use client'
 
 import styled from 'styled-components'
-import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { ArrowUpRight, Mail, MapPin, Github, Linkedin, Twitter, Instagram } from 'lucide-react'
+import Image from 'next/image'
+import { useMode } from '@/contexts/mode-context'
 
 const FooterContainer = styled.footer`
   background: #020202;
   color: white;
-  padding: 8rem 2rem 2rem;
+  padding: 5rem 2rem 2rem;
   position: relative;
   overflow: hidden;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+
+  @media (max-width: 768px) {
+    padding: 3rem 1.5rem 1.5rem;
+  }
 `
 
-const ContentWrapper = styled.div`
-  max-width: 1400px;
+const Inner = styled.div`
+  max-width: 1100px;
   margin: 0 auto;
   position: relative;
   z-index: 2;
 `
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 4rem;
-  padding-bottom: 4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-  }
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-`
-
-const Column = styled.div`
+const TopRow = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
 `
 
-const Logo = styled.div`
-  font-family: ${props => props.theme.fonts.aesthetic};
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-`
-
-const Bio = styled.p`
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
-  max-width: 300px;
-`
-
-const ColumnTitle = styled.h4`
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: white;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-`
-
-const LinkList = styled.ul`
-  list-style: none;
-  padding: 0;
+const BrandCol = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-width: 320px;
+`
+
+const LogoRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  img { border-radius: 50%; }
+`
+
+const LogoText = styled.span`
+  font-family: ${p => p.theme.fonts.main};
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+`
+
+const Bio = styled.p`
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.6;
+  font-weight: 300;
+`
+
+const LinksRow = styled.div`
+  display: flex;
+  gap: 4rem;
+
+  @media (max-width: 768px) {
+    gap: 2.5rem;
+    flex-wrap: wrap;
+  }
+`
+
+const LinkCol = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+`
+
+const ColTitle = styled.span`
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
 `
 
 const FooterLink = styled(Link)`
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
   transition: color 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 
-  &:hover {
-    color: white;
-  }
+  &:hover { color: #fff; }
 `
 
-const SocialLink = styled.a`
-  color: rgba(255, 255, 255, 0.6);
+const ExtLink = styled.a`
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
   transition: color 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 
-  &:hover {
-    color: white;
-  }
+  &:hover { color: #fff; }
+`
+
+const ContactLink = styled.button`
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.3s ease;
+
+  &:hover { color: #fff; }
 `
 
 const BottomBar = styled.div`
@@ -105,77 +129,83 @@ const BottomBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.78rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.6rem;
+    text-align: center;
   }
 `
 
-const Glow = styled.div`
-  position: absolute;
-  bottom: -20%;
-  left: -10%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-`
-
 export default function Footer() {
+  const { isPro, isPerso } = useMode()
+
   return (
     <FooterContainer>
-      <Glow />
-      <ContentWrapper>
-        <Grid>
-          <Column>
-            <Logo>KENZ</Logo>
+      <Inner>
+        <TopRow>
+          <BrandCol>
+            <LogoRow>
+              <Image src="/images/KzLogo.png" alt="Kenz" width={28} height={28} />
+              <LogoText>Kenz Narainen</LogoText>
+            </LogoRow>
             <Bio>
-              Développeur créatif et explorateur digital. Je conçois des expériences web immersives et des applications mobiles intuitives.
+              {isPro
+                ? "Développeur Full Stack basé à Paris. Je conçois des applications mobiles et des expériences web performantes."
+                : "Créateur de contenu, développeur et globe-trotteur. Je partage mes voyages et mes projets entre Paris et l'Asie."}
             </Bio>
-          </Column>
+          </BrandCol>
 
-          <Column>
-            <ColumnTitle>Sitemap</ColumnTitle>
-            <LinkList>
-              <li><FooterLink href="/">Accueil</FooterLink></li>
-              <li><FooterLink href="#about">À propos</FooterLink></li>
-              <li><FooterLink href="#apps">Projets</FooterLink></li>
-              <li><FooterLink href="#travel">Voyages</FooterLink></li>
-            </LinkList>
-          </Column>
+          <LinksRow>
+            <LinkCol>
+              <ColTitle>Navigation</ColTitle>
+              <FooterLink href="/">Accueil</FooterLink>
+              {isPro && (
+                <>
+                  <FooterLink href="/#apps">Projets</FooterLink>
+                  <FooterLink href="/#kenz-ai">Kenz AI</FooterLink>
+                  <ContactLink onClick={() => window.dispatchEvent(new Event('open-contact-modal'))}>
+                    Contact
+                  </ContactLink>
+                </>
+              )}
+              {isPerso && (
+                <>
+                  <FooterLink href="/#content">Contenu</FooterLink>
+                  <FooterLink href="/#travel">Voyages</FooterLink>
+                  <FooterLink href="/#sport">Sport</FooterLink>
+                  <FooterLink href="/#socials">Réseaux</FooterLink>
+                </>
+              )}
+            </LinkCol>
 
-          <Column>
-            <ColumnTitle>Réseaux</ColumnTitle>
-            <LinkList>
-              <li><SocialLink href="https://www.tiktok.com/@7kinze" target="_blank">TikTok</SocialLink></li>
-              <li><SocialLink href="https://www.instagram.com/kenz.dev" target="_blank">Instagram</SocialLink></li>
-              <li><SocialLink href="https://www.youtube.com/@7Kinze" target="_blank">YouTube</SocialLink></li>
-              <li><SocialLink href="https://linkedin.com" target="_blank">LinkedIn</SocialLink></li>
-            </LinkList>
-          </Column>
+            <LinkCol>
+              <ColTitle>Réseaux</ColTitle>
+              <ExtLink href="https://github.com/7Darken" target="_blank">GitHub</ExtLink>
+              <ExtLink href="https://www.linkedin.com/in/kenz-narainen" target="_blank">LinkedIn</ExtLink>
+              <ExtLink href="https://www.tiktok.com/@7kinze" target="_blank">TikTok</ExtLink>
+              <ExtLink href="https://www.youtube.com/@7Kinze" target="_blank">YouTube</ExtLink>
+              <ExtLink href="https://www.instagram.com/kenz.dev" target="_blank">Instagram</ExtLink>
+            </LinkCol>
 
-          <Column>
-            <ColumnTitle>Infos</ColumnTitle>
-            <LinkList>
-              <li><FooterLink href="#">Mentions Légales</FooterLink></li>
-              <li><FooterLink href="#">Confidentialité</FooterLink></li>
-              <li style={{ marginTop: '1rem', color: 'rgba(255,255,255,0.4)' }}>
-                Paris, France 🇫🇷
-              </li>
-            </LinkList>
-          </Column>
-        </Grid>
+            {isPro && (
+              <LinkCol>
+                <ColTitle>Apps</ColTitle>
+                <FooterLink href="/apps/oshii">Oshii</FooterLink>
+                <FooterLink href="/apps/zenko">Zenko</FooterLink>
+                <FooterLink href="/apps/sago">Sago</FooterLink>
+              </LinkCol>
+            )}
+          </LinksRow>
+        </TopRow>
 
         <BottomBar>
-          <p>&copy; {new Date().getFullYear()} Kenz. All rights reserved.</p>
-          <p>Designed & Built with passion.</p>
+          <span>&copy; {new Date().getFullYear()} Kenz Narainen. Tous droits réservés.</span>
+          <span>Paris, France</span>
         </BottomBar>
-      </ContentWrapper>
+      </Inner>
     </FooterContainer>
   )
 }

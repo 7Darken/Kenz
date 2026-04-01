@@ -32,6 +32,7 @@ export type Project = {
   repoUrl?: string;
   socials?: ProjectLink[];
   glowColor?: string;
+  screenshots?: string[];
   detail?: ProjectDetail;
 };
 
@@ -43,9 +44,16 @@ export const projects: Project[] = [
     period: "2025 · App mobile",
     description:
       "Garde toutes tes recettes TikTok au même endroit Oshii convertit les vidéos en vraies recettes prêtes à cuisiner !",
-    thumbnail: "/images/projects/Oshii_dark.png",
+    thumbnail: "/images/projects/oshii/icon.png",
     glowColor: "#ff2330",
-    liveUrl: "https://nebula.app",
+    screenshots: [
+      "/images/projects/oshii/screenshots/460x996bb.webp",
+      "/images/projects/oshii/screenshots/460x996bb (1).webp",
+      "/images/projects/oshii/screenshots/460x996bb (2).webp",
+      "/images/projects/oshii/screenshots/460x996bb (3).webp",
+      "/images/projects/oshii/screenshots/460x996bb (4).webp",
+    ],
+    liveUrl: "https://www.oshii.fr/",
 
     socials: [
       {
@@ -105,9 +113,13 @@ export const projects: Project[] = [
     period: "2025 · App mobile",
     description:
       "Ton compagnon de voyage intelligent,des programmes quotidiens personnalisés adaptés à vos envies et à votre budget.",
-    thumbnail: "/images/projects/Zenko.png",
+    thumbnail: "/images/projects/zenko/icon.png",
     glowColor: "#944f29",
-    liveUrl: "https://orbit.app",
+    screenshots: [
+      "/images/projects/zenko/screenshots/Simulator Screenshot - iPhone 16 - 2025-10-07 at 14.51.22.png",
+      "/images/projects/zenko/screenshots/simulator_screenshot_0F87DCF3-7B95-49D6-A78C-14F2DAC1B13E.png",
+      "/images/projects/zenko/screenshots/simulator_screenshot_2AFCECC9-DC68-4C66-9685-EF373A9913FD.png",
+    ],
     socials: [
       {
         label: "Télécharger sur",
@@ -155,6 +167,68 @@ export const projects: Project[] = [
           value: "4.7",
           description: "Sur le store & beta testers",
           accentColor: "#4ade80",
+        },
+      ],
+    },
+  },
+  {
+    id: 3,
+    slug: "sago",
+    name: "Sago",
+    period: "2025 · App mobile",
+    description:
+      "Apprends le japonais de manière intuitive avec des leçons interactives, du vocabulaire contextuel et un suivi de progression personnalisé.",
+    thumbnail: "/images/projects/sago/icon.png",
+    glowColor: "#e74c6f",
+    liveUrl: "https://sago-landing.vercel.app/",
+    screenshots: [
+      "/images/projects/sago/screenshots/preview-1.png",
+      "/images/projects/sago/screenshots/preview-2.png",
+      "/images/projects/sago/screenshots/preview-3.png",
+      "/images/projects/sago/screenshots/preview-4.png",
+      "/images/projects/sago/screenshots/preview-5.png",
+    ],
+    socials: [
+      {
+        label: "Télécharger sur",
+        href: "#",
+        title: "App Store",
+        icon: "/images/icons/Apple_logo_white.png",
+      },
+    ],
+    detail: {
+      headline: "Le japonais, simplifié",
+      subheadline:
+        "Sago rend l'apprentissage du japonais accessible avec des leçons courtes, de la reconnaissance de caractères et un système de répétition espacée.",
+      overview: [
+        "Leçons interactives couvrant hiragana, katakana et kanji avec progression adaptative.",
+        "Système de répétition espacée intelligent pour ancrer le vocabulaire sur le long terme.",
+        "Exercices contextuels basés sur des situations réelles de voyage et de conversation.",
+      ],
+      stats: [
+        {
+          label: "Caractères",
+          value: "2000+",
+          description: "Kanji et kana disponibles",
+          accentColor: "#e74c6f",
+        },
+        {
+          label: "Leçons",
+          value: "150+",
+          description: "Du débutant à l'avancé",
+          accentColor: "#8b5cf6",
+        },
+        {
+          label: "Rétention",
+          value: "85%",
+          description: "Grâce à la répétition espacée",
+          accentColor: "#06b6d4",
+        },
+        {
+          label: "Temps moyen",
+          value: "10min",
+          description: "Par session quotidienne",
+          accentColor: "#f59e0b",
         },
       ],
     },

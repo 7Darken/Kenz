@@ -3,7 +3,6 @@
 import styled from 'styled-components'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { Play, Heart, MessageCircle, Share2, Music2 } from 'lucide-react'
 
 const Section = styled.section`
   padding: 5rem 2rem;
@@ -23,16 +22,21 @@ const Header = styled.div`
 
 const Title = styled(motion.h2)`
   font-family: ${props => props.theme.fonts.aesthetic};
-  font-size: clamp(3rem, 6vw, 5rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 400;
+  font-style: italic;
   margin-bottom: 1rem;
   line-height: 1;
+  color: #fff;
 `
 
 const Subtitle = styled.p`
   color: ${props => props.theme.colors.textSecondary};
-  font-size: 1.1rem;
+  font-size: 1rem;
   max-width: 500px;
   margin: 0 auto;
+  line-height: 1.5;
+  font-weight: 300;
 `
 
 const ContentGrid = styled.div`
@@ -79,6 +83,18 @@ const PhoneFrame = styled(motion.div)`
     border-bottom-left-radius: 16px;
     border-bottom-right-radius: 16px;
     z-index: 10;
+  }
+`
+
+const TikTokEmbed = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
   }
 `
 
@@ -160,6 +176,25 @@ const MusicDisc = styled(motion.div)`
 `
 
 // YouTube Specific Styles
+const YouTubeEmbed = styled.div`
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+`
+
 const VideoCard = styled(motion.div)`
   width: 100%;
   aspect-ratio: 16/9;
@@ -256,10 +291,10 @@ export default function ContentCreation() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Content Creation
+            Création de Contenu
           </Title>
           <Subtitle>
-            Sharing my journey and knowledge through video.
+            Je partage mes voyages, mes projets et mes découvertes en vidéo.
           </Subtitle>
         </Header>
 
@@ -276,40 +311,41 @@ export default function ContentCreation() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               <TikTokScreen>
-                {/* Placeholder for TikTok content */}
-                <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: '4rem' }}>
-                  <Music2 size={64} />
-                </div>
+                <TikTokEmbed>
+                  <iframe
+                    src="https://www.tiktok.com/player/v1/7544103386883427606?music_info=1&description=1"
+                    allow="fullscreen"
+                    allowFullScreen
+                  />
+                </TikTokEmbed>
 
-                <TikTokOverlay>
-                  <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>@kenz.dev</div>
-                  <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
-                    Building the future of mobile apps 🚀 #coding #dev #tech
-                  </div>
-                </TikTokOverlay>
-
-                <TikTokSideBar>
-                  <ActionIcon>
-                    <div><Heart fill="white" size={24} /></div>
-                    <span>12.5K</span>
-                  </ActionIcon>
-                  <ActionIcon>
-                    <div><MessageCircle size={24} /></div>
-                    <span>482</span>
-                  </ActionIcon>
-                  <ActionIcon>
-                    <div><Share2 size={24} /></div>
-                    <span>Share</span>
-                  </ActionIcon>
-                  <MusicDisc
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Music2 size={20} />
-                  </MusicDisc>
-                </TikTokSideBar>
               </TikTokScreen>
             </PhoneFrame>
+
+            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+              <motion.a
+                href="https://www.tiktok.com/@7kinze"
+                target="_blank"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  padding: '0.8rem 1.8rem',
+                  background: '#ff0050',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '100px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
+                }}
+              >
+                S&apos;abonner
+              </motion.a>
+            </div>
           </PlatformCard>
 
           {/* YouTube Column */}
@@ -318,44 +354,41 @@ export default function ContentCreation() {
               <span>●</span> YouTube
             </PlatformLabel>
 
-            <VideoCard>
-              <Thumbnail src="/images/destinations/Japon.png" alt="YouTube Video" />
-              <PlayButton whileTap={{ scale: 0.9 }}>
-                <Play fill="white" size={32} />
-              </PlayButton>
-              <VideoInfo>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
-                  Building a Travel App from Scratch
-                </h3>
-                <p style={{ color: '#aaa', fontSize: '0.9rem' }}>
-                  Full process: Design, Code & Launch
-                </p>
-              </VideoInfo>
-            </VideoCard>
+            <YouTubeEmbed>
+              <iframe
+                src="https://www.youtube.com/embed/Fp3SsWY28WE"
+                title="Voyage en Malaisie"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </YouTubeEmbed>
 
-            <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <p style={{ color: '#aaa', marginBottom: '1rem' }}>
-                Join 50K+ subscribers learning mobile development
+            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+              <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                Rejoins la chaîne pour suivre mes aventures
               </p>
-              <motion.button
+              <motion.a
+                href="https://www.youtube.com/@7Kinze?sub_confirmation=1"
+                target="_blank"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  padding: '1rem 2rem',
+                  padding: '0.8rem 1.8rem',
                   background: '#FF0000',
                   color: 'white',
                   border: 'none',
                   borderRadius: '100px',
                   fontWeight: 'bold',
                   cursor: 'pointer',
-                  display: 'flex',
+                  display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  margin: '0 auto'
+                  textDecoration: 'none',
+                  fontSize: '0.9rem',
                 }}
               >
-                Subscribe Now
-              </motion.button>
+                S&apos;abonner
+              </motion.a>
             </div>
           </PlatformCard>
         </ContentGrid>

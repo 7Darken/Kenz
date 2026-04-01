@@ -2,12 +2,12 @@
 
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
-import { Instagram, Twitter, Youtube, Linkedin } from 'lucide-react'
+import { Instagram, Youtube } from 'lucide-react'
 
 // Custom TikTok icon since Lucide might not have it or I want a specific style
 const TikTokIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.394 6.394 0 0 0-5.394 6.365c0 3.532 2.868 6.397 6.406 6.397 3.538 0 6.406-2.865 6.406-6.397V6.22c.703.328 1.482.536 2.299.604V6.686z" />
+    <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.14c0 3.48-2.32 6.66-5.79 7.18-4.78.72-9.14-2.56-9.66-7.3C.68 9.28 4.31 4.91 9.24 5.3c.64.05 1.28.22 1.88.49v4.2c-.17-.07-.35-.1-.53-.13-1.74-.22-3.35.81-3.97 2.47-.73 1.96.25 4.21 2.17 5.03 2.21.94 4.82-.4 5.54-2.7.13-.42.19-.85.19-1.29V.02h-1.19z" />
     </svg>
 )
 
@@ -27,17 +27,24 @@ const Container = styled.div`
 `
 
 const Title = styled.h2`
-  font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 900;
+  font-family: ${props => props.theme.fonts.aesthetic};
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 400;
+  font-style: italic;
   margin-bottom: 3rem;
-  text-transform: uppercase;
-  line-height: 0.9;
-  
+  line-height: 1;
+  color: #fff;
+
   span {
     display: block;
-    color: transparent;
-    -webkit-text-stroke: 2px ${props => props.theme.colors.text};
-    opacity: 0.3;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.5em;
+    font-style: normal;
+    font-family: ${props => props.theme.fonts.main};
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
   }
 `
 
@@ -106,11 +113,9 @@ const SocialCard = styled(motion.a) <{ $color: string }>`
 `
 
 const socials = [
-    { name: 'TikTok', icon: TikTokIcon, color: '#ff0050', link: '#' },
-    { name: 'Instagram', icon: Instagram, color: '#E1306C', link: '#' },
-    { name: 'Twitter', icon: Twitter, color: '#1DA1F2', link: '#' },
-    { name: 'LinkedIn', icon: Linkedin, color: '#0077B5', link: '#' },
-    { name: 'YouTube', icon: Youtube, color: '#FF0000', link: '#' },
+    { name: 'TikTok', icon: TikTokIcon, color: '#ff0050', link: 'https://www.tiktok.com/@7kinze' },
+    { name: 'Instagram', icon: Instagram, color: '#E1306C', link: 'https://www.instagram.com/kenz.dev' },
+    { name: 'YouTube', icon: Youtube, color: '#FF0000', link: 'https://www.youtube.com/@7Kinze' },
 ]
 
 export default function Socials() {
@@ -118,8 +123,8 @@ export default function Socials() {
         <Section id="socials">
             <Container>
                 <Title>
-                    <span>Follow The</span>
-                    Journey
+                    <span>Suivre</span>
+                    L&apos;Aventure
                 </Title>
 
                 <SocialGrid>

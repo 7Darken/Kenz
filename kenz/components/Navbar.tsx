@@ -1,364 +1,523 @@
 'use client'
 
 import styled from 'styled-components'
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { projects } from '@/data/projects'
 import { destinations } from '@/data/destinations'
-import { ChevronDown } from 'lucide-react'
-import confetti from 'canvas-confetti'
+import { ChevronDown, X } from 'lucide-react'
+import { useMode } from '@/contexts/mode-context'
 
-const NavContainer = styled(motion.div)`
+/* ═══════════════════════════════════════════
+   NAVBAR — Full-width frosted bar
+   ═══════════════════════════════════════════ */
+
+const NavOuter = styled(motion.header)<{ $scrolled: boolean }>`
   position: fixed;
-  top: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
-  width: fit-content;
-  max-width: 90vw;
-  
-  @media (max-width: 768px) {
-    top: 1rem;
-    width: 90%;
-  }
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  background: ${p => p.$scrolled ? 'rgba(3, 3, 5, 0.7)' : 'transparent'};
+  backdrop-filter: ${p => p.$scrolled ? 'blur(20px)' : 'none'};
+  border-bottom: 1px solid ${p => p.$scrolled ? 'rgba(255,255,255,0.05)' : 'transparent'};
+  box-shadow: ${p => p.$scrolled ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'};
 `
 
-const NavPill = styled(motion.nav)`
+const NavInner = styled.nav`
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 3rem;
-  padding: 0.8rem 1.5rem;
-  background: rgba(20, 20, 20, 0.6);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 100px;
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  justify-content: space-between;
+  padding: 1rem 2rem;
 
   @media (max-width: 768px) {
-    justify-content: space-between;
-    width: 100%;
-    gap: 1rem;
     padding: 0.8rem 1.2rem;
   }
 `
 
+/* ── Logo ── */
+
 const LogoLink = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
   text-decoration: none;
   color: white;
   font-weight: 700;
-  font-size: 1.2rem;
-  font-family: ${props => props.theme.fonts.aesthetic};
+  font-size: 1.15rem;
+  font-family: ${p => p.theme.fonts.main};
+  letter-spacing: -0.01em;
+  transition: opacity 0.3s ease;
 
-  img {
-    border-radius: 50%;
-  }
+  &:hover { opacity: 0.8; }
+
+  img { border-radius: 50%; }
 `
 
-const Links = styled.div`
+/* ── Desktop Nav ── */
+
+const DesktopNav = styled.div`
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 0.3rem;
 
   @media (max-width: 768px) {
     display: none;
   }
 `
 
-const NavLink = styled(Link)`
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+const NavItem = styled(Link)`
+  font-size: 0.85rem;
+  font-weight: 450;
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  transition: color 0.25s ease, background 0.25s ease;
 
   &:hover {
     color: white;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 2px;
-    background: white;
-    transition: width 0.3s ease;
-    border-radius: 2px;
-  }
-
-  &:hover::after {
-    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
   }
 `
 
-const DropdownContainer = styled.div`
+const DropdownWrap = styled.div`
   position: relative;
+`
+
+const DropdownTrigger = styled.button`
   display: flex;
   align-items: center;
-  height: 100%;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 450;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease;
+
+  &:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+  }
 `
 
-const DropdownMenu = styled(motion.div)`
+const DropdownPanel = styled(motion.div)`
   position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-85%); /* Aggressively shifted left to align with text */
-  margin-top: 0.5rem;
-  background: rgba(20, 20, 20, 0.8);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 0.5rem;
-  min-width: 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
-  overflow: hidden;
+  top: calc(100% + 8px);
+  left: 0;
+  background: rgba(12, 12, 14, 0.92);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 0.4rem;
+  min-width: 260px;
+  box-shadow: 0 16px 48px -8px rgba(0, 0, 0, 0.6);
 
+  /* Invisible bridge so hover doesn't break */
   &::before {
     content: '';
     position: absolute;
-    top: -20px;
+    top: -12px;
     left: 0;
     right: 0;
-    height: 20px;
-    background: transparent;
+    height: 12px;
   }
 `
 
-const DropdownItem = styled(Link)`
+const DropdownLink = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.8rem 1rem;
-  border-radius: 14px;
+  gap: 0.8rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
   text-decoration: none;
   transition: background 0.2s ease;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
+  &:hover { background: rgba(255, 255, 255, 0.06); }
 
   img {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     object-fit: cover;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  }
-
-  div {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-    
-    span {
-      color: white;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    small {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.75rem;
-    }
   }
 `
 
-const PassionButton = styled(motion.button)`
-  background: white;
-  color: black;
-  padding: 0.6rem 1.2rem;
+const DropdownText = styled.div`
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+
+  span {
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 550;
+  }
+
+  small {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.72rem;
+  }
+`
+
+/* ── Right side ── */
+
+const RightGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+`
+
+/* ── Mode Toggle ── */
+
+const ModeToggle = styled.button`
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 100px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border: none;
+  padding: 3px;
   cursor: pointer;
-  transition: transform 0.2s ease;
   position: relative;
-  overflow: hidden;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-
-  /* Shine effect */
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
-    transition: left 0.5s ease;
-  }
-
-  &:hover::after {
-    left: 100%;
-  }
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 `
 
-const MobileMenuButton = styled.button`
+const ModeLabel = styled.span<{ $active: boolean }>`
+  position: relative;
+  z-index: 2;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: ${p => p.$active ? '#000' : 'rgba(255, 255, 255, 0.45)'};
+  border-radius: 100px;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+  user-select: none;
+`
+
+const ModeIndicator = styled(motion.div)`
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 100px;
+  background: white;
+  z-index: 1;
+`
+
+/* ── Mobile ── */
+
+const Burger = styled.button`
   display: none;
   color: white;
   background: none;
   border: none;
   cursor: pointer;
-  
+  padding: 0.3rem;
+
   @media (max-width: 768px) {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `
 
+const MobileOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(3, 3, 5, 0.95);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+`
+
+const MobileTop = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+`
+
+const MobileClose = styled.button`
+  color: white;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3rem;
+`
+
+const MobileLinks = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+`
+
+const MobileLink = styled(Link)`
+  font-size: 1.8rem;
+  font-family: ${p => p.theme.fonts.aesthetic};
+  font-style: italic;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: 0.6rem 0;
+  transition: color 0.3s ease;
+
+  &:hover { color: white; }
+`
+
+const MobileBottom = styled.div`
+  margin-top: auto;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const MobileModeText = styled.span`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+`
+
+/* ═══════════════════════════════════════════
+   COMPONENT
+   ═══════════════════════════════════════════ */
+
 export default function Navbar() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [isTravelDropdownOpen, setIsTravelDropdownOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [projectsDrop, setProjectsDrop] = useState(false)
+  const [travelDrop, setTravelDrop] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const { mode, toggleMode, isPro, isPerso } = useMode()
 
-  const triggerConfetti = () => {
-    const duration = 3 * 1000
-    const animationEnd = Date.now() + duration
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
-
-    const interval: any = setInterval(function () {
-      const timeLeft = animationEnd - Date.now()
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval)
-      }
-
-      const particleCount = 50 * (timeLeft / duration)
-
-      // since particles fall down, start a bit higher than random
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-      })
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-      })
-    }, 250)
-  }
+  // Lock body scroll when mobile menu open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [mobileOpen])
 
   return (
-    <NavContainer
-      initial={{ y: -100, x: "-50%", opacity: 0 }}
-      animate={{ y: 0, x: "-50%", opacity: 1 }}
-      transition={{ duration: 0.8, ease: [0.2, 0.8, 0.2, 1] }}
-    >
-      <NavPill>
-        <LogoLink href="/">
-          <Image src="/images/KzLogo.png" alt="Kenz" width={32} height={32} />
-          Kenz.
-        </LogoLink>
+    <>
+      <NavOuter
+        $scrolled={scrolled}
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <NavInner>
+          <LogoLink href="/">
+            <Image src="/images/KzLogo.png" alt="Kenz" width={30} height={30} />
+            Kenz.
+          </LogoLink>
 
-        <Links>
-          <NavLink href="#about">À propos</NavLink>
+          <DesktopNav>
+            {isPro && (
+              <>
+                <DropdownWrap
+                  onMouseEnter={() => setProjectsDrop(true)}
+                  onMouseLeave={() => setProjectsDrop(false)}
+                >
+                  <DropdownTrigger>
+                    Projets
+                    <ChevronDown
+                      size={13}
+                      style={{
+                        transform: projectsDrop ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease',
+                        opacity: 0.5,
+                      }}
+                    />
+                  </DropdownTrigger>
 
-          <DropdownContainer
-            onMouseEnter={() => setIsDropdownOpen(true)}
-            onMouseLeave={() => setIsDropdownOpen(false)}
-          >
-            <NavLink href="#apps" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Projets
-              <ChevronDown
-                size={14}
+                  <AnimatePresence>
+                    {projectsDrop && (
+                      <DropdownPanel
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.18 }}
+                      >
+                        {projects.map((p) => (
+                          <DropdownLink key={p.id} href={`/apps/${p.slug}`}>
+                            <img src={p.thumbnail} alt={p.name} />
+                            <DropdownText>
+                              <span>{p.name}</span>
+                              <small>{p.period}</small>
+                            </DropdownText>
+                          </DropdownLink>
+                        ))}
+                      </DropdownPanel>
+                    )}
+                  </AnimatePresence>
+                </DropdownWrap>
+                <NavItem href="#kenz-ai">Kenz AI</NavItem>
+                <NavItem
+                  href="#contact"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault()
+                    window.dispatchEvent(new Event('open-contact-modal'))
+                  }}
+                >
+                  Contact
+                </NavItem>
+              </>
+            )}
+
+            {isPerso && (
+              <>
+                <NavItem href="#content">Contenu</NavItem>
+                <DropdownWrap
+                  onMouseEnter={() => setTravelDrop(true)}
+                  onMouseLeave={() => setTravelDrop(false)}
+                >
+                  <DropdownTrigger>
+                    Voyages
+                    <ChevronDown
+                      size={13}
+                      style={{
+                        transform: travelDrop ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.3s ease',
+                        opacity: 0.5,
+                      }}
+                    />
+                  </DropdownTrigger>
+
+                  <AnimatePresence>
+                    {travelDrop && (
+                      <DropdownPanel
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.18 }}
+                      >
+                        {destinations.map((d) => (
+                          <DropdownLink key={d.id} href={`/destination/${d.slug}`}>
+                            <img src={d.imageUrl} alt={d.name} />
+                            <DropdownText>
+                              <span>{d.country}</span>
+                              <small>{d.name}</small>
+                            </DropdownText>
+                          </DropdownLink>
+                        ))}
+                      </DropdownPanel>
+                    )}
+                  </AnimatePresence>
+                </DropdownWrap>
+                <NavItem href="#socials">Réseaux</NavItem>
+              </>
+            )}
+          </DesktopNav>
+
+          <RightGroup>
+            <ModeToggle onClick={toggleMode}>
+              <ModeLabel $active={mode === 'pro'}>Pro</ModeLabel>
+              <ModeLabel $active={mode === 'perso'}>Moi</ModeLabel>
+              <ModeIndicator
+                layout
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 style={{
-                  transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.3s ease'
+                  left: mode === 'pro' ? 3 : '50%',
+                  right: mode === 'perso' ? 3 : '50%',
                 }}
               />
-            </NavLink>
+            </ModeToggle>
 
-            <AnimatePresence>
-              {isDropdownOpen && (
-                <DropdownMenu
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {projects.map((project) => (
-                    <DropdownItem key={project.id} href={`/apps/${project.slug}`}>
-                      <img src={project.thumbnail} alt={project.name} />
-                      <div>
-                        <span>{project.name}</span>
-                        <small>App Mobile</small>
-                      </div>
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              )}
-            </AnimatePresence>
-          </DropdownContainer>
+            <Burger onClick={() => setMobileOpen(true)} aria-label="Menu">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </Burger>
+          </RightGroup>
+        </NavInner>
+      </NavOuter>
 
-          <DropdownContainer
-            onMouseEnter={() => setIsTravelDropdownOpen(true)}
-            onMouseLeave={() => setIsTravelDropdownOpen(false)}
+      {/* ── Mobile menu ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <MobileOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <NavLink href="#travel" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Voyages
-              <ChevronDown
-                size={14}
-                style={{
-                  transform: isTravelDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 0.3s ease'
-                }}
-              />
-            </NavLink>
+            <MobileTop>
+              <LogoLink href="/" onClick={() => setMobileOpen(false)}>
+                <Image src="/images/KzLogo.png" alt="Kenz" width={28} height={28} />
+                Kenz.
+              </LogoLink>
+              <MobileClose onClick={() => setMobileOpen(false)} aria-label="Fermer">
+                <X size={24} />
+              </MobileClose>
+            </MobileTop>
 
-            <AnimatePresence>
-              {isTravelDropdownOpen && (
-                <DropdownMenu
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {destinations.map((destination) => (
-                    <DropdownItem key={destination.id} href={`/destination/${destination.slug}`}>
-                      <img src={destination.imageUrl} alt={destination.name} />
-                      <div>
-                        <span>{destination.country}</span>
-                        <small>{destination.name}</small>
-                      </div>
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
+            <MobileLinks>
+              {isPro && (
+                <>
+                  <MobileLink href="/#apps" onClick={() => setMobileOpen(false)}>Projets</MobileLink>
+                  <MobileLink href="/#kenz-ai" onClick={() => setMobileOpen(false)}>Kenz AI</MobileLink>
+                  <MobileLink
+                    href="#"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault()
+                      setMobileOpen(false)
+                      window.dispatchEvent(new Event('open-contact-modal'))
+                    }}
+                  >
+                    Contact
+                  </MobileLink>
+                </>
               )}
-            </AnimatePresence>
-          </DropdownContainer>
-        </Links>
+              {isPerso && (
+                <>
+                  <MobileLink href="/#content" onClick={() => setMobileOpen(false)}>Contenu</MobileLink>
+                  <MobileLink href="/#travel" onClick={() => setMobileOpen(false)}>Voyages</MobileLink>
+                  <MobileLink href="/#socials" onClick={() => setMobileOpen(false)}>Réseaux</MobileLink>
+                </>
+              )}
+            </MobileLinks>
 
-        <PassionButton onClick={triggerConfetti}>
-          Passion
-        </PassionButton>
-
-        <MobileMenuButton>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 12h18M3 6h18M3 18h18" />
-          </svg>
-        </MobileMenuButton>
-      </NavPill>
-    </NavContainer>
+            <MobileBottom>
+              <MobileModeText>Mode</MobileModeText>
+              <ModeToggle onClick={toggleMode}>
+                <ModeLabel $active={mode === 'pro'}>Pro</ModeLabel>
+                <ModeLabel $active={mode === 'perso'}>Moi</ModeLabel>
+                <ModeIndicator
+                  layout
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  style={{
+                    left: mode === 'pro' ? 3 : '50%',
+                    right: mode === 'perso' ? 3 : '50%',
+                  }}
+                />
+              </ModeToggle>
+            </MobileBottom>
+          </MobileOverlay>
+        )}
+      </AnimatePresence>
+    </>
   )
 }

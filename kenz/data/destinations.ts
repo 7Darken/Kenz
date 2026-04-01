@@ -3,6 +3,7 @@ export type Destination = {
   slug: string;
   name: string;
   country: string;
+  countryCode: string;
   description: string;
   imageUrl: string;
   stats: {
@@ -18,6 +19,7 @@ export const destinations: Destination[] = [
     slug: 'japon',
     name: 'Tokyo & Kyoto',
     country: 'Japon',
+    countryCode: 'jp',
     description: 'Une immersion entre tradition millénaire et futurisme néon. Des temples zen aux quartiers électriques d\'Akihabara.',
     imageUrl: '/images/destinations/Japon.png',
     stats: [
@@ -31,6 +33,7 @@ export const destinations: Destination[] = [
     slug: 'islande',
     name: 'South Coast',
     country: 'Islande',
+    countryCode: 'is',
     description: 'Terre de glace et de feu. Cascades géantes, plages de sable noir et aurores boréales.',
     imageUrl: '/images/destinations/Islande.png',
     stats: [
@@ -44,6 +47,7 @@ export const destinations: Destination[] = [
     slug: 'chine',
     name: 'Shanghai & Beijing',
     country: 'Chine',
+    countryCode: 'cn',
     description: 'La grandeur de la Grande Muraille et la modernité vertigineuse des gratte-ciels.',
     imageUrl: '/images/destinations/Chine.png',
     stats: [
@@ -57,6 +61,7 @@ export const destinations: Destination[] = [
     slug: 'coree',
     name: 'Seoul',
     country: 'Corée du Sud',
+    countryCode: 'kr',
     description: 'K-Pop, Street Food et Palais Royaux. Une ville qui ne dort jamais.',
     imageUrl: '/images/destinations/Coree.png',
     stats: [
@@ -70,6 +75,7 @@ export const destinations: Destination[] = [
     slug: 'malaisie',
     name: 'Kuala Lumpur',
     country: 'Malaisie',
+    countryCode: 'my',
     description: 'Un melting-pot culturel au cœur de l\'Asie du Sud-Est. Tours Petronas et jungle urbaine.',
     imageUrl: '/images/destinations/Malaisie.png',
     stats: [
