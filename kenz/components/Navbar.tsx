@@ -330,7 +330,7 @@ export default function Navbar() {
       >
         <NavInner>
           <LogoLink href="/">
-            <Image src="/images/KzLogo.png" alt="Kenz" width={30} height={30} />
+            <Image src="/images/KzLogo.webp" alt="Kenz" width={30} height={30} />
             Kenz.
           </LogoLink>
 
@@ -363,7 +363,7 @@ export default function Navbar() {
                       >
                         {projects.map((p) => (
                           <DropdownLink key={p.id} href={`/apps/${p.slug}`}>
-                            <img src={p.thumbnail} alt={p.name} />
+                            <Image src={p.thumbnail} alt={p.name} width={34} height={34} />
                             <DropdownText>
                               <span>{p.name}</span>
                               <small>{p.period}</small>
@@ -416,7 +416,7 @@ export default function Navbar() {
                       >
                         {destinations.map((d) => (
                           <DropdownLink key={d.id} href={`/destination/${d.slug}`}>
-                            <img src={d.imageUrl} alt={d.name} />
+                            <Image src={d.imageUrl} alt={d.name} width={34} height={34} />
                             <DropdownText>
                               <span>{d.country}</span>
                               <small>{d.name}</small>
@@ -466,7 +466,7 @@ export default function Navbar() {
           >
             <MobileTop>
               <LogoLink href="/" onClick={() => setMobileOpen(false)}>
-                <Image src="/images/KzLogo.png" alt="Kenz" width={28} height={28} />
+                <Image src="/images/KzLogo.webp" alt="Kenz" width={28} height={28} />
                 Kenz.
               </LogoLink>
               <MobileClose onClick={() => setMobileOpen(false)} aria-label="Fermer">

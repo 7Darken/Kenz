@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { projects } from '@/data/projects'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, ArrowUpRight, ExternalLink, ChevronRight, ChevronLeft, Globe } from 'lucide-react'
 
 /* ═══════════════════════════════════════════
@@ -177,9 +178,9 @@ const SocialBtn = styled.a<{ $glow: string }>`
   gap: 0.5rem;
   padding: 0.85rem 1.4rem;
   border-radius: 100px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.85rem;
@@ -189,19 +190,18 @@ const SocialBtn = styled.a<{ $glow: string }>`
     width: 16px;
     height: 16px;
     object-fit: contain;
-    opacity: 0.7;
   }
 
   svg {
     width: 14px;
     height: 14px;
-    opacity: 0.5;
   }
 
   &:hover {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: ${p => p.$glow}60;
+    box-shadow: 0 0 30px ${p => p.$glow}20;
+    transform: translateY(-2px);
   }
 `
 
@@ -652,7 +652,14 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <img src={project.thumbnail} alt={project.name} />
+          <Image
+            src={project.thumbnail}
+            alt={project.name}
+            width={140}
+            height={140}
+            sizes="140px"
+            priority
+          />
         </IconWrapper>
 
         <HeroContent>
@@ -692,7 +699,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 rel="noopener noreferrer"
                 $glow={glow}
               >
-                <img src="/images/icons/Apple_logo_white.png" alt="Apple" />
+                <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={18} height={18} />
                 Télécharger
               </AppStoreBtn>
             )}
@@ -705,7 +712,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             )}
             {otherSocials.map((social, i) => (
               <SocialBtn key={i} href={social.href} target="_blank" $glow={glow}>
-                {social.icon && <img src={social.icon} alt="" />}
+                {social.icon && <Image src={social.icon} alt="" width={16} height={16} />}
                 {social.title}
                 <ExternalLink />
               </SocialBtn>
@@ -773,7 +780,14 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <img src={src} alt={`${project.name} screenshot ${i + 1}`} />
+                  <Image
+                    src={src}
+                    alt={`${project.name} screenshot ${i + 1}`}
+                    width={240}
+                    height={520}
+                    sizes="(max-width: 768px) 200px, 240px"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                  />
                 </PhoneFrame>
               ))
             ) : (
@@ -891,7 +905,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
           >
-            <img src="/images/icons/Apple_logo_white.png" alt="Apple" />
+            <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={18} height={18} />
             Télécharger maintenant
             <ArrowUpRight size={16} />
           </CTAButton>

@@ -47,7 +47,7 @@ const logos: {
     blur: 0.9,
   },
   {
-    src: "/images/projects/Oshii_dark.png",
+    src: "/images/projects/Oshii_dark.webp",
     alt: "Oshii logo",
     delay: 0.18,
     size: 82,
@@ -56,7 +56,7 @@ const logos: {
     blur: 0.95,
   },
   {
-    src: "/images/projects/Zenko.png",
+    src: "/images/projects/Zenko.webp",
     alt: "Zenko logo",
     delay: 0.24,
     size: 94,

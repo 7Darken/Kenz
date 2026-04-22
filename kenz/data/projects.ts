@@ -44,7 +44,7 @@ export const projects: Project[] = [
     period: "2025 · App mobile",
     description:
       "Garde toutes tes recettes TikTok au même endroit Oshii convertit les vidéos en vraies recettes prêtes à cuisiner !",
-    thumbnail: "/images/projects/oshii/icon.png",
+    thumbnail: "/images/projects/oshii/icon.webp",
     glowColor: "#ff2330",
     screenshots: [
       "/images/projects/oshii/screenshots/460x996bb.webp",
@@ -60,13 +60,13 @@ export const projects: Project[] = [
         label: "Télécharger sur",
         href: "https://apps.apple.com/fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905",
         title: "App Store",
-        icon: "/images/icons/Apple_logo_white.png",
+        icon: "/images/icons/Apple_logo_white.webp",
       },
       {
         label: "Tiktok",
         href: "https://kenz.blog/nebula",
         title: "+1 abonnés",
-        icon: "/images/icons/tiktok_white.png",
+        icon: "/images/icons/tiktok_white.webp",
       },
     ],
     detail: {
@@ -113,25 +113,25 @@ export const projects: Project[] = [
     period: "2025 · App mobile",
     description:
       "Ton compagnon de voyage intelligent,des programmes quotidiens personnalisés adaptés à vos envies et à votre budget.",
-    thumbnail: "/images/projects/zenko/icon.png",
+    thumbnail: "/images/projects/zenko/icon.webp",
     glowColor: "#944f29",
     screenshots: [
-      "/images/projects/zenko/screenshots/Simulator Screenshot - iPhone 16 - 2025-10-07 at 14.51.22.png",
-      "/images/projects/zenko/screenshots/simulator_screenshot_0F87DCF3-7B95-49D6-A78C-14F2DAC1B13E.png",
-      "/images/projects/zenko/screenshots/simulator_screenshot_2AFCECC9-DC68-4C66-9685-EF373A9913FD.png",
+      "/images/projects/zenko/screenshots/Simulator Screenshot - iPhone 16 - 2025-10-07 at 14.51.22.webp",
+      "/images/projects/zenko/screenshots/simulator_screenshot_0F87DCF3-7B95-49D6-A78C-14F2DAC1B13E.webp",
+      "/images/projects/zenko/screenshots/simulator_screenshot_2AFCECC9-DC68-4C66-9685-EF373A9913FD.webp",
     ],
     socials: [
       {
         label: "Télécharger sur",
         href: "https://apps.apple.com/ch/app/zenko/id6753706200?l=fr-FR",
         title: "App Store",
-        icon: "/images/icons/Apple_logo_white.png",
+        icon: "/images/icons/Apple_logo_white.webp",
       },
       {
         label: "Tiktok",
         href: "https://www.tiktok.com/@7kinze",
         title: "+10K abonnés",
-        icon: "/images/icons/tiktok_white.png",
+        icon: "/images/icons/tiktok_white.webp",
       },
     ],
     detail: {
@@ -178,22 +178,22 @@ export const projects: Project[] = [
     period: "2025 · App mobile",
     description:
       "Apprends le japonais de manière intuitive avec des leçons interactives, du vocabulaire contextuel et un suivi de progression personnalisé.",
-    thumbnail: "/images/projects/sago/icon.png",
+    thumbnail: "/images/projects/sago/icon.webp",
     glowColor: "#e74c6f",
     liveUrl: "https://sago-landing.vercel.app/",
     screenshots: [
-      "/images/projects/sago/screenshots/preview-1.png",
-      "/images/projects/sago/screenshots/preview-2.png",
-      "/images/projects/sago/screenshots/preview-3.png",
-      "/images/projects/sago/screenshots/preview-4.png",
-      "/images/projects/sago/screenshots/preview-5.png",
+      "/images/projects/sago/screenshots/preview-1.webp",
+      "/images/projects/sago/screenshots/preview-2.webp",
+      "/images/projects/sago/screenshots/preview-3.webp",
+      "/images/projects/sago/screenshots/preview-4.webp",
+      "/images/projects/sago/screenshots/preview-5.webp",
     ],
     socials: [
       {
         label: "Télécharger sur",
-        href: "#",
+        href: "https://apps.apple.com/fr/app/id6759610780",
         title: "App Store",
-        icon: "/images/icons/Apple_logo_white.png",
+        icon: "/images/icons/Apple_logo_white.webp",
       },
     ],
     detail: {
@@ -233,5 +233,66 @@ export const projects: Project[] = [
       ],
     },
   },
-
+  {
+    id: 4,
+    slug: "miru",
+    name: "Miru: Imposteur Loup Garou",
+    period: "2026 · App mobile",
+    description:
+      "Le jeu party entre amis ou en famille : imposteur, loup-garou et mini-jeux en ligne, avec des catégories animes, nourriture, acteurs et bien plus.",
+    thumbnail: "/images/projects/miru/icon.webp",
+    glowColor: "#7c3aed",
+    liveUrl: "https://v0-miru-website.vercel.app/",
+    screenshots: [
+      "/images/projects/miru/screenshots/untitled-project-1242x2688.webp",
+      "/images/projects/miru/screenshots/untitled-project-1242x2688 (1).webp",
+      "/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.27.19.webp",
+      "/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.29.59.webp",
+      "/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.30.20.webp",
+    ],
+    socials: [
+      {
+        label: "Télécharger sur",
+        href: "https://apps.apple.com/ch/app/id6761622088",
+        title: "App Store",
+        icon: "/images/icons/Apple_logo_white.webp",
+      },
+    ],
+    detail: {
+      headline: "Le jeu party à partager entre amis ou en famille",
+      subheadline:
+        "Miru réunit tes proches autour de parties d'imposteur, de loup-garou et de mini-jeux en ligne, avec un catalogue de catégories prêtes à l'emploi.",
+      overview: [
+        "Rooms multijoueur en ligne pour rejoindre tes amis ou ta famille où qu'ils soient et lancer une partie en quelques secondes.",
+        "Modes imposteur, loup-garou et mini-jeux animés par une belle variété de catégories : animes, nourriture, acteurs, et bien plus.",
+        "Fonctionnalité clé : crée tes propres catégories personnalisées assistées par IA pour des parties 100% à ton image.",
+      ],
+      stats: [
+        {
+          label: "Modes de jeu",
+          value: "15+",
+          description: "Imposteur, loup-garou & mini-jeux",
+          accentColor: "#a855f7",
+        },
+        {
+          label: "Joueurs par room",
+          value: "12",
+          description: "En ligne et en simultané",
+          accentColor: "#22d3ee",
+        },
+        {
+          label: "Rôles uniques",
+          value: "30+",
+          description: "Pour varier chaque partie",
+          accentColor: "#f472b6",
+        },
+        {
+          label: "Catégories",
+          value: "20+",
+          description: "Animes, nourriture, acteurs… + IA perso",
+          accentColor: "#facc15",
+        },
+      ],
+    },
+  },
 ];

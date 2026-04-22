@@ -268,7 +268,7 @@ export function SiteHeader() {
     <>
       <HeaderRoot $scrolled={scrolled}>
         <Brand href="/" onClick={() => setMenuOpen(false)}>
-          <BrandLogo src="/images/KzLogo.png" alt="Kenz" width={120} height={48} priority />
+          <BrandLogo src="/images/KzLogo.webp" alt="Kenz" width={120} height={48} priority />
         </Brand>
         <NavBar>
           {navigation.map((item) => (
@@ -311,7 +311,7 @@ export function SiteHeader() {
               transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             >
               <Brand href="/" onClick={() => setMenuOpen(false)}>
-                <BrandLogo src="/images/KzLogo.png" alt="Kenz" width={112} height={44} priority />
+                <BrandLogo src="/images/KzLogo.webp" alt="Kenz" width={112} height={44} priority />
               </Brand>
               <MobileLinks>
                 {navigation.map((item) => (

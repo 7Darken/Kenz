@@ -39,7 +39,7 @@ const BackgroundLayer = styled.div`
 const PersoBackground = styled.div`
   position: absolute;
   inset: 0;
-  background: url('/images/background-moi.png') center center / cover no-repeat;
+  background: url('/images/background-moi.webp') center center / cover no-repeat;
   z-index: 0;
   pointer-events: none;
 `
@@ -627,7 +627,7 @@ export default function Hero() {
               >
                 <ProPhoto>
                   <Image
-                    src="/images/Pro-pp.png"
+                    src="/images/Pro-pp.webp"
                     alt="Kenz"
                     fill
                     sizes="(max-width: 768px) 340px, 560px"
@@ -662,8 +662,8 @@ export default function Hero() {
                 transition={{ delay: 1.1, duration: 0.8 }}
               >
                 <AvatarStack>
-                  <Image src="/images/projects/oshii/icon.png" alt="" width={32} height={32} />
-                  <Image src="/images/projects/zenko/icon.png" alt="" width={32} height={32} />
+                  <Image src="/images/projects/oshii/icon.webp" alt="" width={32} height={32} />
+                  <Image src="/images/projects/zenko/icon.webp" alt="" width={32} height={32} />
                 </AvatarStack>
                 <TrustText>
                   <strong>3 apps</strong> publiées sur l&apos;App Store avec <strong>12k+ téléchargements</strong>
@@ -737,7 +737,7 @@ export default function Hero() {
               >
                 <ProPhoto>
                   <Image
-                    src="/images/Moi-pp.png"
+                    src="/images/Moi-pp.webp"
                     alt="Kenz"
                     fill
                     sizes="(max-width: 768px) 340px, 560px"

@@ -21,7 +21,7 @@ export const destinations: Destination[] = [
     country: 'Japon',
     countryCode: 'jp',
     description: 'Une immersion entre tradition millénaire et futurisme néon. Des temples zen aux quartiers électriques d\'Akihabara.',
-    imageUrl: '/images/destinations/Japon.png',
+    imageUrl: '/images/destinations/Japon.webp',
     stats: [
       { label: 'Durée', value: '3 semaines' },
       { label: 'Saison', value: 'Printemps' },
@@ -35,7 +35,7 @@ export const destinations: Destination[] = [
     country: 'Islande',
     countryCode: 'is',
     description: 'Terre de glace et de feu. Cascades géantes, plages de sable noir et aurores boréales.',
-    imageUrl: '/images/destinations/Islande.png',
+    imageUrl: '/images/destinations/Islande.webp',
     stats: [
       { label: 'Durée', value: '10 jours' },
       { label: 'Saison', value: 'Hiver' },
@@ -49,7 +49,7 @@ export const destinations: Destination[] = [
     country: 'Chine',
     countryCode: 'cn',
     description: 'La grandeur de la Grande Muraille et la modernité vertigineuse des gratte-ciels.',
-    imageUrl: '/images/destinations/Chine.png',
+    imageUrl: '/images/destinations/Chine.webp',
     stats: [
       { label: 'Durée', value: '2 semaines' },
       { label: 'Saison', value: 'Automne' },
@@ -63,7 +63,7 @@ export const destinations: Destination[] = [
     country: 'Corée du Sud',
     countryCode: 'kr',
     description: 'K-Pop, Street Food et Palais Royaux. Une ville qui ne dort jamais.',
-    imageUrl: '/images/destinations/Coree.png',
+    imageUrl: '/images/destinations/Coree.webp',
     stats: [
       { label: 'Durée', value: '2 semaines' },
       { label: 'Saison', value: 'Été' },
@@ -77,7 +77,7 @@ export const destinations: Destination[] = [
     country: 'Malaisie',
     countryCode: 'my',
     description: 'Un melting-pot culturel au cœur de l\'Asie du Sud-Est. Tours Petronas et jungle urbaine.',
-    imageUrl: '/images/destinations/Malaisie.png',
+    imageUrl: '/images/destinations/Malaisie.webp',
     stats: [
       { label: 'Durée', value: '1 semaine' },
       { label: 'Saison', value: 'Toute l\'année' },

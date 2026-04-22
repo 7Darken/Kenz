@@ -9,14 +9,14 @@
   "description": "Kenz en Bien. Toujours dans le bon. Créateur de contenu, ingénieur développeur d'application pour aider et facilité le quotidien des gens. Oui, on peut dire philanthrope.",
   "icons": [
     {
-      "src": "/images/KzLogo.png",
+      "src": "/images/KzLogo.webp",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/webp"
     },
     {
-      "src": "/images/KzLogo.png",
+      "src": "/images/KzLogo.webp",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/webp"
     }
   ]
 }

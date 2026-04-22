@@ -148,7 +148,7 @@ export default function Footer() {
         <TopRow>
           <BrandCol>
             <LogoRow>
-              <Image src="/images/KzLogo.png" alt="Kenz" width={28} height={28} />
+              <Image src="/images/KzLogo.webp" alt="Kenz" width={28} height={28} />
               <LogoText>Kenz Narainen</LogoText>
             </LogoRow>
             <Bio>

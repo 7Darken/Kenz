@@ -65,7 +65,7 @@ export const metadata: Metadata = {
       "Portfolio de Kenz Narainen — Développeur Full Stack, créateur d'applications mobiles et créateur de contenu voyage.",
     images: [
       {
-        url: "/images/Pro-pp.png",
+        url: "/images/Pro-pp.webp",
         width: 1200,
         height: 630,
         alt: "Kenz Narainen — Portfolio",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     title: "Kenz Narainen | Développeur Full Stack & Créateur de Contenu",
     description:
       "Portfolio de Kenz Narainen — Apps mobiles, développement web et création de contenu voyage.",
-    images: ["/images/Pro-pp.png"],
+    images: ["/images/Pro-pp.webp"],
   },
   robots: {
     index: true,
@@ -92,11 +92,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/KzLogo.png", type: "image/png", sizes: "32x32" },
-      { url: "/images/KzLogo.png", type: "image/png", sizes: "16x16" },
+      { url: "/images/KzLogo.webp", type: "image/webp", sizes: "32x32" },
+      { url: "/images/KzLogo.webp", type: "image/webp", sizes: "16x16" },
     ],
-    shortcut: "/images/KzLogo.png",
-    apple: "/images/KzLogo.png",
+    shortcut: "/images/KzLogo.webp",
+    apple: "/images/KzLogo.webp",
   },
 };
 
@@ -116,7 +116,7 @@ export default function RootLayout({
               "@type": "Person",
               name: "Kenz Narainen",
               url: "https://kenzenbien.fr",
-              image: "https://kenzenbien.fr/images/Pro-pp.png",
+              image: "https://kenzenbien.fr/images/Pro-pp.webp",
               jobTitle: "Full Stack Developer",
               description: "Développeur Full Stack et créateur de contenu voyage (en Bien en Asie) basé à Paris.",
               sameAs: [

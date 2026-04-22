@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import { projects } from '@/data/projects'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 
 const Section = styled.section`
@@ -51,8 +52,9 @@ const CardsRow = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  gap: 2.5rem;
-  max-width: 1200px;
+  flex-wrap: wrap;
+  gap: 2rem;
+  max-width: 1500px;
   width: 100%;
 
   @media (max-width: 968px) {
@@ -62,13 +64,10 @@ const CardsRow = styled.div`
   }
 `
 
-const CardOuter = styled(motion.div)<{ $position: 'left' | 'center' | 'right' }>`
+const CardOuter = styled(motion.div)<{ $rotate: number; $offset: number }>`
   position: relative;
-  margin-top: ${p => p.$position === 'center' ? '0' : '50px'};
-  rotate: ${p =>
-    p.$position === 'left' ? '-3deg' :
-    p.$position === 'right' ? '3deg' : '0deg'
-  };
+  margin-top: ${p => p.$offset}px;
+  rotate: ${p => p.$rotate}deg;
   transition: rotate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
               transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -200,13 +199,28 @@ const DetailButton = styled(PillButton)`
   &:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.25); }
 `
 
-const positions: ('left' | 'center' | 'right')[] = ['left', 'center', 'right']
-// Display order: Zenko (index 1) left, Oshii (index 0) center, Sago (index 2) right
-const displayOrder = [1, 0, 2]
+// Display order: Zenko, Oshii, Sago, Miru — étalés en éventail
+const displayOrder = [1, 0, 2, 3]
+
+// Gère dynamiquement 3 ou 4 cartes (rotation + offset vertical)
+const layoutsByCount: Record<number, { rotate: number; offset: number }[]> = {
+  3: [
+    { rotate: -3, offset: 50 },
+    { rotate: 0, offset: 0 },
+    { rotate: 3, offset: 50 },
+  ],
+  4: [
+    { rotate: -4, offset: 60 },
+    { rotate: -1.5, offset: 10 },
+    { rotate: 1.5, offset: 10 },
+    { rotate: 4, offset: 60 },
+  ],
+}
 
 export default function MobileApps() {
   const router = useRouter()
   const orderedProjects = displayOrder.map(i => projects[i]).filter(Boolean)
+  const layout = layoutsByCount[orderedProjects.length] || layoutsByCount[3]
 
   return (
     <Section id="apps">
@@ -233,10 +247,13 @@ export default function MobileApps() {
         {orderedProjects.map((project, index) => {
           const appStoreLink = project.socials?.find(s => s.title === 'App Store')?.href || '#'
 
+          const slot = layout[index] || { rotate: 0, offset: 0 }
+
           return (
             <CardOuter
               key={project.id}
-              $position={positions[index] || 'center'}
+              $rotate={slot.rotate}
+              $offset={slot.offset}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -253,7 +270,13 @@ export default function MobileApps() {
                 <CardNumber>0{index + 1}</CardNumber>
 
                 <ImageWrapper>
-                  <img src={project.thumbnail} alt={project.name} />
+                  <Image
+                    src={project.thumbnail}
+                    alt={project.name}
+                    width={180}
+                    height={180}
+                    sizes="180px"
+                  />
                 </ImageWrapper>
 
                 <TextContent>
@@ -262,7 +285,7 @@ export default function MobileApps() {
 
                   <ButtonRow onClick={(e) => e.stopPropagation()}>
                     <DownloadButton href={appStoreLink} target="_blank" rel="noopener noreferrer">
-                      <img src="/images/icons/Apple_logo_white.png" alt="Apple" />
+                      <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={16} height={16} />
                       Télécharger
                     </DownloadButton>
                     <DetailButton

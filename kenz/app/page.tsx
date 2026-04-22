@@ -1,18 +1,20 @@
 'use client'
 
 import Hero from '@/components/Hero'
-import Impact from '@/components/Impact'
-import TechStack from '@/components/TechStack'
-import MobileApps from '@/components/MobileApps'
-import TravelShowcase from '@/components/TravelShowcase'
-import Socials from '@/components/Socials'
-import Footer from '@/components/Footer'
-import ContentCreation from '@/components/ContentCreation'
-import Contact from '@/components/Contact'
-import SportTimeline from '@/components/SportTimeline'
+import dynamic from 'next/dynamic'
 import styled from 'styled-components'
 import { useMode } from '@/contexts/mode-context'
 import { AnimatePresence, motion } from 'framer-motion'
+
+const Impact = dynamic(() => import('@/components/Impact'))
+const TechStack = dynamic(() => import('@/components/TechStack'))
+const MobileApps = dynamic(() => import('@/components/MobileApps'))
+const TravelShowcase = dynamic(() => import('@/components/TravelShowcase'))
+const Socials = dynamic(() => import('@/components/Socials'))
+const Footer = dynamic(() => import('@/components/Footer'))
+const ContentCreation = dynamic(() => import('@/components/ContentCreation'))
+const Contact = dynamic(() => import('@/components/Contact'))
+const SportTimeline = dynamic(() => import('@/components/SportTimeline'))
 
 const Main = styled.main`
   width: 100%;

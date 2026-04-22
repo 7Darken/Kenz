@@ -412,7 +412,7 @@ function ChatMessage({ msg, shouldAnimate, onDone }: {
     >
       {isKenz && (
         <MsgAvatar>
-          <Image src="/images/Pro-pp.png" alt="Kenz" width={28} height={28} />
+          <Image src="/images/Pro-pp.webp" alt="Kenz" width={28} height={28} />
         </MsgAvatar>
       )}
       <div>
@@ -543,7 +543,7 @@ export default function TechStack() {
         >
           <ChatHeader>
             <ChatAvatar>
-              <Image src="/images/Pro-pp.png" alt="Kenz" width={32} height={32} />
+              <Image src="/images/Pro-pp.webp" alt="Kenz" width={32} height={32} />
             </ChatAvatar>
             <ChatHeaderInfo>
               <ChatHeaderName>Kenz</ChatHeaderName>
@@ -566,7 +566,7 @@ export default function TechStack() {
             {isTyping && (
               <TypingIndicator initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <MsgAvatar>
-                  <Image src="/images/Pro-pp.png" alt="Kenz" width={28} height={28} />
+                  <Image src="/images/Pro-pp.webp" alt="Kenz" width={28} height={28} />
                 </MsgAvatar>
                 <span>Kenz écrit</span>
               </TypingIndicator>

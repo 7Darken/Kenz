@@ -17,7 +17,7 @@ export interface DestinationDetail {
 export const destinationDetails: Record<string, DestinationDetail> = {
   japon: {
     slug: "japon",
-    heroImage: "/images/destinations/Japon.png",
+    heroImage: "/images/destinations/Japon.webp",
     badge: "日本国",
     title: "JAPON",
     subtitle: "Le pays du soleil levant entre tradition et avant-garde",
@@ -48,7 +48,7 @@ export const destinationDetails: Record<string, DestinationDetail> = {
   },
   islande: {
     slug: "islande",
-    heroImage: "/images/destinations/Islande.png",
+    heroImage: "/images/destinations/Islande.webp",
     badge: "ÍSLAND",
     title: "ISLANDE",
     subtitle: "Terre de feu, de glace et d'aurores",
@@ -79,7 +79,7 @@ export const destinationDetails: Record<string, DestinationDetail> = {
   },
   chine: {
     slug: "chine",
-    heroImage: "/images/destinations/Chine.png",
+    heroImage: "/images/destinations/Chine.webp",
     badge: "中国",
     title: "CHINE",
     subtitle: "Dynasties, innovation et contrastes infinis",
@@ -105,7 +105,7 @@ export const destinationDetails: Record<string, DestinationDetail> = {
   },
   "coree-du-sud": {
     slug: "coree-du-sud",
-    heroImage: "/images/destinations/Coree.png",
+    heroImage: "/images/destinations/Coree.webp",
     badge: "대한민국",
     title: "CORÉE DU SUD",
     subtitle: "Entre pop culture et temples majestueux",
@@ -131,7 +131,7 @@ export const destinationDetails: Record<string, DestinationDetail> = {
   },
   malaisie: {
     slug: "malaisie",
-    heroImage: "/images/destinations/Malaisie.png",
+    heroImage: "/images/destinations/Malaisie.webp",
     badge: "ماليزيا",
     title: "MALAISIE",
     subtitle: "Jungle luxuriante et villes scintillantes",

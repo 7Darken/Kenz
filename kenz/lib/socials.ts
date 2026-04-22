@@ -26,7 +26,7 @@ const socialDefinitions: Record<SocialLabel, SocialDefinition> = {
     label: "TikTok",
     icon: ({ size = 16 } = {}) =>
       createElement(Image, {
-        src: "/images/icons/tiktok_white.png",
+        src: "/images/icons/tiktok_white.webp",
         alt: "TikTok",
         width: size,
         height: size,
@@ -61,7 +61,7 @@ const socialDefinitions: Record<SocialLabel, SocialDefinition> = {
     label: "Apple",
     icon: ({ size = 16 } = {}) =>
       createElement(Image, {
-        src: "/images/icons/Apple_logo_white.png",
+        src: "/images/icons/Apple_logo_white.webp",
         alt: "Apple",
         width: size,
         height: size,
