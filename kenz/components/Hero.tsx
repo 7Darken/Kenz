@@ -522,6 +522,7 @@ export default function Hero() {
   const { isPro } = useMode()
   const [stepIndex, setStepIndex] = useState(0)
   const steps = isPro ? proSteps : persoSteps
+  const currentStep = steps[stepIndex % steps.length]
 
   useEffect(() => {
     setStepIndex(0)
@@ -603,8 +604,8 @@ export default function Hero() {
                     exit={{ opacity: 0, y: -15, filter: 'blur(6px)' }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <ProNameWhite>{steps[stepIndex][0]} </ProNameWhite>
-                    <ProNameGreen>{steps[stepIndex][1]}</ProNameGreen>
+                    <ProNameWhite>{currentStep[0]} </ProNameWhite>
+                    <ProNameGreen>{currentStep[1]}</ProNameGreen>
                   </motion.span>
                 </AnimatePresence>
               </ProNameLine>
@@ -713,8 +714,8 @@ export default function Hero() {
                     exit={{ opacity: 0, y: -15, filter: 'blur(6px)' }}
                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    <ProNameWhite>{steps[stepIndex][0]} </ProNameWhite>
-                    <PersoNameOrange>{steps[stepIndex][1]}</PersoNameOrange>
+                    <ProNameWhite>{currentStep[0]} </ProNameWhite>
+                    <PersoNameOrange>{currentStep[1]}</PersoNameOrange>
                   </motion.span>
                 </AnimatePresence>
               </ProNameLine>
