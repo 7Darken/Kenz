@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, ArrowUpRight, ExternalLink, ChevronRight, ChevronLeft, Globe } from 'lucide-react'
+import { StoreButton } from '@/components/ui/store-button'
 
 /* ═══════════════════════════════════════════
    ANIMATIONS
@@ -540,6 +541,16 @@ const CTASubtitle = styled(motion.p)`
   z-index: 1;
 `
 
+const CTAActions = styled.div`
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+`
+
 const CTAButton = styled(motion.a)<{ $glow: string }>`
   position: relative;
   z-index: 1;
@@ -630,7 +641,9 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
   const scrollRight = () => scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' })
   const scrollLeft = () => scrollRef.current?.scrollBy({ left: -300, behavior: 'smooth' })
   const appStoreLink = project.socials?.find(s => s.title === 'App Store')
-  const otherSocials = project.socials?.filter(s => s.title !== 'App Store') || []
+  const playStoreLink = project.socials?.find(s => s.title === 'Play Store')
+  const otherSocials =
+    project.socials?.filter(s => s.title !== 'App Store' && s.title !== 'Play Store') || []
 
   return (
     <Page>
@@ -702,6 +715,15 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={18} height={18} />
                 Télécharger
               </AppStoreBtn>
+            )}
+            {playStoreLink && (
+              <StoreButton
+                store="google"
+                href={playStoreLink.href}
+                size="md"
+                glow={glow}
+                label="Télécharger"
+              />
             )}
             {project.liveUrl && (
               <SocialBtn href={project.liveUrl} target="_blank" $glow={glow}>
@@ -892,8 +914,11 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             viewport={{ once: true }}
             transition={{ delay: 0.15, duration: 0.6 }}
           >
-            Disponible gratuitement sur l&apos;App Store.
+            {playStoreLink
+              ? 'Disponible gratuitement sur l’App Store et Google Play.'
+              : 'Disponible gratuitement sur l’App Store.'}
           </CTASubtitle>
+          <CTAActions>
           <CTAButton
             href={appStoreLink.href}
             target="_blank"
@@ -909,6 +934,23 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             Télécharger maintenant
             <ArrowUpRight size={16} />
           </CTAButton>
+          {playStoreLink && (
+            <StoreButton
+              store="google"
+              href={playStoreLink.href}
+              size="md"
+              glow={glow}
+              label="Google Play"
+              animated
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.35, duration: 0.6 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            />
+          )}
+          </CTAActions>
         </CTASection>
       )}
     </Page>

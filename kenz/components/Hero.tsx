@@ -317,15 +317,23 @@ const ProPhotoContainer = styled(motion.div)<{ $narrow?: boolean }>`
   }
 `
 
-const ProPhoto = styled.div`
+const ProPhoto = styled.div<{ $fit?: 'cover' | 'contain' }>`
   width: 100%;
   height: 100%;
   position: relative;
   overflow: hidden;
 
   img {
-    object-fit: cover;
-    object-position: top center;
+    object-fit: ${p => p.$fit || 'cover'};
+    object-position: ${p => (p.$fit === 'contain' ? 'center' : 'top center')};
+    transform: ${p => (p.$fit === 'contain' ? 'translateY(16%) scale(1.35)' : 'none')};
+    transform-origin: center;
+
+    @media (max-width: 768px) {
+      object-fit: cover;
+      object-position: top center;
+      transform: none;
+    }
   }
 `
 
@@ -626,7 +634,7 @@ export default function Hero() {
                 transition={{ delay: 0.5, duration: 1.2, ease: [0.2, 0.8, 0.2, 1] }}
                 style={{ x: x3, y: y3 }}
               >
-                <ProPhoto>
+                <ProPhoto $fit="contain">
                   <Image
                     src="/images/Pro-pp.webp"
                     alt="Kenz"

@@ -6,6 +6,7 @@ import { projects } from '@/data/projects'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
+import { StoreButton } from '@/components/ui/store-button'
 
 const Section = styled.section`
   padding: 6rem 2rem;
@@ -83,12 +84,13 @@ const CardOuter = styled(motion.div)<{ $rotate: number; $offset: number }>`
 `
 
 const Card = styled.div<{ $glowColor?: string }>`
+  position: relative;
   width: 330px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  padding: 2.5rem 2rem;
+  padding: 2.5rem 2rem 4.5rem;
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -165,10 +167,26 @@ const ProjectDescription = styled.p`
   margin-top: 0.2rem;
 `
 
-const ButtonRow = styled.div`
+const ButtonStack = styled.div`
   display: flex;
-  gap: 0.6rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 0.5rem;
+  width: 100%;
+`
+
+const StoreRow = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+`
+
+const DetailRow = styled.div`
+  position: absolute;
+  bottom: 0.9rem;
+  right: 1rem;
 `
 
 const PillButton = styled.a`
@@ -194,9 +212,11 @@ const DownloadButton = styled(PillButton)`
 `
 
 const DetailButton = styled(PillButton)`
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  &:hover { background: rgba(255, 255, 255, 0.18); border-color: rgba(255, 255, 255, 0.25); }
+  background: transparent;
+  border: none;
+  padding: 0.35rem 0.6rem;
+  color: rgba(255, 255, 255, 0.55);
+  &:hover { color: #fff; }
 `
 
 // Display order: Zenko, Oshii, Sago, Miru — étalés en éventail
@@ -246,6 +266,7 @@ export default function MobileApps() {
       <CardsRow>
         {orderedProjects.map((project, index) => {
           const appStoreLink = project.socials?.find(s => s.title === 'App Store')?.href || '#'
+          const playStoreLink = project.socials?.find(s => s.title === 'Play Store')?.href
 
           const slot = layout[index] || { rotate: 0, offset: 0 }
 
@@ -283,23 +304,37 @@ export default function MobileApps() {
                   <ProjectTitle>{project.name}</ProjectTitle>
                   <ProjectDescription>{project.description}</ProjectDescription>
 
-                  <ButtonRow onClick={(e) => e.stopPropagation()}>
-                    <DownloadButton href={appStoreLink} target="_blank" rel="noopener noreferrer">
-                      <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={16} height={16} />
-                      Télécharger
-                    </DownloadButton>
-                    <DetailButton
-                      onClick={(e) => {
-                        e.preventDefault()
-                        router.push(`/apps/${project.slug}`)
-                      }}
-                      href={`/apps/${project.slug}`}
-                    >
-                      Détails
-                      <ArrowRight />
-                    </DetailButton>
-                  </ButtonRow>
+                  <ButtonStack onClick={(e) => e.stopPropagation()}>
+                    <StoreRow>
+                      <DownloadButton href={appStoreLink} target="_blank" rel="noopener noreferrer">
+                        <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={16} height={16} />
+                        App Store
+                      </DownloadButton>
+                      {playStoreLink && (
+                        <StoreButton
+                          store="google"
+                          href={playStoreLink}
+                          size="sm"
+                          glow={project.glowColor}
+                          label="Play Store"
+                        />
+                      )}
+                    </StoreRow>
+                  </ButtonStack>
                 </TextContent>
+
+                <DetailRow onClick={(e) => e.stopPropagation()}>
+                  <DetailButton
+                    onClick={(e) => {
+                      e.preventDefault()
+                      router.push(`/apps/${project.slug}`)
+                    }}
+                    href={`/apps/${project.slug}`}
+                  >
+                    Détails
+                    <ArrowRight />
+                  </DetailButton>
+                </DetailRow>
               </Card>
             </CardOuter>
           )

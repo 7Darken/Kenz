@@ -63,6 +63,11 @@ export const projects: Project[] = [
         icon: "/images/icons/Apple_logo_white.webp",
       },
       {
+        label: "Disponible sur",
+        href: "https://play.google.com/store/apps/details?id=com.x7kenz.Oshii",
+        title: "Play Store",
+      },
+      {
         label: "Tiktok",
         href: "https://kenz.blog/nebula",
         title: "+1 abonnés",
