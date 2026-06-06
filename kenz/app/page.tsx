@@ -7,6 +7,7 @@ import { useMode } from '@/contexts/mode-context'
 import { AnimatePresence, motion } from 'framer-motion'
 
 const Impact = dynamic(() => import('@/components/Impact'))
+const ProAchievements = dynamic(() => import('@/components/ProAchievements'))
 const TechStack = dynamic(() => import('@/components/TechStack'))
 const MobileApps = dynamic(() => import('@/components/MobileApps'))
 const TravelShowcase = dynamic(() => import('@/components/TravelShowcase'))
@@ -36,6 +37,7 @@ export default function Home() {
           <Impact />
           <MobileApps />
           <TechStack />
+          <ProAchievements />
         </>
       )}
       <AnimatePresence mode="wait">
