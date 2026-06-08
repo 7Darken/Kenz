@@ -5,40 +5,43 @@ import Link from "next/link";
 import styled from "styled-components";
 
 import type { DestinationDetail } from "@/data/destination-details";
+import { useLanguage } from "@/contexts/language-context";
+import { localize } from "@/i18n/localize";
 
 export interface DestinationDetailViewProps {
   detail: DestinationDetail;
 }
 
 export function DestinationDetailView({ detail }: DestinationDetailViewProps) {
+  const { lang } = useLanguage();
   return (
     <PageWrapper>
       <HeroSection>
         <BackLink href="/#destination">← Retour</BackLink>
         <HeroBackground>
-          <HeroImage src={detail.heroImage} alt={detail.title} fill priority sizes="100vw" />
+          <HeroImage src={detail.heroImage} alt={localize(detail.title, lang)} fill priority sizes="100vw" />
           <HeroGradient aria-hidden />
           <HeroRadial aria-hidden />
         </HeroBackground>
 
         <HeroContent>
           {detail.badge ? <HeroBadge>{detail.badge}</HeroBadge> : null}
-          <HeroTitle>{detail.title}</HeroTitle>
-          <HeroDescription>{detail.description}</HeroDescription>
+          <HeroTitle>{localize(detail.title, lang)}</HeroTitle>
+          <HeroDescription>{localize(detail.description, lang)}</HeroDescription>
         </HeroContent>
 
         <HighlightsBar>
-          {detail.highlights.map((highlight) => (
-            <HighlightCard key={highlight.name}>
+          {detail.highlights.map((highlight, i) => (
+            <HighlightCard key={i}>
               <HighlightFrame>
                 <HighlightRing aria-hidden />
                 <HighlightImageWrapper>
-                  <Image src={highlight.imageUrl} alt={highlight.name} fill sizes="150px" />
+                  <Image src={highlight.imageUrl} alt={localize(highlight.name, lang)} fill sizes="150px" />
                 </HighlightImageWrapper>
               </HighlightFrame>
 
-              <HighlightTagline>{highlight.tagline}</HighlightTagline>
-              <HighlightName>{highlight.name}</HighlightName>
+              <HighlightTagline>{localize(highlight.tagline, lang)}</HighlightTagline>
+              <HighlightName>{localize(highlight.name, lang)}</HighlightName>
             </HighlightCard>
           ))}
         </HighlightsBar>

@@ -236,4 +236,29 @@ export const en: Dictionary = {
     successTitle: "Message sent",
     successText: "Thanks! I'll get back to you very soon.",
   },
+
+  contentCreation: {
+    title: "Content Creation",
+    subtitle: "I share my travels, projects and discoveries on video.",
+    subscribe: "Subscribe",
+    youtubeTitle: "Trip to Malaysia",
+    joinChannel: "Join the channel to follow my adventures",
+  },
+
+  travelShowcase: {
+    explore: "Explore",
+  },
+
+  destinationPage: {
+    back: "Back",
+    onSite: "on site",
+    season: "season",
+    highlights: "Key places",
+    otherDestinations: "Other destinations",
+    continueAdventure: "Continue the adventure",
+    ctaBefore: "Want to discover ",
+    ctaAfter: "?",
+    vlogsBefore: "Watch the ",
+    vlogsAfter: " vlogs",
+  },
 };

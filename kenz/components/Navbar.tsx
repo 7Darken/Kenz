@@ -434,7 +434,7 @@ export default function Navbar() {
                           <DropdownLink key={d.id} href={`/destination/${d.slug}`}>
                             <Image src={d.imageUrl} alt={d.name} width={34} height={34} />
                             <DropdownText>
-                              <span>{d.country}</span>
+                              <span>{localize(d.country, lang)}</span>
                               <small>{d.name}</small>
                             </DropdownText>
                           </DropdownLink>

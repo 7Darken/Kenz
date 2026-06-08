@@ -7,6 +7,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { destinations } from '@/data/destinations'
+import { useLanguage } from '@/contexts/language-context'
+import { localize } from '@/i18n/localize'
 
 const ShowcaseContainer = styled.section`
   height: 85vh;
@@ -159,6 +161,7 @@ const ThumbLabel = styled.span`
 
 export default function TravelShowcase() {
   const [activeIndex, setActiveIndex] = useState(0)
+  const { lang, t } = useLanguage()
   const activeDest = destinations[activeIndex]
 
   return (
@@ -195,13 +198,13 @@ export default function TravelShowcase() {
           >
             <DestinationTitle>{activeDest.name}</DestinationTitle>
             <DestinationMeta>
-              <span>{activeDest.country}</span>
+              <span>{localize(activeDest.country, lang)}</span>
               <span>•</span>
-              <span>{activeDest.stats[0].value}</span> {/* Duration */}
+              <span>{localize(activeDest.stats[0].value, lang)}</span> {/* Duration */}
             </DestinationMeta>
 
             <ViewButton href={`/destination/${activeDest.slug}`}>
-              Explore <ArrowRight size={20} />
+              {t.travelShowcase.explore} <ArrowRight size={20} />
             </ViewButton>
           </motion.div>
         </MainInfo>
@@ -225,7 +228,7 @@ export default function TravelShowcase() {
                 whileHover={{ scale: 1.05, zIndex: 10 }}
               >
                 <Image src={dest.imageUrl} alt={dest.name} fill sizes="120px" />
-                <ThumbLabel>{dest.country}</ThumbLabel>
+                <ThumbLabel>{localize(dest.country, lang)}</ThumbLabel>
               </Thumbnail>
             ))}
           </MarqueeTrack>

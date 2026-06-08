@@ -8,6 +8,8 @@ import { useMemo, useState } from "react";
 import styled, { css } from "styled-components";
 
 import type { Destination } from "@/data/destinations";
+import { useLanguage } from "@/contexts/language-context";
+import { localize } from "@/i18n/localize";
 
 export interface DestinationShowcaseProps {
   destinations: Destination[];
@@ -575,6 +577,7 @@ const cardVariants = {
 
 export function DestinationShowcase({ destinations }: DestinationShowcaseProps) {
   const router = useRouter();
+  const { lang } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
 
   const total = destinations.length;
@@ -630,7 +633,7 @@ export function DestinationShowcase({ destinations }: DestinationShowcaseProps) 
             >
               <HeroEyebrow>Discover</HeroEyebrow>
               <HeroTitle>{activeDestination.name}</HeroTitle>
-              <HeroDescription>{activeDestination.description}</HeroDescription>
+              <HeroDescription>{localize(activeDestination.description, lang)}</HeroDescription>
               <HeroButton
                 type="button"
                 onClick={() => router.push(`/destination/${activeDestination.slug}`)}
@@ -670,7 +673,7 @@ export function DestinationShowcase({ destinations }: DestinationShowcaseProps) 
                   </PreviewImageWrapper>
 
                   <PreviewBody>
-                    <PreviewDescription>{activeDestination.description}</PreviewDescription>
+                    <PreviewDescription>{localize(activeDestination.description, lang)}</PreviewDescription>
                     <PreviewAction
                       type="button"
                       onClick={() => router.push(`/destination/${activeDestination.slug}`)}

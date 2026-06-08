@@ -9,6 +9,8 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Clock, Compass } from 'lucide-react'
+import { useLanguage } from '@/contexts/language-context'
+import { localize } from '@/i18n/localize'
 
 /* ═══════════════════════════════════════════
    ANIMATIONS
@@ -547,12 +549,14 @@ const CTAButton = styled(motion.a)`
 
 export default function DestinationDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params)
+  const { lang, t } = useLanguage()
   const destination = destinations.find(d => d.slug === slug)
   const detail = getDestinationDetail(slug)
 
   if (!destination) notFound()
 
   const statsIcons = [Clock, Compass, MapPin]
+  const country = localize(destination.country, lang)
 
   return (
     <Page>
@@ -560,7 +564,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
       <Hero>
         <BackBtn href="/#travel">
           <ArrowLeft />
-          Retour
+          {t.destinationPage.back}
         </BackBtn>
 
         <HeroBg>
@@ -597,7 +601,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7 }}
           >
-            {destination.country}
+            {country}
           </HeroCountry>
 
           <HeroDesc
@@ -605,7 +609,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.7 }}
           >
-            {detail?.description || destination.description}
+            {localize(detail?.description ?? destination.description, lang)}
           </HeroDesc>
         </HeroContent>
       </Hero>
@@ -623,8 +627,8 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
               <StatCell key={i}>
                 <StatIcon><Icon /></StatIcon>
                 <StatInfo>
-                  <StatLabel>{stat.label}</StatLabel>
-                  <StatValue>{stat.value}</StatValue>
+                  <StatLabel>{localize(stat.label, lang)}</StatLabel>
+                  <StatValue>{localize(stat.value, lang)}</StatValue>
                 </StatInfo>
               </StatCell>
             )
@@ -645,7 +649,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
           <GlobeInner>
             <GlobeFlag
               src={`https://flagcdn.com/w160/${destination.countryCode}.png`}
-              alt={destination.country}
+              alt={country}
             />
           </GlobeInner>
         </GlobeContainer>
@@ -658,8 +662,8 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
         >
           {destination.stats[0] && (
             <>
-              <strong>{destination.stats[0].value}</strong> sur place
-              {destination.stats[1] && <> &middot; saison <strong>{destination.stats[1].value.toLowerCase()}</strong></>}
+              <strong>{localize(destination.stats[0].value, lang)}</strong> {t.destinationPage.onSite}
+              {destination.stats[1] && <> &middot; {t.destinationPage.season} <strong>{localize(destination.stats[1].value, lang).toLowerCase()}</strong></>}
             </>
           )}
         </GlobeCaption>
@@ -673,7 +677,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            Lieux marquants
+            {t.destinationPage.highlights}
           </SectionLabel>
           <SectionTitle
             initial={{ opacity: 0, y: 20 }}
@@ -681,22 +685,22 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            {detail.subtitle}
+            {localize(detail.subtitle, lang)}
           </SectionTitle>
 
           <HighlightsGrid>
             {detail.highlights.map((h, i) => (
               <HighlightCard
-                key={h.name}
+                key={i}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               >
-                <Image src={h.imageUrl} alt={h.name} fill />
+                <Image src={h.imageUrl} alt={localize(h.name, lang)} fill />
                 <HighlightInfo>
-                  <HighlightName>{h.name}</HighlightName>
-                  <HighlightTagline>{h.tagline}</HighlightTagline>
+                  <HighlightName>{localize(h.name, lang)}</HighlightName>
+                  <HighlightTagline>{localize(h.tagline, lang)}</HighlightTagline>
                 </HighlightInfo>
               </HighlightCard>
             ))}
@@ -711,7 +715,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          Autres destinations
+          {t.destinationPage.otherDestinations}
         </SectionLabel>
         <SectionTitle
           initial={{ opacity: 0, y: 20 }}
@@ -720,7 +724,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           style={{ marginBottom: '1.5rem' }}
         >
-          Continue l&apos;aventure
+          {t.destinationPage.continueAdventure}
         </SectionTitle>
 
         <OtherGrid>
@@ -739,10 +743,10 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
                 <OtherInfo>
                   <OtherFlag
                     src={`https://flagcdn.com/w80/${d.countryCode}.png`}
-                    alt={d.country}
+                    alt={localize(d.country, lang)}
                   />
                   <OtherName>
-                    <span>{d.country}</span>
+                    <span>{localize(d.country, lang)}</span>
                     <span>{d.name}</span>
                   </OtherName>
                 </OtherInfo>
@@ -761,7 +765,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
           transition={{ duration: 0.7 }}
           style={{ marginBottom: '1.5rem' }}
         >
-          Envie de découvrir {destination.country} ?
+          {t.destinationPage.ctaBefore}{country}{t.destinationPage.ctaAfter}
         </SectionTitle>
         <CTAButton
           href="https://www.tiktok.com/@7kinze"
@@ -769,7 +773,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
         >
-          Voir les vlogs {destination.country}
+          {t.destinationPage.vlogsBefore}{country}{t.destinationPage.vlogsAfter}
           <Compass size={16} />
         </CTAButton>
       </CTASection>

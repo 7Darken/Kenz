@@ -3,6 +3,7 @@
 import styled from 'styled-components'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
+import { useTranslation } from '@/contexts/language-context'
 
 const Section = styled.section`
   padding: 5rem 2rem;
@@ -273,6 +274,7 @@ const PlatformLabel = styled.div<{ $color: string }>`
 `
 
 export default function ContentCreation() {
+  const t = useTranslation()
   const containerRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -291,10 +293,10 @@ export default function ContentCreation() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Création de Contenu
+            {t.contentCreation.title}
           </Title>
           <Subtitle>
-            Je partage mes voyages, mes projets et mes découvertes en vidéo.
+            {t.contentCreation.subtitle}
           </Subtitle>
         </Header>
 
@@ -343,7 +345,7 @@ export default function ContentCreation() {
                   fontSize: '0.9rem',
                 }}
               >
-                S&apos;abonner
+                {t.contentCreation.subscribe}
               </motion.a>
             </div>
           </PlatformCard>
@@ -357,7 +359,7 @@ export default function ContentCreation() {
             <YouTubeEmbed>
               <iframe
                 src="https://www.youtube.com/embed/Fp3SsWY28WE"
-                title="Voyage en Malaisie"
+                title={t.contentCreation.youtubeTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
@@ -365,7 +367,7 @@ export default function ContentCreation() {
 
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
               <p style={{ color: '#aaa', marginBottom: '1rem', fontSize: '0.9rem' }}>
-                Rejoins la chaîne pour suivre mes aventures
+                {t.contentCreation.joinChannel}
               </p>
               <motion.a
                 href="https://www.youtube.com/@7Kinze?sub_confirmation=1"
@@ -387,7 +389,7 @@ export default function ContentCreation() {
                   fontSize: '0.9rem',
                 }}
               >
-                S&apos;abonner
+                {t.contentCreation.subscribe}
               </motion.a>
             </div>
           </PlatformCard>

@@ -240,6 +240,31 @@ export const fr = {
     successTitle: "Message envoyé",
     successText: "Merci ! Je reviens vers toi très rapidement.",
   },
+
+  contentCreation: {
+    title: "Création de Contenu",
+    subtitle: "Je partage mes voyages, mes projets et mes découvertes en vidéo.",
+    subscribe: "S'abonner",
+    youtubeTitle: "Voyage en Malaisie",
+    joinChannel: "Rejoins la chaîne pour suivre mes aventures",
+  },
+
+  travelShowcase: {
+    explore: "Explorer",
+  },
+
+  destinationPage: {
+    back: "Retour",
+    onSite: "sur place",
+    season: "saison",
+    highlights: "Lieux marquants",
+    otherDestinations: "Autres destinations",
+    continueAdventure: "Continue l'aventure",
+    ctaBefore: "Envie de découvrir ",
+    ctaAfter: " ?",
+    vlogsBefore: "Voir les vlogs ",
+    vlogsAfter: "",
+  },
 } satisfies Record<string, unknown>;
 
 /** Canonical dictionary shape, derived from the French (base) dictionary. */
