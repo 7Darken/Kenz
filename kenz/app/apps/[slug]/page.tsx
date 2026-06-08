@@ -9,6 +9,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowLeft, ArrowUpRight, ExternalLink, ChevronRight, ChevronLeft, Globe } from 'lucide-react'
 import { StoreButton } from '@/components/ui/store-button'
+import { useLanguage } from '@/contexts/language-context'
+import { localize } from '@/i18n/localize'
 
 /* ═══════════════════════════════════════════
    ANIMATIONS
@@ -499,6 +501,144 @@ const Tag = styled.span`
 `
 
 /* ═══════════════════════════════════════════
+   TECHNICAL / SOUS LE CAPOT
+   ═══════════════════════════════════════════ */
+
+const TechSummary = styled(motion.p)`
+  font-size: 0.98rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.75;
+  font-weight: 300;
+  max-width: 620px;
+  margin-bottom: 2.5rem;
+`
+
+const SubLabel = styled(motion.span)`
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  display: block;
+  margin: 3rem 0 1.2rem;
+`
+
+const StackGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const StackCard = styled(motion.div)`
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+`
+
+const StackLabel = styled.span`
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  display: block;
+  margin-bottom: 1rem;
+`
+
+const ChipRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`
+
+const TechChip = styled.span<{ $glow: string }>`
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 0.74rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.75);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: ${p => p.$glow}50;
+    color: #fff;
+  }
+`
+
+const AiGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const AiCard = styled(motion.div)<{ $glow: string }>`
+  position: relative;
+  padding: 1.6rem;
+  border-radius: 16px;
+  background: linear-gradient(160deg, ${p => p.$glow}0e, rgba(255, 255, 255, 0.02));
+  border: 1px solid ${p => p.$glow}25;
+  overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+
+  &:hover {
+    border-color: ${p => p.$glow}45;
+    box-shadow: 0 0 30px ${p => p.$glow}12;
+  }
+`
+
+const AiBadge = styled.span<{ $glow: string }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: ${p => p.$glow};
+  margin-bottom: 0.9rem;
+`
+
+const AiTitle = styled.h4`
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.35rem;
+`
+
+const AiModel = styled.span<{ $glow: string }>`
+  font-family: ${p => p.theme.fonts.mono};
+  font-size: 0.72rem;
+  color: ${p => p.$glow};
+  display: block;
+  margin-bottom: 0.75rem;
+`
+
+const AiDesc = styled.p`
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.65;
+  font-weight: 300;
+`
+
+const HighlightTitle = styled.h4`
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.4rem;
+`
+
+/* ═══════════════════════════════════════════
    CTA FOOTER
    ═══════════════════════════════════════════ */
 
@@ -614,6 +754,7 @@ const stagger = {
 
 export default function AppDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params)
+  const { lang, t } = useLanguage()
   const project = projects.find(p => p.slug === slug)
 
   if (!project) notFound()
@@ -644,6 +785,10 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
   const playStoreLink = project.socials?.find(s => s.title === 'Play Store')
   const otherSocials =
     project.socials?.filter(s => s.title !== 'App Store' && s.title !== 'Play Store') || []
+  const tech = project.detail?.technical
+  const projectName = localize(project.name, lang)
+  const overview = project.detail ? localize(project.detail.overview, lang) : []
+  const tags = project.detail?.tags ? localize(project.detail.tags, lang) : []
 
   return (
     <Page>
@@ -656,7 +801,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
           transition={{ delay: 0.1, duration: 0.5 }}
         >
           <ArrowLeft size={16} />
-          Retour
+          {t.appDetail.back}
         </BackLink>
 
         <IconWrapper
@@ -667,7 +812,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
         >
           <Image
             src={project.thumbnail}
-            alt={project.name}
+            alt={projectName}
             width={140}
             height={140}
             sizes="140px"
@@ -681,7 +826,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            {project.name}
+            {projectName}
           </AppName>
 
           <Headline
@@ -689,7 +834,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            {project.detail?.subheadline || project.description}
+            {localize(project.detail?.subheadline ?? project.description, lang)}
           </Headline>
 
           <Period
@@ -697,7 +842,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            {project.period}
+            {localize(project.period, lang)}
           </Period>
 
           <HeroActions
@@ -713,7 +858,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 $glow={glow}
               >
                 <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={18} height={18} />
-                Télécharger
+                {t.appDetail.download}
               </AppStoreBtn>
             )}
             {playStoreLink && (
@@ -722,13 +867,13 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 href={playStoreLink.href}
                 size="md"
                 glow={glow}
-                label="Télécharger"
+                label={t.appDetail.download}
               />
             )}
             {project.liveUrl && (
               <SocialBtn href={project.liveUrl} target="_blank" $glow={glow}>
                 <Globe size={16} />
-                Site web
+                {t.appDetail.website}
                 <ExternalLink />
               </SocialBtn>
             )}
@@ -762,8 +907,8 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 <StatValue $accent={stat.accentColor || glow}>
                   {stat.value}
                 </StatValue>
-                <StatLabel>{stat.label}</StatLabel>
-                {stat.description && <StatDesc>{stat.description}</StatDesc>}
+                <StatLabel>{localize(stat.label, lang)}</StatLabel>
+                {stat.description && <StatDesc>{localize(stat.description, lang)}</StatDesc>}
               </StatCard>
             ))}
           </StatsGrid>
@@ -778,7 +923,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
           >
-            Aperçu
+            {t.appDetail.overview}
           </SectionLabel>
           <SectionTitle
             initial={{ opacity: 0, y: 20 }}
@@ -786,7 +931,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Captures d&apos;écran
+            {t.appDetail.screenshots}
           </SectionTitle>
         </PreviewHeader>
 
@@ -804,7 +949,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
                 >
                   <Image
                     src={src}
-                    alt={`${project.name} screenshot ${i + 1}`}
+                    alt={`${projectName} screenshot ${i + 1}`}
                     width={240}
                     height={520}
                     sizes="(max-width: 768px) 200px, 240px"
@@ -849,7 +994,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          Fonctionnalités
+          {t.appDetail.features}
         </SectionLabel>
         <SectionTitle
           initial={{ opacity: 0, y: 20 }}
@@ -857,11 +1002,11 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          {project.detail?.headline}
+          {project.detail && localize(project.detail.headline, lang)}
         </SectionTitle>
 
         <FeatureGrid>
-          {project.detail?.overview.map((feature, i) => (
+          {overview.map((feature, i) => (
             <FeatureCard
               key={i}
               $index={i}
@@ -881,14 +1026,14 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
           ))}
         </FeatureGrid>
 
-        {project.detail?.tags && project.detail.tags.length > 0 && (
+        {tags.length > 0 && (
           <TagsWrap
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {project.detail.tags.map((tag, i) => (
+            {tags.map((tag, i) => (
               <Tag key={i}>{tag}</Tag>
             ))}
           </TagsWrap>
@@ -896,6 +1041,123 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
       </ContentWrap>
 
       <Divider $glow={glow} />
+
+      {/* ── Technical / Sous le capot ── */}
+      {tech && (
+        <>
+          <ContentWrap>
+            <SectionLabel
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              {t.appDetail.underTheHood}
+            </SectionLabel>
+            <SectionTitle
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {t.appDetail.stackArchitecture}
+            </SectionTitle>
+
+            {tech.summary && (
+              <TechSummary
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                {localize(tech.summary, lang)}
+              </TechSummary>
+            )}
+
+            <StackGrid>
+              {tech.stack.map((group, i) => (
+                <StackCard
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <StackLabel>{localize(group.label, lang)}</StackLabel>
+                  <ChipRow>
+                    {localize(group.items, lang).map((item, j) => (
+                      <TechChip key={j} $glow={glow}>
+                        {item}
+                      </TechChip>
+                    ))}
+                  </ChipRow>
+                </StackCard>
+              ))}
+            </StackGrid>
+
+            {tech.ai && tech.ai.length > 0 && (
+              <>
+                <SubLabel
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                >
+                  {t.appDetail.aiIntegrations}
+                </SubLabel>
+                <AiGrid>
+                  {tech.ai.map((cap, i) => (
+                    <AiCard
+                      key={i}
+                      $glow={glow}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <AiBadge $glow={glow}>✦ {t.appDetail.aiBadge}</AiBadge>
+                      <AiTitle>{localize(cap.title, lang)}</AiTitle>
+                      <AiModel $glow={glow}>{localize(cap.model, lang)}</AiModel>
+                      <AiDesc>{localize(cap.description, lang)}</AiDesc>
+                    </AiCard>
+                  ))}
+                </AiGrid>
+              </>
+            )}
+
+            {tech.highlights && tech.highlights.length > 0 && (
+              <>
+                <SubLabel
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                >
+                  {t.appDetail.technicalChallenges}
+                </SubLabel>
+                <FeatureGrid>
+                  {tech.highlights.map((h, i) => (
+                    <FeatureCard
+                      key={i}
+                      $index={i}
+                      $glow={glow}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <FeatureNumber $glow={glow}>0{i + 1}</FeatureNumber>
+                      <div>
+                        <HighlightTitle>{localize(h.title, lang)}</HighlightTitle>
+                        <FeatureText>{localize(h.description, lang)}</FeatureText>
+                      </div>
+                    </FeatureCard>
+                  ))}
+                </FeatureGrid>
+              </>
+            )}
+          </ContentWrap>
+
+          <Divider $glow={glow} />
+        </>
+      )}
 
       {/* ── CTA ── */}
       {appStoreLink && (
@@ -906,7 +1168,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Prêt à essayer {project.name.split(' ')[0]} ?
+            {t.appDetail.ctaBefore}{projectName.split(' ')[0]}{t.appDetail.ctaAfter}
           </CTATitle>
           <CTASubtitle
             initial={{ opacity: 0 }}
@@ -915,8 +1177,8 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             transition={{ delay: 0.15, duration: 0.6 }}
           >
             {playStoreLink
-              ? 'Disponible gratuitement sur l’App Store et Google Play.'
-              : 'Disponible gratuitement sur l’App Store.'}
+              ? t.appDetail.ctaSubtitleBoth
+              : t.appDetail.ctaSubtitleApple}
           </CTASubtitle>
           <CTAActions>
           <CTAButton
@@ -931,7 +1193,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
             whileTap={{ scale: 0.97 }}
           >
             <Image src="/images/icons/Apple_logo_white.webp" alt="Apple" width={18} height={18} />
-            Télécharger maintenant
+            {t.appDetail.downloadNow}
             <ArrowUpRight size={16} />
           </CTAButton>
           {playStoreLink && (
@@ -940,7 +1202,7 @@ export default function AppDetail({ params }: { params: Promise<{ slug: string }
               href={playStoreLink.href}
               size="md"
               glow={glow}
-              label="Google Play"
+              label={t.appDetail.googlePlay}
               animated
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}

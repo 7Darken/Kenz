@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMode } from '@/contexts/mode-context'
+import { useTranslation } from '@/contexts/language-context'
 
 const FooterContainer = styled.footer`
   background: #020202;
@@ -141,6 +142,7 @@ const BottomBar = styled.div`
 
 export default function Footer() {
   const { isPro, isPerso } = useMode()
+  const t = useTranslation()
 
   return (
     <FooterContainer>
@@ -152,37 +154,35 @@ export default function Footer() {
               <LogoText>Kenz Narainen</LogoText>
             </LogoRow>
             <Bio>
-              {isPro
-                ? "Développeur Full Stack basé à Paris. Je conçois des applications mobiles et des expériences web performantes."
-                : "Créateur de contenu, développeur et globe-trotteur. Je partage mes voyages et mes projets entre Paris et l'Asie."}
+              {isPro ? t.footer.bioPro : t.footer.bioPerso}
             </Bio>
           </BrandCol>
 
           <LinksRow>
             <LinkCol>
-              <ColTitle>Navigation</ColTitle>
-              <FooterLink href="/">Accueil</FooterLink>
+              <ColTitle>{t.footer.navigation}</ColTitle>
+              <FooterLink href="/">{t.footer.home}</FooterLink>
               {isPro && (
                 <>
-                  <FooterLink href="/#apps">Projets</FooterLink>
-                  <FooterLink href="/#kenz-ai">Kenz AI</FooterLink>
+                  <FooterLink href="/#apps">{t.nav.projects}</FooterLink>
+                  <FooterLink href="/#kenz-ai">{t.nav.kenzAi}</FooterLink>
                   <ContactLink onClick={() => window.dispatchEvent(new Event('open-contact-modal'))}>
-                    Contact
+                    {t.nav.contact}
                   </ContactLink>
                 </>
               )}
               {isPerso && (
                 <>
-                  <FooterLink href="/#content">Contenu</FooterLink>
-                  <FooterLink href="/#travel">Voyages</FooterLink>
-                  <FooterLink href="/#sport">Sport</FooterLink>
-                  <FooterLink href="/#socials">Réseaux</FooterLink>
+                  <FooterLink href="/#content">{t.nav.content}</FooterLink>
+                  <FooterLink href="/#travel">{t.nav.travels}</FooterLink>
+                  <FooterLink href="/#sport">{t.footer.sport}</FooterLink>
+                  <FooterLink href="/#socials">{t.nav.socials}</FooterLink>
                 </>
               )}
             </LinkCol>
 
             <LinkCol>
-              <ColTitle>Réseaux</ColTitle>
+              <ColTitle>{t.footer.networks}</ColTitle>
               <ExtLink href="https://github.com/7Darken" target="_blank">GitHub</ExtLink>
               <ExtLink href="https://www.linkedin.com/in/kenz-narainen" target="_blank">LinkedIn</ExtLink>
               <ExtLink href="https://www.tiktok.com/@7kinze" target="_blank">TikTok</ExtLink>
@@ -192,7 +192,7 @@ export default function Footer() {
 
             {isPro && (
               <LinkCol>
-                <ColTitle>Apps</ColTitle>
+                <ColTitle>{t.footer.apps}</ColTitle>
                 <FooterLink href="/apps/oshii">Oshii</FooterLink>
                 <FooterLink href="/apps/zenko">Zenko</FooterLink>
                 <FooterLink href="/apps/sago">Sago</FooterLink>
@@ -202,8 +202,8 @@ export default function Footer() {
         </TopRow>
 
         <BottomBar>
-          <span>&copy; {new Date().getFullYear()} Kenz Narainen. Tous droits réservés.</span>
-          <span>Paris, France</span>
+          <span>&copy; {new Date().getFullYear()} Kenz Narainen. {t.footer.rights}</span>
+          <span>{t.footer.location}</span>
         </BottomBar>
       </Inner>
     </FooterContainer>

@@ -5,6 +5,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
 import { Trophy } from 'lucide-react'
+import { useTranslation } from '@/contexts/language-context'
 
 /* ── Types ── */
 
@@ -338,6 +339,7 @@ const Tag = styled.span<{ $color: string }>`
 /* ── Sous-composant : visuel d'un événement (galerie, image, ou placeholder) ── */
 
 function EventMedia({ event }: { event: TimelineEvent }) {
+  const t = useTranslation()
   if (event.gallery && event.gallery.length > 0) {
     return (
       <PhotoStack>
@@ -376,7 +378,7 @@ function EventMedia({ event }: { event: TimelineEvent }) {
 
   return (
     <EventImage>
-      <EventImagePlaceholder>Photo à venir</EventImagePlaceholder>
+      <EventImagePlaceholder>{t.common.comingSoon}</EventImagePlaceholder>
     </EventImage>
   )
 }

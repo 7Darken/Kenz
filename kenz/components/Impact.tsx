@@ -3,22 +3,16 @@
 import styled from 'styled-components'
 import { motion, useInView, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
-
-/* ── Data ── */
-
-const stats = [
-  { value: 12000, suffix: '+', label: 'Téléchargements', prefix: '' },
-  { value: 3, suffix: '', label: 'Apps publiées', prefix: '' },
-  { value: 4.9, suffix: '/5', label: 'Note App Store', prefix: '' },
-]
+import { useLanguage } from '@/contexts/language-context'
 
 /* ── Animated Counter ── */
 
-function Counter({ target, suffix, prefix, inView }: {
+function Counter({ target, suffix, prefix, inView, locale }: {
   target: number
   suffix: string
   prefix: string
   inView: boolean
+  locale: string
 }) {
   const [display, setDisplay] = useState('0')
 
@@ -33,7 +27,7 @@ function Counter({ target, suffix, prefix, inView }: {
         if (isDecimal) {
           setDisplay(v.toFixed(1))
         } else if (target >= 1000) {
-          setDisplay(Math.round(v).toLocaleString('fr-FR'))
+          setDisplay(Math.round(v).toLocaleString(locale))
         } else {
           setDisplay(Math.round(v).toString())
         }
@@ -41,7 +35,7 @@ function Counter({ target, suffix, prefix, inView }: {
     })
 
     return () => controls.stop()
-  }, [inView, target])
+  }, [inView, target, locale])
 
   return <>{prefix}{display}{suffix}</>
 }
@@ -129,6 +123,14 @@ const AccentLine = styled.div<{ $delay: number }>`
 export default function Impact() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
+  const { lang, t } = useLanguage()
+  const locale = lang === 'fr' ? 'fr-FR' : 'en-US'
+
+  const stats = [
+    { value: 12000, suffix: '+', label: t.impact.downloads, prefix: '' },
+    { value: 3, suffix: '', label: t.impact.appsPublished, prefix: '' },
+    { value: 4.9, suffix: '/5', label: t.impact.rating, prefix: '' },
+  ]
 
   return (
     <Section ref={ref}>
@@ -150,6 +152,7 @@ export default function Impact() {
                 suffix={stat.suffix}
                 prefix={stat.prefix}
                 inView={inView}
+                locale={locale}
               />
             </StatValue>
             <StatLabel>{stat.label}</StatLabel>

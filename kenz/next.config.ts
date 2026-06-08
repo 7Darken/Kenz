@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        // Free, key-less flag API used by the language switcher.
+        protocol: "https",
+        hostname: "flagcdn.com",
+      },
     ],
   },
   experimental: {

@@ -2,11 +2,12 @@
 
 import styled, { keyframes } from 'styled-components'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { Send } from 'lucide-react'
 import Image from 'next/image'
+import { useTranslation } from '@/contexts/language-context'
 
-/* ── Data ── */
+/* ── Types (content comes from the i18n dictionary) ── */
 
 type Msg = {
   role: 'kenz' | 'visitor'
@@ -15,77 +16,7 @@ type Msg = {
   cta?: boolean
 }
 
-const firstExchange: Msg[] = [
-  { role: 'visitor', text: 'Salut Kenz, tu fais quoi exactement ?' },
-  {
-    role: 'kenz',
-    text: 'Je développe des applications mobiles et des produits digitaux de A à Z — de l\'idée au déploiement sur l\'App Store.',
-    tags: ['Swift', 'SwiftUI', 'React Native', 'App Store'],
-  },
-]
-
 type Suggestion = { label: string; question: string; response: Msg }
-
-const suggestions: Suggestion[] = [
-  {
-    label: '🌐 Et côté web ?',
-    question: 'Et côté web ?',
-    response: {
-      role: 'kenz',
-      text: 'Je build des expériences web modernes et performantes. Ce portfolio en est un exemple — animations fluides, responsive, SSR.',
-      tags: ['Next.js', 'React', 'TypeScript', 'Framer Motion'],
-    },
-  },
-  {
-    label: '⚙️ Tu gères le backend ?',
-    question: 'Tu gères aussi le backend ?',
-    response: {
-      role: 'kenz',
-      text: 'Full stack. APIs REST, bases de données, auth, paiement, déploiement cloud. Mes apps tournent en prod avec des milliers d\'utilisateurs.',
-      tags: ['Node.js', 'PostgreSQL', 'Firebase', 'Vercel'],
-    },
-  },
-  {
-    label: '📱 Tes apps ?',
-    question: 'C\'est quoi tes apps ?',
-    response: {
-      role: 'kenz',
-      text: 'J\'ai 3 apps publiées — Oshii pour les recettes TikTok, Zenko pour les voyages et Sago pour apprendre le japonais. Plus de 12k téléchargements au total.',
-      tags: ['Oshii', 'Zenko', 'Sago'],
-    },
-  },
-  {
-    label: '🎨 Et le design ?',
-    question: 'Tu fais aussi le design ?',
-    response: {
-      role: 'kenz',
-      text: 'Oui, du concept au pixel. Identité visuelle, UI/UX, prototypage. Je crée des produits complets, pas juste du code.',
-      tags: ['Figma', 'UI/UX', 'Branding'],
-    },
-  },
-]
-
-const autoResponses: { keywords: string[]; response: Msg }[] = [
-  {
-    keywords: ['prix', 'tarif', 'cout', 'coût', 'combien', 'budget'],
-    response: { role: 'kenz', text: 'Ça dépend du projet ! Envoie-moi un mail à contact@kenzenbien.fr et on en discute.', tags: ['Freelance'] },
-  },
-  {
-    keywords: ['contact', 'mail', 'email', 'joindre'],
-    response: { role: 'kenz', text: 'Tu peux me contacter à contact@kenzenbien.fr ou sur LinkedIn. Je suis disponible pour de nouveaux projets.', tags: ['Disponible'] },
-  },
-  {
-    keywords: ['bonjour', 'salut', 'hello', 'hey', 'yo', 'coucou'],
-    response: { role: 'kenz', text: 'Hey ! N\'hésite pas à me poser des questions sur mes projets ou compétences.' },
-  },
-]
-
-const defaultResponse: Msg = {
-  role: 'kenz',
-  text: 'Bonne question ! N\'hésite pas à me contacter directement pour en discuter.',
-  tags: ['Contact'],
-  cta: true,
-}
 
 const OPEN_CONTACT_EVENT = 'open-contact-modal'
 
@@ -396,6 +327,7 @@ function ChatMessage({ msg, shouldAnimate, onDone }: {
   shouldAnimate: boolean
   onDone?: () => void
 }) {
+  const t = useTranslation()
   const isKenz = msg.role === 'kenz'
   const { displayed, done } = useTypingEffect(msg.text, isKenz ? 18 : 8, shouldAnimate)
 
@@ -422,13 +354,13 @@ function ChatMessage({ msg, shouldAnimate, onDone }: {
           {isKenz && msg.cta && done && (
             <CtaButton onClick={() => window.dispatchEvent(new Event(OPEN_CONTACT_EVENT))}>
               <Send size={13} />
-              Me contacter
+              {t.techStack.contactCta}
             </CtaButton>
           )}
         </MsgBubble>
-        {isKenz && msg.tags && done && (
+        {isKenz && msg.tags && msg.tags.length > 0 && done && (
           <TagsRow>
-            {msg.tags.map(t => <Tag key={t}>{t}</Tag>)}
+            {msg.tags.map(tag => <Tag key={tag}>{tag}</Tag>)}
           </TagsRow>
         )}
       </div>
@@ -442,6 +374,35 @@ export default function TechStack() {
   const ref = useRef(null)
   const chatBodyRef = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
+  const t = useTranslation()
+
+  // Conversation content, built from the active-language dictionary.
+  const firstExchange = useMemo<Msg[]>(() => [
+    { role: 'visitor', text: t.techStack.intro.question },
+    { role: 'kenz', text: t.techStack.intro.answer, tags: t.techStack.intro.tags },
+  ], [t])
+
+  const suggestions = useMemo<Suggestion[]>(() => t.techStack.suggestions.map(s => ({
+    label: s.label,
+    question: s.question,
+    response: { role: 'kenz', text: s.answer, tags: s.tags },
+  })), [t])
+
+  const autoResponses = useMemo(() => t.techStack.autoResponses.map(r => ({
+    keywords: r.keywords,
+    response: {
+      role: 'kenz' as const,
+      text: r.answer,
+      tags: r.tags.length ? r.tags : undefined,
+    },
+  })), [t])
+
+  const defaultResponse = useMemo<Msg>(() => ({
+    role: 'kenz',
+    text: t.techStack.defaultAnswer,
+    tags: t.techStack.defaultTags,
+    cta: true,
+  }), [t])
 
   const [messages, setMessages] = useState<Msg[]>([])
   const [isTyping, setIsTyping] = useState(false)
@@ -482,7 +443,7 @@ export default function TechStack() {
         }, 800)
       }, 600)
     }, 500)
-  }, [inView, introPhase])
+  }, [inView, introPhase, firstExchange])
 
   const addExchange = useCallback((question: string, response: Msg) => {
     if (isTyping) return
@@ -506,7 +467,7 @@ export default function TechStack() {
     const s = suggestions[index]
     setUsedSuggestions(prev => new Set(prev).add(index))
     addExchange(s.question, s.response)
-  }, [addExchange])
+  }, [addExchange, suggestions])
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault()
@@ -526,14 +487,14 @@ export default function TechStack() {
           animate={inView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
         >
-          Ce que je fais
+          {t.techStack.label}
         </SectionLabel>
         <SectionTitle
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          Kenz AI
+          {t.techStack.title}
         </SectionTitle>
 
         <ChatWindow
@@ -546,8 +507,8 @@ export default function TechStack() {
               <Image src="/images/Pro-pp.webp" alt="Kenz" width={32} height={32} />
             </ChatAvatar>
             <ChatHeaderInfo>
-              <ChatHeaderName>Kenz</ChatHeaderName>
-              <ChatHeaderStatus><OnlineDot />En ligne</ChatHeaderStatus>
+              <ChatHeaderName>{t.techStack.name}</ChatHeaderName>
+              <ChatHeaderStatus><OnlineDot />{t.techStack.online}</ChatHeaderStatus>
             </ChatHeaderInfo>
           </ChatHeader>
 
@@ -568,7 +529,7 @@ export default function TechStack() {
                 <MsgAvatar>
                   <Image src="/images/Pro-pp.webp" alt="Kenz" width={28} height={28} />
                 </MsgAvatar>
-                <span>Kenz écrit</span>
+                <span>{t.techStack.typing}</span>
               </TypingIndicator>
             )}
 
@@ -599,7 +560,7 @@ export default function TechStack() {
             <ChatInput
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder={allSuggestionsUsed ? 'Pose-moi une question...' : 'Choisis une question ou écris la tienne...'}
+              placeholder={allSuggestionsUsed ? t.techStack.placeholderAsk : t.techStack.placeholderDefault}
               disabled={introPhase !== 'done'}
             />
             <SendBtn type="submit" disabled={!input.trim() || isTyping || introPhase !== 'done'}>

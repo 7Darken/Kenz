@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useMode } from '@/contexts/mode-context'
+import { useTranslation } from '@/contexts/language-context'
 import { ArrowRight } from 'lucide-react'
 
 /* ═══════════════════════════════════════════
@@ -508,28 +509,12 @@ const GetInTouchButton = styled(motion.a)`
    COMPONENT
    ═══════════════════════════════════════════ */
 
-// Pro mode steps
-const proSteps: [string, string][] = [
-  ['Full Stack', 'Developer'],
-  ['Backend', 'Developer'],
-  ['Frontend', 'Developer'],
-  ['Software', 'Developer'],
-  ['Software', 'Engineer'],
-]
-
-// Perso mode steps
-const persoSteps: [string, string][] = [
-  ['Créateur', 'Digital'],
-  ['Créateur', 'de Contenu'],
-  ['Globe', 'Trotteur'],
-  ['Athlète', 'Hybride'],
-]
-
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null)
   const { isPro } = useMode()
+  const t = useTranslation()
   const [stepIndex, setStepIndex] = useState(0)
-  const steps = isPro ? proSteps : persoSteps
+  const steps = isPro ? t.hero.proSteps : t.hero.persoSteps
   const currentStep = steps[stepIndex % steps.length]
 
   useEffect(() => {
@@ -601,7 +586,7 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
               >
-                Salut, moi c&apos;est Kenz
+                {t.hero.greetingPro}
               </ProGreeting>
               <ProNameLine>
                 <AnimatePresence mode="wait">
@@ -654,7 +639,7 @@ export default function Hero() {
                 transition={{ delay: 0.9, duration: 0.8 }}
               >
                 <GreenDot />
-                Disponible pour de nouvelles opportunités
+                {t.hero.available}
               </AvailableBadge>
 
               <ProBioFloat
@@ -662,7 +647,7 @@ export default function Hero() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1, duration: 0.8 }}
               >
-                Passionné par la création d&apos;expériences mobiles &amp; web intuitives qui apportent une vraie valeur.
+                {t.hero.bio}
               </ProBioFloat>
 
               <TrustBlock
@@ -675,7 +660,7 @@ export default function Hero() {
                   <Image src="/images/projects/zenko/icon.webp" alt="" width={32} height={32} />
                 </AvatarStack>
                 <TrustText>
-                  <strong>3 apps</strong> publiées sur l&apos;App Store avec <strong>12k+ téléchargements</strong>
+                  <strong>{t.hero.trust.apps}</strong>{t.hero.trust.middle}<strong>{t.hero.trust.downloads}</strong>
                 </TrustText>
               </TrustBlock>
 
@@ -692,7 +677,7 @@ export default function Hero() {
                 whileTap={{ scale: 0.97 }}
               >
                 <ArrowRight />
-                Me contacter
+                {t.hero.contact}
               </GetInTouchButton>
             </ProFloatingLayer>
           </ProWrapper>
@@ -711,7 +696,7 @@ export default function Hero() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
               >
-                Hey, moi c&apos;est Kenz
+                {t.hero.greetingPerso}
               </ProGreeting>
               <ProNameLine>
                 <AnimatePresence mode="wait">
@@ -769,8 +754,8 @@ export default function Hero() {
                   <svg viewBox="0 0 24 24" fill="#fff" width="14" height="14"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93v6.14c0 3.48-2.32 6.66-5.79 7.18-4.78.72-9.14-2.56-9.66-7.3C.68 9.28 4.31 4.91 9.24 5.3c.64.05 1.28.22 1.88.49v4.2c-.17-.07-.35-.1-.53-.13-1.74-.22-3.35.81-3.97 2.47-.73 1.96.25 4.21 2.17 5.03 2.21.94 4.82-.4 5.54-2.7.13-.42.19-.85.19-1.29v-13.36H12.525z" /></svg>
                 </CommentAvatar>
                 <CommentBody>
-                  <CommentUser>TikTok <CommentTime>@7kinze</CommentTime></CommentUser>
-                  <CommentText>Vlogs voyage 🌍 Astuces business en ligne 💰 Japon · Corée · Islande</CommentText>
+                  <CommentUser>TikTok <CommentTime>{t.hero.tiktok.handle}</CommentTime></CommentUser>
+                  <CommentText>{t.hero.tiktok.text}</CommentText>
                 </CommentBody>
               </SocialComment>
 
@@ -786,8 +771,8 @@ export default function Hero() {
                   <svg viewBox="0 0 24 24" fill="#fff" width="14" height="14"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>
                 </CommentAvatar>
                 <CommentBody>
-                  <CommentUser>YouTube <CommentTime>@7Kinze</CommentTime></CommentUser>
-                  <CommentText>Création de contenu · Business en ligne · Voyages longue durée 🎬</CommentText>
+                  <CommentUser>YouTube <CommentTime>{t.hero.youtube.handle}</CommentTime></CommentUser>
+                  <CommentText>{t.hero.youtube.text}</CommentText>
                 </CommentBody>
               </SocialComment>
 
@@ -800,7 +785,7 @@ export default function Hero() {
                 transition={{ delay: 1.3, duration: 0.8 }}
               >
                 <NotifIcon>🎉</NotifIcon>
-                <NotifText><strong>10K abonnés</strong> atteints sur TikTok</NotifText>
+                <NotifText><strong>{t.hero.notifFollowers.strong}</strong>{t.hero.notifFollowers.rest}</NotifText>
               </SocialNotif>
 
               {/* Notif: business */}
@@ -812,7 +797,7 @@ export default function Hero() {
                 transition={{ delay: 1.5, duration: 0.8 }}
               >
                 <NotifIcon>🚀</NotifIcon>
-                <NotifText><strong>3 apps</strong> lancées · <strong>5 pays</strong> filmés</NotifText>
+                <NotifText><strong>{t.hero.notifApps.apps}</strong>{t.hero.notifApps.middle}<strong>{t.hero.notifApps.countries}</strong>{t.hero.notifApps.rest}</NotifText>
               </SocialNotif>
             </ProFloatingLayer>
           </ProWrapper>

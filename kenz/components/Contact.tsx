@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { ArrowUpRight, Mail, Github, Linkedin, X, Send } from 'lucide-react'
+import { useTranslation } from '@/contexts/language-context'
 
 /* ── Styles ── */
 
@@ -316,6 +317,8 @@ const SuccessText = styled.p`
 export default function Contact() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+  const t = useTranslation()
+  const c = t.contactSection
   const [isOpen, setIsOpen] = useState(false)
   const [sent, setSent] = useState(false)
 
@@ -368,7 +371,7 @@ export default function Contact() {
             animate={inView ? { opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
           >
-            Contact
+            {c.label}
           </Label>
 
           <Title
@@ -376,7 +379,7 @@ export default function Contact() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Un projet en tête ?
+            {c.title}
           </Title>
 
           <Subtitle
@@ -384,7 +387,7 @@ export default function Contact() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
-            Je suis toujours ouvert aux nouvelles opportunités, collaborations ou simplement échanger sur un projet.
+            {c.subtitle}
           </Subtitle>
 
           <ContactButton
@@ -396,7 +399,7 @@ export default function Contact() {
             whileTap={{ scale: 0.97 }}
           >
             <Mail />
-            Me contacter
+            {c.cta}
             <ArrowUpRight />
           </ContactButton>
 
@@ -419,7 +422,7 @@ export default function Contact() {
             transition={{ delay: 0.55, duration: 0.6 }}
           >
             <GreenDot />
-            Disponible pour de nouvelles opportunités
+            {t.hero.available}
           </Availability>
         </Inner>
       </Section>
@@ -454,19 +457,19 @@ export default function Contact() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ModalTitle>Envoyer un message</ModalTitle>
+                    <ModalTitle>{c.modalTitle}</ModalTitle>
                     <ModalSubtitle>
-                      Laisse-moi ton email et ton message, je te réponds rapidement.
+                      {c.modalSubtitle}
                     </ModalSubtitle>
 
                     <Form onSubmit={handleSubmit}>
                       <InputGroup>
-                        <InputLabel htmlFor="contact-email">Email *</InputLabel>
+                        <InputLabel htmlFor="contact-email">{c.emailLabel}</InputLabel>
                         <Input
                           id="contact-email"
                           type="email"
                           required
-                          placeholder="ton@email.com"
+                          placeholder={c.emailPlaceholder}
                           value={email}
                           onChange={e => setEmail(e.target.value)}
                           autoFocus
@@ -474,10 +477,10 @@ export default function Contact() {
                       </InputGroup>
 
                       <InputGroup>
-                        <InputLabel htmlFor="contact-message">Message</InputLabel>
+                        <InputLabel htmlFor="contact-message">{c.messageLabel}</InputLabel>
                         <Textarea
                           id="contact-message"
-                          placeholder="Décris ton projet ou ta question..."
+                          placeholder={c.messagePlaceholder}
                           value={message}
                           onChange={e => setMessage(e.target.value)}
                         />
@@ -490,7 +493,7 @@ export default function Contact() {
                         whileTap={{ scale: 0.98 }}
                       >
                         <Send />
-                        {sending ? 'Envoi...' : 'Envoyer'}
+                        {sending ? c.sending : c.send}
                       </SubmitBtn>
                     </Form>
                   </motion.div>
@@ -503,9 +506,9 @@ export default function Contact() {
                   >
                     <SuccessMsg>
                       <SuccessIcon>✓</SuccessIcon>
-                      <ModalTitle>Message envoyé</ModalTitle>
+                      <ModalTitle>{c.successTitle}</ModalTitle>
                       <SuccessText>
-                        Merci ! Je reviens vers toi très rapidement.
+                        {c.successText}
                       </SuccessText>
                     </SuccessMsg>
                   </motion.div>

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { StoreButton } from '@/components/ui/store-button'
+import { useLanguage } from '@/contexts/language-context'
+import { localize } from '@/i18n/localize'
 
 const Section = styled.section`
   padding: 6rem 2rem;
@@ -54,7 +56,8 @@ const CardsRow = styled.div`
   align-items: flex-start;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 2rem;
+  column-gap: 2rem;
+  row-gap: 0;
   max-width: 1500px;
   width: 100%;
 
@@ -65,20 +68,29 @@ const CardsRow = styled.div`
   }
 `
 
-const CardOuter = styled(motion.div)<{ $rotate: number; $offset: number }>`
+const CardOuter = styled(motion.div)<{ $rotate: number; $offset: number; $z: number }>`
   position: relative;
+  z-index: ${p => p.$z};
   margin-top: ${p => p.$offset}px;
+  /* Chevauchement vertical quand les cards passent sur 2 lignes */
+  margin-bottom: -48px;
   rotate: ${p => p.$rotate}deg;
-  transition: rotate 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: rotate 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
+    z-index: 20;
     rotate: 0deg;
-    transform: translateY(-8px);
+  }
+
+  /* Dès que les 4 cards ne tiennent plus sur une ligne : on supprime
+     l'éventail (offset) pour que la 2e ligne remonte et chevauche. */
+  @media (max-width: 1500px) {
+    margin-top: 0;
   }
 
   @media (max-width: 968px) {
     margin-top: 0;
+    margin-bottom: 0;
     rotate: 0deg;
   }
 `
@@ -239,6 +251,7 @@ const layoutsByCount: Record<number, { rotate: number; offset: number }[]> = {
 
 export default function MobileApps() {
   const router = useRouter()
+  const { lang, t } = useLanguage()
   const orderedProjects = displayOrder.map(i => projects[i]).filter(Boolean)
   const layout = layoutsByCount[orderedProjects.length] || layoutsByCount[3]
 
@@ -251,7 +264,7 @@ export default function MobileApps() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          Applications Mobiles
+          {t.mobileApps.title}
         </Title>
         <Subtitle
           initial={{ opacity: 0, y: 20 }}
@@ -259,7 +272,7 @@ export default function MobileApps() {
           viewport={{ once: true }}
           transition={{ delay: 0.1, duration: 0.8 }}
         >
-          Des expériences digitales conçues avec passion.
+          {t.mobileApps.subtitle}
         </Subtitle>
       </Header>
 
@@ -275,9 +288,11 @@ export default function MobileApps() {
               key={project.id}
               $rotate={slot.rotate}
               $offset={slot.offset}
+              $z={orderedProjects.length - index}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              whileHover={{ y: -12, scale: 1.02 }}
               transition={{
                 delay: index * 0.15,
                 duration: 0.8,
@@ -293,7 +308,7 @@ export default function MobileApps() {
                 <ImageWrapper>
                   <Image
                     src={project.thumbnail}
-                    alt={project.name}
+                    alt={localize(project.name, lang)}
                     width={180}
                     height={180}
                     sizes="180px"
@@ -301,8 +316,8 @@ export default function MobileApps() {
                 </ImageWrapper>
 
                 <TextContent>
-                  <ProjectTitle>{project.name}</ProjectTitle>
-                  <ProjectDescription>{project.description}</ProjectDescription>
+                  <ProjectTitle>{localize(project.name, lang)}</ProjectTitle>
+                  <ProjectDescription>{localize(project.description, lang)}</ProjectDescription>
 
                   <ButtonStack onClick={(e) => e.stopPropagation()}>
                     <StoreRow>
@@ -331,7 +346,7 @@ export default function MobileApps() {
                     }}
                     href={`/apps/${project.slug}`}
                   >
-                    Détails
+                    {t.mobileApps.details}
                     <ArrowRight />
                   </DetailButton>
                 </DetailRow>

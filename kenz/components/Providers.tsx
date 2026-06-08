@@ -6,17 +6,20 @@ import { ThemeProvider } from 'styled-components'
 import { theme } from '@/styles/theme'
 import SmoothScroll from './SmoothScroll'
 import { ModeProvider } from '@/contexts/mode-context'
+import { LanguageProvider } from '@/contexts/language-context'
 
 export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <StyledComponentsRegistry>
             <ThemeProvider theme={theme}>
                 <GlobalStyles />
-                <ModeProvider>
-                    <SmoothScroll>
-                        {children}
-                    </SmoothScroll>
-                </ModeProvider>
+                <LanguageProvider>
+                    <ModeProvider>
+                        <SmoothScroll>
+                            {children}
+                        </SmoothScroll>
+                    </ModeProvider>
+                </LanguageProvider>
             </ThemeProvider>
         </StyledComponentsRegistry>
     )

@@ -11,6 +11,8 @@ import { projects } from "@/data/projects";
 import type { ProjectLink as ProjectSocialLink } from "@/data/projects";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { getSocialIcon } from "@/lib/socials";
+import { useLanguage } from "@/contexts/language-context";
+import { localize } from "@/i18n/localize";
 
 const projectReveal = {
   initial: { opacity: 0, y: 40 },
@@ -46,10 +48,11 @@ type ProjectLink = {
 };
 
 export function ProjectList() {
+  const { lang } = useLanguage();
   return (
     <ProjectListRoot>
       {projects.map((project, index) => {
-        const [firstWord, ...restWords] = project.name.split(" ");
+        const [firstWord, ...restWords] = localize(project.name, lang).split(" ");
         const accentColor = project.glowColor ?? "#ff8a1f";
 
         const socialLinks: ProjectSocialLink[] = project.socials ?? [];
@@ -91,12 +94,12 @@ export function ProjectList() {
           >
             <ProjectCard variants={projectSection} $reverse={index % 2 === 1}>
               <TextColumn variants={projectChild}>
-                <Eyebrow>{project.period}</Eyebrow>
+                <Eyebrow>{localize(project.period, lang)}</Eyebrow>
                 <Title>
                   <Accent $color={accentColor}>{firstWord}</Accent>
                   {restWords.length > 0 ? ` ${restWords.join(" ")}` : ""}
                 </Title>
-                <Description>{project.description}</Description>
+                <Description>{localize(project.description, lang)}</Description>
 
                 <Actions>
                   <PrimaryAction href={primaryLink.href} $color={accentColor}>
@@ -134,7 +137,7 @@ export function ProjectList() {
               <VisualColumn variants={projectChild}>
                 <VisualGlow $color={project.glowColor} />
                 <Thumbnail>
-                  <Image src={project.thumbnail} alt={`${project.name} preview`} fill sizes="(max-width: 768px) 100vw, 480px" priority={index === 0} />
+                  <Image src={project.thumbnail} alt={`${localize(project.name, lang)} preview`} fill sizes="(max-width: 768px) 100vw, 480px" priority={index === 0} />
                 </Thumbnail>
               </VisualColumn>
             </ProjectCard>

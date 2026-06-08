@@ -3,6 +3,7 @@
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import { Instagram, Youtube } from 'lucide-react'
+import { useTranslation } from '@/contexts/language-context'
 
 // Custom TikTok icon since Lucide might not have it or I want a specific style
 const TikTokIcon = () => (
@@ -119,12 +120,13 @@ const socials = [
 ]
 
 export default function Socials() {
+    const t = useTranslation()
     return (
         <Section id="socials">
             <Container>
                 <Title>
-                    <span>Suivre</span>
-                    L&apos;Aventure
+                    <span>{t.socials.eyebrow}</span>
+                    {t.socials.title}
                 </Title>
 
                 <SocialGrid>

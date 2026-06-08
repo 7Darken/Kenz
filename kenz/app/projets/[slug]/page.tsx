@@ -5,6 +5,11 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
 import { projects } from "@/data/projects";
+import { localize } from "@/i18n/localize";
+import { DEFAULT_LANG } from "@/i18n/config";
+
+// Server component (legacy route): render in the site's base language.
+const lang = DEFAULT_LANG;
 
 const statPositions = [
   "md:-left-28 md:-top-4",
@@ -39,19 +44,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  const name = localize(project.name, lang);
+  const description = localize(project.detail?.subheadline ?? project.description, lang);
+
   return {
-    title: `${project.name} · Projet · Kenz`,
-    description: project.detail?.subheadline ?? project.description,
+    title: `${name} · Projet · Kenz`,
+    description,
     openGraph: {
-      title: project.name,
-      description: project.detail?.subheadline ?? project.description,
+      title: name,
+      description,
       images: project.thumbnail
         ? [
             {
               url: project.thumbnail,
               width: 1200,
               height: 630,
-              alt: `${project.name} thumbnail`,
+              alt: `${name} thumbnail`,
             },
           ]
         : undefined,
@@ -69,9 +77,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
   const { detail } = project;
   const accentColor = project.glowColor ?? "#2563eb";
+  const name = localize(project.name, lang);
+  const period = localize(project.period, lang);
+  const subheadline = detail.subheadline ? localize(detail.subheadline, lang) : null;
+  const headline = localize(detail.headline, lang);
   const stats = detail.stats ?? [];
-  const overviewItems = detail.overview ?? [];
-  const tags = detail.tags ?? [];
+  const overviewItems = localize(detail.overview, lang);
+  const tags = detail.tags ? localize(detail.tags, lang) : [];
 
   return (
     <div className="flex flex-col gap-16 pb-24">
@@ -94,7 +106,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         </Link>
         <span className="text-[color:color-mix(in_srgb,var(--muted)_70%,transparent)]">/</span>
         <span className="inline-flex items-center gap-2 rounded-full bg-[color:color-mix(in_srgb,var(--foreground)_10%,transparent)] px-3 py-1.5 font-medium text-[var(--foreground)]">
-          {project.name}
+          {name}
         </span>
       </nav>
 
@@ -103,13 +115,13 @@ export default async function ProjectDetailPage({ params }: PageProps) {
         <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-14 text-center">
           <div className="flex flex-col items-center gap-6">
             <span className="text-xs uppercase tracking-[0.42em] text-[color:color-mix(in_srgb,var(--muted)_88%,transparent)]">
-              {project.period}
+              {period}
             </span>
             <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
-              {project.name}
+              {name}
             </h1>
             <p className="max-w-3xl text-lg text-[color:color-mix(in_srgb,var(--muted)_80%,transparent)]">
-              {detail.subheadline ?? detail.headline}
+              {subheadline ?? headline}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {tags.map((tag) => (
@@ -136,7 +148,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
               <div className="relative aspect-square overflow-hidden rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--border)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--background)_60%,transparent)] shadow-[0_24px_40px_rgba(8,8,8,0.35)]">
                 <Image
                   src={project.thumbnail}
-                  alt={`${project.name} aperçu`}
+                  alt={`${name} aperçu`}
                   fill
                   sizes="(max-width: 768px) 60vw, 220px"
                   className="object-cover"
@@ -147,7 +159,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
 
             {stats.map((stat, index) => (
               <div
-                key={`${stat.label}-${index}`}
+                key={`${localize(stat.label, lang)}-${index}`}
                 className={`mt-10 flex w-full max-w-[220px] flex-col gap-2 rounded-2xl border border-[color:color-mix(in_srgb,var(--border)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--card)_60%,transparent)] px-5 py-4 text-left shadow-[0_18px_38px_rgba(10,10,10,0.18)] backdrop-blur-xl md:absolute ${
                   statPositions[index] ?? ""
                 } md:mt-0`}
@@ -158,14 +170,14 @@ export default async function ProjectDetailPage({ params }: PageProps) {
                 }}
               >
                 <span className="text-xs uppercase tracking-[0.32em] text-[color:color-mix(in_srgb,var(--muted)_80%,transparent)]">
-                  {stat.label}
+                  {localize(stat.label, lang)}
                 </span>
                 <span className="text-3xl font-semibold text-[var(--foreground)]">
                   {stat.value}
                 </span>
                 {stat.description ? (
                   <span className="text-sm text-[color:color-mix(in_srgb,var(--muted)_85%,transparent)]">
-                    {stat.description}
+                    {localize(stat.description, lang)}
                   </span>
                 ) : null}
               </div>
@@ -176,7 +188,7 @@ export default async function ProjectDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-5">
               <h2 className="text-lg font-semibold text-[var(--foreground)]">Vision produit</h2>
               <p className="text-[color:color-mix(in_srgb,var(--muted)_78%,transparent)]">
-                {detail.headline}
+                {headline}
               </p>
               <ul className="mt-4 space-y-3 text-[color:color-mix(in_srgb,var(--muted)_78%,transparent)]">
                 {overviewItems.map((point) => (

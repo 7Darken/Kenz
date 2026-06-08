@@ -5,10 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { projects } from '@/data/projects'
 import { destinations } from '@/data/destinations'
 import { ChevronDown, X } from 'lucide-react'
 import { useMode } from '@/contexts/mode-context'
+import { useLanguage } from '@/contexts/language-context'
+import { localize } from '@/i18n/localize'
+import LanguageToggle from '@/components/LanguageToggle'
 
 /* ═══════════════════════════════════════════
    NAVBAR — Full-width frosted bar
@@ -177,40 +181,45 @@ const RightGroup = styled.div`
   gap: 0.8rem;
 `
 
-/* ── Mode Toggle ── */
+/* ── Secret mode trigger: the dot in "Kenz." ──
+   Hidden in plain sight. Only the initiated click it.
+   Its colour quietly reveals the current mode:
+   green = Pro, orange = Moi. */
 
-const ModeToggle = styled.button`
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 100px;
-  padding: 3px;
-  cursor: pointer;
-  position: relative;
-`
-
-const ModeLabel = styled.span<{ $active: boolean }>`
-  position: relative;
-  z-index: 2;
-  padding: 0.35rem 0.85rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: ${p => p.$active ? '#000' : 'rgba(255, 255, 255, 0.45)'};
-  border-radius: 100px;
-  transition: color 0.3s ease;
+const LogoText = styled.span`
+  display: inline-block;
   white-space: nowrap;
-  user-select: none;
 `
 
-const ModeIndicator = styled(motion.div)`
-  position: absolute;
-  top: 3px;
-  bottom: 3px;
-  border-radius: 100px;
-  background: white;
-  z-index: 1;
+const SecretDot = styled.span<{ $mode: 'pro' | 'perso' }>`
+  display: inline-block;
+  cursor: pointer;
+  color: ${p => (p.$mode === 'pro' ? '#00c8a0' : '#ff8c38')};
+  transform-origin: 50% 70%;
+  transition: color 0.6s ease, text-shadow 0.35s ease;
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    text-shadow: 0 0 16px currentColor;
+    animation: secretDotPulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes secretDotPulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.5); }
+  }
+`
+
+const ModeRipple = styled(motion.div)`
+  position: fixed;
+  width: 250vmax;
+  height: 250vmax;
+  margin-left: -125vmax;
+  margin-top: -125vmax;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: screen;
 `
 
 /* ── Mobile ── */
@@ -275,23 +284,6 @@ const MobileLink = styled(Link)`
   &:hover { color: white; }
 `
 
-const MobileBottom = styled.div`
-  margin-top: auto;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
-
-const MobileModeText = styled.span`
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
-`
-
 /* ═══════════════════════════════════════════
    COMPONENT
    ═══════════════════════════════════════════ */
@@ -302,6 +294,34 @@ export default function Navbar() {
   const [travelDrop, setTravelDrop] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { mode, toggleMode, isPro, isPerso } = useMode()
+  const { lang, t } = useLanguage()
+  const pathname = usePathname()
+  const isHome = pathname === '/'
+  const [ripple, setRipple] = useState<{ id: number; x: number; y: number; color: string } | null>(null)
+
+  // Le contact ouvre une modale sur la home (où le listener vit) ; ailleurs,
+  // on laisse le Link naviguer vers /#contact pour rejoindre la section.
+  const handleContactClick = (e: React.MouseEvent) => {
+    if (isHome) {
+      e.preventDefault()
+      window.dispatchEvent(new Event('open-contact-modal'))
+    }
+  }
+
+  // Secret switch: clicking the dot in the logo flips Pro <-> Moi,
+  // sending a coloured wave out from the dot itself.
+  const triggerSecretSwitch = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    setRipple({
+      id: Date.now(),
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      color: isPro ? '#ff8c38' : '#00c8a0',
+    })
+    toggleMode()
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -331,7 +351,9 @@ export default function Navbar() {
         <NavInner>
           <LogoLink href="/">
             <Image src="/images/KzLogo.webp" alt="Kenz" width={30} height={30} />
-            Kenz.
+            <LogoText>
+              Kenz<SecretDot $mode={mode} onClick={triggerSecretSwitch}>.</SecretDot>
+            </LogoText>
           </LogoLink>
 
           <DesktopNav>
@@ -342,7 +364,7 @@ export default function Navbar() {
                   onMouseLeave={() => setProjectsDrop(false)}
                 >
                   <DropdownTrigger>
-                    Projets
+                    {t.nav.projects}
                     <ChevronDown
                       size={13}
                       style={{
@@ -363,10 +385,10 @@ export default function Navbar() {
                       >
                         {projects.map((p) => (
                           <DropdownLink key={p.id} href={`/apps/${p.slug}`}>
-                            <Image src={p.thumbnail} alt={p.name} width={34} height={34} />
+                            <Image src={p.thumbnail} alt={localize(p.name, lang)} width={34} height={34} />
                             <DropdownText>
-                              <span>{p.name}</span>
-                              <small>{p.period}</small>
+                              <span>{localize(p.name, lang)}</span>
+                              <small>{localize(p.period, lang)}</small>
                             </DropdownText>
                           </DropdownLink>
                         ))}
@@ -374,28 +396,22 @@ export default function Navbar() {
                     )}
                   </AnimatePresence>
                 </DropdownWrap>
-                <NavItem href="#kenz-ai">Kenz AI</NavItem>
-                <NavItem
-                  href="#contact"
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault()
-                    window.dispatchEvent(new Event('open-contact-modal'))
-                  }}
-                >
-                  Contact
+                <NavItem href="/#kenz-ai">{t.nav.kenzAi}</NavItem>
+                <NavItem href="/#contact" onClick={handleContactClick}>
+                  {t.nav.contact}
                 </NavItem>
               </>
             )}
 
             {isPerso && (
               <>
-                <NavItem href="#content">Contenu</NavItem>
+                <NavItem href="/#content">{t.nav.content}</NavItem>
                 <DropdownWrap
                   onMouseEnter={() => setTravelDrop(true)}
                   onMouseLeave={() => setTravelDrop(false)}
                 >
                   <DropdownTrigger>
-                    Voyages
+                    {t.nav.travels}
                     <ChevronDown
                       size={13}
                       style={{
@@ -427,26 +443,15 @@ export default function Navbar() {
                     )}
                   </AnimatePresence>
                 </DropdownWrap>
-                <NavItem href="#socials">Réseaux</NavItem>
+                <NavItem href="/#socials">{t.nav.socials}</NavItem>
               </>
             )}
           </DesktopNav>
 
           <RightGroup>
-            <ModeToggle onClick={toggleMode}>
-              <ModeLabel $active={mode === 'pro'}>Pro</ModeLabel>
-              <ModeLabel $active={mode === 'perso'}>Moi</ModeLabel>
-              <ModeIndicator
-                layout
-                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                style={{
-                  left: mode === 'pro' ? 3 : '50%',
-                  right: mode === 'perso' ? 3 : '50%',
-                }}
-              />
-            </ModeToggle>
+            <LanguageToggle />
 
-            <Burger onClick={() => setMobileOpen(true)} aria-label="Menu">
+            <Burger onClick={() => setMobileOpen(true)} aria-label={t.nav.menu}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <path d="M4 7h16M4 12h16M4 17h16" />
               </svg>
@@ -469,7 +474,7 @@ export default function Navbar() {
                 <Image src="/images/KzLogo.webp" alt="Kenz" width={28} height={28} />
                 Kenz.
               </LogoLink>
-              <MobileClose onClick={() => setMobileOpen(false)} aria-label="Fermer">
+              <MobileClose onClick={() => setMobileOpen(false)} aria-label={t.nav.close}>
                 <X size={24} />
               </MobileClose>
             </MobileTop>
@@ -477,45 +482,45 @@ export default function Navbar() {
             <MobileLinks>
               {isPro && (
                 <>
-                  <MobileLink href="/#apps" onClick={() => setMobileOpen(false)}>Projets</MobileLink>
-                  <MobileLink href="/#kenz-ai" onClick={() => setMobileOpen(false)}>Kenz AI</MobileLink>
+                  <MobileLink href="/#apps" onClick={() => setMobileOpen(false)}>{t.nav.projects}</MobileLink>
+                  <MobileLink href="/#kenz-ai" onClick={() => setMobileOpen(false)}>{t.nav.kenzAi}</MobileLink>
                   <MobileLink
-                    href="#"
+                    href="/#contact"
                     onClick={(e: React.MouseEvent) => {
-                      e.preventDefault()
                       setMobileOpen(false)
-                      window.dispatchEvent(new Event('open-contact-modal'))
+                      if (isHome) {
+                        e.preventDefault()
+                        window.dispatchEvent(new Event('open-contact-modal'))
+                      }
                     }}
                   >
-                    Contact
+                    {t.nav.contact}
                   </MobileLink>
                 </>
               )}
               {isPerso && (
                 <>
-                  <MobileLink href="/#content" onClick={() => setMobileOpen(false)}>Contenu</MobileLink>
-                  <MobileLink href="/#travel" onClick={() => setMobileOpen(false)}>Voyages</MobileLink>
-                  <MobileLink href="/#socials" onClick={() => setMobileOpen(false)}>Réseaux</MobileLink>
+                  <MobileLink href="/#content" onClick={() => setMobileOpen(false)}>{t.nav.content}</MobileLink>
+                  <MobileLink href="/#travel" onClick={() => setMobileOpen(false)}>{t.nav.travels}</MobileLink>
+                  <MobileLink href="/#socials" onClick={() => setMobileOpen(false)}>{t.nav.socials}</MobileLink>
                 </>
               )}
             </MobileLinks>
-
-            <MobileBottom>
-              <MobileModeText>Mode</MobileModeText>
-              <ModeToggle onClick={toggleMode}>
-                <ModeLabel $active={mode === 'pro'}>Pro</ModeLabel>
-                <ModeLabel $active={mode === 'perso'}>Moi</ModeLabel>
-                <ModeIndicator
-                  layout
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  style={{
-                    left: mode === 'pro' ? 3 : '50%',
-                    right: mode === 'perso' ? 3 : '50%',
-                  }}
-                />
-              </ModeToggle>
-            </MobileBottom>
           </MobileOverlay>
+        )}
+      </AnimatePresence>
+
+      {/* Inversion wave radiating from the secret dot */}
+      <AnimatePresence>
+        {ripple && (
+          <ModeRipple
+            key={ripple.id}
+            style={{ left: ripple.x, top: ripple.y, background: ripple.color }}
+            initial={{ scale: 0, opacity: 0.55 }}
+            animate={{ scale: 1, opacity: 0 }}
+            transition={{ duration: 0.95, ease: [0.22, 1, 0.36, 1] }}
+            onAnimationComplete={() => setRipple(null)}
+          />
         )}
       </AnimatePresence>
     </>
