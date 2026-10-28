@@ -11,6 +11,7 @@ import { getCityStops, getTripStats, type Itinerary } from "@/data/itineraries";
 import { useLanguage } from "@/contexts/language-context";
 import { localize } from "@/i18n/localize";
 import { Container, EASE, Eyebrow, formatEuroRange, tokens } from "./shared";
+import { ThemeToggle } from "./theme";
 
 interface ItineraryHeroProps {
   itinerary: Itinerary;
@@ -33,10 +34,13 @@ export function ItineraryHero({ itinerary, videoUrl, onExplore }: ItineraryHeroP
       </Backdrop>
 
       <Container>
-        <BackLink href="/#content">
-          <ArrowLeft size={15} />
-          {strings.back}
-        </BackLink>
+        <TopRow>
+          <BackLink href="/#content">
+            <ArrowLeft size={15} />
+            {strings.back}
+          </BackLink>
+          <ThemeToggle />
+        </TopRow>
 
         <Layout>
           <Copy>
@@ -244,8 +248,16 @@ const Watermark = styled.span`
   line-height: 1;
   font-weight: 800;
   color: transparent;
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.035);
+  -webkit-text-stroke: 1px var(--it-watermark);
   user-select: none;
+`;
+
+const TopRow = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 `;
 
 const BackLink = styled(Link)`
@@ -258,13 +270,13 @@ const BackLink = styled(Link)`
   font-size: 0.82rem;
   font-weight: 500;
   color: ${tokens.muted};
-  background: rgba(255, 255, 255, 0.04);
+  background: ${tokens.fill};
   border: 1px solid ${tokens.border};
   transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease;
 
   &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    color: ${tokens.ink};
+    background: ${tokens.fillStrong};
     transform: translateX(-2px);
   }
 `;
@@ -299,7 +311,7 @@ const Title = styled.h1`
   font-style: italic;
   line-height: 0.92;
   letter-spacing: -0.035em;
-  color: #fff;
+  color: ${tokens.ink};
 `;
 
 const Word = styled(motion.span)`
@@ -333,7 +345,7 @@ const RouteChip = styled.span<{ $color: string }>`
   border-radius: 100px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #fff;
+  color: ${tokens.ink};
   background: color-mix(in srgb, ${(p) => p.$color} 10%, transparent);
   border: 1px solid color-mix(in srgb, ${(p) => p.$color} 35%, transparent);
 
@@ -368,8 +380,8 @@ const PrimaryButton = styled(motion.button)`
   border-radius: 100px;
   font-size: 0.92rem;
   font-weight: 650;
-  color: #08080a;
-  background: #fff;
+  color: ${tokens.onInverse};
+  background: ${tokens.inverse};
   transition: box-shadow 0.3s ease;
 
   svg {
@@ -377,7 +389,7 @@ const PrimaryButton = styled(motion.button)`
   }
 
   &:hover {
-    box-shadow: 0 12px 40px -10px rgba(255, 255, 255, 0.45);
+    box-shadow: 0 12px 40px -10px color-mix(in srgb, ${tokens.inverse} 45%, transparent);
   }
 
   &:hover svg {
@@ -393,7 +405,7 @@ const GhostLink = styled.a`
   border-radius: 100px;
   font-size: 0.92rem;
   font-weight: 600;
-  color: #fff;
+  color: ${tokens.ink};
   border: 1px solid ${tokens.borderStrong};
   transition: background 0.25s ease, border-color 0.25s ease;
 
@@ -402,8 +414,8 @@ const GhostLink = styled.a`
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: ${tokens.fill};
+    border-color: ${tokens.faint};
   }
 `;
 
@@ -420,8 +432,8 @@ const PosterCard = styled(motion.a)`
   transform-style: preserve-3d;
   border: 1px solid ${tokens.borderStrong};
   box-shadow:
-    0 40px 80px -30px rgba(0, 0, 0, 0.9),
-    0 0 0 6px rgba(255, 255, 255, 0.025);
+    0 40px 80px -30px ${tokens.shadow},
+    0 0 0 6px ${tokens.fill};
 
   img {
     object-fit: cover;
@@ -488,7 +500,7 @@ const Stat = styled.div`
   flex-direction: column;
   gap: 0.25rem;
   padding: 1.2rem 1.4rem;
-  background: #07070a;
+  background: ${tokens.solid};
 
   strong {
     font-family: ${(p) => p.theme.fonts.aesthetic};
@@ -496,7 +508,7 @@ const Stat = styled.div`
     font-weight: 400;
     font-style: italic;
     line-height: 1;
-    color: #fff;
+    color: ${tokens.ink};
     font-variant-numeric: tabular-nums;
   }
 

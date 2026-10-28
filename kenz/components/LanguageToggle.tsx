@@ -20,8 +20,8 @@ const Toggle = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--nav-fill, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--nav-panel-border, rgba(255, 255, 255, 0.08));
   border-radius: 100px;
   padding: 3px;
 `;
@@ -40,7 +40,8 @@ const Option = styled.button<{ $active: boolean }>`
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.03em;
-  color: ${(p) => (p.$active ? "#000" : "rgba(255, 255, 255, 0.45)")};
+  color: ${(p) =>
+    p.$active ? "var(--nav-pill-text, #000)" : "var(--nav-text-faint, rgba(255, 255, 255, 0.45))"};
   transition: color 0.35s ease;
   white-space: nowrap;
   user-select: none;
@@ -60,7 +61,7 @@ const Indicator = styled(motion.div)`
   bottom: 3px;
   left: 0;
   border-radius: 100px;
-  background: #fff;
+  background: var(--nav-pill, #fff);
   z-index: 0;
 `;
 

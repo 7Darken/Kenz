@@ -18,6 +18,9 @@ import LanguageToggle from '@/components/LanguageToggle'
    NAVBAR — Full-width frosted bar
    ═══════════════════════════════════════════ */
 
+/* Colours read optional --nav-* variables (set by pages with their own
+   theme, e.g. the light itinerary page) and fall back to the dark look. */
+
 const NavOuter = styled(motion.header)<{ $scrolled: boolean }>`
   position: fixed;
   top: 0;
@@ -25,10 +28,10 @@ const NavOuter = styled(motion.header)<{ $scrolled: boolean }>`
   right: 0;
   z-index: 100;
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-  background: ${p => p.$scrolled ? 'rgba(3, 3, 5, 0.7)' : 'transparent'};
+  background: ${p => p.$scrolled ? 'var(--nav-bg, rgba(3, 3, 5, 0.7))' : 'transparent'};
   backdrop-filter: ${p => p.$scrolled ? 'blur(20px)' : 'none'};
-  border-bottom: 1px solid ${p => p.$scrolled ? 'rgba(255,255,255,0.05)' : 'transparent'};
-  box-shadow: ${p => p.$scrolled ? '0 4px 30px rgba(0,0,0,0.3)' : 'none'};
+  border-bottom: 1px solid ${p => p.$scrolled ? 'var(--nav-border, rgba(255,255,255,0.05))' : 'transparent'};
+  box-shadow: ${p => p.$scrolled ? 'var(--nav-shadow, 0 4px 30px rgba(0,0,0,0.3))' : 'none'};
 `
 
 const NavInner = styled.nav`
@@ -51,7 +54,7 @@ const LogoLink = styled(Link)`
   align-items: center;
   gap: 0.6rem;
   text-decoration: none;
-  color: white;
+  color: var(--nav-text-strong, white);
   font-weight: 700;
   font-size: 1.15rem;
   font-family: ${p => p.theme.fonts.main};
@@ -60,7 +63,10 @@ const LogoLink = styled(Link)`
 
   &:hover { opacity: 0.8; }
 
-  img { border-radius: 50%; }
+  img {
+    border-radius: 50%;
+    filter: var(--nav-logo-filter, none);
+  }
 `
 
 /* ── Desktop Nav ── */
@@ -78,15 +84,15 @@ const DesktopNav = styled.div`
 const NavItem = styled(Link)`
   font-size: 0.85rem;
   font-weight: 450;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--nav-text, rgba(255, 255, 255, 0.55));
   text-decoration: none;
   padding: 0.5rem 0.9rem;
   border-radius: 10px;
   transition: color 0.25s ease, background 0.25s ease;
 
   &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--nav-text-strong, white);
+    background: var(--nav-hover, rgba(255, 255, 255, 0.05));
   }
 `
 
@@ -100,7 +106,7 @@ const DropdownTrigger = styled.button`
   gap: 4px;
   font-size: 0.85rem;
   font-weight: 450;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--nav-text, rgba(255, 255, 255, 0.55));
   padding: 0.5rem 0.9rem;
   border-radius: 10px;
   border: none;
@@ -109,8 +115,8 @@ const DropdownTrigger = styled.button`
   transition: color 0.25s ease, background 0.25s ease;
 
   &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--nav-text-strong, white);
+    background: var(--nav-hover, rgba(255, 255, 255, 0.05));
   }
 `
 
@@ -118,9 +124,9 @@ const DropdownPanel = styled(motion.div)`
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  background: rgba(12, 12, 14, 0.92);
+  background: var(--nav-panel, rgba(12, 12, 14, 0.92));
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--nav-panel-border, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
   padding: 0.4rem;
   min-width: 260px;
@@ -146,7 +152,7 @@ const DropdownLink = styled(Link)`
   text-decoration: none;
   transition: background 0.2s ease;
 
-  &:hover { background: rgba(255, 255, 255, 0.06); }
+  &:hover { background: var(--nav-hover, rgba(255, 255, 255, 0.06)); }
 
   img {
     width: 34px;
@@ -162,13 +168,13 @@ const DropdownText = styled.div`
   line-height: 1.2;
 
   span {
-    color: white;
+    color: var(--nav-text-strong, white);
     font-size: 0.85rem;
     font-weight: 550;
   }
 
   small {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--nav-text-faint, rgba(255, 255, 255, 0.4));
     font-size: 0.72rem;
   }
 `
@@ -226,7 +232,7 @@ const ModeRipple = styled(motion.div)`
 
 const Burger = styled.button`
   display: none;
-  color: white;
+  color: var(--nav-text-strong, white);
   background: none;
   border: none;
   cursor: pointer;
@@ -243,7 +249,7 @@ const MobileOverlay = styled(motion.div)`
   position: fixed;
   inset: 0;
   z-index: 150;
-  background: rgba(3, 3, 5, 0.95);
+  background: var(--nav-overlay, rgba(3, 3, 5, 0.95));
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
@@ -258,7 +264,7 @@ const MobileTop = styled.div`
 `
 
 const MobileClose = styled.button`
-  color: white;
+  color: var(--nav-text-strong, white);
   background: none;
   border: none;
   cursor: pointer;
@@ -276,12 +282,12 @@ const MobileLink = styled(Link)`
   font-family: ${p => p.theme.fonts.aesthetic};
   font-style: italic;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--nav-text, rgba(255, 255, 255, 0.7));
   text-decoration: none;
   padding: 0.6rem 0;
   transition: color 0.3s ease;
 
-  &:hover { color: white; }
+  &:hover { color: var(--nav-text-strong, white); }
 `
 
 /* ═══════════════════════════════════════════

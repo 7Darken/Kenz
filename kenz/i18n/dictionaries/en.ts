@@ -324,6 +324,11 @@ export const en: Dictionary = {
       night: "Night",
       transport: "Transit",
       shopping: "Shopping",
+      wellness: "Wellness",
+    },
+    theme: {
+      toLight: "Switch to light mode",
+      toDark: "Switch to dark mode",
     },
     essentials: {
       eyebrow: "Before you go",

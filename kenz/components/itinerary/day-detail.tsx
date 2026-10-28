@@ -377,6 +377,8 @@ const BigNumber = styled(motion.span)`
   -webkit-background-clip: text;
   background-clip: text;
   font-variant-numeric: tabular-nums;
+  /* Room for the italic overhang, which background-clip: text would cut. */
+  padding-right: 0.12em;
 
   @media (max-width: 720px) {
     position: absolute;
@@ -407,7 +409,7 @@ const CityPill = styled.span`
   border-radius: 100px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #fff;
+  color: ${tokens.ink};
   background: color-mix(in srgb, var(--c) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
 
@@ -444,7 +446,7 @@ const DayTitle = styled.h3`
   font-style: italic;
   line-height: 1.02;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: ${tokens.ink};
 `;
 
 const Summary = styled.p`
@@ -476,8 +478,8 @@ const IconButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: ${tokens.ink};
+  background: ${tokens.fill};
   border: 1px solid ${tokens.border};
   transition:
     background 0.2s ease,
@@ -515,8 +517,8 @@ const Toast = styled(motion.span)`
   font-size: 0.72rem;
   font-weight: 600;
   white-space: nowrap;
-  color: #08080a;
-  background: #fff;
+  color: ${tokens.onInverse};
+  background: ${tokens.inverse};
   pointer-events: none;
   z-index: 2;
 `;
@@ -535,13 +537,13 @@ const factStyles = `
   padding: 0.65rem 0.95rem 0.65rem 0.8rem;
   border-radius: 14px;
   font-size: 0.85rem;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.035);
+  color: ${tokens.ink};
+  background: ${tokens.card};
   border: 1px solid ${tokens.border};
 
   > svg {
     flex-shrink: 0;
-    color: var(--c);
+    color: color-mix(in srgb, var(--c) var(--it-tint-mix), var(--it-ink));
   }
 
   span {
@@ -572,7 +574,7 @@ const FactLink = styled.a`
   }
 
   &:hover {
-    background: rgba(255, 0, 51, 0.08);
+    background: color-mix(in srgb, ${tokens.youtube} 10%, transparent);
   }
 `;
 
@@ -621,8 +623,8 @@ const Node = styled.span`
   width: 40px;
   height: 40px;
   border-radius: 13px;
-  color: var(--tint);
-  background: color-mix(in srgb, var(--tint) 13%, #0a0a0d);
+  color: color-mix(in srgb, var(--tint) var(--it-tint-mix), var(--it-ink));
+  background: color-mix(in srgb, var(--tint) 13%, ${tokens.solid});
   border: 1px solid color-mix(in srgb, var(--tint) 35%, transparent);
   box-shadow: 0 0 22px -6px color-mix(in srgb, var(--tint) 60%, transparent);
 
@@ -640,7 +642,7 @@ const Line = styled(motion.span)`
   margin: 6px 0;
   border-radius: 2px;
   transform-origin: top;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 50%, transparent), rgba(255, 255, 255, 0.06));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 50%, transparent), ${tokens.fill});
 `;
 
 const Body = styled.div`
@@ -673,7 +675,7 @@ const KindTag = styled.span`
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--tint);
+  color: color-mix(in srgb, var(--tint) var(--it-tint-mix), var(--it-ink));
   margin-right: 0.2rem;
 `;
 
@@ -681,7 +683,7 @@ const MobileTime = styled.span`
   display: none;
   font-family: ${(p) => p.theme.fonts.mono};
   font-size: 0.72rem;
-  color: #fff;
+  color: ${tokens.ink};
 
   @media (max-width: 640px) {
     display: inline;
@@ -696,7 +698,7 @@ const Chip = styled.span`
   border-radius: 100px;
   font-size: 0.7rem;
   color: ${tokens.muted};
-  background: rgba(255, 255, 255, 0.05);
+  background: ${tokens.fill};
 `;
 
 const ItemTitle = styled.h4`
@@ -704,7 +706,7 @@ const ItemTitle = styled.h4`
   font-size: 1.05rem;
   font-weight: 650;
   line-height: 1.3;
-  color: #fff;
+  color: ${tokens.ink};
 `;
 
 const ItemText = styled.p`
@@ -722,18 +724,18 @@ const Tip = styled.div`
   border-radius: 12px;
   font-size: 0.84rem;
   line-height: 1.5;
-  color: rgba(255, 236, 200, 0.85);
-  background: rgba(245, 199, 107, 0.07);
-  border: 1px solid rgba(245, 199, 107, 0.18);
+  color: var(--it-tip-text);
+  background: var(--it-tip-bg);
+  border: 1px solid var(--it-tip-border);
 
   svg {
     flex-shrink: 0;
     margin-top: 0.1rem;
-    color: #f5c76b;
+    color: var(--it-tip-accent);
   }
 
   strong {
-    color: #f5c76b;
+    color: var(--it-tip-accent);
     font-weight: 650;
   }
 `;
@@ -753,7 +755,7 @@ const MapLink = styled.a`
   }
 
   &:hover {
-    color: #fff;
+    color: ${tokens.ink};
   }
 
   &:hover svg:last-child {
@@ -773,12 +775,12 @@ const NextCard = styled.button<{ $color: string }>`
   padding: 1.2rem 1.4rem;
   border-radius: 22px;
   text-align: left;
-  color: #fff;
+  color: ${tokens.ink};
   overflow: hidden;
   background: linear-gradient(
     120deg,
     color-mix(in srgb, var(--n) 16%, transparent),
-    rgba(255, 255, 255, 0.02) 60%
+    ${tokens.card} 60%
   );
   border: 1px solid color-mix(in srgb, var(--n) 30%, transparent);
   transition:
@@ -795,7 +797,7 @@ const NextCard = styled.button<{ $color: string }>`
     font-family: ${(p) => p.theme.fonts.mono};
     font-size: 0.7rem;
     letter-spacing: 0.06em;
-    color: var(--n);
+    color: color-mix(in srgb, var(--n) var(--it-tint-mix), var(--it-ink));
   }
 
   strong {
@@ -829,7 +831,7 @@ const EndCard = styled(GlassCard)`
     display: block;
     font-size: 2.6rem;
     font-weight: 700;
-    color: var(--c);
+    color: color-mix(in srgb, var(--c) var(--it-tint-mix), var(--it-ink));
     text-shadow: 0 0 30px color-mix(in srgb, var(--c) 60%, transparent);
   }
 
@@ -838,7 +840,7 @@ const EndCard = styled(GlassCard)`
     font-family: ${(p) => p.theme.fonts.aesthetic};
     font-size: 1.5rem;
     font-style: italic;
-    color: #fff;
+    color: ${tokens.ink};
   }
 
   button {
@@ -850,12 +852,12 @@ const EndCard = styled(GlassCard)`
     border-radius: 100px;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #fff;
+    color: ${tokens.ink};
     border: 1px solid ${tokens.borderStrong};
     transition: background 0.2s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: ${tokens.fill};
     }
   }
 `;

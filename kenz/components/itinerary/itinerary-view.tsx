@@ -13,6 +13,7 @@ import { ItineraryHero } from "./itinerary-hero";
 import { PLANNER_ID, Planner, readHashDay } from "./planner";
 import { tokens } from "./shared";
 import { SubscribeGate } from "./subscribe-gate";
+import { ItineraryThemeStyles, useItineraryTheme, useThemeAttribute } from "./theme";
 import { VideoSection } from "./video-section";
 
 /** Shared by every itinerary: subscribing once unlocks them all. */
@@ -23,6 +24,8 @@ export function ItineraryView({ slug }: { slug: string }) {
   if (!itinerary) notFound();
 
   const hydrated = useHydrated();
+  const { choice: themeChoice } = useItineraryTheme();
+  useThemeAttribute(themeChoice);
   const [subscriber, setSubscriber] = useStoredState(SUBSCRIBER_KEY);
   // Server render and hydration show the page itself (indexable, no flash
   // for returning subscribers); the gate fades in right after if needed.
@@ -54,6 +57,7 @@ export function ItineraryView({ slug }: { slug: string }) {
 
   return (
     <MotionConfig reducedMotion="user">
+      <ItineraryThemeStyles />
       <Page>
         <Grain aria-hidden />
         <Content inert={locked}>
@@ -85,7 +89,7 @@ export function ItineraryView({ slug }: { slug: string }) {
 const Page = styled.main`
   position: relative;
   min-height: 100vh;
-  background: #030305;
+  background: ${tokens.bg};
   color: ${tokens.text};
   overflow-x: clip;
 `;
@@ -96,8 +100,8 @@ const Grain = styled.div`
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: var(--it-grain-opacity);
+  mix-blend-mode: var(--it-grain-blend);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 `;
 

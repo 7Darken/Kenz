@@ -226,8 +226,8 @@ const linkStyles = css`
 
 const LightLink = styled.a`
   ${linkStyles}
-  color: #08080a;
-  background: #fff;
+  color: ${tokens.onInverse};
+  background: ${tokens.inverse};
 `;
 
 const RedLink = styled.a`

@@ -4,10 +4,10 @@ import { useId } from "react";
 import styled, { keyframes } from "styled-components";
 import { AnimatePresence, motion } from "framer-motion";
 
-import { getCityStops, type Itinerary, type ItineraryCity, type TravelMode } from "@/data/itineraries";
+import { getCity, getCityStops, type Itinerary, type ItineraryCity, type TravelMode } from "@/data/itineraries";
 import { useLanguage } from "@/contexts/language-context";
 import { localize } from "@/i18n/localize";
-import { EASE, Eyebrow, GlassCard, SPRING, TRAVEL_ICONS, tokens } from "./shared";
+import { EASE, Eyebrow, GlassCard, SPRING, TRAVEL_ICONS, tintText, tokens } from "./shared";
 
 interface RouteMapProps {
   itinerary: Itinerary;
@@ -53,10 +53,14 @@ export function RouteMap({ itinerary, currentDay, onSelectDay }: RouteMapProps) 
   );
   const current = stops[currentIndex];
 
-  const legs = stops.slice(1).map((stop, i) => {
-    const from = stops[i].city;
-    const mode = itinerary.days[stop.firstDay - 1].travel?.mode ?? "plane";
-    return { from, to: stop.city, mode, day: stop.firstDay, ...arc(from.map, stop.city.map, mode) };
+  // One arc per travel day, from the city actually left: a day trip
+  // (Chongqing → Wulong, back the same night) shows up as a spur.
+  const legs = itinerary.days.flatMap((day, index) => {
+    if (!day.travel) return [];
+    const from = getCity(itinerary, day.travel.from);
+    const to = getCity(itinerary, day.city);
+    const { mode } = day.travel;
+    return [{ from, to, mode, day: index + 1, ...arc(from.map, to.map, mode) }];
   });
 
   return (
@@ -72,7 +76,7 @@ export function RouteMap({ itinerary, currentDay, onSelectDay }: RouteMapProps) 
         <svg viewBox="0 0 100 84" role="img" aria-label={stops.map((s) => localize(s.city.name, lang)).join(" → ")}>
           <defs>
             <pattern id={`${uid}-dots`} width="4" height="4" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="0.28" fill="rgba(255,255,255,0.13)" />
+              <circle cx="1" cy="1" r="0.28" style={{ fill: "var(--it-map-dot)" }} />
             </pattern>
             {legs.map((leg, i) => (
               <linearGradient
@@ -103,7 +107,7 @@ export function RouteMap({ itinerary, currentDay, onSelectDay }: RouteMapProps) 
                 <path
                   d={leg.d}
                   fill="none"
-                  stroke="rgba(255,255,255,0.14)"
+                  style={{ stroke: "var(--it-map-line)" }}
                   strokeWidth={0.5}
                   strokeDasharray={leg.mode === "plane" ? "1.2 1.4" : undefined}
                   strokeLinecap="round"
@@ -119,8 +123,12 @@ export function RouteMap({ itinerary, currentDay, onSelectDay }: RouteMapProps) 
                   transition={{ duration: 0.9, ease: EASE }}
                 />
                 <g transform={`translate(${leg.mid.x} ${leg.mid.y})`}>
-                  <circle r="2.9" fill="#0b0b0f" stroke={done ? leg.to.color : "rgba(255,255,255,0.18)"} strokeWidth={0.35} />
-                  <TravelIcon x={-1.7} y={-1.7} size={3.4} color={done ? "#fff" : "rgba(255,255,255,0.4)"} />
+                  <circle
+                    r="2.9"
+                    strokeWidth={0.35}
+                    style={{ fill: tokens.solid, stroke: done ? leg.to.color : tokens.borderStrong }}
+                  />
+                  <TravelIcon x={-1.7} y={-1.7} size={3.4} style={{ color: done ? tokens.ink : tokens.faint }} />
                 </g>
               </g>
             );
@@ -164,29 +172,28 @@ export function RouteMap({ itinerary, currentDay, onSelectDay }: RouteMapProps) 
                   cx={x}
                   cy={y}
                   r="1.5"
-                  fill={visited ? stop.city.color : "#0b0b0f"}
+                  style={{ fill: visited ? stop.city.color : tokens.solid }}
                   stroke={stop.city.color}
                   strokeWidth={0.5}
                 />
-                <text
+                <CityLabel
                   x={x + offset.dx}
                   y={y + offset.dy}
                   textAnchor={offset.anchor}
                   fontSize="3.3"
-                  fontWeight={active ? 700 : 500}
-                  fill={active ? "#fff" : "rgba(255,255,255,0.6)"}
+                  $active={active}
                 >
                   {name}
-                  <tspan fontSize="2.5" fill="rgba(255,255,255,0.4)" dx="1">
+                  <tspan fontSize="2.5" dx="1" style={{ fill: tokens.faint }}>
                     {stop.city.hanzi}
                   </tspan>
-                </text>
+                </CityLabel>
               </CityNode>
             );
           })}
 
           <motion.g initial={false} animate={{ x: current.city.map.x, y: current.city.map.y }} transition={SPRING}>
-            <Target r="3.6" fill="none" stroke="#fff" strokeWidth={0.4} strokeDasharray="1.6 1.2" />
+            <Target r="3.6" fill="none" strokeWidth={0.4} strokeDasharray="1.6 1.2" />
           </motion.g>
         </svg>
       </MapFrame>
@@ -254,7 +261,7 @@ const MapFrame = styled.div`
 const Watermark = styled.text`
   font-size: 34px;
   font-weight: 800;
-  fill: rgba(255, 255, 255, 0.025);
+  fill: var(--it-watermark);
   user-select: none;
 `;
 
@@ -268,11 +275,17 @@ const CityNode = styled.g`
 
   &:hover text,
   &:focus-visible text {
-    fill: #fff;
+    fill: ${tokens.ink};
   }
 `;
 
+const CityLabel = styled.text<{ $active: boolean }>`
+  fill: ${(p) => (p.$active ? tokens.ink : tokens.muted)};
+  font-weight: ${(p) => (p.$active ? 700 : 500)};
+`;
+
 const Target = styled.circle`
+  stroke: ${tokens.ink};
   transform-box: fill-box;
   transform-origin: center;
   animation: ${spin} 6s linear infinite;
@@ -291,13 +304,13 @@ const Hanzi = styled.span<{ $color: string }>`
   font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  color: ${(p) => p.$color};
+  color: ${(p) => tintText(p.$color)};
   text-shadow: 0 0 24px color-mix(in srgb, ${(p) => p.$color} 55%, transparent);
 `;
 
 const CityName = styled.p`
   font-weight: 650;
-  color: #fff;
+  color: ${tokens.ink};
 `;
 
 const CityTagline = styled.p`

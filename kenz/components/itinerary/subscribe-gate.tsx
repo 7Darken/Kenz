@@ -21,6 +21,7 @@ import LanguageToggle from "@/components/LanguageToggle";
 import { useTranslation } from "@/contexts/language-context";
 import { YOUTUBE_HANDLE, YOUTUBE_SUBSCRIBE_URL } from "@/lib/socials";
 import { EASE, tokens } from "./shared";
+import { ThemeToggle } from "./theme";
 
 /* Honor-system gate: YouTube offers no way to check a subscription without
    making the visitor sign in, so we ask, send them to the channel in a new
@@ -105,7 +106,10 @@ export function SubscribeGate({ stats, colors, onUnlock }: SubscribeGateProps) {
           <ArrowLeft size={15} />
           {t.back}
         </BackLink>
-        <LanguageToggle />
+        <TopActions>
+          <ThemeToggle />
+          <LanguageToggle />
+        </TopActions>
       </TopBar>
 
       <Card
@@ -364,7 +368,7 @@ const Overlay = styled(motion.div)`
   place-items: center;
   padding: 5rem 1rem 2rem;
   overflow-y: auto;
-  background: rgba(3, 3, 5, 0.62);
+  background: var(--it-overlay);
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
 `;
@@ -400,14 +404,20 @@ const BackLink = styled(Link)`
   font-size: 0.82rem;
   font-weight: 500;
   color: ${tokens.muted};
-  background: rgba(255, 255, 255, 0.05);
+  background: ${tokens.fill};
   border: 1px solid ${tokens.border};
   transition: color 0.25s ease, background 0.25s ease;
 
   &:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.09);
+    color: ${tokens.ink};
+    background: ${tokens.fillStrong};
   }
+`;
+
+const TopActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 `;
 
 const Card = styled(motion.div)`
@@ -417,10 +427,10 @@ const Card = styled(motion.div)`
   border-radius: 32px;
   text-align: center;
   outline: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02));
+  background: var(--it-sheet);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 50px 120px -30px rgba(0, 0, 0, 0.85);
+    inset 0 1px 0 ${tokens.highlight},
+    0 50px 120px -30px ${tokens.shadow};
 
   /* Specular edge — a 1px gradient border drawn through a mask. */
   &::before {
@@ -431,9 +441,9 @@ const Card = styled(motion.div)`
     border-radius: inherit;
     background: linear-gradient(
       150deg,
-      rgba(255, 255, 255, 0.38),
-      rgba(255, 255, 255, 0.05) 35%,
-      rgba(255, 255, 255, 0.03) 65%,
+      ${tokens.borderStrong},
+      ${tokens.border} 35%,
+      ${tokens.border} 65%,
       rgba(255, 0, 51, 0.45)
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -467,7 +477,7 @@ const AvatarImage = styled.div`
   inset: 0;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #0b0b0f;
+  border: 3px solid ${tokens.solid};
 
   img {
     object-fit: cover;
@@ -487,7 +497,7 @@ const AvatarBadge = styled(motion.span)<{ $success: boolean }>`
   border-radius: 50%;
   color: ${(p) => (p.$success ? "#03140e" : "#fff")};
   background: ${(p) => (p.$success ? SUCCESS : tokens.youtube)};
-  border: 3px solid #121216;
+  border: 3px solid ${tokens.solid};
   box-shadow: 0 6px 18px -4px ${(p) => (p.$success ? SUCCESS : tokens.youtube)};
 `;
 
@@ -525,7 +535,7 @@ const Title = styled.h2`
   font-style: italic;
   line-height: 1.08;
   letter-spacing: -0.01em;
-  color: #fff;
+  color: ${tokens.ink};
 `;
 
 const Text = styled.p`
@@ -567,11 +577,11 @@ const buttonStyles = css<{ $variant: Variant }>`
   ${(p) =>
     p.$variant === "light" &&
     css`
-      color: #08080a;
-      background: #fff;
+      color: ${tokens.onInverse};
+      background: ${tokens.inverse};
 
       &:hover {
-        background: #ececf0;
+        background: ${tokens.inverseHover};
       }
     `}
 
@@ -603,13 +613,13 @@ const buttonStyles = css<{ $variant: Variant }>`
       border: 1px solid ${tokens.border};
 
       &:hover {
-        color: #fff;
+        color: ${tokens.ink};
         border-color: ${tokens.borderStrong};
       }
     `}
 
   &:focus-visible {
-    outline: 2px solid #fff;
+    outline: 2px solid ${tokens.ink};
     outline-offset: 3px;
   }
 `;
@@ -638,7 +648,7 @@ const Perk = styled.span`
   border-radius: 100px;
   font-size: 0.74rem;
   color: ${tokens.muted};
-  background: rgba(255, 255, 255, 0.04);
+  background: ${tokens.fill};
   border: 1px solid ${tokens.border};
 `;
 
@@ -696,7 +706,7 @@ const StepLine = styled.span`
   width: calc(100% - 30px);
   height: 2px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.1);
+  background: ${tokens.fillStrong};
   overflow: hidden;
 
   span {
@@ -715,9 +725,9 @@ const StepDot = styled.span<{ $done: boolean; $active: boolean }>`
   border-radius: 50%;
   font-size: 0.7rem;
   font-weight: 700;
-  color: ${(p) => (p.$done ? "#03140e" : p.$active ? "#fff" : tokens.faint)};
-  background: ${(p) => (p.$done ? SUCCESS : p.$active ? "rgba(255, 255, 255, 0.12)" : "transparent")};
-  border: 1.5px solid ${(p) => (p.$done ? SUCCESS : p.$active ? "#fff" : "rgba(255, 255, 255, 0.15)")};
+  color: ${(p) => (p.$done ? "#03140e" : p.$active ? tokens.ink : tokens.faint)};
+  background: ${(p) => (p.$done ? SUCCESS : p.$active ? tokens.fillStrong : "transparent")};
+  border: 1.5px solid ${(p) => (p.$done ? SUCCESS : p.$active ? tokens.ink : tokens.borderStrong)};
   transition: all 0.35s ease;
 `;
 
@@ -731,7 +741,7 @@ const Progress = styled.div`
   margin: 1.6rem auto 0;
   width: 60%;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  background: ${tokens.fillStrong};
   overflow: hidden;
 
   span {

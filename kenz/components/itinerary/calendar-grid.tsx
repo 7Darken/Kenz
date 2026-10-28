@@ -7,7 +7,7 @@ import { getCity, type Itinerary } from "@/data/itineraries";
 import { useLanguage } from "@/contexts/language-context";
 import { LANG_META } from "@/i18n/config";
 import { localize } from "@/i18n/localize";
-import { DAY_ICONS, EASE, TRAVEL_ICONS, addDays, formatDate, padDay, tokens } from "./shared";
+import { DAY_ICONS, EASE, TRAVEL_ICONS, addDays, formatDate, padDay, tintText, tokens } from "./shared";
 
 interface CalendarGridProps {
   itinerary: Itinerary;
@@ -114,11 +114,11 @@ const Cell = styled(motion.button)<{ $color: string; $from: string; $selected: b
   padding: 0.75rem 0.75rem 0.85rem;
   border-radius: 20px;
   text-align: left;
-  color: #fff;
+  color: ${tokens.ink};
   overflow: hidden;
   isolation: isolate;
   background: ${(p) =>
-    p.$selected ? "color-mix(in srgb, var(--c) 12%, rgba(255, 255, 255, 0.03))" : "rgba(255, 255, 255, 0.025)"};
+    p.$selected ? `color-mix(in srgb, var(--c) 12%, ${tokens.card})` : tokens.card};
   border: 1px solid ${tokens.border};
   transition:
     background 0.35s ease,
@@ -209,7 +209,7 @@ const IconWrap = styled.span<{ $color: string }>`
   width: 28px;
   height: 28px;
   border-radius: 9px;
-  color: ${(p) => p.$color};
+  color: ${(p) => tintText(p.$color)};
   background: color-mix(in srgb, ${(p) => p.$color} 12%, transparent);
 
   @media (max-width: 640px) {
@@ -269,7 +269,7 @@ const CellCity = styled.span<{ $color: string }>`
   gap: 0.25rem;
   font-size: 0.68rem;
   font-weight: 500;
-  color: ${(p) => p.$color};
+  color: ${(p) => tintText(p.$color)};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

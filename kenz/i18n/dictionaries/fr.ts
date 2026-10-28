@@ -328,6 +328,11 @@ export const fr = {
       night: "Soirée",
       transport: "Trajet",
       shopping: "Shopping",
+      wellness: "Détente",
+    },
+    theme: {
+      toLight: "Passer en mode clair",
+      toDark: "Passer en mode sombre",
     },
     essentials: {
       eyebrow: "Avant de partir",

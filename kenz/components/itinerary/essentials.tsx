@@ -9,7 +9,7 @@ import type { Itinerary } from "@/data/itineraries";
 import { useLanguage } from "@/contexts/language-context";
 import { localize } from "@/i18n/localize";
 import { useStoredState } from "@/lib/browser-state";
-import { Container, EASE, ESSENTIAL_ICONS, Eyebrow, SectionTitle, glass, tokens } from "./shared";
+import { Container, EASE, ESSENTIAL_ICONS, Eyebrow, SectionTitle, glass, tintText, tokens } from "./shared";
 
 const READY = "#2fd6a3";
 
@@ -94,7 +94,7 @@ export function Essentials({ itinerary }: { itinerary: Itinerary }) {
                   cy="20"
                   r="16"
                   initial={false}
-                  animate={{ pathLength: done / total }}
+                  animate={{ pathLength: done / total, opacity: done ? 1 : 0 }}
                   transition={{ type: "spring", stiffness: 120, damping: 20 }}
                 />
               </Ring>
@@ -185,7 +185,7 @@ const InfoCard = styled(motion.article)`
     margin-top: 1rem;
     font-size: 1rem;
     font-weight: 650;
-    color: #fff;
+    color: ${tokens.ink};
   }
 
   p {
@@ -207,8 +207,8 @@ const IconBox = styled.span`
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  color: #fff;
-  background: linear-gradient(140deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.03));
+  color: ${tokens.ink};
+  background: linear-gradient(140deg, ${tokens.fillStrong}, ${tokens.fill});
   border: 1px solid ${tokens.border};
 `;
 
@@ -237,7 +237,7 @@ const ChecklistHead = styled.div`
     font-size: 1.5rem;
     font-weight: 400;
     font-style: italic;
-    color: #fff;
+    color: ${tokens.ink};
   }
 
   small {
@@ -259,7 +259,7 @@ const Ring = styled.svg`
   }
 
   circle:first-child {
-    stroke: rgba(255, 255, 255, 0.08);
+    stroke: ${tokens.fillStrong};
   }
 
   circle:last-child {
@@ -286,7 +286,7 @@ const CheckRow = styled.button`
   transition: background 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: ${tokens.fill};
   }
 
   &:focus-visible {
@@ -302,9 +302,9 @@ const Box = styled.span<{ $checked: boolean }>`
   width: 22px;
   height: 22px;
   border-radius: 7px;
-  color: #03140e;
+  color: ${(p) => (p.$checked ? "#03140e" : "transparent")};
   background: ${(p) => (p.$checked ? READY : "transparent")};
-  border: 1.5px solid ${(p) => (p.$checked ? READY : "rgba(255, 255, 255, 0.25)")};
+  border: 1.5px solid ${(p) => (p.$checked ? READY : tokens.faint)};
   transition:
     background 0.25s ease,
     border-color 0.25s ease,
@@ -325,9 +325,9 @@ const Box = styled.span<{ $checked: boolean }>`
 const Label = styled.span<{ $checked: boolean }>`
   font-size: 0.88rem;
   line-height: 1.4;
-  color: ${(p) => (p.$checked ? tokens.faint : "#fff")};
+  color: ${(p) => (p.$checked ? tokens.faint : tokens.ink)};
   text-decoration: line-through;
-  text-decoration-color: ${(p) => (p.$checked ? "rgba(255, 255, 255, 0.4)" : "transparent")};
+  text-decoration-color: ${(p) => (p.$checked ? tokens.faint : "transparent")};
   transition:
     color 0.3s ease,
     text-decoration-color 0.3s ease;
@@ -341,5 +341,5 @@ const Footer = styled(motion.p)<{ $ready: boolean }>`
   padding-top: 1rem;
   font-size: 0.78rem;
   font-weight: ${(p) => (p.$ready ? 650 : 400)};
-  color: ${(p) => (p.$ready ? READY : tokens.faint)};
+  color: ${(p) => (p.$ready ? tintText(READY) : tokens.faint)};
 `;

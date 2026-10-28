@@ -3,9 +3,12 @@
 import styled, { css } from "styled-components";
 import { motion } from "framer-motion";
 import {
+  Bath,
+  Bike,
   BrickWall,
   Building,
   Building2,
+  Coffee,
   CreditCard,
   Flower2,
   Landmark,
@@ -19,6 +22,7 @@ import {
   Sailboat,
   ShoppingBag,
   Ship,
+  Sparkles,
   Stamp,
   Sun,
   ThermometerSun,
@@ -36,18 +40,33 @@ import type { Dictionary } from "@/i18n/dictionaries";
    TOKENS
    ═══════════════════════════════════════════ */
 
+/** Theme-dependent values are CSS variables, defined for light and dark in ./theme. */
 export const tokens = {
-  card: "rgba(255, 255, 255, 0.035)",
-  cardHover: "rgba(255, 255, 255, 0.06)",
-  border: "rgba(255, 255, 255, 0.08)",
-  borderStrong: "rgba(255, 255, 255, 0.16)",
-  text: "#f5f5f7",
-  muted: "rgba(255, 255, 255, 0.6)",
-  faint: "rgba(255, 255, 255, 0.38)",
+  bg: "var(--it-bg)",
+  card: "var(--it-surface)",
+  cardHover: "var(--it-surface-hover)",
+  solid: "var(--it-surface-solid)",
+  fill: "var(--it-fill)",
+  fillStrong: "var(--it-fill-strong)",
+  border: "var(--it-border)",
+  borderStrong: "var(--it-border-strong)",
+  ink: "var(--it-ink)",
+  text: "var(--it-text)",
+  muted: "var(--it-muted)",
+  faint: "var(--it-faint)",
+  inverse: "var(--it-inverse)",
+  onInverse: "var(--it-on-inverse)",
+  inverseHover: "var(--it-inverse-hover)",
+  shadow: "var(--it-shadow)",
+  highlight: "var(--it-highlight)",
   youtube: "#ff0033",
+  success: "#2fd6a3",
   /** Height of the fixed site navbar, for sticky elements and scroll offsets. */
   navOffset: 88,
 };
+
+/** A bright accent used as text: darkened in light mode so it stays readable. */
+export const tintText = (color: string) => `color-mix(in srgb, ${color} var(--it-tint-mix), var(--it-ink))`;
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 export const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
@@ -61,6 +80,10 @@ export const DAY_ICONS: Record<DayIcon, LucideIcon> = {
   palace: Landmark,
   wall: BrickWall,
   temple: Sun,
+  rest: Coffee,
+  spa: Bath,
+  lights: Sparkles,
+  bike: Bike,
   plane: Plane,
   train: TrainFront,
   city: Building2,
@@ -84,6 +107,7 @@ export const KIND_STYLES: Record<ActivityKind, { icon: LucideIcon; color: string
   night: { icon: MoonStar, color: "#a58bff" },
   transport: { icon: Navigation, color: "#7cc4ff" },
   shopping: { icon: ShoppingBag, color: "#ff7ac6" },
+  wellness: { icon: Bath, color: "#56d6e8" },
 };
 
 export const ESSENTIAL_ICONS: Record<EssentialIcon, LucideIcon> = {
@@ -162,7 +186,7 @@ export const SectionTitle = styled(motion.h2)`
   font-style: italic;
   line-height: 1;
   letter-spacing: -0.02em;
-  color: ${tokens.text};
+  color: ${tokens.ink};
 `;
 
 export const glass = css`
@@ -171,8 +195,8 @@ export const glass = css`
   background: ${tokens.card};
   border: 1px solid ${tokens.border};
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 30px 60px -30px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 ${tokens.highlight},
+    0 30px 60px -30px ${tokens.shadow};
   backdrop-filter: blur(18px);
 `;
 

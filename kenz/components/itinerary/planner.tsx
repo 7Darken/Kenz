@@ -365,7 +365,7 @@ const LegendChip = styled.button<{ $color: string; $active: boolean }>`
   border-radius: 100px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: ${(p) => (p.$active ? "#fff" : tokens.muted)};
+  color: ${(p) => (p.$active ? tokens.ink : tokens.muted)};
   background: ${(p) => (p.$active ? `color-mix(in srgb, ${p.$color} 16%, transparent)` : "transparent")};
   border: 1px solid ${(p) => (p.$active ? `color-mix(in srgb, ${p.$color} 45%, transparent)` : tokens.border)};
   transition: all 0.3s ease;
@@ -379,7 +379,7 @@ const LegendChip = styled.button<{ $color: string; $active: boolean }>`
   }
 
   &:hover {
-    color: #fff;
+    color: ${tokens.ink};
     border-color: color-mix(in srgb, ${(p) => p.$color} 45%, transparent);
   }
 `;
@@ -405,8 +405,8 @@ const DateField = styled(motion.div)<{ $alert: boolean }>`
   gap: 0.6rem;
   padding: 0.35rem 0.5rem 0.35rem 0.85rem;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid ${(p) => (p.$alert ? "#f5c76b" : tokens.border)};
+  background: ${tokens.fill};
+  border: 1px solid ${(p) => (p.$alert ? "var(--it-tip-accent)" : tokens.border)};
   box-shadow: ${(p) => (p.$alert ? "0 0 0 4px rgba(245, 199, 107, 0.15)" : "none")};
   transition:
     border-color 0.3s ease,
@@ -437,11 +437,10 @@ const DateField = styled(motion.div)<{ $alert: boolean }>`
     font: inherit;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #fff;
+    color: ${tokens.ink};
     background: transparent;
     border: none;
     outline: none;
-    color-scheme: dark;
   }
 `;
 
@@ -452,10 +451,10 @@ const ClearDate = styled.button`
   height: 24px;
   border-radius: 50%;
   color: ${tokens.muted};
-  background: rgba(255, 255, 255, 0.06);
+  background: ${tokens.fill};
 
   &:hover {
-    color: #fff;
+    color: ${tokens.ink};
   }
 `;
 
@@ -468,8 +467,8 @@ const ExportButton = styled(motion.button)<{ $done: boolean }>`
   border-radius: 14px;
   font-size: 0.85rem;
   font-weight: 650;
-  color: #08080a;
-  background: ${(p) => (p.$done ? "#2fd6a3" : "#fff")};
+  color: ${(p) => (p.$done ? "#03140e" : tokens.onInverse)};
+  background: ${(p) => (p.$done ? tokens.success : tokens.inverse)};
   transition: background 0.3s ease;
 
   span {
@@ -488,9 +487,9 @@ const Notice = styled(motion.div)`
     padding: 0.6rem 0.9rem;
     border-radius: 12px;
     font-size: 0.84rem;
-    color: #f5c76b;
-    background: rgba(245, 199, 107, 0.08);
-    border: 1px solid rgba(245, 199, 107, 0.2);
+    color: var(--it-tip-accent);
+    background: var(--it-tip-bg);
+    border: 1px solid var(--it-tip-border);
   }
 `;
 

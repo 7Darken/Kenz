@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCity, type Itinerary } from "@/data/itineraries";
 import { useLanguage } from "@/contexts/language-context";
 import { localize } from "@/i18n/localize";
-import { EASE, tokens } from "./shared";
+import { EASE, tintText, tokens } from "./shared";
 
 interface DayDockProps {
   itinerary: Itinerary;
@@ -109,13 +109,13 @@ const Dock = styled(motion.nav)`
   gap: 0.35rem;
   padding: 0.35rem;
   border-radius: 100px;
-  background: rgba(14, 14, 18, 0.72);
+  background: var(--it-dock);
   border: 1px solid ${tokens.borderStrong};
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 20px 50px -12px rgba(0, 0, 0, 0.8);
+    inset 0 1px 0 ${tokens.highlight},
+    0 20px 50px -12px ${tokens.shadow};
 `;
 
 const Arrow = styled.button`
@@ -124,13 +124,13 @@ const Arrow = styled.button`
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  color: #fff;
+  color: ${tokens.ink};
   transition:
     background 0.2s ease,
     opacity 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
+    background: ${tokens.fillStrong};
   }
 
   &:disabled {
@@ -174,7 +174,7 @@ const CityLabel = styled.span<{ $color: string }>`
   padding: 0 0.4rem 0 0.2rem;
   font-size: 0.78rem;
   font-weight: 600;
-  color: ${(p) => p.$color};
+  color: ${(p) => tintText(p.$color)};
   white-space: nowrap;
 
   @media (max-width: 520px) {
