@@ -87,6 +87,11 @@ export function getSocialIcon(label: string, options?: { size?: number }): React
   return createElement(Share2, { size: options?.size ?? 16, "aria-hidden": true });
 }
 
+export const YOUTUBE_CHANNEL_URL = "https://www.youtube.com/@7Kinze";
+/** Opens the channel with YouTube's "Subscribe?" confirmation dialog. */
+export const YOUTUBE_SUBSCRIBE_URL = `${YOUTUBE_CHANNEL_URL}?sub_confirmation=1`;
+export const YOUTUBE_HANDLE = "@7Kinze";
+
 export type HeroSocial = {
   label: SocialLabel;
   href: string;

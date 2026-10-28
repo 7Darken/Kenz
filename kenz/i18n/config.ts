@@ -20,13 +20,14 @@ export const LANG_STORAGE_KEY = "kenz-lang";
  * `flagCode` is the ISO 3166-1 alpha-2 code used by the free flagcdn.com API
  * (https://flagcdn.com) — no API key required.
  *   FR -> France flag (fr), EN -> United Kingdom flag (gb).
+ * `locale` is the BCP 47 tag used for Intl date / number formatting.
  */
 export const LANG_META: Record<
   Lang,
-  { label: string; flagCode: string; aria: string }
+  { label: string; flagCode: string; aria: string; locale: string }
 > = {
-  fr: { label: "FR", flagCode: "fr", aria: "Français" },
-  en: { label: "EN", flagCode: "gb", aria: "English" },
+  fr: { label: "FR", flagCode: "fr", aria: "Français", locale: "fr-FR" },
+  en: { label: "EN", flagCode: "gb", aria: "English", locale: "en-GB" },
 };
 
 /** Builds the flagcdn.com URL for a given language (width-40 PNG, retina-friendly). */

@@ -5,10 +5,11 @@ import styled, { keyframes } from 'styled-components'
 import { motion } from 'framer-motion'
 import { destinations } from '@/data/destinations'
 import { getDestinationDetail } from '@/data/destination-details'
+import { getItinerary } from '@/data/itineraries'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Clock, Compass } from 'lucide-react'
+import { ArrowLeft, ArrowRight, MapPin, Clock, Compass } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 import { localize } from '@/i18n/localize'
 
@@ -543,6 +544,32 @@ const CTAButton = styled(motion.a)`
   svg { width: 16px; height: 16px; }
 `
 
+const CTAActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+`
+
+const CTAPrimary = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  border-radius: 100px;
+  background: #fff;
+  color: #08080a;
+  font-weight: 650;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px -10px rgba(255, 255, 255, 0.4);
+  }
+`
+
 /* ═══════════════════════════════════════════
    COMPONENT
    ═══════════════════════════════════════════ */
@@ -552,6 +579,7 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
   const { lang, t } = useLanguage()
   const destination = destinations.find(d => d.slug === slug)
   const detail = getDestinationDetail(slug)
+  const itinerary = getItinerary(slug)
 
   if (!destination) notFound()
 
@@ -767,15 +795,23 @@ export default function DestinationDetail({ params }: { params: Promise<{ slug: 
         >
           {t.destinationPage.ctaBefore}{country}{t.destinationPage.ctaAfter}
         </SectionTitle>
-        <CTAButton
-          href="https://www.tiktok.com/@7kinze"
-          target="_blank"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          {t.destinationPage.vlogsBefore}{country}{t.destinationPage.vlogsAfter}
-          <Compass size={16} />
-        </CTAButton>
+        <CTAActions>
+          {itinerary && (
+            <CTAPrimary href={`/itineraire/${itinerary.slug}`}>
+              {t.destinationPage.itineraryCta}
+              <ArrowRight size={16} />
+            </CTAPrimary>
+          )}
+          <CTAButton
+            href="https://www.tiktok.com/@7kinze"
+            target="_blank"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            {t.destinationPage.vlogsBefore}{country}{t.destinationPage.vlogsAfter}
+            <Compass size={16} />
+          </CTAButton>
+        </CTAActions>
       </CTASection>
     </Page>
   )
