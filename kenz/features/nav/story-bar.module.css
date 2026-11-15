@@ -1,0 +1,78 @@
+/* La barre « stories » (accueil Créateur) : un segment par chapitre, en fil doré ; un nœud entre deux
+   chapitres s'allume quand le chapitre est lu. Elle fait office de filet de progression. */
+.story {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  padding: 6px var(--gr) 0 var(--gl);
+  pointer-events: auto;
+}
+
+.segment {
+  position: relative;
+  flex: 1 1 0;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.segment::before,
+.fill {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.segment::before {
+  background: rgb(var(--fg-rgb) / .18);
+  transition: background-color .4s var(--expo);
+}
+
+.fill {
+  background: rgb(var(--lum));
+  transform: scaleX(var(--fill, 0));
+  transform-origin: left;
+  box-shadow: 0 0 8px rgb(var(--lum) / .7);
+}
+
+.segment:hover::before {
+  background: rgb(var(--fg-rgb) / .34);
+}
+
+.segment:focus-visible {
+  outline-offset: 1px;
+}
+
+.segment::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 6px;
+  z-index: 1;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .4);
+  transition: background-color .6s var(--expo), box-shadow .6s var(--expo);
+}
+
+.segment:last-child::after {
+  display: none;
+}
+
+.segment[data-done]::after {
+  background: rgb(var(--lum));
+  box-shadow: 0 0 0 2px rgb(var(--lum) / .18), 0 0 8px rgb(var(--lum) / .8);
+}
+
+:global(html[data-theme="light"]) .fill {
+  box-shadow: 0 0 6px rgb(var(--lum) / .35);
+}
+
+:global(html[data-theme="light"]) .segment[data-done]::after {
+  box-shadow: 0 0 0 2px rgb(var(--lum) / .16);
+}

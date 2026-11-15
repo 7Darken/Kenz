@@ -1,0 +1,102 @@
+/* La loupe : une lentille de verre légèrement teinté, ×1,1, qui suit la souris (shared/theme.css §10).
+   Jamais au toucher ni en mouvement réduit. */
+.loupe {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-loupe);
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0s .5s;
+}
+
+.loupe[data-on] {
+  visibility: visible;
+  transition: none;
+}
+
+.body {
+  --lt: 168px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--lt);
+  height: var(--lt);
+  will-change: transform;
+}
+
+.disc {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  clip-path: circle(0% at 50% 50%);
+  transition: clip-path .28s var(--out);
+}
+
+.loupe[data-on] .disc {
+  clip-path: circle(50% at 50% 50%);
+  transition: clip-path .7s var(--expo);
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+}
+
+/* Le clone de l'élément agrandi : ses propres transformations sont neutralisées */
+.clone {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  transform-origin: 50% 50% !important;
+  translate: none !important;
+  rotate: none !important;
+  scale: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Le verre : une teinte de la lumière, un reflet, un bord plus dense */
+.tint {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 50% 50%, rgb(var(--lum) / 0) 58%, rgb(var(--lum) / .2) 100%),
+    rgb(var(--lum) / .07);
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(.7);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .62), inset 0 1px 0 1px rgba(255, 255, 255, .18), 0 0 0 1px rgb(var(--lum) / .45), 0 0 26px rgb(var(--lum) / .3), 0 24px 50px -22px rgba(0, 0, 0, .75);
+  transition: opacity .28s var(--out), transform .28s var(--out);
+}
+
+:global(html[data-theme="light"]) .ring {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 1px rgba(26, 25, 24, .1), 0 0 0 4px rgba(255, 255, 255, .35), 0 22px 44px -20px rgba(26, 25, 24, .45);
+}
+
+.loupe[data-on] .ring {
+  opacity: 1;
+  transform: none;
+  transition: opacity .6s var(--expo), transform .9s var(--expo);
+}
+
+/* Sur une image (pas un lien) : la lentille remplace le curseur */
+:global(html.kz-loupe-curseur) {
+  cursor: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loupe {
+    display: none;
+  }
+}

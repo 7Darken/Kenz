@@ -1,0 +1,120 @@
+/* L'arche : la forme signature des cadres (porte ovale), shared/theme.css §9 */
+.arch {
+  --arche-ratio: .714;
+  --arche-rb: 0px;
+  --arche-c: var(--lum);
+  position: relative;
+  aspect-ratio: var(--arche-ratio);
+  isolation: isolate;
+  border-radius: 50% 50% var(--arche-rb) var(--arche-rb) / calc(var(--arche-ratio) * 50%) calc(var(--arche-ratio) * 50%) var(--arche-rb) var(--arche-rb);
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  isolation: isolate;
+}
+
+/* Une photo en cover dans l'arche (next/image avec fill, ou <img>) */
+.inner img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+/* Arche de lumière : un intérieur lumineux qui s'éteint vers le sol */
+.light::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(76% 40% at 50% 22%, rgb(var(--arche-c) / .3), rgb(var(--arche-c) / .08) 60%, rgb(var(--arche-c) / 0)),
+    linear-gradient(180deg, rgb(var(--arche-c) / .08), rgb(var(--arche-c) / 0) 70%);
+}
+
+:global(html[data-theme="light"]) .light::before {
+  background:
+    radial-gradient(80% 42% at 50% 24%, rgba(255, 255, 255, .9), rgba(255, 255, 255, .4) 62%, rgba(255, 255, 255, 0)),
+    linear-gradient(180deg, rgb(var(--arche-c) / .08), rgb(var(--arche-c) / 0) 80%);
+}
+
+/* Le fil de l'arche (dessiné par <ArchTrace>) */
+.trace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.trace path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.fil {
+  stroke: rgb(var(--arche-c));
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 4px rgb(var(--arche-c) / .7));
+}
+
+.shadow {
+  stroke: rgb(var(--fg-rgb) / .16);
+  stroke-width: 1.1;
+}
+
+:global(html[data-theme="light"]) .fil {
+  stroke-width: 1.3;
+  filter: drop-shadow(0 0 3px rgb(var(--arche-c) / .3));
+}
+
+.trace[data-traced] .fil {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 2.4s var(--io) var(--fil-delay, .1s);
+}
+
+.trace[data-traced] .shadow {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 2.8s var(--io) var(--shadow-delay, .5s);
+}
+
+/* La ligne de sol */
+.floor {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, rgb(var(--arche-c) / 0), rgb(var(--arche-c) / .7) 32%, rgb(var(--arche-c) / .7) 68%, rgb(var(--arche-c) / 0));
+  box-shadow: 0 0 10px rgb(var(--arche-c) / .4);
+}
+
+.trace[data-traced] ~ .floor,
+.floorStatic {
+  transform: none;
+  transition: transform 2s var(--expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace path {
+    stroke-dashoffset: 0;
+    transition: none !important;
+  }
+
+  .floor {
+    transform: none;
+  }
+}

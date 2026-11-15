@@ -1,0 +1,129 @@
+/* Le bouton de mode : soleil / lune en SVG fin (shared/theme.css §6). On montre le mode qu'on obtiendra :
+   le soleil en sombre, la lune en clair. */
+.toggle {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--target);
+  height: var(--target);
+  border-radius: 50%;
+  color: var(--fg);
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .5s var(--expo), color .35s var(--expo);
+}
+
+.toggle::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--cta-bg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  transition: background-color .4s var(--expo), box-shadow .4s var(--expo);
+}
+
+.toggle:hover::before {
+  background-color: var(--ghost-hover);
+  box-shadow: inset 0 0 0 1px var(--field-line-2);
+}
+
+:global(html[data-theme="light"]) .toggle::before {
+  background: rgba(255, 255, 255, .62);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 14px -8px rgba(26, 25, 24, .3);
+}
+
+:global(html[data-theme="light"]) .toggle:hover::before {
+  background-color: #fff;
+}
+
+.toggle:active {
+  transform: scale(.94);
+}
+
+.toggle:focus-visible {
+  outline-offset: 2px;
+}
+
+/* Sans pastille (le pied de page) : juste l'icône */
+.bare {
+  color: var(--muted);
+}
+
+.bare::before,
+:global(html[data-theme="light"]) .bare::before {
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.bare:hover {
+  color: var(--fg);
+}
+
+.bare:hover::before,
+:global(html[data-theme="light"]) .bare:hover::before {
+  background-color: rgb(var(--fg-rgb) / .07);
+  box-shadow: none;
+}
+
+.toggle svg {
+  width: 19px;
+  height: 19px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bare svg {
+  width: 17px;
+  height: 17px;
+}
+
+.sun,
+.moon {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  transition: opacity .45s var(--expo), transform .8s var(--expo);
+}
+
+.rays {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  transition: transform .9s var(--expo), opacity .45s var(--expo);
+}
+
+:global(html:not([data-theme="light"])) .moon {
+  opacity: 0;
+  transform: rotate(-60deg) scale(.55);
+}
+
+:global(html[data-theme="light"]) .sun {
+  opacity: 0;
+  transform: rotate(80deg) scale(.55);
+}
+
+:global(html[data-theme="light"]) .rays {
+  transform: scale(.4);
+  opacity: 0;
+}
+
+.toggle:hover .rays {
+  transform: rotate(22.5deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sun,
+  .moon,
+  .rays {
+    transition-property: opacity;
+  }
+}

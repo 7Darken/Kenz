@@ -1,0 +1,4 @@
+/* Un chapitre : repère du fil (nœud sur le rail) et de l'aura ; position relative pour son trait */
+.section {
+  position: relative;
+}

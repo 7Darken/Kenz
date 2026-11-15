@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# kenzenbien.fr
 
-## Getting Started
+Le site de Kenz : deux univers séparés, **Pro** (l'espace : apps, agents IA) et **Créateur** (la Terre : le voyage en Asie, le sport avec k15ze), en français et en anglais, en mode clair et en mode sombre.
 
-First, run the development server:
+## Installation
+
+Prérequis : Node 22.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.local.example .env.local   # TELEGRAM_BOT_TOKEN et TELEGRAM_CHAT_ID (formulaires)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | Serveur de développement |
+| `npm run build` | Build de production, puis sitemap (`next-sitemap`) |
+| `npm run start` | Sert le build |
+| `npm run lint` | ESLint (flat config) |
+| `npx tsc --noEmit` | Vérification des types |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pile
 
-## Learn More
+- Next.js 16 (App Router, React Compiler)
+- React 19
+- TypeScript 6, en mode strict
+- CSS Modules et jetons CSS
+- GSAP et ScrollTrigger, Lenis
+- three.js pour la Terre
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/                 routes : (pro) /, /apps/[slug], /agents · (createur) /createur, /createur/voyage, /createur/sport
+                     layout racine (polices, script de thème, providers), api/contact (Telegram)
+design-system/       tokens.css, base.css, thème, primitives (Button, Arch, Fil, Aura, Loupe, Reveal, Words, Dialog…)
+features/            un dossier par module (motion, nav, footer, hero, apps-space, victoire, ia, terre, courses, passages…)
+content/             données typées et localisées : apps, startup-weekend, ia, series, courses, socials, site, contact
+i18n/                FR par défaut, `?lang=en` ; dictionnaires par espace de noms ; <T>, useTranslation, localize
+public/assets/       images, captures, objets 3D et textures de la maquette
+docs/refonte-v6/     ARCHITECTURE.md (décisions), CARTE.md (maquette → code), CONVENTIONS.md (écrire un module)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+La maquette de référence est dans `maquettes/v6/`. Les anciennes adresses (`/projets/*`, `/destination/*`) redirigent en 308.

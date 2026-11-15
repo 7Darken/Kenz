@@ -1,0 +1,404 @@
+/* La navigation (shared/theme.css §5 « Navigation », createur.html, voyage.html, sport.html, app.html).
+   Fixe en haut, transparente sur le hero, un voile flouté dès qu'on défile. */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-nav);
+  padding-top: env(safe-area-inset-top);
+  pointer-events: none;
+}
+
+.nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow: inset 0 -1px 0 var(--line-2);
+  opacity: 0;
+  transition: opacity .6s var(--expo);
+}
+
+:global(html[data-theme="light"]) .nav::before {
+  bottom: -18px;
+  box-shadow: none;
+  -webkit-mask-image: linear-gradient(#000 72%, transparent);
+  mask-image: linear-gradient(#000 72%, transparent);
+}
+
+.nav[data-scrolled]::before {
+  opacity: 1;
+}
+
+.inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--nav-h);
+  padding-left: var(--gl);
+  padding-right: var(--gr);
+}
+
+.inner > * {
+  pointer-events: auto;
+}
+
+/* « Kenz· » : le logo, en Melodrama */
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  margin-right: auto;
+  padding: 8px 4px 8px 2px;
+  border-radius: 10px;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -.01em;
+  color: var(--fg);
+  white-space: nowrap;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+/* Le point du logo (sans cordon : un simple point ; le cordon le remplace par son bouton) */
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 0 0 .07em;
+  border-radius: 50%;
+  background: var(--fg);
+  vertical-align: baseline;
+}
+
+/* Le bouton d'appel (Pro) : « Me contacter » et sa flèche ronde */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 4px 0 18px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fg);
+  background: var(--cta-bg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  isolation: isolate;
+  transition: transform .5s var(--expo);
+}
+
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--ghost-hover);
+  opacity: 0;
+  transition: opacity .4s var(--expo);
+}
+
+.cta:hover::before {
+  opacity: 1;
+}
+
+.cta:active {
+  transform: scale(.98);
+}
+
+.ctaIco {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  transition: transform .7s var(--expo);
+}
+
+.ctaIco svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cta:hover .ctaIco {
+  transform: translate(2px, -1px) scale(1.06);
+}
+
+:global(html[data-theme="light"]) .cta {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 10px 24px -10px rgba(26, 25, 24, .55);
+}
+
+:global(html[data-theme="light"]) .cta::before {
+  background: rgba(255, 255, 255, .08);
+}
+
+:global(html[data-theme="light"]) .ctaIco {
+  background: rgba(244, 239, 230, .14);
+  color: var(--creme);
+}
+
+/* L'app de la page (/apps/[slug]) : son icône et « Essayer » */
+.app {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 18px 0 6px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fg);
+  background: var(--cta-bg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  isolation: isolate;
+  transition: transform .5s var(--expo);
+}
+
+.app::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--ghost-hover);
+  opacity: 0;
+  transition: opacity .4s var(--expo);
+}
+
+.app:hover::before {
+  opacity: 1;
+}
+
+.app:active {
+  transform: scale(.98);
+}
+
+.app img {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1);
+  transition: transform .7s var(--expo);
+}
+
+.app:hover img {
+  transform: scale(1.06);
+}
+
+:global(html[data-theme="light"]) .app {
+  background: rgba(255, 255, 255, .74);
+  box-shadow: inset 0 0 0 1px var(--line-2), 0 10px 22px -12px rgba(26, 25, 24, .35);
+}
+
+:global(html[data-theme="light"]) .app::before {
+  background: #fff;
+}
+
+:global(html[data-theme="light"]) .app img {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .06), 0 4px 10px -4px rgba(26, 25, 24, .35);
+}
+
+/* Le motif d'Escapades Libres (projet web) à la place de l'icône */
+.mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--or);
+}
+
+.mark svg {
+  width: 29px;
+  overflow: visible;
+}
+
+/* Le retour vers l'accueil Créateur (pages Voyage et Sport) */
+.back {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--target);
+  padding: 0 16px 0 4px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--fg);
+  background: var(--cta-bg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  isolation: isolate;
+  transition: transform .5s var(--expo), opacity .4s var(--expo);
+}
+
+.back::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--ghost-hover);
+  opacity: 0;
+  transition: opacity .4s var(--expo);
+}
+
+.back:hover::before {
+  opacity: 1;
+}
+
+.back:active {
+  transform: scale(.98);
+}
+
+.backIco {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgb(var(--fg-rgb) / .08);
+  transition: transform .7s var(--expo);
+}
+
+.backIco svg {
+  width: 14px;
+  height: 14px;
+}
+
+.back:hover .backIco {
+  transform: translateX(-2px);
+}
+
+:global(html[data-theme="light"]) .back {
+  background: rgba(255, 255, 255, .62);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 14px -8px rgba(26, 25, 24, .3);
+}
+
+:global(html[data-theme="light"]) .back:hover::before {
+  background: #fff;
+}
+
+.backShort {
+  display: none;
+}
+
+@media (max-width: 370px) {
+  .backLong {
+    display: none;
+  }
+
+  .backShort {
+    display: inline;
+  }
+}
+
+/* Accueil Créateur : la barre « stories » au-dessus, une nav plus basse */
+.withStory .inner {
+  height: 58px;
+}
+
+/* Le nom du chapitre en cours (Instrument Serif), remplacé en glissant */
+.chapter {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  overflow: hidden;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.3;
+  color: rgb(var(--fg-rgb) / .86);
+}
+
+.chapterText {
+  display: block;
+  white-space: nowrap;
+  animation: chapterIn .8s var(--expo) both;
+}
+
+@keyframes chapterIn {
+  from {
+    transform: translateY(110%);
+    filter: blur(4px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .inner {
+    height: 64px;
+    gap: 6px;
+  }
+
+  .withStory .inner {
+    height: 54px;
+  }
+
+  .logo {
+    font-size: 25px;
+  }
+
+  .cta {
+    height: var(--target);
+    gap: 10px;
+    padding-left: 16px;
+    font-size: 13.5px;
+  }
+
+  .ctaIco {
+    width: 36px;
+    height: 36px;
+  }
+
+  .app {
+    height: var(--target);
+    padding-right: 16px;
+    font-size: 13.5px;
+  }
+
+  .chapter {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapterText {
+    animation-name: chapterFade;
+  }
+
+  @keyframes chapterFade {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+}

@@ -5,13 +5,17 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
+    // Ignorés par défaut par eslint-config-next
     ".next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Pas du code du site : maquettes, exports, fichiers publics, cache npm
+    "maquettes/**",
+    "output/**",
+    "public/**",
+    ".npm-cache/**",
   ]),
 ]);
 

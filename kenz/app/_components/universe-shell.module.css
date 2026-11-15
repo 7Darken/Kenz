@@ -1,0 +1,9 @@
+/* Le contenu passe devant l'aura (fixe, z-index 0) */
+.main {
+  position: relative;
+  z-index: 1;
+}
+
+.main:focus {
+  outline: none;
+}

@@ -1,0 +1,26 @@
+/* Les mots qui montent (shared/theme.css §5, [data-words]) : chaque mot sort du flou, l'un après l'autre */
+.word {
+  display: inline-block;
+}
+
+:global(.js) .words .word {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.06);
+  transition: opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .words[data-in] .word {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo);
+  transition-delay: calc(var(--wd, 0s) + var(--i, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .words .word {
+    transform: none !important;
+    filter: none !important;
+  }
+}

@@ -1,0 +1,74 @@
+/* L'aura : des halos de lumière diffuse, fixes derrière les chapitres, et le grain (shared/theme.css §7) */
+.aura {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--aura-fond);
+  opacity: 0;
+  transition: opacity 1.6s var(--expo);
+}
+
+.aura[data-on] {
+  opacity: 1;
+}
+
+.halo {
+  --s: 80vmax;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--s);
+  aspect-ratio: 1;
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border-radius: 50%;
+  translate: var(--x, 50vw) var(--y, 50vh);
+  opacity: var(--o, 1);
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--c) / calc(var(--a) * var(--aura-a))),
+    rgb(var(--c) / calc(var(--a) * var(--aura-a) * .4)) 48%,
+    rgb(var(--c) / 0)
+  );
+  transition: translate 2.8s var(--io), opacity 2.8s var(--io);
+  will-change: translate;
+}
+
+.halo1 {
+  --s: 78vmax;
+  --c: var(--lum);
+  --a: .15;
+}
+
+.halo2 {
+  --s: 64vmax;
+  --c: var(--lum-2);
+  --a: .2;
+}
+
+.halo3 {
+  --s: 46vmax;
+  --c: var(--lum);
+  --a: .08;
+}
+
+:global(html[data-theme="light"]) .halo2 {
+  --a: .32;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: var(--grain-op);
+  background-image: var(--noise);
+  background-size: 180px 180px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo {
+    transition-duration: .01s;
+  }
+}

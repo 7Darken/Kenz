@@ -19,13 +19,19 @@ const config = {
   // Priorité par défaut pour les pages qui ne sont pas explicitement listées dans la logique ci-dessous.
   priority: 0.7,
 
+  // Fichiers de métadonnées et API : pas des pages.
+  exclude: ['/icon.png', '/favicon.ico', '/api/*'],
+
   // Personnalisation fine de chaque URL du sitemap.
   transform: async (config, path) => {
     // Cartographie des pages principales avec leur priorité SEO souhaitée.
+    // Les deux accueils (Pro et Créateur) en tête, puis leurs pages.
     const priorityOverrides = new Map([
       ['/', 1.0],
-      ['/a-propos', 0.8],
-      ['/contact', 0.8],
+      ['/createur', 1.0],
+      ['/agents', 0.8],
+      ['/createur/voyage', 0.8],
+      ['/createur/sport', 0.8],
     ]);
 
     return {

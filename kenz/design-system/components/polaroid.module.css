@@ -1,0 +1,46 @@
+/* Le polaroïd (shared/profondeur.css) : un vrai cadre blanc, plus large en bas ; la photo garde son 16:9 */
+.polaroid {
+  --papier: #F4F0E8;
+  --papier-2: #E4DED2;
+  --ombre: 3 5 9;
+  display: block;
+  padding: 5.6% 5.6% 19%;
+  border-radius: 2.5px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, var(--papier), var(--papier-2));
+  box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .07), 0 1px 1.5px rgb(var(--ombre) / .28);
+  rotate: var(--rot, 0deg);
+}
+
+:global(html[data-theme="light"]) .polaroid {
+  --papier: #FFFFFF;
+  --papier-2: #F3EFE8;
+  --ombre: 58 42 26;
+}
+
+.photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: 1px;
+  background: #1A1816;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+/* Un léger reflet sur le tirage */
+.photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 34%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), inset 0 1px 5px rgba(0, 0, 0, .28);
+}

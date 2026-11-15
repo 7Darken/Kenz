@@ -1,0 +1,63 @@
+/* Sélecteur FR / EN segmenté (repris de l'ancien LanguageToggle) : une pastille glisse sous la langue active */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: rgb(var(--fg-rgb) / .05);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.pill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: var(--r-pill);
+  background: var(--fg);
+  transform: translateX(calc(var(--active, 0) * 100%));
+  transition: transform .5s var(--expo);
+}
+
+.option {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: rgb(var(--fg-rgb) / .55);
+  transition: color .35s var(--expo);
+  user-select: none;
+}
+
+.option[aria-pressed="true"] {
+  color: var(--bg);
+}
+
+.option img {
+  display: block;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .15);
+  opacity: .6;
+  transition: opacity .35s var(--expo);
+}
+
+.option[aria-pressed="true"] img {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+}

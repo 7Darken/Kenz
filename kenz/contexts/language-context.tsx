@@ -11,7 +11,7 @@ import {
 import { usePathname } from "next/navigation";
 
 import { DEFAULT_LANG, LANG_STORAGE_KEY, LANGUAGES, type Lang } from "@/i18n/config";
-import { dictionaries, type Dictionary } from "@/i18n/dictionaries";
+import { dictionaries, type Dictionary } from "@/i18n/legacy";
 
 interface LanguageContextValue {
   /** Active language code. */

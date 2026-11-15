@@ -1,0 +1,141 @@
+/* Le bouton dans le bouton (shared/theme.css §5) : une pilule, et une icône ronde à droite */
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  height: 56px;
+  padding: 0 7px 0 24px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .005em;
+  white-space: nowrap;
+  isolation: isolate;
+  transition: transform .5s var(--expo);
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity .45s var(--expo);
+}
+
+.button:hover::before {
+  opacity: 1;
+}
+
+.button:active {
+  transform: scale(.98);
+}
+
+.button:focus-visible {
+  outline-offset: 4px;
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: .75;
+  cursor: progress;
+}
+
+/* Sans icône : la pilule est symétrique */
+.plain {
+  padding: 0 24px;
+}
+
+.ico {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  transition: transform .7s var(--expo);
+}
+
+.ico svg {
+  width: 15px;
+  height: 15px;
+}
+
+.button:hover .ico {
+  transform: translate(2px, -1px) scale(1.06);
+}
+
+/* Principal : crème en sombre, encre en clair (vert en k15ze) */
+.light {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: var(--btn-sh);
+}
+
+.light::before {
+  background: var(--btn-hover);
+}
+
+.light .ico {
+  background: var(--btn-ico-bg);
+  color: var(--btn-ico-fg);
+}
+
+/* Secondaire : verre discret, filet fin */
+.ghost {
+  background: var(--ghost-bg);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+}
+
+.ghost::before {
+  background: var(--ghost-hover);
+}
+
+.ghost .ico {
+  background: var(--ghost-ico);
+}
+
+/* Accent : la lumière de l'univers (ou --accent-bg posé par la section, ex. la couleur d'une app) */
+.accent {
+  background: var(--accent-bg);
+  color: var(--accent-fg);
+  box-shadow: 0 16px 36px -22px rgb(var(--lum) / .7);
+}
+
+.accent::before {
+  background: rgb(255 255 255 / .1);
+}
+
+.accent .ico {
+  background: var(--accent-ico-bg);
+}
+
+.sm {
+  height: 46px;
+  padding: 0 5px 0 18px;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.sm.plain {
+  padding: 0 18px;
+}
+
+.sm .ico {
+  width: 36px;
+  height: 36px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .ico {
+    transition-property: opacity, background-color, color, box-shadow;
+  }
+
+  .button:hover .ico {
+    transform: none;
+  }
+}

@@ -1,0 +1,35 @@
+/* Gestes d'apparition (shared/theme.css §5) : l'état de départ n'existe qu'avec JS (html.js) ;
+   sans JS ou si l'application ne démarre pas, tout est visible. */
+:global(.js) .card {
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .card[data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s var(--expo), transform 1.2s var(--expo);
+  transition-delay: calc(var(--wd, 0s) + var(--d, 0) * 90ms);
+}
+
+:global(.js) .fade {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity .24s var(--out), filter .24s var(--out);
+}
+
+:global(.js) .fade[data-in] {
+  opacity: 1;
+  filter: none;
+  transition: opacity 1s var(--expo), filter 1s var(--expo);
+  transition-delay: calc(var(--wd, 0s) + var(--d, 0) * 90ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .card,
+  :global(.js) .fade {
+    transform: none !important;
+    filter: none !important;
+  }
+}

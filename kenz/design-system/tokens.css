@@ -1,0 +1,363 @@
+/* ==========================================================================
+   Jetons du design system (portés de maquettes/v6/shared/theme.css, la source de vérité)
+
+   - Le mode : <html data-theme="dark|light">, posé avant l'affichage par le script de thème (app/layout.tsx).
+   - L'univers : <div data-univers="pro|createur|k15ze"> (layout de chaque groupe de routes). Les jetons
+     d'univers sont posés sur :root grâce à :has(), pour que tout en hérite : le fond de <html>, les calques
+     fixes (aura, fil, loupe), les dialogues et le voile des passages.
+   - Les couleurs « r g b » (--fg-rgb, --lum, --lum-2) s'utilisent ainsi : rgb(var(--lum) / .5).
+   - Les jetons --kz-* servent aux modules partagés (apps, victoire) : ils suivent le mode.
+   ========================================================================== */
+
+/* =========================================================
+   1. Marque, typographie, mesures, mouvement (communs à tous les modes)
+   ========================================================= */
+:root {
+  /* Couleurs de marque (sans version claire) */
+  --creme: #F4EFE6;
+  --encre: #1A1918;          /* l'encre du mode clair (fond Studio) */
+  --nuit: #0E1220;           /* l'encre de l'heure bleue (mode sombre Pro) */
+  --red: #E8322B;
+  --lagon: #0F5D6B;
+  --or: #E3A21A;             /* Escapades Libres, la victoire */
+  --k-vert-nuit: #3DDC84;    /* k15ze, en sombre */
+  --k-vert-jour: #1E7A46;    /* k15ze, en clair */
+  --k-fond: #0D0F0E;         /* k15ze, le fond */
+
+  /* Polices (variables posées par next/font sur <html>) */
+  --f-title: var(--font-melodrama), var(--font-instrument), Georgia, serif;
+  --f-text: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-word: var(--font-instrument), Georgia, serif;
+  --f-num: var(--font-anton), "Impact", "Arial Narrow", sans-serif;
+  --f-ja: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+
+  /* Tailles de texte récurrentes de la maquette */
+  --fs-body: 17px;
+  --fs-small: 14px;
+  --fs-cap: clamp(19px, 1.5vw, 22px);
+  --fs-lead: clamp(20px, 1.8vw, 26px);
+  --fs-statement: clamp(34px, 5vw, 72px);
+  --fs-h2: clamp(54px, 8.4vw, 128px);
+  --fs-hero: clamp(92px, 26vw, 150px);
+  --fs-hero-wide: clamp(120px, 15vw, 250px);
+
+  /* Mesures */
+  --gutter: clamp(16px, 4vw, 56px);
+  --gl: max(var(--gutter), env(safe-area-inset-left));
+  --gr: max(var(--gutter), env(safe-area-inset-right));
+  --maxw: 1240px;
+  --sec: clamp(96px, 12vw, 176px);
+  --nav-h: 72px;
+  --space-xs: 8px;
+  --space-s: 16px;
+  --space-m: 24px;
+  --space-l: 40px;
+  --space-xl: 64px;
+  --target: 44px;            /* cible tactile minimale */
+
+  /* Rayons */
+  --r-xl: 32px;
+  --r-lg: 24px;
+  --r-md: 16px;
+  --r-pill: 999px;
+
+  /* Mouvement (équivalents GSAP dans features/motion/easings.ts) */
+  --expo: cubic-bezier(.16, 1, .3, 1);       /* expo.out : les arrivées */
+  --out: cubic-bezier(.55, 0, .75, .2);      /* les sorties rapides */
+  --io: cubic-bezier(.65, 0, .35, 1);        /* power3.inOut : les tracés */
+  --ios: cubic-bezier(.2, .8, .2, 1);
+  --hand: cubic-bezier(.62, .04, .32, 1);
+  --t-mode: .4s;                             /* fondu de bascule clair / sombre */
+
+  /* Plans */
+  --z-rail: 40;
+  --z-loupe: 46;
+  --z-nav: 50;
+  --z-progress: 51;
+  --z-grain: 60;
+  --z-skip: 95;
+  --z-passage: 2147483560;
+
+  /* Le grain (bruit fractal) : clair et sombre */
+  --noise-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-light: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .09 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   2. Mode sombre (l'heure bleue), univers Pro : la base
+   ========================================================= */
+:root {
+  color-scheme: dark;
+
+  --bg: #0E1220;
+  --bg-2: #121A2B;
+  --hero-bg: #0B0F1B;
+  --fg: #F4EFE6;
+  --fg-rgb: 244 239 230;
+  --muted: rgba(244, 239, 230, .74);
+  --faint: rgba(244, 239, 230, .62);
+  --line: rgba(244, 239, 230, .12);
+  --line-2: rgba(244, 239, 230, .07);
+
+  /* Matière : coque et cœur (« double biseau »), ombres en couches */
+  --surface: rgba(244, 239, 230, .035);
+  --surface-edge: rgba(244, 239, 230, .075);
+  --core: linear-gradient(180deg, #171E31, #121827);
+  --core-hl: inset 0 1px 0 rgba(255, 255, 255, .06);
+  --sh-1: 0 1px 1px rgba(0, 0, 0, .25), 0 30px 70px -36px rgba(0, 0, 0, .7);
+  --sh-2: 0 1px 1px rgba(0, 0, 0, .25), 0 50px 90px -46px rgba(0, 0, 0, .9);
+
+  /* Lumière : aura, fil, arches, loupe */
+  --lum: 118 188 210;
+  --lum-2: 15 93 107;
+  --aura-a: 1;
+  --aura-fond: radial-gradient(55% 45% at 88% 0%, rgba(110, 150, 214, .08), transparent 70%);
+  --word-c: currentColor;
+  --glow: 0 0 .5em rgb(var(--lum) / .5), 0 0 1.4em rgb(var(--lum) / .22);
+
+  /* Boutons : principal (light), secondaire (ghost), accent de l'univers */
+  --btn-bg: #F4EFE6;
+  --btn-fg: #0E1220;
+  --btn-hover: rgba(14, 18, 32, .07);
+  --btn-sh: 0 16px 36px -22px rgb(var(--lum) / .55);
+  --btn-ico-bg: #0E1220;
+  --btn-ico-fg: #F4EFE6;
+  --ghost-bg: rgba(244, 239, 230, .04);
+  --ghost-line: rgba(244, 239, 230, .2);
+  --ghost-hover: rgba(244, 239, 230, .07);
+  --ghost-ico: rgba(244, 239, 230, .1);
+  --accent-bg: rgb(var(--lum));
+  --accent-fg: var(--bg);
+  --accent-ico-bg: rgb(0 0 0 / .14);
+  --cta-bg: rgba(14, 18, 32, .4);
+
+  /* Champs */
+  --field-bg: rgba(0, 0, 0, .24);
+  --field-line: rgba(244, 239, 230, .14);
+  --field-line-2: rgba(244, 239, 230, .26);
+  --field-focus: rgba(244, 239, 230, .6);
+  --placeholder: rgba(244, 239, 230, .42);
+  --warn: #F2C48A;
+  --warn-line: rgba(242, 180, 90, .9);
+
+  /* Divers */
+  --nav-bg: linear-gradient(180deg, rgba(14, 18, 32, .86), rgba(14, 18, 32, .5));
+  --focus: #F4EFE6;
+  --sel-bg: rgba(244, 239, 230, .88);
+  --sel-fg: #0E1220;
+  --grain-op: .05;
+  --noise: var(--noise-dark);
+
+  /* Photos (pages Créateur et k15ze) */
+  --media-bg: #071015;
+  --media-sh: 0 0 0 1px rgba(244, 239, 230, .09), 0 26px 50px -28px rgba(0, 0, 0, .85);
+  --arche-glow: 0 0 44px -10px rgb(var(--lum) / .5), 0 30px 60px -30px rgba(0, 0, 0, .8);
+
+  /* Modules partagés (apps, victoire) */
+  --kz-bg: var(--bg);
+  --kz-surface: #151B2C;
+  --kz-ink: var(--fg);
+  --kz-muted: var(--muted);
+  --kz-line: var(--line);
+  --kz-accent: rgb(var(--lum));
+  --kz-title: var(--f-title);
+  --kz-text: var(--f-text);
+  --kz-word: var(--f-word);
+  --kz-radius: var(--r-xl);
+  --kz-victoire-nuit: #05070D;
+  --kz-victoire-or: var(--or);
+}
+
+/* =========================================================
+   3. Mode clair (le fond de Studio : papier chaud, brume froide)
+   ========================================================= */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #F5F3EF;
+  --bg-2: #EFECE6;
+  --hero-bg: #E7EBED;
+  --fg: #1A1918;
+  --fg-rgb: 26 25 24;
+  --muted: #4B4743;
+  --faint: #69645E;
+  --line: rgba(26, 25, 24, .12);
+  --line-2: rgba(26, 25, 24, .07);
+
+  --surface: rgba(255, 255, 255, .52);
+  --surface-edge: rgba(26, 25, 24, .05);
+  --core: linear-gradient(180deg, #FFFFFF 0%, #FBFAF8 100%);
+  --core-hl: inset 0 0 0 1px rgba(26, 25, 24, .05), inset 0 1px 0 rgba(255, 255, 255, .75);
+  --sh-1: 0 0 0 1px rgba(26, 25, 24, .05), 0 1px 1px rgba(26, 25, 24, .03), 0 3px 6px -2px rgba(26, 25, 24, .04), 0 12px 24px -10px rgba(26, 25, 24, .07), 0 32px 64px -24px rgba(26, 25, 24, .10);
+  --sh-2: 0 2px 4px -1px rgba(26, 25, 24, .05), 0 22px 44px -14px rgba(26, 25, 24, .13), 0 60px 120px -34px rgba(26, 25, 24, .22);
+
+  --lum: 15 93 107;
+  --lum-2: 150 178 192;
+  --aura-a: .62;
+  --aura-fond: radial-gradient(55% 45% at 88% 2%, rgba(214, 226, 233, .85), rgba(214, 226, 233, 0) 70%), radial-gradient(42% 40% at 0% 92%, rgba(226, 232, 234, .7), rgba(226, 232, 234, 0) 70%);
+  --word-c: #0F5D6B;
+  --glow: 0 0 .9em rgb(var(--lum) / .14);
+
+  --btn-bg: #1A1918;
+  --btn-fg: #F4EFE6;
+  --btn-hover: rgba(255, 255, 255, .08);
+  --btn-sh: inset 0 1px 0 rgba(255, 255, 255, .12), 0 10px 24px -10px rgba(26, 25, 24, .55);
+  --btn-ico-bg: rgba(244, 239, 230, .14);
+  --btn-ico-fg: #F4EFE6;
+  --ghost-bg: rgba(255, 255, 255, .66);
+  --ghost-line: rgba(26, 25, 24, .14);
+  --ghost-hover: #FFFFFF;
+  --ghost-ico: rgba(26, 25, 24, .06);
+  --accent-fg: var(--creme);
+  --accent-ico-bg: rgb(255 255 255 / .16);
+  --cta-bg: rgba(255, 255, 255, .62);
+
+  --field-bg: #FFFFFF;
+  --field-line: rgba(26, 25, 24, .14);
+  --field-line-2: rgba(26, 25, 24, .26);
+  --field-focus: #0F5D6B;
+  --placeholder: #76716B;
+  --warn: #A3352A;
+  --warn-line: rgba(163, 53, 42, .9);
+
+  --nav-bg: rgba(245, 243, 239, .74);
+  --focus: #0F5D6B;
+  --sel-bg: rgba(15, 93, 107, .18);
+  --sel-fg: #1A1918;
+  --grain-op: .04;
+  --noise: var(--noise-light);
+
+  --media-bg: #E2E8E6;
+  --media-sh: 0 0 0 1px rgba(26, 25, 24, .06), 0 2px 4px -1px rgba(26, 25, 24, .05), 0 22px 44px -22px rgba(26, 25, 24, .32);
+  --arche-glow: 0 0 40px -12px rgb(var(--lum) / .35), 0 24px 50px -24px rgba(26, 25, 24, .35);
+
+  --kz-surface: #FFFFFF;
+  --kz-accent: #0F5D6B;
+  --kz-victoire-nuit: #141210;
+  --kz-victoire-or: #E9A84C;
+}
+
+/* =========================================================
+   4. Univers Créateur : la DA « Terre » (createur.html, voyage.html)
+   Sombre : la Terre de nuit (océan noir, lueur Lagon, or doux). Clair : la Terre de jour.
+   ========================================================= */
+:root:not([data-theme="light"]):has([data-univers="createur"]) {
+  --bg: #0A1117;
+  --bg-2: #0E1820;
+  --hero-bg: #05090D;
+  --core: linear-gradient(180deg, #111D25, #0C151C);
+  --lum: 63 176 194;
+  --lum-2: 206 160 92;
+  --btn-fg: #0A1117;
+  --btn-hover: rgba(10, 17, 23, .07);
+  --btn-ico-bg: #0A1117;
+  --cta-bg: rgba(10, 17, 23, .42);
+  --nav-bg: linear-gradient(180deg, rgba(7, 12, 17, .86), rgba(7, 12, 17, .5));
+  --sel-fg: #0A1117;
+  --aura-fond: radial-gradient(55% 45% at 88% 0%, rgba(63, 176, 194, .07), transparent 70%);
+  --kz-surface: #111C24;
+  --kz-victoire-nuit: #05090C;
+}
+:root[data-theme="light"]:has([data-univers="createur"]) {
+  --bg: #F6F2EB;
+  --bg-2: #EFEAE1;
+  --hero-bg: #EEF0EC;
+  --lum: 15 93 107;
+  --lum-2: 224 186 122;
+  --word-c: #0F5D6B;
+  --focus: #0F5D6B;
+  --field-focus: #0F5D6B;
+  --sel-bg: rgba(15, 93, 107, .16);
+  --aura-fond: radial-gradient(55% 45% at 88% 2%, rgba(220, 234, 236, .9), rgba(220, 234, 236, 0) 70%), radial-gradient(42% 40% at 0% 92%, rgba(236, 220, 190, .55), rgba(236, 220, 190, 0) 70%);
+  --kz-accent: #0F5D6B;
+}
+
+/* =========================================================
+   5. Univers k15ze (sport.html) : fond #0D0F0E, vert #3DDC84 ; en clair, vert #1E7A46
+   ========================================================= */
+:root:has([data-univers="k15ze"]) {
+  --k-title: var(--f-text);  /* titres k15ze en Inter gras ; chiffres en Anton (--f-num) ; le logo garde --f-title */
+}
+:root:not([data-theme="light"]):has([data-univers="k15ze"]) {
+  --k-vert: var(--k-vert-nuit);
+  --k-card: #141816;
+  --bg: var(--k-fond);
+  --bg-2: #121513;
+  --hero-bg: #0A0C0B;
+  --fg: #F7F7F2;
+  --fg-rgb: 247 247 242;
+  --muted: rgba(247, 247, 242, .74);
+  --faint: #9DA39F;
+  --line: rgba(247, 247, 242, .12);
+  --line-2: rgba(247, 247, 242, .07);
+  --surface: rgba(247, 247, 242, .035);
+  --surface-edge: rgba(247, 247, 242, .075);
+  --core: linear-gradient(180deg, #161A18, #111412);
+  --core-hl: inset 0 1px 0 rgba(255, 255, 255, .05);
+  --sh-1: 0 1px 1px rgba(0, 0, 0, .3), 0 30px 70px -36px rgba(0, 0, 0, .8);
+  --lum: 61 220 132;
+  --lum-2: 24 70 46;
+  --aura-a: .42;
+  --word-c: #3DDC84;
+  --glow: 0 0 .45em rgb(61 220 132 / .42), 0 0 1.3em rgb(61 220 132 / .18);
+  --btn-bg: #3DDC84;
+  --btn-fg: #0D0F0E;
+  --btn-hover: rgba(13, 15, 14, .08);
+  --btn-sh: 0 16px 36px -22px rgb(61 220 132 / .55);
+  --btn-ico-bg: #0D0F0E;
+  --btn-ico-fg: #3DDC84;
+  --ghost-bg: rgba(247, 247, 242, .04);
+  --ghost-line: rgba(247, 247, 242, .2);
+  --ghost-hover: rgba(247, 247, 242, .07);
+  --ghost-ico: rgba(247, 247, 242, .1);
+  --cta-bg: rgba(13, 15, 14, .42);
+  --nav-bg: linear-gradient(180deg, rgba(13, 15, 14, .88), rgba(13, 15, 14, .55));
+  --focus: #3DDC84;
+  --sel-bg: rgba(61, 220, 132, .85);
+  --sel-fg: #0D0F0E;
+  --aura-fond: radial-gradient(55% 45% at 88% 0%, rgba(61, 220, 132, .045), transparent 70%);
+  --media-bg: #141816;
+  --media-sh: 0 0 0 1px rgba(247, 247, 242, .09), 0 26px 50px -28px rgba(0, 0, 0, .85);
+}
+:root[data-theme="light"]:has([data-univers="k15ze"]) {
+  --k-vert: var(--k-vert-jour);
+  --k-card: #FFFFFF;
+  --bg: #F4F5F1;
+  --bg-2: #ECEEE9;
+  --hero-bg: #EEF0EB;
+  --fg: #0D0F0E;
+  --fg-rgb: 13 15 14;
+  --muted: #454B47;
+  --faint: #5C635F;
+  --line: rgba(13, 15, 14, .12);
+  --line-2: rgba(13, 15, 14, .07);
+  --surface: rgba(255, 255, 255, .62);
+  --surface-edge: rgba(13, 15, 14, .05);
+  --core: linear-gradient(180deg, #FFFFFF, #FAFBF8);
+  --core-hl: inset 0 0 0 1px rgba(13, 15, 14, .05), inset 0 1px 0 rgba(255, 255, 255, .75);
+  --lum: 30 122 70;
+  --lum-2: 200 216 206;
+  --aura-a: .55;
+  --word-c: #1E7A46;
+  --glow: none;
+  --btn-bg: #1E7A46;
+  --btn-fg: #F7F7F2;
+  --btn-hover: rgba(255, 255, 255, .08);
+  --btn-sh: inset 0 1px 0 rgba(255, 255, 255, .14), 0 10px 24px -10px rgba(30, 122, 70, .55);
+  --btn-ico-bg: rgba(247, 247, 242, .16);
+  --btn-ico-fg: #F7F7F2;
+  --ghost-bg: rgba(255, 255, 255, .7);
+  --ghost-line: rgba(13, 15, 14, .14);
+  --ghost-hover: #FFFFFF;
+  --ghost-ico: rgba(13, 15, 14, .06);
+  --cta-bg: rgba(255, 255, 255, .62);
+  --nav-bg: rgba(244, 245, 241, .8);
+  --focus: #1E7A46;
+  --field-focus: #1E7A46;
+  --sel-bg: rgba(30, 122, 70, .18);
+  --sel-fg: #0D0F0E;
+  --aura-fond: radial-gradient(55% 45% at 88% 2%, rgba(214, 232, 220, .8), rgba(214, 232, 220, 0) 70%), radial-gradient(42% 40% at 0% 92%, rgba(228, 234, 228, .7), rgba(228, 234, 228, 0) 70%);
+  --media-bg: #E3E7E2;
+  --media-sh: 0 0 0 1px rgba(13, 15, 14, .06), 0 2px 4px -1px rgba(13, 15, 14, .05), 0 22px 44px -22px rgba(13, 15, 14, .3);
+  --kz-accent: #1E7A46;
+}

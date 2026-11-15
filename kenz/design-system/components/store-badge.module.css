@@ -1,0 +1,28 @@
+/* Badge officiel d'un store (non modifié), 48 px de haut, une ombre douce */
+.badge {
+  display: inline-flex;
+  border-radius: 9px;
+  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, .55);
+  transition: transform .5s var(--expo), box-shadow .5s;
+}
+
+.badge img {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+
+.badge:hover {
+  transform: translateY(-2px);
+}
+
+.badge:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,7 @@
+/* La largeur de lecture : 1240 px au plus, gouttières sûres (encoches) */
+.container {
+  max-width: calc(var(--maxw) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-left: var(--gl);
+  padding-right: var(--gr);
+}
