@@ -1,0 +1,331 @@
+/* Escapades Libres : un test, un profil, un petit groupe. Des formes, pas de phrases (app.html, « Scènes ») */
+.scene {
+  --tint: 227 162 26;
+  --sc-a: #1B2438;
+  --sc-b: #10172A;
+  --el-or: #E3A21A;
+  --el-carte: #F6F0E4;
+  --el-encre: #121A2B;
+  --el-trait: rgba(244, 239, 230, .2);
+}
+
+.dots {
+  position: absolute;
+  left: 11cqw;
+  right: 11cqw;
+  top: 11cqw;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dots li {
+  position: relative;
+  width: 3.6cqw;
+  height: 3.6cqw;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 .45cqw rgba(244, 239, 230, .22);
+}
+
+.dots i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--el-or);
+  box-shadow: 0 0 2.2cqw rgb(227 162 26 / .5);
+}
+
+.question {
+  position: absolute;
+  left: 13cqw;
+  right: 13cqw;
+  top: 27cqw;
+  padding: 7.4cqw 6.6cqw 6.6cqw;
+  border-radius: 6cqw;
+  background: rgba(244, 239, 230, .06);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+  opacity: 0;
+}
+
+.questionBar {
+  display: block;
+  height: 3.2cqw;
+  border-radius: 2cqw;
+  background: var(--el-trait);
+  transform-origin: left;
+}
+
+.questionBar + .questionBar {
+  width: 62%;
+  margin-top: 2.8cqw;
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8.4cqw;
+}
+
+.scale li {
+  position: relative;
+  width: 9cqw;
+  height: 9cqw;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 .5cqw rgba(244, 239, 230, .24);
+}
+
+.scale i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--el-or);
+  box-shadow: 0 0 3cqw rgb(227 162 26 / .5);
+}
+
+.profile {
+  position: absolute;
+  left: 21cqw;
+  right: 21cqw;
+  top: 28cqw;
+  display: grid;
+  justify-items: center;
+  gap: 4.6cqw;
+  padding: 7cqw 5cqw;
+  border-radius: 6cqw;
+  background: var(--el-carte);
+  color: var(--el-encre);
+  opacity: 0;
+  box-shadow: 0 0 0 1px rgba(18, 26, 43, .08), 0 5cqw 12cqw -5cqw rgba(0, 0, 0, .85);
+}
+
+.profileIcon {
+  display: grid;
+  place-items: center;
+  width: 18cqw;
+  height: 18cqw;
+  border-radius: 4.4cqw;
+  background: rgba(227, 162, 26, .12);
+  border: .45cqw dashed rgba(227, 162, 26, .9);
+}
+
+.profileIcon svg {
+  width: 9.4cqw;
+  height: 9.4cqw;
+  fill: none;
+  stroke: var(--el-encre);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.profileName {
+  font-size: max(17px, 7.2cqw);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+.links {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100cqw;
+  height: 125cqw;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links path {
+  fill: none;
+  stroke: rgba(244, 239, 230, .26);
+  stroke-width: .32;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.av {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 13cqw;
+  height: 13cqw;
+  margin: -6.5cqw 0 0 -6.5cqw;
+  border-radius: 50%;
+  background: #232D46;
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .15), 0 2cqw 5cqw -2cqw rgba(0, 0, 0, .65);
+}
+
+.av svg {
+  width: 6.2cqw;
+  height: 6.2cqw;
+  fill: none;
+  stroke: #F4EFE6;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.me {
+  z-index: 1;
+  width: 18cqw;
+  height: 18cqw;
+  margin: -9cqw 0 0 -9cqw;
+  background: var(--el-or);
+  box-shadow: 0 0 0 1.4cqw rgb(227 162 26 / .18), 0 0 9cqw rgb(227 162 26 / .45);
+}
+
+.me svg {
+  width: 8.6cqw;
+  height: 8.6cqw;
+  stroke: var(--el-encre);
+  stroke-width: 2;
+}
+
+.trip {
+  position: absolute;
+  left: 9cqw;
+  right: 9cqw;
+  top: 70cqw;
+  padding: 5cqw 5.4cqw 5.4cqw;
+  border-radius: 5.4cqw;
+  background: rgba(244, 239, 230, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .11);
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 3cqw;
+  color: var(--el-or);
+}
+
+.route svg {
+  flex: none;
+  width: 6.4cqw;
+  height: 6.4cqw;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.routeLine {
+  flex: 1;
+  height: 0;
+  border-top: .5cqw dashed rgb(227 162 26 / .7);
+  transform-origin: left;
+}
+
+.chips {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5cqw;
+}
+
+.chip {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 15.4cqw;
+  height: 15.4cqw;
+  border-radius: 4cqw;
+  background: rgba(244, 239, 230, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+}
+
+.chip > svg {
+  width: 7cqw;
+  height: 7cqw;
+  fill: none;
+  stroke: #F4EFE6;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* La case de l'agence, posée en coin */
+.chip .chipCheck {
+  position: absolute;
+  right: -1.8cqw;
+  top: -1.8cqw;
+  width: 6.2cqw;
+  height: 6.2cqw;
+  box-shadow: 0 0 0 .7cqw #1A2235;
+}
+
+.chip .chipCheck > i {
+  background: var(--el-or);
+}
+
+.chip .chipCheck path {
+  stroke: var(--el-encre);
+}
+
+/* La scène en mode clair : un écran clair, l'or et le bleu nuit du site gardent leurs couleurs */
+:global(html[data-theme="light"]) .scene {
+  --tint: 227 162 26;
+  --sc-a: #FFFFFF;
+  --sc-b: #FBF5EA;
+  --el-trait: rgba(26, 25, 24, .12);
+}
+
+:global(html[data-theme="light"]) .dots li,
+:global(html[data-theme="light"]) .scale li {
+  box-shadow: inset 0 0 0 .45cqw rgba(26, 25, 24, .16);
+}
+
+:global(html[data-theme="light"]) .dots i,
+:global(html[data-theme="light"]) .scale i {
+  box-shadow: 0 1cqw 2.4cqw -.6cqw rgb(227 162 26 / .6);
+}
+
+:global(html[data-theme="light"]) .question,
+:global(html[data-theme="light"]) .trip {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .26);
+}
+
+:global(html[data-theme="light"]) .profile {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 2cqw 4cqw -1cqw rgba(26, 25, 24, .14), 0 8cqw 16cqw -6cqw rgba(26, 25, 24, .34);
+}
+
+:global(html[data-theme="light"]) .links path {
+  stroke: rgba(26, 25, 24, .2);
+}
+
+:global(html[data-theme="light"]) .av {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1.6cqw 3.6cqw -1.4cqw rgba(26, 25, 24, .32);
+}
+
+:global(html[data-theme="light"]) .av svg,
+:global(html[data-theme="light"]) .chip > svg {
+  stroke: var(--el-encre);
+}
+
+:global(html[data-theme="light"]) .me {
+  background: var(--el-or);
+  box-shadow: 0 0 0 1.4cqw rgb(227 162 26 / .16), 0 2cqw 5cqw -1cqw rgb(227 162 26 / .55);
+}
+
+:global(html[data-theme="light"]) .route {
+  color: #C8890C;
+}
+
+:global(html[data-theme="light"]) .chip {
+  background: #FBF6EC;
+  box-shadow: inset 0 0 0 1px rgba(26, 25, 24, .07);
+}
+
+:global(html[data-theme="light"]) .chip .chipCheck {
+  box-shadow: 0 0 0 .7cqw #fff;
+}
+
+:global(html[data-theme="light"]) .chip .chipCheck > i {
+  background: var(--el-or);
+}
+
+:global(html[data-theme="light"]) .chip .chipCheck path {
+  stroke: var(--el-encre);
+}

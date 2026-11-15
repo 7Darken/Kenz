@@ -1,0 +1,200 @@
+/* =========================================================
+   Le cadre des animations « Comment ça marche » (app.html, « Scènes ») : une coque, un écran en unités cqw.
+   État final par défaut (lisible sans JS et en mouvement réduit) ; GSAP pose l'état de départ et joue.
+   Chaque scène pose --tint (« r g b »), --sc-a et --sc-b (le dégradé de l'écran) sur sa racine.
+   ========================================================= */
+.sc {
+  position: relative;
+  width: min(100%, 440px);
+  margin-inline: auto;
+}
+
+.view {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 34px;
+  background: rgba(244, 239, 230, .04);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .08), 0 1px 1px rgba(0, 0, 0, .25), 0 50px 90px -46px rgba(0, 0, 0, .9);
+}
+
+.core {
+  position: absolute;
+  inset: 6px;
+  border-radius: 28px;
+  overflow: hidden;
+  container-type: inline-size;
+  background: radial-gradient(90% 60% at 50% 0%, rgb(var(--tint) / .22), transparent 70%), linear-gradient(180deg, var(--sc-a, #161D30), var(--sc-b, #0F1424));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+
+/* « exemple » : des données d'exemple */
+.ex {
+  position: absolute;
+  left: 5.5cqw;
+  bottom: 4cqw;
+  z-index: 5;
+  font-size: max(11px, 2.9cqw);
+  color: rgba(244, 239, 230, .6);
+  letter-spacing: .01em;
+}
+
+.exTop {
+  top: 4.4cqw;
+  bottom: auto;
+}
+
+/* Rejouer : discret, dans le coin de l'animation (après la fin, hors épinglage) */
+.replay {
+  position: absolute;
+  z-index: 4;
+  bottom: 16px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 13px 0 10px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgb(var(--fg-rgb) / .86);
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .16);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo);
+}
+
+/* Une cible de 44 px au moins */
+.replay::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+.replay svg {
+  width: 13px;
+  height: 13px;
+  transition: transform .8s var(--expo);
+}
+
+.replay:hover svg {
+  transform: rotate(-200deg);
+}
+
+.replay:active {
+  transform: scale(.97);
+}
+
+.replay[data-on] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .8s var(--expo), visibility 0s;
+}
+
+/* Petites pièces partagées entre scènes : la case cochée, le rouleau de chiffres, la fente d'un nombre */
+.chk {
+  position: relative;
+  flex: none;
+  display: block;
+  width: 8cqw;
+  height: 8cqw;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 .5cqw rgba(244, 239, 230, .28);
+}
+
+.chk > i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #B9A5FF;
+}
+
+.chk svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.chk path {
+  fill: none;
+  stroke: #15122A;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.rollW {
+  display: inline-block;
+  height: 1.04em;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roll {
+  display: flex;
+  flex-direction: column;
+}
+
+.roll b {
+  display: block;
+  height: 1.04em;
+  line-height: 1.04em;
+  font-weight: inherit;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.slit {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0 .05em .08em;
+  margin: 0 -.05em -.08em;
+}
+
+.num {
+  display: inline-block;
+}
+
+/* Le mode clair (le fond de Studio) : un écran clair posé dans sa coque */
+:global(html[data-theme="light"]) .view {
+  background: rgba(255, 255, 255, .6);
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .05), 0 2px 4px -1px rgba(26, 25, 24, .05), 0 30px 60px -28px rgba(26, 25, 24, .32), 0 70px 120px -50px rgba(26, 25, 24, .22), inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+:global(html[data-theme="light"]) .core {
+  background: radial-gradient(90% 60% at 50% 0%, rgb(var(--tint) / .12), transparent 70%), linear-gradient(180deg, var(--sc-a), var(--sc-b));
+  box-shadow: inset 0 0 0 1px rgba(26, 25, 24, .05), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+:global(html[data-theme="light"]) .ex {
+  color: var(--faint);
+}
+
+:global(html[data-theme="light"]) .replay {
+  background: rgba(255, 255, 255, .86);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 16px -8px rgba(26, 25, 24, .32);
+}
+
+:global(html[data-theme="light"]) .chk {
+  box-shadow: inset 0 0 0 .5cqw rgba(26, 25, 24, .18);
+}
+
+:global(html[data-theme="light"]) .chk > i {
+  background: #6A55D8;
+}
+
+:global(html[data-theme="light"]) .chk path {
+  stroke: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .replay,
+  .replay svg {
+    transition-property: opacity, background-color, color, box-shadow;
+  }
+}

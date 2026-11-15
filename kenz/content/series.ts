@@ -1,6 +1,6 @@
 /**
  * Le voyage, côté Créateur : les escales du globe (/createur) et la page /createur/voyage
- * (mes séries, la dernière vidéo, le vrai prix, le guide Chine, les budgets du formulaire Marques).
+ * (mes séries, la dernière vidéo, le vrai prix, le guide Chine, « Me suivre »).
  * Sources : maquettes/v6/createur.html (escales) et maquettes/v6/voyage.html ; faits observés
  * de maquettes/_shared/content.js (KENZ.createur.asie, KENZ.videos) seulement.
  *
@@ -490,7 +490,10 @@ export interface TravelGuide {
   /** Nombre de jours : le calendrier dessiné sur la carte. */
   days: number;
   bases: readonly Place[];
-  link: ExternalLink;
+  /** La page de l'itinéraire ; tant qu'elle n'est pas en ligne (`online: false`), le bouton mène à `video`. */
+  page: ExternalLink & { online: boolean };
+  /** La vidéo du même itinéraire, sur YouTube. */
+  video: `https://${string}`;
 }
 
 export const CHINA_GUIDE: TravelGuide = {
@@ -504,8 +507,31 @@ export const CHINA_GUIDE: TravelGuide = {
     { name: { fr: "Chongqing", en: "Chongqing" }, nativeName: { text: "重庆", lang: "zh" } },
     { name: { fr: "Shanghai", en: "Shanghai" }, nativeName: { text: "上海", lang: "zh" } },
   ],
-  link: {
+  // /itineraire/chine n'existe pas encore : le bouton ouvre la vidéo de l'itinéraire (LATEST_VIDEO).
+  page: {
     label: { fr: "Ouvrir l’itinéraire", en: "Open the itinerary" },
     href: "https://kenzenbien.fr/itineraire/chine",
+    online: false,
   },
+  video: LATEST_VIDEO.href,
 };
+
+/* ------------------------------------------------------------------------
+   Me suivre (/createur/voyage) : le paysage derrière, le portrait dans l'arche
+   ------------------------------------------------------------------------ */
+
+export const FOLLOW_MEDIA = {
+  landscape: { src: "/assets/img/paysage-kuala-lumpur.jpg", width: 1600, height: 900 },
+  portrait: {
+    src: "/assets/img/kenz-carre.jpg",
+    width: 900,
+    height: 855,
+    alt: {
+      fr: "Kenz en t-shirt vert devant les rizières de Malaisie",
+      en: "Kenz in a green T-shirt in front of the rice fields of Malaysia",
+    },
+  },
+} satisfies Record<string, ImageAsset>;
+
+/** Le nombre d'abonnés TikTok affiché sous « Me suivre » (chiffre observé, déjà sur la maquette). */
+export const TIKTOK_FOLLOWERS = { fr: "≈\u202f28\u202f000", en: "≈\u202f28,000" } satisfies Localized<string>;

@@ -1,0 +1,46 @@
+/* 2. Le problème : une phrase, un écran (app.html) */
+.problem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: var(--sec) 0;
+}
+
+.problem > div {
+  width: 100%;
+}
+
+.title {
+  max-width: 21ch;
+  margin: 0;
+  font-size: clamp(38px, 6vw, 100px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.title :global(.word) {
+  text-shadow: var(--glow);
+}
+
+.long {
+  max-width: 19ch;
+  font-size: clamp(38px, 5.4vw, 90px);
+}
+
+.caption {
+  margin-top: clamp(26px, 3vw, 40px);
+  max-width: 40ch;
+}
+
+/* Les mots s'allument au défilement : avant JS, ils sont déjà éteints (sans JS, tout reste lisible) */
+.scrubWord {
+  display: inline-block;
+}
+
+:global(.js) .scrubWord {
+  opacity: .12;
+}

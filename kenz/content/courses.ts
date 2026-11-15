@@ -87,6 +87,17 @@ const PHOTOS = {
   },
 } satisfies Record<string, ImageAsset>;
 
+/** L'arrivée de /createur/sport : Kenz en pleine course (sport.html, `.kh__photo` ; le cadrage suit l'écran, en CSS). */
+export const SPORT_HERO_PHOTO: ImageAsset = {
+  src: PHOTOS.sledPush.src,
+  width: PHOTOS.sledPush.width,
+  height: PHOTOS.sledPush.height,
+  alt: {
+    fr: "Kenz pousse le traîneau sur la piste du HYROX de Riga, sous les projecteurs",
+    en: "Kenz pushing the sled down the track at HYROX Riga, under the spotlights",
+  },
+};
+
 /* ------------------------------------------------------------------------
    Les scènes animées de la fiche (icônes 3D)
    ------------------------------------------------------------------------ */
@@ -278,6 +289,8 @@ export const COURSE_SCENES: CourseScenes = {
 /** Toutes les courses, dans l'ordre de la page Sport. */
 export const COURSE_IDS = ["hyrox", "spartan", "boxe"] as const;
 export type CourseId = (typeof COURSE_IDS)[number];
+
+export const isCourseId = (value: string): value is CourseId => (COURSE_IDS as readonly string[]).includes(value);
 
 /** Les courses de l'aperçu sur /createur. */
 export const CREATEUR_COURSE_IDS: readonly CourseId[] = ["hyrox", "spartan"];

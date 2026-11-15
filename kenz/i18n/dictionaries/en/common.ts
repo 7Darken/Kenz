@@ -21,9 +21,6 @@ export const common: CommonDictionary = {
     back: "Content creation",
     backShort: "Content",
   },
-  passages: {
-    dotLabel: "Kenz",
-  },
   actions: {
     backToTop: "Back to top",
     close: "Close",

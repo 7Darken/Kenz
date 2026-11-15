@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Le cordon (port de maquettes/v6/shared/cordon.css) : au repos, le point de 7 px de « Kenz· », rien d'autre.
+   Seul le curseur passe en « grab ». Tiré vers le bas : une chaîne à billes sort de son œillet.
+   La lumière est celle de l'univers visé (bleu lune : vers Pro).
+   ========================================================================== */
+
+.dot {
+  position: relative;
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 0 0 .07em;
+  border-radius: 50%;
+  background: var(--fg);
+  vertical-align: baseline;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: box-shadow 1.4s var(--expo);
+}
+
+/* Zone de prise un peu plus large que le point, invisible (souris : à peine ; doigt : 44 px) */
+.dot::before {
+  content: "";
+  position: absolute;
+  inset: -5px -6px -6px -4px;
+  border-radius: 50%;
+  touch-action: none;
+}
+
+@media (pointer: coarse) {
+  .dot::before {
+    inset: -18px -16px -19px -9px;
+  }
+}
+
+.pulled {
+  opacity: 0;
+}
+
+/* Juste après le geste : le point garde un instant la lumière du mécanisme */
+.engaged {
+  box-shadow: 0 0 0 1px rgb(var(--cordon-rgb) / .55), 0 0 14px 3px rgb(var(--cordon-rgb) / .55);
+  transition: none;
+}
+
+.dot,
+.fil {
+  --cordon-rgb: 157 184 255;
+}
+
+:global(html).pulling,
+:global(html).pulling * {
+  cursor: grabbing !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* ---------- Le fil : œillet, chaîne à billes, point ---------- */
+.fil {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: calc(var(--z-passage) + 30);
+  pointer-events: none;
+}
+
+.eyelet {
+  position: absolute;
+  left: -5.5px;
+  top: -5.5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, #050403 0 38%, #1b1612 52%, #6c4f30 66%, #c8a26b 78%, #4a341e 92%);
+  box-shadow: 0 1px 0 rgb(255 240 220 / .12), 0 2px 6px rgb(0 0 0 / .55);
+  transition: box-shadow .5s var(--expo);
+}
+
+.svg {
+  position: absolute;
+  left: -60px;
+  top: -20px;
+  width: 120px;
+  height: 300px;
+  overflow: visible;
+  transition: filter .5s var(--expo);
+}
+
+.chain,
+.shine {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.chain {
+  stroke: rgb(244 239 230 / .78);
+  stroke-width: 2.1;
+  stroke-dasharray: 0 4.2;
+  transition: stroke .5s var(--expo);
+}
+
+.shine {
+  stroke: rgb(var(--cordon-rgb));
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity .5s var(--expo);
+}
+
+.point {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: #F4EFE6;
+  will-change: transform;
+  box-shadow: 0 3px 8px rgb(0 0 0 / .45);
+  transition: box-shadow .5s var(--expo);
+}
+
+/* Le cran : la chaîne s'éclaire d'un coup */
+.notched .chain {
+  stroke: rgb(var(--cordon-rgb));
+  transition-duration: .05s;
+}
+
+.notched .shine {
+  opacity: .55;
+  transition-duration: .05s;
+}
+
+.notched .svg {
+  filter: drop-shadow(0 0 1.5px rgb(var(--cordon-rgb) / .95)) drop-shadow(0 0 6px rgb(var(--cordon-rgb) / .6));
+  transition-duration: .05s;
+}
+
+.notched .point {
+  box-shadow: 0 0 0 1px rgb(var(--cordon-rgb) / .6), 0 0 14px 3px rgb(var(--cordon-rgb) / .7);
+  transition-duration: .05s;
+}
+
+.notched .eyelet {
+  box-shadow: 0 0 0 1px rgb(var(--cordon-rgb) / .7), 0 0 12px 2px rgb(var(--cordon-rgb) / .55);
+  transition-duration: .05s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .svg,
+  .chain,
+  .point {
+    transition: none;
+  }
+}

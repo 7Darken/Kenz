@@ -1,0 +1,88 @@
+/* La phrase forte de /agents (agents.html, .hero), et la lumière qui s'allume derrière */
+.hero {
+  padding: calc(env(safe-area-inset-top) + 104px) 0 clamp(18px, 2.4vw, 30px);
+  isolation: isolate;
+}
+
+.light {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10%;
+  height: 160%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(46% 52% at 72% 34%, rgb(var(--lum) / .14), transparent 72%);
+}
+
+:global(html[data-theme="light"]) .light {
+  background: radial-gradient(46% 52% at 72% 34%, rgba(255, 251, 244, .95), rgba(255, 251, 244, 0) 72%);
+}
+
+.title {
+  max-width: 26ch;
+  font-size: clamp(32px, 4.1vw, 62px);
+  line-height: 1.05;
+  letter-spacing: -.042em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.title :global(.word) {
+  font-size: 1.12em;
+}
+
+.lead {
+  color: var(--muted);
+}
+
+.sub {
+  margin-top: clamp(14px, 1.6vw, 22px);
+  max-width: 30ch;
+  font-size: clamp(18px, 1.45vw, 21px);
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+@media (min-width: 1100px) {
+  .inner {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 56px;
+  }
+
+  .sub {
+    margin: 0 0 .45em;
+    max-width: 20ch;
+    text-align: right;
+    text-wrap: balance;
+  }
+}
+
+/* L'arrivée (avec JS seulement) : la lumière, puis l'invitation */
+:global(.js) .light {
+  opacity: 0;
+}
+
+:global(.js) .hero[data-in] .light {
+  opacity: 1;
+  transition: opacity 1.8s var(--expo);
+}
+
+:global(.js) .sub {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+:global(.js) .hero[data-in] .sub {
+  opacity: 1;
+  transform: none;
+  transition: opacity 1s var(--expo) 1.2s, transform 1.2s var(--expo) 1.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .sub {
+    transform: none !important;
+  }
+}

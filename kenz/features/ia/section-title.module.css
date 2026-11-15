@@ -1,0 +1,10 @@
+/* Le titre de chapitre (agents.html .h2, shared/ia.css .kz-ia__h2) */
+.title {
+  width: fit-content;
+  max-width: 100%;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(46px, 7vw, 112px);
+  line-height: .92;
+  letter-spacing: -.01em;
+}

@@ -1,0 +1,352 @@
+/* =========================================================
+   1. L'arrivée (app.html) : la couleur de l'app remplit l'écran, se rétracte dans l'icône, sous une arche
+   de lumière que le fil dessine ; puis le nom en balayage et l'accroche mot à mot.
+   L'état de départ n'existe qu'avec JS (html.js) ; [data-arrived] joue l'arrivée.
+   ========================================================= */
+
+/* La couleur de l'app qui remplit l'écran à l'arrivée, puis se rétracte dans l'icône */
+.flood {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  background: var(--teinte);
+  pointer-events: none;
+}
+
+:global(.js) .flood {
+  display: block;
+}
+
+:global(.js) .flood[data-off] {
+  display: none;
+}
+
+.arrival {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(env(safe-area-inset-top) + 88px) var(--gr) 112px var(--gl);
+  text-align: center;
+}
+
+.light {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(38% 34% at 50% 30%, rgb(var(--teinte-rgb) / .3), transparent 72%),
+    radial-gradient(75% 46% at 50% 112%, rgb(var(--teinte-rgb) / .3), transparent 70%),
+    linear-gradient(180deg, var(--hero-bg), rgb(var(--fg-rgb) / 0) 72%);
+}
+
+:global(html[data-theme="light"]) .light {
+  background:
+    radial-gradient(42% 36% at 50% 30%, rgb(var(--teinte-rgb) / .1), transparent 72%),
+    radial-gradient(75% 46% at 50% 112%, rgb(var(--teinte-rgb) / .12), transparent 70%),
+    linear-gradient(180deg, #ECEFF0, rgba(245, 243, 239, 0) 72%);
+}
+
+/* L'arche : sa lumière (couleur de l'app) monte du sol, puis le fil la dessine */
+.arche {
+  --fil-delay: .95s;
+  --shadow-delay: 1.25s;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: -1;
+  height: min(82vh, 760px, 128vw);
+  height: min(82svh, 760px, 128vw);
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.arrival .arche::before {
+  background: radial-gradient(70% 52% at 50% 34%, rgb(var(--teinte-rgb) / .5), rgb(var(--teinte-rgb) / .14) 60%, rgb(var(--teinte-rgb) / 0) 86%);
+  -webkit-mask-image: linear-gradient(180deg, #000 52%, transparent);
+  mask-image: linear-gradient(180deg, #000 52%, transparent);
+}
+
+:global(html[data-theme="light"]) .arrival .arche::before {
+  background:
+    radial-gradient(62% 44% at 50% 30%, rgba(255, 255, 255, .96), rgba(255, 255, 255, .55) 56%, rgba(255, 255, 255, 0) 84%),
+    radial-gradient(84% 62% at 50% 28%, rgb(var(--teinte-rgb) / .16), rgb(var(--teinte-rgb) / 0) 82%);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 2.6vh, 30px);
+}
+
+.icon {
+  width: clamp(96px, 11vw, 150px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 23%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 34px 70px -26px rgb(var(--teinte-rgb) / .85), 0 14px 26px -12px rgba(0, 0, 0, .6);
+}
+
+:global(html[data-theme="light"]) .icon {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .06), 0 34px 70px -26px rgb(var(--teinte-rgb) / .7), 0 14px 26px -12px rgba(26, 25, 24, .3);
+}
+
+/* Projet web : le motif se trace là où l'icône se pose ; la couleur s'y rétracte en pilule */
+.markBox {
+  position: relative;
+  display: block;
+  width: clamp(108px, 10vw, 150px);
+  aspect-ratio: 4 / 3;
+}
+
+.markBox::before {
+  content: "";
+  position: absolute;
+  inset: -55% -45%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--teinte-rgb) / .3), rgb(var(--teinte-rgb) / 0));
+  pointer-events: none;
+}
+
+:global(html[data-theme="light"]) .markBox::before {
+  background: radial-gradient(closest-side, rgb(var(--teinte-rgb) / .16), rgb(var(--teinte-rgb) / 0));
+}
+
+.markBox svg {
+  filter: drop-shadow(0 0 16px rgb(var(--teinte-rgb) / .5));
+}
+
+:global(html[data-theme="light"]) .markBox svg {
+  filter: drop-shadow(0 10px 16px rgb(var(--teinte-rgb) / .3));
+}
+
+.name {
+  position: relative;
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: min(28vw, 290px, 32vh);
+  line-height: .84;
+  letter-spacing: -.02em;
+  color: var(--fg);
+}
+
+.webName {
+  font-size: min(17vw, 200px, 19vh);
+  line-height: .86;
+}
+
+.nameLine {
+  display: block;
+}
+
+.title {
+  display: block;
+}
+
+.ghost {
+  position: absolute;
+  inset: 0;
+  filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.line {
+  max-width: 31ch;
+  font-size: clamp(18px, 1.6vw, 23px);
+  line-height: 1.45;
+  color: rgb(var(--fg-rgb) / .94);
+  text-wrap: balance;
+}
+
+.webLine {
+  max-width: none;
+  font-size: clamp(24px, 2.5vw, 38px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.line :global(.word) {
+  text-shadow: var(--glow);
+}
+
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: calc(26px + env(safe-area-inset-bottom));
+  translate: -50% 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: var(--fg);
+  background: var(--ghost-bg);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .5), 0 0 22px -6px rgb(var(--lum) / .8);
+  transition: background-color .4s var(--expo);
+}
+
+.cue:hover {
+  background-color: var(--ghost-hover);
+}
+
+:global(html[data-theme="light"]) .cue {
+  background-color: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .35), 0 8px 18px -10px rgba(26, 25, 24, .35);
+}
+
+:global(html[data-theme="light"]) .cue:hover {
+  background-color: #fff;
+}
+
+.cue svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Le geste d'arrivée ---------- */
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes titleIn {
+  0% {
+    clip-path: inset(-25% 100% -30% -8%);
+    filter: blur(10px);
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    filter: none;
+  }
+}
+
+@keyframes ghostIn {
+  0% {
+    clip-path: inset(-25% 100% -30% -8%);
+    opacity: .9;
+  }
+
+  65% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: .45;
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: 0;
+  }
+}
+
+:global(.js) .light {
+  opacity: 0;
+}
+
+:global(.js) .arrival[data-arrived] .light {
+  opacity: 1;
+  transition: opacity 1.6s var(--expo) .15s;
+}
+
+:global(.js) .arche::before {
+  opacity: 0;
+  transform: scaleY(.55);
+  transform-origin: 50% 100%;
+}
+
+:global(.js) .arrival[data-arrived] .arche::before {
+  opacity: 1;
+  transform: none;
+  transition: opacity 1.6s var(--expo) .75s, transform 2.2s var(--expo) .75s;
+}
+
+:global(.js) .icon {
+  opacity: 0;
+  transform: scale(1.04);
+}
+
+:global(.js) .arrival[data-arrived] .icon {
+  opacity: 1;
+  transform: none;
+  transition: opacity .3s linear .82s, transform 1.3s var(--expo) 1.05s;
+}
+
+:global(.js) .main {
+  clip-path: inset(-25% 100% -30% -8%);
+}
+
+:global(.js) .arrival[data-arrived] .main {
+  animation: titleIn 1.6s var(--expo) 1s both;
+}
+
+:global(.js) .arrival[data-arrived] .ghost {
+  animation: ghostIn 1.4s var(--expo) .86s both;
+}
+
+:global(.js) .cue {
+  opacity: 0;
+}
+
+:global(.js) .arrival[data-arrived] .cue {
+  opacity: 1;
+  transition: opacity 1s var(--expo) 2.2s, background-color .4s var(--expo);
+}
+
+/* Le motif se trace : les deux arcs, l'un après l'autre */
+:global(.js) .markBox path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+:global(.js) .arrival[data-arrived] .markBox path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.5s var(--expo) 1s;
+}
+
+:global(.js) .arrival[data-arrived] .markBox path + path {
+  transition-delay: 1.16s;
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .icon,
+  :global(.js) .arche::before {
+    transform: none !important;
+  }
+
+  :global(.js) .main {
+    clip-path: none;
+    opacity: 0;
+  }
+
+  :global(.js) .arrival[data-arrived] .main {
+    animation: fade 1s var(--expo) .3s both;
+  }
+
+  .ghost {
+    display: none;
+  }
+
+  :global(.js) .arrival[data-arrived] .icon {
+    transition: opacity .6s var(--expo) .1s;
+  }
+
+  :global(.js) .markBox path {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+}

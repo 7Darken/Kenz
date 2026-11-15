@@ -1,0 +1,37 @@
+/* Le chapitre contact (pro.html A4) : la phrase et les liens à gauche, le formulaire à droite */
+.contact {
+  padding: var(--sec) 0;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(40px, 6vw, 96px);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .split {
+    grid-template-columns: 5fr 7fr;
+  }
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.say {
+  max-width: 11ch;
+  font-size: clamp(42px, 5.6vw, 86px);
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-weight: 500;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

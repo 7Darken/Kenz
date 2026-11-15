@@ -1,0 +1,438 @@
+/* ==========================================================================
+   Mes courses (port de maquettes/v6/shared/courses.css, .kc*) : des compositions photo éditoriales,
+   sans cartes ni boîtes, posées sur le fond de la section. Identité k15ze, quel que soit l'univers :
+   sombre, texte #F7F7F2, vert #3DDC84 ; clair, texte #0D0F0E, vert #1E7A46. Noms et chiffres en Anton.
+   --courses-bg (posé par le parent) : le fond sous les compositions, où fond le bas de la grande photo.
+   ========================================================================== */
+.courses {
+  --kc-green: #3DDC84;
+  --kc-green-rgb: 61 220 132;
+  --kc-text: #F7F7F2;
+  --kc-text-rgb: 247 247 242;
+  --kc-soft: rgba(247, 247, 242, .72);
+  --kc-line: rgba(247, 247, 242, .14);
+  --kc-media: #151917;
+  --kc-bg: var(--courses-bg, var(--bg));
+  --kcd-bg: #111412;
+  position: relative;
+  color: var(--kc-text);
+  font-family: var(--f-text);
+}
+
+:global(html[data-theme="light"]) .courses {
+  --kc-green: #1E7A46;
+  --kc-green-rgb: 30 122 70;
+  --kc-text: #0D0F0E;
+  --kc-text-rgb: 13 15 14;
+  --kc-soft: #4A504C;
+  --kc-line: rgba(13, 15, 14, .12);
+  --kc-media: #E2E6E1;
+  --kcd-bg: #FAFBF8;
+}
+
+/* ---------- La disposition ---------- */
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(72px, 12vw, 120px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  /* landing : côte à côte, en rythmes décalés (la 2e plus bas) */
+  .landing .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(48px, 7vw, 120px);
+    row-gap: clamp(72px, 9vw, 140px);
+    align-items: start;
+  }
+
+  .landing .item:nth-child(even) {
+    margin-top: clamp(72px, 13vh, 150px);
+  }
+
+  .landing.single .list {
+    grid-template-columns: minmax(0, 640px);
+  }
+
+  /* page : une course par rangée, la composition et le texte côte à côte, en alternance */
+  .page .list {
+    gap: clamp(72px, 9vw, 130px);
+  }
+
+  .page .course {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(40px, 6vw, 110px);
+    align-items: center;
+  }
+
+  .page .item:nth-child(even) .course {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  .page .item:nth-child(even) .compo {
+    order: 2;
+  }
+
+  .page .text {
+    margin-top: 0;
+  }
+}
+
+/* ---------- La composition : une grande photo, une ou deux en décalé, le nom qui mord sur le bas ---------- */
+.compo {
+  position: relative;
+  padding-bottom: 14%;
+  cursor: pointer;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.layer {
+  position: relative;
+  margin: 0;
+}
+
+.layerA {
+  z-index: 1;
+  width: 64%;
+}
+
+.layerB {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  bottom: 0;
+  width: 42%;
+}
+
+.layerC {
+  position: absolute;
+  z-index: 2;
+  right: 7%;
+  top: 3%;
+  width: 30%;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--r, .8);
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--kc-media);
+}
+
+.frame img {
+  object-fit: cover;
+  transition: filter .9s var(--expo);
+}
+
+/* le bas de la grande photo fond dans le fond de la section : le nom y reste lisible, en clair comme en sombre */
+.frameA::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(0 0 0 / 0) 56%, var(--kc-bg) 99%);
+}
+
+/* les petites photos, découpées dans le fond (un liseré de la couleur du fond), avec de la profondeur */
+.layerB .frame,
+.layerC .frame {
+  box-shadow: 0 0 0 6px var(--kc-bg), 0 34px 60px -26px rgba(0, 0, 0, .7);
+}
+
+:global(html[data-theme="light"]) .layerB .frame,
+:global(html[data-theme="light"]) .layerC .frame {
+  box-shadow: 0 0 0 6px var(--kc-bg), 0 30px 50px -26px rgba(13, 15, 14, .38);
+}
+
+/* sans photo : le dessin au trait, posé tel quel */
+.frameEmpty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 10;
+  background: none;
+  overflow: visible;
+}
+
+.compoDrawing {
+  padding-bottom: 6%;
+}
+
+.compoDrawing .layerA {
+  width: 74%;
+}
+
+.drawing {
+  width: 82%;
+  height: auto;
+  overflow: visible;
+  fill: none;
+  stroke: rgb(var(--kc-text-rgb) / .8);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: perspective(700px) rotateX(48deg);
+}
+
+.drawing .accent {
+  stroke: var(--kc-green);
+  stroke-width: 1.8;
+}
+
+.name {
+  position: absolute;
+  z-index: 4;
+  left: -.03em;
+  bottom: 9%;
+  margin: 0;
+  max-width: 100%;
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: clamp(64px, 8.4vw, 136px);
+  line-height: .86;
+  letter-spacing: .004em;
+  color: var(--kc-text);
+  pointer-events: none;
+  text-wrap: balance;
+}
+
+.page .name {
+  font-size: clamp(64px, 7.4vw, 124px);
+}
+
+/* en sombre, une ombre douce : le nom reste lisible là où il passe sur une petite photo */
+:global(html:not([data-theme="light"])) .name {
+  text-shadow: 0 2px 26px rgba(0, 0, 0, .4);
+}
+
+/* page, en alternance : la composition en miroir */
+@media (min-width: 900px) {
+  .page .item:nth-child(even) .layerA {
+    margin-left: auto;
+  }
+
+  .page .item:nth-child(even) .layerB {
+    right: auto;
+    left: 0;
+  }
+
+  .page .item:nth-child(even) .layerC {
+    right: auto;
+    left: 7%;
+  }
+
+  .page .item:nth-child(even) .name {
+    left: auto;
+    right: -.03em;
+    text-align: right;
+  }
+}
+
+/* le survol suggère le clic : la photo s'éclaire, les petites s'écartent, le « + » tourne */
+.layerB,
+.layerC {
+  transition: translate 1s var(--expo);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .course:hover .frameA img {
+    filter: brightness(1.08) saturate(1.05);
+  }
+
+  .course:hover .layerB {
+    translate: 10px -8px;
+  }
+
+  .course:hover .layerC {
+    translate: -8px -6px;
+  }
+
+  .page .item:nth-child(even) .course:hover .layerB {
+    translate: -10px -8px;
+  }
+}
+
+/* ---------- Le texte, dessous ---------- */
+.text {
+  position: relative;
+  z-index: 2;
+  max-width: 46ch;
+  margin-top: clamp(18px, 2.2vw, 28px);
+}
+
+.when {
+  font-size: 14px;
+}
+
+.summary {
+  margin: 10px 0 0;
+  font-size: clamp(16px, 1.2vw, 18px);
+  line-height: 1.5;
+  color: rgb(var(--kc-text-rgb) / .9);
+  text-wrap: pretty;
+}
+
+.figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--kc-soft);
+}
+
+.figure b {
+  margin-right: 3px;
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--kc-green);
+}
+
+.sep {
+  opacity: .5;
+}
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 600 15px/1.2 var(--f-text);
+  color: var(--kc-text);
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0 1px;
+  background-position: 0 calc(100% - 8px);
+  background-repeat: no-repeat;
+  transition: background-size .7s var(--expo);
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--kc-green);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.plus {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--kc-green);
+  box-shadow: inset 0 0 0 1.5px var(--kc-green);
+  transition: transform .7s var(--expo), background-color .4s var(--expo), color .4s var(--expo);
+}
+
+.plus svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .course:hover .open {
+    background-size: calc(100% - 44px) 1px;
+  }
+
+  .course:hover .plus {
+    transform: rotate(90deg);
+    background-color: var(--kc-green);
+    color: var(--kc-bg);
+  }
+}
+
+/* ---------- L'entrée à l'écran (une fois ; avec JS et hors mouvement réduit) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  :global(.js) .course .frameA {
+    clip-path: inset(100% 0 0 0 round 6px);
+  }
+
+  :global(.js) .course[data-in] .frameA {
+    clip-path: inset(0 0 0 0 round 6px);
+    transition: clip-path 1.3s var(--expo) calc(var(--i, 0) * .12s);
+  }
+
+  :global(.js) .course .drawing rect {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+
+  :global(.js) .course[data-in] .drawing rect {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1.6s var(--io) .2s;
+  }
+
+  :global(.js) .course .layerB > .frame,
+  :global(.js) .course .layerC > .frame {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  :global(.js) .course[data-in] .layerB > .frame,
+  :global(.js) .course[data-in] .layerC > .frame {
+    opacity: 1;
+    transform: none;
+    transition: opacity 1s var(--expo) calc(var(--i, 0) * .12s + .45s), transform 1.4s var(--expo) calc(var(--i, 0) * .12s + .45s);
+  }
+
+  :global(.js) .course[data-in] .layerC > .frame {
+    transition-delay: calc(var(--i, 0) * .12s + .6s);
+  }
+
+  :global(.js) .course .name {
+    opacity: 0;
+    clip-path: inset(-10% 100% -20% 0);
+    filter: blur(8px);
+  }
+
+  :global(.js) .course[data-in] .name {
+    opacity: 1;
+    clip-path: inset(-10% -4% -20% -4%);
+    filter: none;
+    transition: opacity .4s var(--expo) calc(var(--i, 0) * .12s + .3s), clip-path 1.3s var(--expo) calc(var(--i, 0) * .12s + .3s), filter 1s var(--expo) calc(var(--i, 0) * .12s + .3s);
+  }
+
+  :global(.js) .course .text > * {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  :global(.js) .course[data-in] .text > * {
+    opacity: 1;
+    transform: none;
+    transition: opacity .9s var(--expo) calc(var(--i, 0) * .12s + .55s), transform 1.1s var(--expo) calc(var(--i, 0) * .12s + .55s);
+  }
+}
+
+/* ---------- Mouvement réduit : tout est posé ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .layerB,
+  .layerC,
+  .frame img,
+  .plus,
+  .open {
+    transition: none !important;
+  }
+
+  .course:hover .layerB,
+  .course:hover .layerC {
+    translate: none !important;
+  }
+}

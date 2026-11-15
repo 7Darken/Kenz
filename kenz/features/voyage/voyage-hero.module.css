@@ -1,0 +1,235 @@
+/* L'arrivée de la page Voyage (voyage.html, .vh) : « Kenz en Asie », et la bille de cristal en petit */
+.hero {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100svh;
+  isolation: isolate;
+}
+
+.inner {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  row-gap: clamp(18px, 3svh, 30px);
+  padding-top: calc(env(safe-area-inset-top) + 64px + clamp(12px, 3svh, 28px));
+  padding-bottom: clamp(40px, 8svh, 96px);
+}
+
+/* L'emplacement de la bille (features/terre la pose ici) */
+.bille {
+  justify-self: center;
+  width: min(60vw, 34svh, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.title {
+  position: relative;
+  margin: 0 0 0 -.03em;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(68px, 19vw, 104px);
+  line-height: .86;
+  letter-spacing: -.012em;
+}
+
+.ttl {
+  display: block;
+}
+
+.ghost {
+  position: absolute;
+  inset: 0;
+  filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.line {
+  display: block;
+}
+
+.phrase {
+  margin: 20px 0 0;
+  max-width: 22ch;
+  font-size: clamp(19px, 1.7vw, 24px);
+  line-height: 1.42;
+  color: rgb(var(--fg-rgb) / .94);
+  text-wrap: balance;
+}
+
+.down {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  margin-top: 24px;
+  padding-right: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .4s var(--expo);
+}
+
+.downIcon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .45), 0 0 18px -6px rgb(var(--lum) / .5);
+  transition: box-shadow .5s var(--expo), background-color .5s var(--expo);
+}
+
+.downIcon svg {
+  width: 15px;
+  height: 15px;
+  transition: transform .7s var(--expo);
+}
+
+.down:hover {
+  color: var(--fg);
+}
+
+.down:hover .downIcon {
+  background-color: rgb(var(--lum) / .1);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .8), 0 0 24px -4px rgb(var(--lum) / .6);
+}
+
+.down:hover .downIcon svg {
+  transform: translateY(3px);
+}
+
+:global(html[data-theme="light"]) .downIcon {
+  background-color: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 14px -8px rgba(26, 25, 24, .3);
+}
+
+:global(html[data-theme="light"]) .down:hover .downIcon {
+  background-color: #fff;
+}
+
+@media (min-width: 900px) {
+  .inner {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    align-items: center;
+    align-content: center;
+    column-gap: clamp(40px, 5vw, 96px);
+    padding-top: calc(72px + 4vh);
+    padding-bottom: 6vh;
+  }
+
+  .bille {
+    order: 2;
+    width: min(46vh, 32vw, 460px);
+  }
+
+  .title {
+    font-size: clamp(112px, 10.6vw, 178px);
+  }
+}
+
+/* L'entrée : le titre se découvre (et son fantôme flou), la phrase mot par mot, puis le lien */
+@keyframes appear {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes titleMain {
+  0% {
+    clip-path: inset(-25% 100% -30% -8%);
+    filter: blur(10px);
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    filter: none;
+  }
+}
+
+@keyframes titleGhost {
+  0% {
+    clip-path: inset(-25% 100% -30% -8%);
+    opacity: .9;
+  }
+
+  65% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: .45;
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: 0;
+  }
+}
+
+:global(.js) .main {
+  clip-path: inset(-25% 100% -30% -8%);
+}
+
+.hero[data-played] .main {
+  animation: titleMain 1.7s var(--expo) var(--td, .5s) both;
+}
+
+.hero[data-played] .ghost {
+  animation: titleGhost 1.5s var(--expo) calc(var(--td, .5s) - .18s) both;
+}
+
+.hero[data-porte] .title {
+  --td: .2s;
+}
+
+:global(.js) .anim {
+  opacity: 0;
+}
+
+.hero[data-played] .anim {
+  opacity: 1;
+  animation: appear 1s var(--expo) both;
+  animation-delay: var(--ad, 1.6s);
+}
+
+.hero[data-porte] .anim {
+  --ad: .8s;
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .main {
+    clip-path: none !important;
+  }
+
+  .hero[data-played] .main,
+  .hero[data-played] .anim {
+    animation-name: fade !important;
+  }
+
+  .ghost {
+    display: none;
+  }
+
+  .down,
+  .downIcon,
+  .downIcon svg {
+    transition: none;
+  }
+}

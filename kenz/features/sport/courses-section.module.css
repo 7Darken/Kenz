@@ -1,0 +1,17 @@
+/* L'en-tête de « Mes courses » (sport.html, .courses__head) */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 40px;
+  margin-bottom: clamp(32px, 4.4vw, 56px);
+}
+
+.sub {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}

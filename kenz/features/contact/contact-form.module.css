@@ -1,0 +1,271 @@
+/* Le formulaire (pro.html A4 ; matière « double biseau », champs et choix de shared/theme.css) */
+.form {
+  position: relative;
+  padding: 6px;
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+}
+
+.core {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  padding: clamp(22px, 3vw, 40px);
+  border-radius: calc(var(--r-xl) - 6px);
+  background: var(--core);
+  box-shadow: var(--core-hl);
+}
+
+.body {
+  transition: opacity .24s var(--out), filter .24s var(--out);
+}
+
+.form[data-sent] .body {
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* ---------- Les champs ---------- */
+.field {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+
+.label {
+  padding: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.input {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: var(--r-md);
+  outline: none;
+  background: var(--field-bg);
+  box-shadow: inset 0 0 0 1px var(--field-line);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--fg);
+  transition: box-shadow .4s var(--expo);
+}
+
+.input::placeholder {
+  color: var(--placeholder);
+}
+
+.input:hover {
+  box-shadow: inset 0 0 0 1px var(--field-line-2);
+}
+
+.input:focus-visible {
+  box-shadow: inset 0 0 0 1.5px var(--field-focus), 0 0 0 4px rgb(var(--lum) / .12);
+}
+
+.input[aria-invalid="true"] {
+  box-shadow: inset 0 0 0 1.5px var(--warn-line);
+}
+
+.textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.choice {
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--muted);
+  background: var(--ghost-bg);
+  box-shadow: inset 0 0 0 1px var(--field-line);
+  transition: background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo);
+}
+
+.choice input:hover + span {
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--field-line-2);
+}
+
+.choice input:checked + span {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  box-shadow: none;
+}
+
+.choice input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.choice input:active + span {
+  transform: scale(.97);
+}
+
+.choices[data-invalid] .choice span {
+  box-shadow: inset 0 0 0 1px var(--warn-line);
+}
+
+.err {
+  margin: 0;
+  font-size: 13px;
+  color: var(--warn);
+}
+
+.err:empty {
+  display: none;
+}
+
+/* Le piège à robots : hors de l'écran, jamais lu */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.failure {
+  flex: 1 1 220px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--warn);
+}
+
+.failure:empty {
+  display: none;
+}
+
+/* ---------- « Merci » : la coche se dessine, le texte sort du flou ---------- */
+.ok {
+  position: absolute;
+  inset: 6px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  padding: clamp(24px, 4vw, 56px);
+  border-radius: calc(var(--r-xl) - 6px);
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  pointer-events: none;
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+.form[data-sent] .ok {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s;
+}
+
+.check {
+  width: 68px;
+  height: 68px;
+}
+
+.check circle,
+.check path {
+  fill: none;
+  stroke: rgb(var(--lum));
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.check path {
+  stroke-width: 2.2;
+}
+
+.form[data-sent] .check circle {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s var(--expo) .35s;
+}
+
+.form[data-sent] .check path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset .8s var(--expo) .85s;
+}
+
+.ok h3 {
+  margin: 0;
+  outline: none;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  font-weight: 500;
+}
+
+.ok p {
+  max-width: 34ch;
+  color: var(--muted);
+}
+
+.ok > :not(svg) {
+  opacity: 0;
+  filter: blur(5px);
+  transition: opacity .24s var(--out), filter .24s var(--out);
+}
+
+.form[data-sent] .ok > :not(svg) {
+  opacity: 1;
+  filter: none;
+  transition: opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ok {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .choice span {
+    transition-property: opacity, background-color, color, box-shadow;
+  }
+}

@@ -1,0 +1,201 @@
+/* L'arrivée k15ze (sport.html, .kh) : « k15ze », la promesse (le mot vert), et Kenz en pleine course */
+.hero {
+  isolation: isolate;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "cap" "mark" "photo" "promise" "tone" "actions";
+  align-content: start;
+  padding-top: calc(env(safe-area-inset-top) + 64px + 18px);
+  padding-bottom: clamp(56px, 9svh, 110px);
+}
+
+.cap {
+  grid-area: cap;
+  margin: 0 0 4px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(19px, 1.5vw, 22px);
+  line-height: 1.3;
+  color: var(--faint);
+  --ad: .1s;
+}
+
+.mark {
+  grid-area: mark;
+  margin: 0 0 0 -.05em;
+  padding-bottom: .04em;
+  overflow: hidden;
+  font-family: var(--k-title);
+  font-weight: 800;
+  font-size: clamp(104px, 31vw, 150px);
+  line-height: .86;
+  letter-spacing: -.045em;
+  white-space: nowrap;
+}
+
+.letter {
+  display: inline-block;
+}
+
+.photo {
+  grid-area: photo;
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin: 22px 0 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--media-bg);
+  box-shadow: var(--media-sh);
+}
+
+.photo img {
+  object-fit: cover;
+  object-position: 50% 48%;
+}
+
+.promise {
+  grid-area: promise;
+  margin: 26px 0 0;
+  max-width: 21ch;
+  font-family: var(--k-title);
+  font-weight: 600;
+  font-size: clamp(25px, 2.5vw, 38px);
+  line-height: 1.16;
+  letter-spacing: -.03em;
+  text-wrap: balance;
+}
+
+.tone {
+  grid-area: tone;
+  margin: 14px 0 0;
+  max-width: 40ch;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  margin-top: 28px;
+}
+
+.down {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .4s var(--expo);
+}
+
+.down svg {
+  width: 15px;
+  height: 15px;
+  transition: transform .7s var(--expo);
+}
+
+.down:hover {
+  color: var(--fg);
+}
+
+.down:hover svg {
+  transform: translateY(3px);
+}
+
+@media (min-width: 900px) {
+  .inner {
+    min-height: 100vh;
+    min-height: 100svh;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: clamp(40px, 6vw, 120px);
+    grid-template-areas: ". photo" "cap photo" "mark photo" "promise photo" "tone photo" "actions photo" ". photo";
+    grid-template-rows: 1fr auto auto auto auto auto 1fr;
+    padding-top: calc(72px + 3vh);
+    padding-bottom: 6vh;
+  }
+
+  .mark {
+    font-size: clamp(150px, 15.5vw, 250px);
+  }
+
+  .photo {
+    align-self: center;
+    justify-self: end;
+    width: min(100%, 420px, calc(72vh * 2 / 3));
+    margin: 0;
+    aspect-ratio: 2 / 3;
+    border-radius: 30px;
+  }
+
+  .photo img {
+    object-position: 50% 40%;
+  }
+}
+
+/* L'entrée : les lettres montent, la photo se découvre de bas en haut, puis la promesse, mot par mot */
+:global(.js) .letter {
+  transform: translateY(105%);
+}
+
+.hero[data-played] .letter {
+  transform: none;
+  transition: transform 1.25s var(--expo) calc(var(--td, .2s) + var(--i) * 55ms);
+}
+
+.hero[data-porte] .mark {
+  --td: .05s;
+}
+
+:global(.js) .photo {
+  clip-path: inset(100% 0 0 0 round 24px);
+}
+
+:global(.js) .photo img {
+  transform: scale(1.14);
+}
+
+.hero[data-played] .photo {
+  clip-path: inset(0 0 0 0 round 24px);
+  transition: clip-path 1.6s var(--expo) .35s;
+}
+
+.hero[data-played] .photo img {
+  transform: none;
+  transition: transform 2.4s var(--expo) .35s;
+}
+
+:global(.js) .anim {
+  opacity: 0;
+}
+
+.hero[data-played] .anim {
+  opacity: 1;
+  transition: opacity 1s var(--expo) var(--ad, 1.3s);
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .letter,
+  :global(.js) .photo,
+  :global(.js) .photo img {
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  .down,
+  .down svg {
+    transition: none;
+  }
+}

@@ -9,7 +9,7 @@
 import type { Localized } from "@/i18n/localize";
 import type { ImageAsset, RichText } from "@/content/types";
 
-/** Pictogrammes au trait (24 × 24). `vous`, `coche`, `rejouer` et `fleche` servent à la machine elle-même. */
+/** Pictogrammes au trait (24 × 24). `vous` et `coche` servent à la station « Vous validez ». */
 export type IaPicto =
   | "oreille"
   | "ampoule"
@@ -30,13 +30,13 @@ export type IaPicto =
   | "notes"
   | "loupe"
   | "tableur"
-  | "produit"
-  | "rejouer"
-  | "fleche";
+  | "produit";
 
 /** Les quatre cas, dans l'ordre des boutons de choix. */
 export const IA_CASE_IDS = ["recette", "assiette", "video", "projet"] as const;
 export type IaCaseId = (typeof IA_CASE_IDS)[number];
+
+export const isIaCaseId = (value: string): value is IaCaseId => (IA_CASE_IDS as readonly string[]).includes(value);
 
 /** Entrée dessinée par le composant (des formes, aucune donnée) : vidéo de recette, assiette, rushs, notes. */
 export type IaInputDrawing = "recipeVideo" | "plate" | "rushes" | "notes";
@@ -288,5 +288,5 @@ export const IA_NEEDS: readonly IaNeed[] = [
 export const IA_METHOD_STEPS: readonly RichText[] = [
   { fr: "On en parle.", en: "We talk it through." },
   { fr: "Je vous montre un premier *prototype*.", en: "I show you a first *prototype*." },
-  { fr: "Vous validez, je lance.", en: "You sign off, I launch." },
+  { fr: "Vous validez, je lance.", en: "You approve, I launch." },
 ];

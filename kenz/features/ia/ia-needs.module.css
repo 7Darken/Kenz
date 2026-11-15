@@ -1,0 +1,219 @@
+/* « Et chez vous ? » (shared/ia.css) : de grandes cartes, une réponse simple, l'action */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+@media (min-width: 720px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1080px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+/* Une carte : un pictogramme, le besoin dans les mots du visiteur */
+.need {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: clamp(150px, 15vw, 206px);
+  padding: 20px 22px 24px;
+  border-radius: var(--r-xl);
+  text-align: left;
+  color: var(--fg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+  transition: transform .6s var(--expo), box-shadow .6s var(--expo), background-color .6s var(--expo);
+}
+
+:global(html[data-theme="light"]) .need {
+  background: rgba(255, 255, 255, .7);
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+
+.need:hover {
+  transform: translateY(-3px);
+}
+
+.need:active {
+  transform: scale(.985);
+}
+
+.need[data-on] {
+  box-shadow: inset 0 0 0 1.5px rgb(var(--lum) / .75), 0 0 0 4px rgb(var(--lum) / .08), var(--sh-2);
+}
+
+:global(html[data-theme="light"]) .need[data-on] {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px rgb(var(--lum) / .55), var(--sh-2);
+}
+
+.picto {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: rgb(var(--lum));
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .45);
+  transition: background-color .5s var(--expo), color .5s var(--expo);
+}
+
+.picto svg {
+  width: 22px;
+  height: 22px;
+}
+
+.need[data-on] .picto {
+  background: rgb(var(--lum));
+  color: var(--bg);
+}
+
+:global(html[data-theme="light"]) .need[data-on] .picto {
+  color: #fff;
+}
+
+.needText {
+  max-width: 22ch;
+  font-size: clamp(20px, 1.8vw, 25px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+/* La réponse (double biseau) : la dernière case de la grille */
+.answer {
+  position: relative;
+  min-height: clamp(150px, 15vw, 206px);
+  padding: 6px;
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+}
+
+.answerCore {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  height: 100%;
+  overflow: hidden;
+  padding: 20px 22px 22px;
+  border-radius: calc(var(--r-xl) - 6px);
+  background: radial-gradient(80% 90% at 100% 0%, rgb(var(--lum) / .16), transparent 70%), var(--core);
+  box-shadow: var(--core-hl);
+}
+
+:global(html[data-theme="light"]) .answerCore {
+  background: radial-gradient(80% 90% at 100% 0%, rgba(214, 226, 233, .85), transparent 70%), linear-gradient(180deg, #FFFFFF, #FBFAF8);
+}
+
+.prompt {
+  margin: auto 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(21px, 1.9vw, 26px);
+  line-height: 1.25;
+  color: var(--faint);
+}
+
+.label {
+  margin: 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.3;
+  color: var(--faint);
+}
+
+.text {
+  margin: 0 0 8px;
+  font-size: 16.5px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+.cta {
+  margin-top: auto;
+}
+
+/* Chaque réponse monte, ligne après ligne, et sort du flou */
+.answerCore[data-in] > * {
+  animation: answerFade .8s var(--expo) both, answerRise 1s var(--expo) both;
+}
+
+.answerCore[data-in] > :nth-child(2) {
+  animation-delay: .06s;
+}
+
+.answerCore[data-in] > :nth-child(3) {
+  animation-delay: .12s;
+}
+
+.answerCore[data-in] > :nth-child(4) {
+  animation-delay: .18s;
+}
+
+.answerCore[data-in] > :nth-child(5) {
+  animation-delay: .26s;
+}
+
+@keyframes answerFade {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+@keyframes answerRise {
+  from {
+    transform: translateY(12px);
+  }
+}
+
+@keyframes answerOpacity {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Sur téléphone : la réponse n'apparaît qu'une fois un besoin choisi */
+@media (max-width: 719px) {
+  .answer:not([data-chosen]) {
+    display: none;
+  }
+
+  .answer {
+    min-height: 0;
+  }
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  .need {
+    transition-property: background-color, box-shadow, color;
+  }
+
+  .need:hover {
+    transform: none;
+  }
+
+  .answerCore[data-in] > * {
+    animation-name: answerOpacity, none;
+  }
+}

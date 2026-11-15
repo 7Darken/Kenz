@@ -12,6 +12,7 @@ import { Loupe } from "@/design-system/components/loupe";
 import { SkipLink } from "@/design-system/components/skip-link";
 import { Footer } from "@/features/footer/footer";
 import { Nav } from "@/features/nav/nav";
+import { PassageRoot } from "@/features/passages";
 import styles from "./universe-shell.module.css";
 
 const MAIN_ID = "contenu";
@@ -35,6 +36,7 @@ export function UniverseShell({ universe, navDot, sky, children }: UniverseShell
         {children}
       </main>
       <Footer variant={universe} sky={sky} />
+      <PassageRoot />
     </div>
   );
 }

@@ -1,0 +1,279 @@
+/* Oshii : la vidéo devient une recette (app.html, « Scènes ») */
+.scene {
+  --tint: 236 104 84;
+  --sc-a: #2A1715;
+  --sc-b: #160E0D;
+}
+
+.video {
+  position: absolute;
+  left: 28cqw;
+  top: 7cqw;
+  width: 44cqw;
+  height: 78cqw;
+  border-radius: 5cqw;
+  overflow: hidden;
+  opacity: 0;
+  transform-origin: -35% 125%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 4cqw 10cqw -3cqw rgba(0, 0, 0, .7);
+}
+
+.food {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0) 34%);
+  pointer-events: none;
+}
+
+.rail {
+  position: absolute;
+  right: 2.6cqw;
+  bottom: 17cqw;
+  z-index: 1;
+  display: grid;
+  gap: 3.6cqw;
+}
+
+.rail svg {
+  width: 5.4cqw;
+  height: 5.4cqw;
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .5));
+}
+
+.cap {
+  position: absolute;
+  left: 3.2cqw;
+  right: 10cqw;
+  bottom: 6.4cqw;
+  z-index: 1;
+  font-size: max(10px, 3cqw);
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+}
+
+.bar {
+  position: absolute;
+  left: 3.2cqw;
+  right: 3.2cqw;
+  bottom: 3.4cqw;
+  z-index: 1;
+  height: .7cqw;
+  border-radius: 1cqw;
+  background: rgba(255, 255, 255, .3);
+  overflow: hidden;
+}
+
+.bar i {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  transform-origin: left;
+  transform: scaleX(.72);
+}
+
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40cqw;
+  padding: 4.6cqw 6cqw 0;
+  border-radius: 6cqw 6cqw 0 0;
+  background: #201C21;
+  transform: translateY(105%);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, .08), 0 -6cqw 14cqw -6cqw rgba(0, 0, 0, .6);
+}
+
+.sheet::before {
+  content: "";
+  position: absolute;
+  top: 1.8cqw;
+  left: 50%;
+  width: 9cqw;
+  height: 1cqw;
+  margin-left: -4.5cqw;
+  border-radius: 1cqw;
+  background: rgba(255, 255, 255, .22);
+}
+
+.sheetTitle {
+  font-size: max(10px, 3.2cqw);
+  line-height: 1.3;
+  font-weight: 600;
+  color: rgba(244, 239, 230, .82);
+}
+
+.row {
+  display: flex;
+  gap: 7.2cqw;
+  margin-top: 3.6cqw;
+}
+
+.app {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 1.6cqw;
+  font-size: max(9px, 2.6cqw);
+  line-height: 1.2;
+  color: rgba(244, 239, 230, .8);
+}
+
+.app > i {
+  display: block;
+  width: 13cqw;
+  height: 13cqw;
+  border-radius: 3.4cqw;
+  background: rgba(255, 255, 255, .1);
+}
+
+.app > b {
+  display: block;
+  width: 9cqw;
+  height: 1.6cqw;
+  margin-top: .6cqw;
+  border-radius: 1cqw;
+  background: rgba(255, 255, 255, .1);
+}
+
+.app img {
+  width: 13cqw;
+  height: 13cqw;
+  border-radius: 3.4cqw;
+}
+
+.tap {
+  position: absolute;
+  left: 50%;
+  top: 6.5cqw;
+  width: 17cqw;
+  height: 17cqw;
+  margin: -8.5cqw 0 0 -8.5cqw;
+  border-radius: 50%;
+  border: .5cqw solid rgba(255, 255, 255, .85);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.recipe {
+  position: absolute;
+  left: 9cqw;
+  right: 9cqw;
+  top: 12cqw;
+  padding: 5.4cqw 6cqw 4.6cqw;
+  border-radius: 5.4cqw;
+  background: var(--creme);
+  color: #1A1918;
+  box-shadow: 0 5cqw 12cqw -5cqw rgba(0, 0, 0, .85);
+}
+
+.recipeHead {
+  display: flex;
+  align-items: center;
+  gap: 3cqw;
+}
+
+.recipeHead img {
+  flex: none;
+  width: 9cqw;
+  height: 9cqw;
+  border-radius: 2.4cqw;
+}
+
+.recipeTitle {
+  font-size: max(13px, 4.8cqw);
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+
+.ing {
+  margin-top: 4cqw;
+}
+
+.ing li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2cqw;
+  padding: 2.2cqw 0;
+  border-top: 1px solid rgba(26, 25, 24, .1);
+  font-size: max(11px, 3.7cqw);
+  line-height: 1.3;
+}
+
+.ing b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1cqw;
+  padding-top: 3cqw;
+  border-top: 1px solid rgba(26, 25, 24, .1);
+  font-size: max(11px, 3.7cqw);
+  font-weight: 600;
+}
+
+.steps svg {
+  width: 4cqw;
+  height: 4cqw;
+}
+
+/* Mode clair */
+:global(html[data-theme="light"]) .scene {
+  --tint: 229 72 59;
+  --sc-a: #FFFFFF;
+  --sc-b: #F8EFEC;
+}
+
+:global(html[data-theme="light"]) .video {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 3cqw 6cqw -2cqw rgba(26, 25, 24, .28), 0 8cqw 16cqw -6cqw rgba(26, 25, 24, .4);
+}
+
+:global(html[data-theme="light"]) .sheet {
+  background: #F4F2EF;
+  box-shadow: 0 -1px 0 rgba(26, 25, 24, .06), 0 -6cqw 14cqw -6cqw rgba(26, 25, 24, .28);
+}
+
+:global(html[data-theme="light"]) .sheet::before {
+  background: rgba(26, 25, 24, .18);
+}
+
+:global(html[data-theme="light"]) .sheetTitle,
+:global(html[data-theme="light"]) .app {
+  color: var(--muted);
+}
+
+:global(html[data-theme="light"]) .app > i,
+:global(html[data-theme="light"]) .app > b {
+  background: rgba(26, 25, 24, .08);
+}
+
+:global(html[data-theme="light"]) .app img {
+  box-shadow: 0 1cqw 2.4cqw -1cqw rgba(26, 25, 24, .45);
+}
+
+:global(html[data-theme="light"]) .tap {
+  border-color: rgba(26, 25, 24, .42);
+}
+
+:global(html[data-theme="light"]) .recipe {
+  background: #fff;
+  color: var(--fg);
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .06), 0 2cqw 4cqw -1cqw rgba(26, 25, 24, .12), 0 8cqw 16cqw -6cqw rgba(26, 25, 24, .32);
+}

@@ -1,0 +1,50 @@
+/* ==========================================================================
+   Le passage coloré (port de maquettes/v6/shared/passage.css). Calque posé dans <body> par veil.ts.
+   Le contenant porte le flou ; l'intérieur porte la découpe (le flou s'applique après la découpe).
+   ========================================================================== */
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-passage);
+  pointer-events: auto;
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  background: var(--passage-color, #0E1220);
+  will-change: clip-path;
+}
+
+/* Une très légère lumière, identique au départ et à l'arrivée, donne de la matière à l'aplat. */
+.inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 70% at 50% 42%, rgb(255 255 255 / .07), transparent 70%),
+    linear-gradient(180deg, transparent 55%, rgb(0 0 0 / .14));
+}
+
+/* L'élément partagé : l'icône de l'app, au centre (même boîte au départ et à l'arrivée) */
+.icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--passage-icon, 112px);
+  height: var(--passage-icon, 112px);
+  max-width: none;
+  margin: calc(var(--passage-icon, 112px) / -2) 0 0 calc(var(--passage-icon, 112px) / -2);
+  border-radius: 22.5%;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / .18), 0 26px 54px -20px rgb(0 0 0 / .5);
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner {
+    will-change: auto;
+  }
+}

@@ -1,0 +1,206 @@
+/* Wado : la photo devient des macros (app.html, « Scènes ») */
+.scene {
+  --tint: 84 196 128;
+  --sc-a: #10261C;
+  --sc-b: #0A1812;
+}
+
+.plate {
+  position: absolute;
+  left: 22cqw;
+  top: 8cqw;
+  width: 56cqw;
+  aspect-ratio: 1;
+}
+
+.food {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scan {
+  position: absolute;
+  inset: -3cqw;
+  overflow: hidden;
+  border-radius: 3cqw;
+  pointer-events: none;
+}
+
+.sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(-100%);
+  background: linear-gradient(180deg, rgba(140, 236, 176, 0), rgba(140, 236, 176, .18));
+  border-bottom: .5cqw solid #B4F3CC;
+  box-shadow: 0 1.2cqw 4cqw -1cqw rgba(140, 240, 180, .7);
+}
+
+.br {
+  position: absolute;
+  width: 8cqw;
+  height: 8cqw;
+  border: 0 solid rgba(244, 239, 230, .9);
+}
+
+.brA {
+  left: -4cqw;
+  top: -4cqw;
+  border-width: .6cqw 0 0 .6cqw;
+  border-radius: 2.6cqw 0 0 0;
+}
+
+.brB {
+  right: -4cqw;
+  top: -4cqw;
+  border-width: .6cqw .6cqw 0 0;
+  border-radius: 0 2.6cqw 0 0;
+}
+
+.brC {
+  left: -4cqw;
+  bottom: -4cqw;
+  border-width: 0 0 .6cqw .6cqw;
+  border-radius: 0 0 0 2.6cqw;
+}
+
+.brD {
+  right: -4cqw;
+  bottom: -4cqw;
+  border-width: 0 .6cqw .6cqw 0;
+  border-radius: 0 0 2.6cqw 0;
+}
+
+.pills {
+  position: absolute;
+  left: 6cqw;
+  top: 73cqw;
+  width: 60cqw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.4cqw;
+}
+
+.pills li {
+  padding: 2.4cqw 3cqw;
+  border-radius: 3.4cqw;
+  background: rgba(244, 239, 230, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+}
+
+.pills span {
+  display: block;
+  font-size: max(10px, 2.9cqw);
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.pills b {
+  display: block;
+  font-size: max(13px, 4.7cqw);
+  line-height: 1.25;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pills small {
+  font-size: .66em;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.kcal {
+  display: flex;
+  align-items: center;
+}
+
+.ring {
+  position: absolute;
+  right: 6cqw;
+  top: 73cqw;
+  width: 25cqw;
+  display: grid;
+  justify-items: center;
+  gap: 1.6cqw;
+}
+
+.ring svg {
+  width: 21cqw;
+  height: 21cqw;
+  transform: rotate(-90deg);
+}
+
+.ring circle {
+  fill: none;
+  stroke-width: 4.6;
+}
+
+.ringBg {
+  stroke: rgba(244, 239, 230, .12);
+}
+
+.ringFg {
+  stroke: #93E6B2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: .24;
+}
+
+.ring span {
+  font-size: max(10px, 3cqw);
+  line-height: 1.2;
+  color: var(--muted);
+  text-align: center;
+}
+
+:global(html[data-theme="light"]) .scene {
+  --tint: 47 122 85;
+  --sc-a: #FFFFFF;
+  --sc-b: #EEF5F0;
+}
+
+:global(html[data-theme="light"]) .food > circle:first-child {
+  fill: #2B4236;
+  opacity: .12;
+}
+
+:global(html[data-theme="light"]) .sweep {
+  background: linear-gradient(180deg, rgba(47, 122, 85, 0), rgba(47, 122, 85, .12));
+  border-bottom-color: #2F7A55;
+  box-shadow: 0 1.2cqw 4cqw -1cqw rgba(47, 122, 85, .45);
+}
+
+:global(html[data-theme="light"]) .br {
+  border-color: var(--fg);
+}
+
+:global(html[data-theme="light"]) .pills li {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .28);
+}
+
+:global(html[data-theme="light"]) .pills span,
+:global(html[data-theme="light"]) .ring span {
+  color: var(--faint);
+}
+
+:global(html[data-theme="light"]) .pills .kcal {
+  background: #24684A;
+}
+
+:global(html[data-theme="light"]) .pills .kcal b {
+  color: #fff;
+}
+
+:global(html[data-theme="light"]) .ringBg {
+  stroke: rgba(26, 25, 24, .08);
+}
+
+:global(html[data-theme="light"]) .ringFg {
+  stroke: #2F7A55;
+}

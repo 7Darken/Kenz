@@ -1,0 +1,130 @@
+/* C2 « Le sport » (createur.html) : l'univers k15ze en un écran. Le vert #3DDC84 (#1E7A46 sur clair). */
+.sport {
+  --sport-vert: 61 220 132;
+  --sport-fond: #0D0F0E;
+  --sport-texte: 247 247 242;
+  position: relative;
+  padding-block: clamp(72px, 10vh, 120px);
+  color: rgb(var(--sport-texte));
+  background: var(--bg);
+  isolation: isolate;
+}
+
+:global(html[data-theme="light"]) .sport {
+  --sport-vert: 30 122 70;
+  --sport-fond: #F1F2EC;
+  --sport-texte: 21 26 22;
+}
+
+/* une lueur verte, à gauche, qui ne touche ni le haut ni le bas */
+.sport::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(55% 40% at 14% 38%, rgb(var(--sport-vert) / .1), rgb(var(--sport-vert) / 0) 70%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 30%, #000 70%, transparent 100%);
+}
+
+/* le fond k15ze arrive en fondu depuis la couleur de la page : aucune frontière, et toujours opaque */
+.sport::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -22vh;
+  bottom: 0;
+  z-index: -2;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0, var(--bg) 22vh, var(--sport-fond) 38%, var(--sport-fond) 78%, var(--bg) 100%);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "cartes" "porte";
+  row-gap: clamp(28px, 4vh, 44px);
+}
+
+.head {
+  grid-area: head;
+}
+
+.universe {
+  margin: 0 0 12px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 19px;
+  color: rgb(var(--sport-texte) / .7);
+}
+
+.title {
+  margin: 0;
+  max-width: 15ch;
+  font-size: clamp(32px, 4vw, 58px);
+  line-height: 1.06;
+  letter-spacing: -.03em;
+  font-weight: 500;
+  text-wrap: balance;
+  color: rgb(var(--sport-texte));
+}
+
+/* le seul mot en vert, avec une lueur douce */
+.title :global(.word) {
+  color: rgb(var(--sport-vert));
+  text-shadow: 0 0 .55em rgb(var(--sport-vert) / .55), 0 0 1.4em rgb(var(--sport-vert) / .25);
+}
+
+:global(html[data-theme="light"]) .title :global(.word) {
+  text-shadow: 0 0 .8em rgb(var(--sport-vert) / .18);
+}
+
+.cards {
+  grid-area: cartes;
+}
+
+/* la porte du sport : le bouton principal, en vert k15ze */
+.door {
+  --btn-bg: rgb(var(--sport-vert));
+  --btn-fg: var(--sport-fond);
+  --btn-sh: 0 14px 34px -18px rgb(var(--sport-vert) / .8);
+  --btn-ico-bg: var(--sport-fond);
+  --btn-ico-fg: rgb(var(--sport-vert));
+  grid-area: porte;
+  justify-self: start;
+}
+
+:global(html[data-theme="light"]) .door {
+  --btn-fg: #F7F7F2;
+  --btn-ico-bg: rgba(255, 255, 255, .16);
+  --btn-ico-fg: #F7F7F2;
+}
+
+@media (min-width: 900px) {
+  /* le titre à gauche, la porte à droite, les deux cartes dessous : la section tient en un écran */
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "head porte" "cartes cartes";
+    align-items: end;
+  }
+
+  .door {
+    justify-self: end;
+    margin-bottom: .35em;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 700px) {
+  .sport {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .inner {
+    width: 100%;
+  }
+}

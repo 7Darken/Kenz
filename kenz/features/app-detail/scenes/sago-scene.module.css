@@ -1,0 +1,100 @@
+/* Sago : le japonais devient lisible (app.html, « Scènes ») */
+.scene {
+  --tint: 150 128 255;
+  --sc-a: #1E1736;
+  --sc-b: #110D21;
+}
+
+.line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52cqw;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3.4cqw;
+  margin: 0;
+  font-family: var(--f-ja);
+  font-weight: 600;
+  font-size: 13.5cqw;
+  line-height: 1;
+  letter-spacing: .02em;
+}
+
+.word {
+  position: relative;
+  display: inline-block;
+}
+
+.kana {
+  display: inline-block;
+}
+
+.draw {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 3.4cqw);
+  width: 24cqw;
+  height: auto;
+  translate: -50% 0;
+  overflow: visible;
+}
+
+.draw path {
+  fill: none;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cat path {
+  stroke: var(--creme);
+}
+
+.heart path {
+  stroke: #C2B3FF;
+}
+
+.fr {
+  position: absolute;
+  left: 6cqw;
+  right: 6cqw;
+  top: 84cqw;
+  text-align: center;
+  font-size: max(17px, 6.6cqw);
+  font-weight: 500;
+  letter-spacing: -.02em;
+  line-height: 1.2;
+}
+
+.frWord {
+  display: inline-block;
+}
+
+.rule {
+  position: absolute;
+  left: 20cqw;
+  right: 20cqw;
+  top: 76cqw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(244, 239, 230, .25), transparent);
+}
+
+:global(html[data-theme="light"]) .scene {
+  --tint: 91 75 196;
+  --sc-a: #FFFFFF;
+  --sc-b: #F2F0FA;
+}
+
+:global(html[data-theme="light"]) .cat path {
+  stroke: var(--fg);
+}
+
+:global(html[data-theme="light"]) .heart path {
+  stroke: #5B4BC4;
+}
+
+:global(html[data-theme="light"]) .rule {
+  background: linear-gradient(90deg, transparent, rgba(26, 25, 24, .22), transparent);
+}

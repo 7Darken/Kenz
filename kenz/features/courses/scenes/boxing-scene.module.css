@@ -1,0 +1,91 @@
+/* Boxe : les bandes, le sac suspendu, les gants (courses.css, .kca-3d--boxe) */
+.scene {
+  position: relative;
+  padding-top: 212px;
+}
+
+.object {
+  position: absolute;
+  opacity: 0;
+}
+
+.wraps {
+  left: 50%;
+  top: 30px;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+}
+
+.wraps .halo {
+  opacity: 1;
+}
+
+.bag {
+  left: 58%;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  transform-origin: 50% 3%;
+}
+
+.gloves {
+  left: 18%;
+  top: 78px;
+  width: 112px;
+  height: 112px;
+}
+
+/* Figée : les trois objets côte à côte */
+.scene[data-frozen] .wraps {
+  left: 12%;
+  top: 76px;
+  width: 92px;
+  height: 92px;
+  margin-left: 0;
+}
+
+.scene[data-frozen] .gloves {
+  left: 36%;
+  top: 66px;
+}
+
+.scene[data-frozen] .bag {
+  left: 64%;
+}
+
+@media (max-width: 640px) {
+  .scene {
+    padding-top: 180px;
+  }
+
+  .wraps {
+    width: 100px;
+    height: 100px;
+    margin-left: -50px;
+  }
+
+  .bag {
+    width: 122px;
+    height: 122px;
+    left: 58%;
+  }
+
+  .gloves {
+    width: 90px;
+    height: 90px;
+    left: 8%;
+    top: 70px;
+  }
+
+  .scene[data-frozen] .wraps {
+    left: 4%;
+    width: 76px;
+    height: 76px;
+    top: 70px;
+  }
+
+  .scene[data-frozen] .gloves {
+    left: 30%;
+  }
+}

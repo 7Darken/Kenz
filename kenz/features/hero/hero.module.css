@@ -1,0 +1,425 @@
+/* ==========================================================================
+   Le hero (pro.html A0, createur.html C0) : le paysage, le portrait détouré, l'arche de lumière derrière lui.
+   Pile, du fond vers l'avant : paysage (0) < calque `behind` (0) < scène (1) < voile Pro (2) < texte (3).
+   L'arrivée : data-in sur le chapitre (posé par HeroDirector) ; data-arriving après un passage ou une porte,
+   data-dive après la plongée (Créateur). L'état final est celui du CSS sans .js.
+   ========================================================================== */
+
+/* ---------- Les deux lumières : l'heure bleue (Pro), l'heure dorée (Créateur) ---------- */
+.pro {
+  --land-f: brightness(.82) saturate(1.06) contrast(1.04);
+  --land-wash: linear-gradient(180deg, rgba(14, 22, 44, .28), rgba(10, 18, 36, .08) 55%, rgba(8, 12, 24, .42));
+  --hero-shade: linear-gradient(180deg, rgba(11, 15, 27, .8) 0%, rgba(11, 15, 27, .42) 36%, rgba(11, 15, 27, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(14, 18, 32, .55) 12%, rgba(14, 18, 32, 0) 32%);
+  --hero-shade-d: linear-gradient(180deg, rgba(11, 15, 27, .55) 0%, rgba(11, 15, 27, 0) 20%), linear-gradient(90deg, rgba(11, 15, 27, .7) 0%, rgba(11, 15, 27, .3) 34%, rgba(11, 15, 27, 0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(14, 18, 32, .5) 10%, rgba(14, 18, 32, 0) 30%);
+  --hero-glow: rgba(118, 158, 228, .22);
+  background: var(--hero-bg);
+}
+
+/* Le même paysage, au matin : il s'éclaircit et fond dans le papier */
+:global(html[data-theme="light"]) .pro {
+  --land-f: saturate(.6) sepia(.12) brightness(1.1) contrast(.84);
+  --land-wash: radial-gradient(60% 52% at 80% 6%, rgba(255, 241, 222, .55), rgba(255, 241, 222, 0) 70%), linear-gradient(180deg, rgba(234, 240, 243, .62) 0%, rgba(240, 242, 242, .3) 46%, rgba(245, 243, 239, .55) 86%);
+  --hero-shade: linear-gradient(180deg, rgba(245, 243, 239, .92) 0%, rgba(245, 243, 239, .6) 36%, rgba(245, 243, 239, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(245, 243, 239, .66) 12%, rgba(245, 243, 239, 0) 32%);
+  --hero-shade-d: linear-gradient(180deg, rgba(245, 243, 239, .62) 0%, rgba(245, 243, 239, 0) 20%), linear-gradient(90deg, rgba(245, 243, 239, .9) 0%, rgba(245, 243, 239, .56) 34%, rgba(245, 243, 239, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(245, 243, 239, .66) 10%, rgba(245, 243, 239, 0) 30%);
+  --hero-glow: rgba(255, 251, 244, .8);
+}
+
+/* Créateur : le fond reste transparent (la Terre de la page passe dessous quand le paysage s'efface) */
+.createur {
+  --land-f: saturate(1.04) brightness(.86) contrast(1.03);
+  --land-wash: radial-gradient(70% 60% at 62% 14%, rgba(255, 176, 96, .28), rgba(255, 176, 96, 0) 70%);
+  --hero-shade: linear-gradient(180deg, rgba(15, 11, 8, .8) 0%, rgba(15, 11, 8, .45) 38%, rgba(15, 11, 8, 0) 60%), linear-gradient(0deg, var(--bg) 0%, rgba(10, 17, 23, .7) 16%, rgba(10, 17, 23, 0) 40%);
+  --hero-shade-d: linear-gradient(180deg, rgba(15, 11, 8, .55) 0%, rgba(15, 11, 8, 0) 20%), linear-gradient(90deg, rgba(15, 11, 8, .68) 0%, rgba(15, 11, 8, .3) 34%, rgba(15, 11, 8, 0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(10, 17, 23, .7) 16%, rgba(10, 17, 23, 0) 40%);
+  --hero-glow: rgba(226, 166, 92, .2);
+}
+
+:global(html[data-theme="light"]) .createur {
+  --land-f: saturate(.74) sepia(.2) brightness(1.1) contrast(.86);
+  --land-wash: radial-gradient(60% 52% at 72% 6%, rgba(255, 232, 196, .6), rgba(255, 232, 196, 0) 70%), linear-gradient(180deg, rgba(246, 238, 226, .55) 0%, rgba(246, 240, 232, .26) 46%, rgba(246, 242, 235, .55) 86%);
+  --hero-shade: linear-gradient(180deg, rgba(246, 242, 235, .92) 0%, rgba(246, 242, 235, .6) 36%, rgba(246, 242, 235, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(246, 242, 235, .72) 16%, rgba(246, 242, 235, 0) 40%);
+  --hero-shade-d: linear-gradient(180deg, rgba(246, 242, 235, .62) 0%, rgba(246, 242, 235, 0) 20%), linear-gradient(90deg, rgba(246, 242, 235, .9) 0%, rgba(246, 242, 235, .56) 34%, rgba(246, 242, 235, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(246, 242, 235, .72) 16%, rgba(246, 242, 235, 0) 40%);
+  --hero-glow: rgba(255, 251, 244, .8);
+}
+
+/* ---------- La composition ---------- */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sentinel {
+  display: none;
+}
+
+.bg {
+  position: absolute;
+  inset: -5% -4%;
+  z-index: 0;
+}
+
+.createur .bg {
+  inset: -4%;
+  will-change: transform, opacity;
+}
+
+.bgIn {
+  position: absolute;
+  inset: 0;
+}
+
+.land {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 46% 50%;
+  filter: var(--land-f);
+}
+
+.wash {
+  position: absolute;
+  inset: 0;
+  background: var(--land-wash);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--hero-shade);
+}
+
+.createur .shade {
+  z-index: auto;
+}
+
+.behind {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: calc(env(safe-area-inset-top) + 92px);
+}
+
+.copy {
+  position: relative;
+  z-index: 3;
+  padding-left: var(--gl);
+  padding-right: var(--gr);
+}
+
+.title {
+  position: relative;
+  margin: 0 0 .16em -.03em;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(92px, 26vw, 150px);
+  line-height: .82;
+  letter-spacing: -.015em;
+  color: var(--fg);
+}
+
+.ttl {
+  display: block;
+}
+
+.ttlGhost {
+  position: absolute;
+  inset: 0;
+  filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dot {
+  display: inline-block;
+  width: .1em;
+  height: .1em;
+  margin-left: .035em;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: baseline;
+}
+
+.line {
+  --wd: 1.05s;
+  margin: 0 0 30px;
+  max-width: 22ch;
+  font-size: clamp(19px, 1.7vw, 24px);
+  line-height: 1.42;
+  color: rgb(var(--fg-rgb) / .94);
+  text-wrap: balance;
+}
+
+.down {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding-right: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .4s var(--expo);
+}
+
+.downIco {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .45), 0 0 18px -6px rgb(var(--lum) / .5);
+  transition: box-shadow .5s var(--expo), background-color .5s var(--expo);
+}
+
+.downIco svg {
+  width: 15px;
+  height: 15px;
+  transition: transform .7s var(--expo);
+}
+
+.down:hover {
+  color: var(--fg);
+}
+
+.down:hover .downIco {
+  background-color: rgb(var(--lum) / .1);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .8), 0 0 24px -4px rgb(var(--lum) / .6);
+}
+
+.down:hover .downIco svg {
+  transform: translateY(3px);
+}
+
+:global(html[data-theme="light"]) .downIco {
+  background-color: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 14px -8px rgba(26, 25, 24, .3);
+}
+
+:global(html[data-theme="light"]) .down:hover .downIco {
+  background-color: #fff;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 46vh;
+  min-height: 46svh;
+}
+
+/* La scène (objets, halo, arche, portrait) : un seul calque, pour l'effacer d'un geste au défilement */
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 2%;
+  width: min(130%, 920px);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--hero-glow), transparent);
+}
+
+/* L'arche : un halo de lumière derrière le portrait, dessinée par le fil (un peu après le portrait) */
+.hero .arch {
+  --fil-delay: .45s;
+  --shadow-delay: .9s;
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: calc(100% / .79 * .045);
+  bottom: 0;
+  translate: -50% 0;
+  -webkit-mask-image: linear-gradient(180deg, #000 46%, transparent 88%);
+  mask-image: linear-gradient(180deg, #000 46%, transparent 88%);
+}
+
+.hero.createur .arch {
+  --arche-c: 96 214 142;
+}
+
+:global(html[data-theme="light"]) .hero.createur .arch {
+  --arche-c: 30 122 70;
+}
+
+.fig {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  height: calc(100% / .79);
+  aspect-ratio: 9 / 16;
+  translate: -50% 0;
+  -webkit-mask-image: radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+}
+
+.portrait {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: contain;
+  object-position: 50% 0;
+}
+
+@media (min-width: 861px) {
+  .layout {
+    justify-content: flex-end;
+    padding: 0 var(--gr) clamp(56px, 11svh, 128px) var(--gl);
+  }
+
+  .copy {
+    padding: 0;
+    max-width: min(640px, 44%);
+  }
+
+  .title {
+    font-size: clamp(120px, 15vw, 250px);
+  }
+
+  .stage {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    top: 9vh;
+    top: 9svh;
+    width: 58%;
+    min-height: 0;
+  }
+
+  .shade {
+    background: var(--hero-shade-d);
+  }
+}
+
+/* ---------- L'arrivée ---------- */
+@keyframes kzIn {
+  from { opacity: 0; filter: blur(8px); }
+  to { opacity: 1; filter: none; }
+}
+
+@keyframes kzFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ttlMain {
+  0% { clip-path: inset(-25% 100% -30% -8%); filter: blur(10px); }
+  100% { clip-path: inset(-25% -8% -30% -8%); filter: none; }
+}
+
+@keyframes ttlGhost {
+  0% { clip-path: inset(-25% 100% -30% -8%); opacity: .9; }
+  65% { clip-path: inset(-25% -8% -30% -8%); opacity: .45; }
+  100% { clip-path: inset(-25% -8% -30% -8%); opacity: 0; }
+}
+
+:global(.js) .bgIn {
+  opacity: 0;
+  transform: scale(1.07);
+}
+
+.hero[data-in] .bgIn {
+  opacity: 1;
+  transform: none;
+  transition: opacity 1.6s var(--expo), transform 2.6s var(--expo);
+}
+
+:global(.js) .stage {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(3%);
+}
+
+.hero[data-in] .stage {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition: opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s;
+}
+
+/* Après la plongée : le portrait attend la fin de la descente */
+.hero.createur[data-dive][data-in] .stage {
+  transition-delay: .9s;
+}
+
+:global(.js) .ttlMain {
+  clip-path: inset(-25% 100% -30% -8%);
+}
+
+.hero[data-in] .ttlMain {
+  animation: ttlMain 1.7s var(--expo) var(--td, .6s) both;
+}
+
+.hero[data-in] .ttlGhost {
+  animation: ttlGhost 1.5s var(--expo) calc(var(--td, .6s) - .18s) both;
+}
+
+:global(.js) .down {
+  opacity: 0;
+}
+
+.hero[data-in] .down {
+  opacity: 1;
+  animation: kzIn 1s var(--expo) both;
+  animation-delay: var(--ad, 1.85s);
+}
+
+/* Créateur, après un passage ou la porte : le voile s'est levé, tout arrive plus vite */
+.createur[data-arriving] .title {
+  --td: .25s;
+}
+
+.createur[data-arriving] .line {
+  --wd: .15s;
+}
+
+.createur[data-arriving] .down {
+  --ad: .8s;
+}
+
+/* ---------- Mouvement réduit : des fondus seulement ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .bgIn,
+  :global(.js) .stage {
+    transform: none !important;
+    filter: none !important;
+  }
+
+  :global(.js) .ttlMain {
+    clip-path: none;
+  }
+
+  .hero[data-in] .ttlMain,
+  .hero[data-in] .ttlGhost,
+  .hero[data-in] .down {
+    animation-name: kzFade !important;
+  }
+
+  .ttlGhost {
+    display: none;
+  }
+
+  .downIco svg {
+    transition-property: opacity;
+  }
+}

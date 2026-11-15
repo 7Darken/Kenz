@@ -1,0 +1,210 @@
+/* Miru : un thème, un jeu, un téléphone qui tourne (app.html, « Scènes ») */
+.scene {
+  --tint: 120 128 255;
+  --sc-a: #1C1B4A;
+  --sc-b: #111130;
+}
+
+.field {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 6cqw;
+  height: 15cqw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .6cqw;
+  padding: 0 4.4cqw;
+  border-radius: 4.4cqw;
+  background: rgba(244, 239, 230, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .15);
+}
+
+.fieldLabel {
+  font-size: max(9px, 2.7cqw);
+  line-height: 1.2;
+  color: var(--muted);
+}
+
+.type {
+  font-size: max(12px, 4.4cqw);
+  line-height: 1.25;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.caret {
+  display: inline-block;
+  width: .5cqw;
+  height: 1.1em;
+  margin-left: .4cqw;
+  vertical-align: -.2em;
+  background: #B4BAFF;
+  opacity: 0;
+}
+
+.av {
+  position: absolute;
+  z-index: 2;
+  width: 14cqw;
+  height: 14cqw;
+  border-radius: 50%;
+  box-shadow: 0 0 0 .7cqw #15153A;
+}
+
+.av svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hi {
+  position: absolute;
+  inset: -1.4cqw;
+  border-radius: 50%;
+  box-shadow: 0 0 0 .5cqw rgba(244, 239, 230, .85), 0 0 5cqw rgba(180, 186, 255, .5);
+  opacity: 0;
+}
+
+.av0 {
+  left: 43cqw;
+  top: 31cqw;
+}
+
+.av1 {
+  left: 75.3cqw;
+  top: 54.5cqw;
+}
+
+.av2 {
+  left: 63cqw;
+  top: 92.5cqw;
+}
+
+.av3 {
+  left: 23cqw;
+  top: 92.5cqw;
+}
+
+.av4 {
+  left: 10.7cqw;
+  top: 54.5cqw;
+}
+
+/* L'état final : le téléphone est chez le 3e joueur */
+.av2 .hi {
+  opacity: 1;
+}
+
+.card {
+  position: absolute;
+  z-index: 1;
+  left: 44cqw;
+  top: 64cqw;
+  width: 12cqw;
+  height: 16cqw;
+  border-radius: 2cqw;
+  background: var(--creme);
+  box-shadow: 0 1.4cqw 3cqw -1cqw rgba(0, 0, 0, .6);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  left: 2.2cqw;
+  right: 2.2cqw;
+  top: 5cqw;
+  height: 1.6cqw;
+  border-radius: 1cqw;
+  background: #3B3FB8;
+  box-shadow: 0 3.2cqw 0 -.3cqw rgba(59, 63, 184, .35);
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  right: 2cqw;
+  bottom: 2cqw;
+  width: 2.2cqw;
+  height: 2.2cqw;
+  border-radius: 50%;
+  background: #FFB86B;
+}
+
+.card0 {
+  transform: translate(0%, -250.75%) rotate(-6deg) scale(.75);
+}
+
+.card1 {
+  transform: translate(318%, -77.5%) rotate(10deg) scale(.75);
+}
+
+.card2 {
+  transform: translate(196.5%, 202.8%) rotate(14deg) scale(.75);
+}
+
+.card3 {
+  transform: translate(-196.5%, 202.8%) rotate(-12deg) scale(.75);
+}
+
+.card4 {
+  transform: translate(-318%, -77.5%) rotate(-9deg) scale(.75);
+}
+
+.phone {
+  position: absolute;
+  z-index: 3;
+  left: 45.5cqw;
+  top: 64cqw;
+  width: 9cqw;
+  height: 16cqw;
+  border-radius: 2.2cqw;
+  background: #0C0C22;
+  box-shadow: inset 0 0 0 .5cqw #CDD1FF, 0 2cqw 4cqw -1cqw rgba(0, 0, 0, .7);
+  transform: translate(122.1%, 94.5%);
+}
+
+.phone i {
+  position: absolute;
+  inset: 1.3cqw;
+  border-radius: 1.2cqw;
+  background: linear-gradient(160deg, #8A90FF, #3B3FB8);
+}
+
+:global(html[data-theme="light"]) .scene {
+  --tint: 75 95 214;
+  --sc-a: #FFFFFF;
+  --sc-b: #EFF1FC;
+}
+
+:global(html[data-theme="light"]) .field {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .24);
+}
+
+:global(html[data-theme="light"]) .fieldLabel {
+  color: var(--faint);
+}
+
+:global(html[data-theme="light"]) .caret {
+  background: #4B5FD6;
+}
+
+:global(html[data-theme="light"]) .av {
+  box-shadow: 0 0 0 .7cqw #fff, 0 1.4cqw 3cqw -1cqw rgba(26, 25, 24, .35);
+}
+
+:global(html[data-theme="light"]) .hi {
+  box-shadow: 0 0 0 .5cqw #4B5FD6, 0 0 5cqw rgba(75, 95, 214, .35);
+}
+
+:global(html[data-theme="light"]) .card {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.4cqw 3cqw -1cqw rgba(26, 25, 24, .4);
+}
+
+:global(html[data-theme="light"]) .phone {
+  background: #16162E;
+  box-shadow: inset 0 0 0 .5cqw #2A2A48, 0 2cqw 4cqw -1cqw rgba(26, 25, 24, .5);
+}

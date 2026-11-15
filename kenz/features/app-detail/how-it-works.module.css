@@ -1,0 +1,268 @@
+/* =========================================================
+   3. Comment ça marche : la grande animation, en 3 temps légendés (app.html)
+   Ordinateur ([data-pin]) : épinglé ; la piste des trois temps glisse à l'horizontale le long du fil,
+   la scène reste à droite. Ailleurs : une colonne, l'animation se joue à l'entrée à l'écran.
+   ========================================================= */
+.how {
+  position: relative;
+  padding: var(--sec) 0;
+  background: radial-gradient(48% 42% at 68% 52%, rgb(var(--teinte-rgb) / .1), transparent 72%);
+}
+
+:global(html[data-theme="light"]) .how {
+  background: radial-gradient(48% 42% at 68% 52%, rgb(var(--teinte-rgb) / .07), transparent 72%);
+}
+
+.pin {
+  position: relative;
+}
+
+.inner {
+  display: grid;
+  grid-template-areas: "t" "s" "l";
+  gap: clamp(28px, 5vw, 44px);
+  align-items: center;
+}
+
+.title {
+  grid-area: t;
+  font-size: clamp(44px, 5vw, 84px);
+}
+
+.stage {
+  grid-area: s;
+  min-width: 0;
+}
+
+.win,
+.track {
+  display: contents;
+}
+
+.beats {
+  grid-area: l;
+  display: grid;
+  gap: clamp(12px, 1.6vw, 22px);
+}
+
+.beat {
+  position: relative;
+  padding-left: 30px;
+  font-size: clamp(20px, 2.1vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  color: var(--fg);
+  transition: color .6s var(--expo);
+}
+
+.beat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .6em;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--fg);
+  transition: background-color .6s var(--expo), box-shadow .6s var(--expo);
+}
+
+.knot {
+  display: none;
+}
+
+.beats[data-driven] .beat {
+  color: rgb(var(--fg-rgb) / .3);
+}
+
+.beats[data-driven] .beat::before {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .45);
+}
+
+.beats[data-driven] .beat[data-on] {
+  color: var(--fg);
+}
+
+.beats[data-driven] .beat[data-on]::before {
+  background: rgb(var(--lum));
+  box-shadow: 0 0 0 5px rgb(var(--lum) / .18), 0 0 18px rgb(var(--lum) / .9);
+}
+
+:global(html[data-theme="light"]) .beats[data-driven] .beat[data-on]::before {
+  box-shadow: 0 0 0 5px rgb(var(--lum) / .14), 0 4px 12px rgb(var(--lum) / .45);
+}
+
+/* La scène en plus grand */
+.stage .scene {
+  width: min(100%, 560px);
+}
+
+@media (min-width: 900px) {
+  .inner {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "t s" "l s";
+    column-gap: clamp(40px, 5vw, 96px);
+    row-gap: 0;
+  }
+
+  .title {
+    align-self: end;
+  }
+
+  .beats {
+    align-self: start;
+    margin-top: clamp(28px, 3.4vw, 48px);
+  }
+}
+
+/* ---------- Ordinateur : épinglé ---------- */
+.how[data-pin],
+:global(html[data-theme="light"]) .how[data-pin] {
+  padding: 0;
+  background: none;
+}
+
+.how[data-pin] > [data-fil-trait] {
+  display: none;
+}
+
+.how[data-pin] .pin {
+  height: 100vh;
+  background: radial-gradient(48% 42% at 68% 52%, rgb(var(--teinte-rgb) / .1), transparent 72%);
+}
+
+:global(html[data-theme="light"]) .how[data-pin] .pin {
+  background: radial-gradient(48% 42% at 68% 52%, rgb(var(--teinte-rgb) / .07), transparent 72%);
+}
+
+.how[data-pin] .inner {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  grid-template-areas: "t s" "w s";
+  column-gap: clamp(36px, 4vw, 80px);
+  row-gap: clamp(20px, 4vh, 44px);
+  align-content: center;
+  align-items: end;
+  height: 100%;
+  padding-top: 84px;
+  padding-bottom: 24px;
+}
+
+.how[data-pin] .title {
+  grid-area: t;
+  align-self: end;
+  font-size: clamp(56px, 5.8vw, 100px);
+}
+
+.how[data-pin] .win {
+  display: block;
+  grid-area: w;
+  align-self: start;
+  position: relative;
+  height: clamp(220px, 36vh, 340px);
+  overflow: hidden;
+  container-type: inline-size;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 78%, transparent);
+  mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 78%, transparent);
+}
+
+.how[data-pin] .track {
+  display: flex;
+  position: relative;
+  height: 100%;
+  width: max-content;
+  padding: 0 40cqw 0 3cqw;
+  will-change: transform;
+}
+
+.how[data-pin] .track::before,
+.how[data-pin] .track::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 28%;
+  height: 1px;
+  pointer-events: none;
+}
+
+.how[data-pin] .track::before {
+  background: linear-gradient(90deg, rgb(var(--fg-rgb) / .16), rgb(var(--fg-rgb) / .16) 70%, rgb(var(--fg-rgb) / 0));
+}
+
+.how[data-pin] .track::after {
+  background: linear-gradient(90deg, rgb(var(--lum) / .3), rgb(var(--lum)) 20%);
+  box-shadow: 0 0 10px rgb(var(--lum) / .6);
+  transform-origin: left;
+  transform: scaleX(var(--hp, 0));
+}
+
+:global(html[data-theme="light"]) .how[data-pin] .track::after {
+  box-shadow: 0 0 8px rgb(var(--lum) / .35);
+}
+
+.how[data-pin] .beats {
+  display: flex;
+  flex: none;
+  margin: 0;
+  gap: 0;
+  align-self: stretch;
+}
+
+.how[data-pin] .beat {
+  position: relative;
+  flex: none;
+  width: 60cqw;
+  height: 100%;
+  padding: 0;
+  font-size: clamp(30px, 3vw, 50px);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.how[data-pin] .beat::before {
+  display: none;
+}
+
+.how[data-pin] .knot {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 28%;
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .5);
+  transition: background-color .6s var(--expo), box-shadow .6s var(--expo);
+}
+
+.how[data-pin] .beat[data-on] .knot {
+  background: rgb(var(--lum));
+  box-shadow: 0 0 0 6px rgb(var(--lum) / .16), 0 0 22px rgb(var(--lum));
+}
+
+:global(html[data-theme="light"]) .how[data-pin] .beat[data-on] .knot {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 5px rgb(var(--lum) / .3), 0 6px 16px rgb(var(--lum) / .4);
+}
+
+.how[data-pin] .beatText {
+  position: absolute;
+  left: 0;
+  right: 12cqw;
+  top: calc(28% + 30px);
+  text-wrap: balance;
+}
+
+.how[data-pin] .stage {
+  grid-area: s;
+  align-self: center;
+}
+
+.how[data-pin] .stage .scene {
+  width: min(40vw, calc((100vh - 150px) * .8), 540px);
+}

@@ -1,0 +1,61 @@
+/* La ligne de date (courses.css : .kc-quand, .kc-lieu, .kc-point, .kc-encours) */
+.when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 0;
+  margin: 0;
+  line-height: 1.4;
+  color: var(--kc-soft);
+}
+
+.place {
+  color: var(--kc-text);
+  font-weight: 600;
+}
+
+.dot {
+  margin: 0 .5em;
+  opacity: .6;
+}
+
+.ongoing {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 12px;
+  color: var(--kc-green);
+  font-weight: 600;
+}
+
+.ongoing i {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--kc-green);
+}
+
+/* Le pouls (seulement hors mouvement réduit) */
+@media (prefers-reduced-motion: no-preference) {
+  .ongoing i::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.5px var(--kc-green);
+    animation: pulse 2.2s var(--expo) infinite;
+  }
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(.6);
+    opacity: .9;
+  }
+
+  to {
+    transform: scale(2);
+    opacity: 0;
+  }
+}

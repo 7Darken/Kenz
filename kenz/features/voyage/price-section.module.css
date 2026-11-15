@@ -1,0 +1,515 @@
+/* Le vrai prix (voyage.html, .prix, .deck, .tk) : des tickets ; sur ordinateur, la scène épinglée les empile */
+.section {
+  /* Les tickets : l'océan de nuit, l'or doux sur la finale */
+  --tk-shell: rgba(244, 239, 230, .04);
+  --tk-shell-sh: inset 0 0 0 1px rgba(244, 239, 230, .08), 0 1px 1px rgba(0, 0, 0, .3), 0 -12px 28px -18px rgba(0, 0, 0, .6), 0 26px 60px -30px rgba(0, 0, 0, .85);
+  --tk-core: radial-gradient(70% 80% at 84% 62%, rgba(63, 176, 194, .13), rgba(63, 176, 194, 0) 70%), linear-gradient(180deg, #13202A, #0D171E);
+  --tk-core-fin: radial-gradient(70% 80% at 82% 58%, rgba(214, 168, 98, .2), rgba(214, 168, 98, 0) 70%), linear-gradient(180deg, #15222B, #0E181F);
+  --tk-hl: inset 0 1px 0 rgba(255, 255, 255, .07);
+  --tk-dim: rgba(5, 9, 12, .3);
+}
+
+:global(html[data-theme="light"]) .section {
+  --tk-shell: rgba(255, 255, 255, .55);
+  --tk-shell-sh: 0 0 0 1px rgba(26, 25, 24, .06), 0 1px 1px rgba(26, 25, 24, .03), 0 -10px 24px -18px rgba(26, 25, 24, .16), 0 24px 50px -26px rgba(26, 25, 24, .28);
+  --tk-core: radial-gradient(70% 80% at 84% 62%, rgba(15, 93, 107, .09), rgba(15, 93, 107, 0) 70%), linear-gradient(180deg, #FFFFFF, #F9FAF8);
+  --tk-core-fin: radial-gradient(70% 80% at 82% 58%, rgba(224, 186, 122, .26), rgba(224, 186, 122, 0) 70%), linear-gradient(180deg, #FFFFFF, #FAF5EC);
+  --tk-hl: inset 0 0 0 1px rgba(26, 25, 24, .05), inset 0 1px 0 rgba(255, 255, 255, .8);
+  --tk-dim: rgba(240, 236, 228, .6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "deck" "note";
+  gap: clamp(36px, 6vw, 56px);
+}
+
+.head {
+  grid-area: head;
+}
+
+.head .lead {
+  margin-top: 30px;
+}
+
+.note {
+  grid-area: note;
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: .01em;
+  color: var(--faint);
+}
+
+.deck {
+  --sh: 58px;
+  grid-area: deck;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ticket {
+  position: relative;
+}
+
+.shell {
+  position: relative;
+  height: auto;
+  padding: 5px;
+  border-radius: 28px;
+  background: var(--tk-shell);
+  box-shadow: var(--tk-shell-sh);
+}
+
+.core {
+  position: relative;
+  overflow: hidden;
+  border-radius: 23px;
+  background: var(--tk-core);
+  box-shadow: var(--tk-hl);
+}
+
+.core::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--tk-dim);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .7s var(--expo);
+}
+
+.top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--sh);
+  padding: 0 20px 0 10px;
+}
+
+.top::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, rgb(var(--lum) / .35) 0 5px, transparent 5px 10px);
+}
+
+.ico {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: min(34px, calc(var(--sh) - 16px));
+  aspect-ratio: 1;
+}
+
+.ico svg {
+  --acc: currentColor;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.accent {
+  stroke: var(--acc);
+}
+
+.item {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity .5s var(--expo);
+}
+
+.section:not([data-pinned]) .top {
+  height: auto;
+  min-height: var(--sh);
+  padding-block: 10px;
+}
+
+.section:not([data-pinned]) .item {
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.mini {
+  flex: none;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(20px, 2.6vh, 26px);
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .5s var(--expo);
+}
+
+.body {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px 16px;
+  padding: 18px 20px 20px;
+}
+
+.value {
+  margin: 0;
+}
+
+.pre {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.suffix {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1;
+  color: rgb(var(--fg-rgb) / .86);
+}
+
+.price {
+  display: block;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(54px, 15vw, 104px);
+  line-height: .9;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+}
+
+.slit {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding: 0 .05em .08em;
+  margin: 0 -.05em -.08em;
+}
+
+.num {
+  display: inline-block;
+}
+
+.art {
+  --acc: rgb(var(--lum));
+  display: block;
+  width: clamp(84px, 24vw, 156px);
+  height: auto;
+  overflow: visible;
+  color: var(--fg);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* La finale : l'iPhone */
+.final .core {
+  background: var(--tk-core-fin);
+}
+
+.was {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.old {
+  position: relative;
+  display: inline-block;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(34px, 8vw, 48px);
+  line-height: 1;
+  color: rgb(var(--fg-rgb) / .62);
+  text-decoration: none;
+}
+
+.strike {
+  position: absolute;
+  left: -12%;
+  top: 6%;
+  width: 124%;
+  height: 84%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.strike path {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.source {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--faint);
+}
+
+.crack {
+  stroke: rgb(var(--fg-rgb) / .85);
+}
+
+.screen {
+  fill: rgb(var(--lum));
+  stroke: none;
+  opacity: .15;
+}
+
+/* Les gestes des tickets (avec JS) */
+:global(.js) .ticket {
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .ticket[data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .8s var(--expo), transform 1.1s var(--expo);
+}
+
+:global(.js) .art {
+  clip-path: inset(-6% 100% -6% -6%);
+  filter: blur(6px);
+  transition: clip-path .2s var(--out), filter .2s var(--out);
+}
+
+:global(.js) .ticket[data-in] .art {
+  clip-path: inset(-6% -6% -6% -6%);
+  filter: none;
+  transition: clip-path 1.3s var(--expo) .16s, filter 1s var(--expo) .16s;
+}
+
+:global(.js) .num {
+  transform: translateY(110%);
+  filter: blur(6px);
+  transition: transform .2s var(--out), filter .2s var(--out);
+}
+
+:global(.js) .ticket[data-in] .num {
+  transform: none;
+  filter: none;
+  transition: transform 1.15s var(--expo) .36s, filter .9s var(--expo) .36s;
+}
+
+:global(.js) .pre,
+:global(.js) .suffix,
+:global(.js) .source {
+  opacity: 0;
+  transition: opacity .2s var(--out);
+}
+
+:global(.js) .ticket[data-in] .pre,
+:global(.js) .ticket[data-in] .suffix,
+:global(.js) .ticket[data-in] .source {
+  opacity: 1;
+  transition: opacity .9s var(--expo) .6s;
+}
+
+:global(.js) .was {
+  opacity: 0;
+  transition: opacity .2s var(--out);
+}
+
+:global(.js) .final[data-in] .was {
+  opacity: 1;
+  transition: opacity .8s var(--expo) .3s;
+}
+
+:global(.js) .strike {
+  clip-path: inset(-30% 100% -30% -4%);
+  transition: clip-path .15s var(--out);
+}
+
+:global(.js) .final[data-in] .strike {
+  clip-path: inset(-30% -4% -30% -4%);
+  transition: clip-path .55s var(--hand) 1s;
+}
+
+:global(.js) .final .num {
+  transition-delay: 0s;
+}
+
+:global(.js) .final[data-in] .num {
+  transition-delay: 1.45s;
+}
+
+:global(.js) .final[data-in] .crack {
+  opacity: 0;
+  transition: opacity .6s var(--expo) 1.7s;
+}
+
+:global(.js) .final .screen {
+  opacity: 0;
+}
+
+:global(.js) .final[data-in] .screen {
+  opacity: .15;
+  transition: opacity 1s var(--expo) 1.8s;
+}
+
+.ticket[data-under] .core::after {
+  opacity: 1;
+}
+
+.ticket[data-under] .item {
+  opacity: 0;
+}
+
+.ticket[data-under] .mini {
+  opacity: 1;
+}
+
+/* Ordinateur : la scène est épinglée, les tickets s'empilent */
+@media (min-width: 900px) and (min-height: 600px) {
+  .section[data-pinned] {
+    height: calc(100vh + 6 * 52vh);
+    padding: 0;
+  }
+
+  .section[data-pinned] .stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .section[data-pinned] .grid {
+    width: 100%;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-areas: "head deck" "note deck";
+    grid-template-rows: auto auto;
+    align-content: center;
+    column-gap: clamp(48px, 6vw, 112px);
+    row-gap: 24px;
+    /* comme la maquette : la scène est centrée dans l'écran, sans réserver la place de la nav */
+    padding-top: 0;
+    padding-bottom: 28px;
+    height: 100%;
+  }
+
+  .section[data-pinned] .head {
+    align-self: end;
+  }
+
+  .section[data-pinned] .note {
+    align-self: start;
+  }
+
+  .section[data-pinned] .deck {
+    --sh: clamp(44px, 6.4vh, 60px);
+    --ch: clamp(272px, 45vh, 420px);
+    display: block;
+    align-self: center;
+    height: calc(5 * var(--sh) + var(--ch));
+    transform: translateY(calc((5 - var(--s, 0)) * var(--sh) / 2));
+    transition: transform 1.1s var(--expo);
+  }
+
+  .section[data-pinned] .ticket {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--k) * var(--sh));
+    height: var(--ch);
+    z-index: var(--k);
+  }
+
+  .section[data-pinned] .shell {
+    height: 100%;
+  }
+
+  .section[data-pinned] .core {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .section[data-pinned] .body {
+    flex: 1;
+    padding: 16px 28px clamp(18px, 3vh, 28px);
+  }
+
+  .section[data-pinned] .art {
+    width: min(210px, calc(var(--ch) - var(--sh) - 64px));
+    align-self: center;
+  }
+
+  .section[data-pinned] .price {
+    font-size: clamp(66px, 11.5vh, 124px);
+  }
+
+  .section[data-pinned] .old {
+    font-size: clamp(32px, 5vh, 46px);
+  }
+
+  .section[data-pinned] .final .price {
+    font-size: clamp(72px, 12.5vh, 136px);
+  }
+}
+
+@media (min-width: 900px) {
+  .section:not([data-pinned]) .deck {
+    max-width: 640px;
+  }
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .ticket,
+  :global(.js) .num,
+  :global(.js) .art,
+  :global(.js) .strike,
+  .deck {
+    transform: none !important;
+    filter: none !important;
+    clip-path: none !important;
+  }
+
+  :global(.js) .num,
+  :global(.js) .art,
+  :global(.js) .strike {
+    opacity: 0;
+    transition: opacity .5s var(--expo);
+  }
+
+  :global(.js) .ticket[data-in] .num,
+  :global(.js) .ticket[data-in] .art,
+  :global(.js) .final[data-in] .strike {
+    opacity: 1;
+    transition: opacity .9s var(--expo) .2s;
+  }
+}

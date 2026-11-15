@@ -1,0 +1,577 @@
+/* C1 « Le voyage » (createur.html) : le trajet sur le globe. Épinglé ([data-pin]) : la scène tient l'écran, le globe
+   (calque fixe) se pose à gauche (ordinateur) ou en haut (mobile), l'escale à droite (ou en bas).
+   Vu une fois ([data-vu]) : un écran statique, la liste compacte des escales. Sans épinglage : une liste. */
+.voyage {
+  --nav-h: 84px; /* la nav « stories » de l'accueil Créateur */
+  position: relative;
+  padding-block: var(--sec);
+}
+
+.stage {
+  position: relative;
+  padding-block: var(--sec);
+}
+
+.head {
+  max-width: calc(var(--maxw) + 2 * var(--gutter));
+  margin: 0 auto;
+  padding: 0 var(--gr) 0 var(--gl);
+}
+
+.title {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(54px, 7vw, 112px);
+  line-height: .9;
+  letter-spacing: -.01em;
+}
+
+.sub {
+  margin: 14px 0 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(19px, 1.5vw, 22px);
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+/* Le globe en image fixe, sous le titre (sans épinglage) */
+.still {
+  display: block;
+  width: min(74vw, 440px);
+  height: auto;
+  margin: clamp(28px, 5vw, 56px) auto 0;
+}
+
+:global(html[data-theme="light"]) .stillNight,
+:global(html:not([data-theme="light"])) .stillDay {
+  display: none;
+}
+
+/* ---------- Les escales ---------- */
+.stops {
+  display: grid;
+  gap: clamp(56px, 8vw, 96px);
+  max-width: calc(var(--maxw) + 2 * var(--gutter));
+  margin: clamp(40px, 6vw, 72px) auto 0;
+  padding: 0 var(--gr) 0 var(--gl);
+}
+
+.stop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 560px;
+}
+
+.rank {
+  margin: 0 0 10px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.rank span {
+  margin-left: .2em;
+  opacity: .7;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(46px, 5.6vw, 92px);
+  line-height: .94;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+.local {
+  margin: 8px 0 0;
+  font-family: var(--f-ja);
+  font-size: clamp(17px, 1.4vw, 21px);
+  line-height: 1.2;
+  letter-spacing: .08em;
+  color: var(--muted);
+}
+
+.when {
+  margin: 14px 0 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(20px, 1.7vw, 25px);
+  line-height: 1.2;
+  color: rgb(var(--fg-rgb) / .94);
+}
+
+.series {
+  margin: 8px 0 0;
+  max-width: 36ch;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.series b {
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.media {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--media-bg);
+  box-shadow: var(--media-sh);
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s var(--expo);
+}
+
+.media:hover img {
+  transform: scale(1.04);
+}
+
+.media:focus-visible {
+  outline-offset: 3px;
+}
+
+/* La pastille « YouTube », en verre */
+.pill {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--creme);
+  background: rgba(28, 27, 26, .42);
+  backdrop-filter: blur(26px) saturate(1.15);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
+}
+
+.pill svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* La prochaine escale : en pointillé, en préparation */
+.upcoming .name {
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgb(var(--fg-rgb) / .9);
+}
+
+.next {
+  margin: 12px 0 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.1;
+  color: var(--word-c);
+  text-shadow: var(--glow);
+}
+
+/* La porte du voyage, au bout du trajet */
+.door {
+  margin-top: 28px;
+}
+
+.route {
+  display: none;
+}
+
+/* ---------- Épinglé : la scène tient l'écran ---------- */
+.voyage[data-pin] {
+  padding: 0;
+}
+
+.voyage[data-pin] > [data-fil-trait] {
+  display: none !important;
+}
+
+.voyage[data-pin] .stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  padding: 0;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.voyage[data-pin] .head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(env(safe-area-inset-top) + var(--nav-h) + 4px);
+}
+
+.voyage[data-pin] .title {
+  font-size: clamp(40px, 11vw, 58px);
+}
+
+.voyage[data-pin] .sub {
+  margin-top: 8px;
+  font-size: 17px;
+}
+
+.voyage[data-pin] .still {
+  display: none;
+}
+
+.voyage[data-pin] .head,
+.voyage[data-pin] .stops,
+.voyage[data-pin] .route {
+  opacity: var(--va, 1);
+  translate: 0 calc((1 - var(--va, 1)) * 14px);
+}
+
+.voyage[data-pin] .stops {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  margin: 0;
+  gap: 0;
+}
+
+.voyage[data-pin] .stop {
+  grid-area: 1 / 1;
+  align-self: end;
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  filter: blur(8px);
+  pointer-events: none;
+  transition: opacity .3s var(--out), transform .45s var(--out), filter .35s var(--out);
+}
+
+.voyage[data-pin] .stop[data-before] {
+  transform: translate3d(0, -28px, 0);
+}
+
+.voyage[data-pin] .stop[data-on] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+  transition: opacity .8s var(--expo) .1s, transform 1.1s var(--expo) .1s, filter .8s var(--expo) .1s;
+}
+
+.voyage[data-pin] .door {
+  margin-top: 22px;
+}
+
+@media (max-width: 899px) {
+  .voyage[data-pin] .stops {
+    bottom: calc(66px + env(safe-area-inset-bottom));
+  }
+
+  .voyage[data-pin] .name {
+    font-size: clamp(38px, 11vw, 52px);
+  }
+
+  .voyage[data-pin] .rank {
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+
+  .voyage[data-pin] .local {
+    margin-top: 4px;
+    font-size: 15px;
+  }
+
+  .voyage[data-pin] .when {
+    margin-top: 8px;
+    font-size: 19px;
+  }
+
+  .voyage[data-pin] .series {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+
+  .voyage[data-pin] .media {
+    margin-top: 12px;
+    aspect-ratio: auto;
+    height: min(21svh, calc((100vw - 2 * var(--gutter)) * .5625));
+  }
+
+  .voyage[data-pin] .pill {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .voyage[data-pin] .title {
+    font-size: clamp(54px, 5.4vw, 88px);
+  }
+
+  .voyage[data-pin] .sub {
+    font-size: 20px;
+  }
+
+  .voyage[data-pin] .stops {
+    left: auto;
+    top: 0;
+    bottom: 0;
+    right: max(var(--gr), calc((100vw - var(--maxw)) / 2));
+    width: min(38vw, 520px);
+    padding: 0;
+    align-content: center;
+  }
+
+  .voyage[data-pin] .stop {
+    align-self: center;
+  }
+
+  /* La petite route : un point par escale, un filet qui avance (--rp), la prochaine en pointillé */
+  .voyage[data-pin] .route {
+    --rp: 0;
+    position: absolute;
+    right: max(var(--gr), calc((100vw - var(--maxw)) / 2));
+    bottom: calc(40px + env(safe-area-inset-bottom));
+    width: min(38vw, 520px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  .route::before,
+  .route::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 50%;
+    height: 1px;
+    margin-top: -.5px;
+  }
+
+  .route::before {
+    background: rgb(var(--fg-rgb) / .18);
+  }
+
+  .route::after {
+    right: auto;
+    width: calc((100% - 6px) * var(--rp));
+    background: rgb(var(--lum));
+    box-shadow: 0 0 8px rgb(var(--lum) / .6);
+  }
+
+  .route li {
+    position: relative;
+    z-index: 1;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .4);
+    transition: background-color .5s var(--expo), box-shadow .5s var(--expo), transform .6s var(--expo);
+  }
+
+  .route li[data-done] {
+    background: rgb(var(--lum));
+    box-shadow: none;
+  }
+
+  .route li[data-on] {
+    transform: scale(1.5);
+    background: rgb(var(--lum));
+    box-shadow: 0 0 0 3px rgb(var(--lum) / .2), 0 0 10px rgb(var(--lum) / .8);
+  }
+
+  .route li:last-child {
+    background: transparent;
+    box-shadow: none;
+    outline: 1px dashed rgb(var(--fg-rgb) / .55);
+    outline-offset: 1px;
+  }
+
+  .route li:last-child[data-on] {
+    outline-color: rgb(var(--lum));
+  }
+}
+
+/* ---------- Vu une fois : l'écran statique, mis en page comme l'écran épinglé (rien ne bouge à la bascule) ---------- */
+.voyage[data-pin][data-vu] .stage {
+  position: relative;
+}
+
+.voyage[data-vu] .stops,
+.voyage[data-vu] .route {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .3s var(--out), visibility 0s linear .3s;
+}
+
+.list {
+  display: none;
+}
+
+.voyage[data-vu] .list {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: seenIn .8s var(--expo) .28s both;
+}
+
+@keyframes seenIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.picks {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+}
+
+.pick {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  text-align: left;
+  color: var(--fg);
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .35s var(--expo), box-shadow .35s var(--expo);
+}
+
+.pickName {
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(20px, 1.7vw, 26px);
+  line-height: 1.1;
+}
+
+.pickWhen {
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pick:hover {
+  background: var(--ghost-bg);
+}
+
+.pick:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.pick[aria-pressed="true"] {
+  background: var(--ghost-bg);
+  box-shadow: inset 0 0 0 1px var(--ghost-line);
+}
+
+.pick[aria-pressed="true"] .pickName {
+  color: var(--word-c);
+  text-shadow: var(--glow);
+}
+
+.pickUpcoming .pickName {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(var(--fg-rgb) / .9);
+}
+
+.pickUpcoming .pick[aria-pressed="true"] .pickName {
+  color: transparent;
+  text-shadow: none;
+}
+
+.listDoor {
+  margin-top: 20px;
+}
+
+@media (min-width: 900px) {
+  .voyage[data-vu] .list {
+    right: max(var(--gr), calc((100vw - var(--maxw)) / 2));
+    top: calc(var(--nav-h) + 8px);
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    width: min(38vw, 460px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: 899px) {
+  .voyage[data-vu] .list {
+    left: var(--gl);
+    right: var(--gr);
+    bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .picks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 6px;
+  }
+
+  .pick {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1px;
+    min-height: 44px;
+    padding: 4px 10px;
+  }
+
+  .pickName {
+    font-size: 17px;
+  }
+
+  .pickWhen {
+    font-size: 13px;
+  }
+
+  .listDoor {
+    margin-top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media img {
+    transition: none !important;
+  }
+}

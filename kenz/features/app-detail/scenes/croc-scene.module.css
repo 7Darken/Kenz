@@ -1,0 +1,159 @@
+/* Croc : le pacte du matin, validé le soir (app.html, « Scènes ») */
+.scene {
+  --tint: 178 160 255;
+  --sc-a: #221D3A;
+  --sc-b: #141127;
+}
+
+.top {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 8cqw;
+  display: flex;
+  align-items: center;
+  gap: 4.4cqw;
+}
+
+.mascot {
+  flex: none;
+  width: 19cqw;
+  height: 19cqw;
+  overflow: visible;
+}
+
+.streak {
+  display: grid;
+  gap: 1cqw;
+}
+
+.streakLabel {
+  font-size: max(10px, 3.2cqw);
+  color: var(--muted);
+}
+
+.streakValue {
+  display: flex;
+  align-items: baseline;
+  gap: 2cqw;
+  font-size: max(26px, 11.5cqw);
+  font-weight: 600;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.roll {
+  transform: translateY(-87.5%);
+}
+
+.streakUnit {
+  font-size: max(13px, 4.6cqw);
+  font-weight: 500;
+  letter-spacing: -.01em;
+  color: var(--muted);
+}
+
+.pact {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 38cqw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3cqw;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 2.6cqw;
+  padding: 3.2cqw;
+  border-radius: 4.4cqw;
+  background: rgba(244, 239, 230, .06);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+}
+
+.pill small {
+  display: block;
+  font-size: max(9px, 2.8cqw);
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.pill span:not([data-s]) {
+  display: block;
+  font-size: max(11px, 3.6cqw);
+  line-height: 1.25;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.week {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 66cqw;
+  display: flex;
+  justify-content: space-between;
+}
+
+.week li {
+  display: grid;
+  justify-items: center;
+  gap: 2cqw;
+  font-size: max(10px, 3cqw);
+  line-height: 1;
+  color: var(--muted);
+}
+
+.week .dayCheck {
+  width: 9.6cqw;
+  height: 9.6cqw;
+}
+
+.week .dayCheck > i {
+  background: #9C88F6;
+}
+
+.bravo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 90cqw;
+  text-align: center;
+  font-size: max(14px, 4.4cqw);
+  font-weight: 500;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+  color: #D9CFFF;
+}
+
+:global(html[data-theme="light"]) .scene {
+  --tint: 142 124 240;
+  --sc-a: #FFFFFF;
+  --sc-b: #F3F0FD;
+}
+
+:global(html[data-theme="light"]) .mascot {
+  filter: drop-shadow(0 1.6cqw 2.4cqw rgba(106, 85, 216, .28));
+}
+
+:global(html[data-theme="light"]) .streakLabel,
+:global(html[data-theme="light"]) .streakUnit,
+:global(html[data-theme="light"]) .pill small,
+:global(html[data-theme="light"]) .week li {
+  color: var(--faint);
+}
+
+:global(html[data-theme="light"]) .pill {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .26);
+}
+
+:global(html[data-theme="light"]) .week .dayCheck > i {
+  background: #8E7CF0;
+}
+
+:global(html[data-theme="light"]) .bravo {
+  color: #5A46C8;
+}

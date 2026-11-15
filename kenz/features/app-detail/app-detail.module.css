@@ -1,0 +1,114 @@
+/* =========================================================
+   La page d'une app (app.html) : jetons propres à la page et briques typographiques du récit.
+   Les couleurs de l'app (--teinte, --lumiere, --fonce, --nx-*, et --lum pour l'aura, le fil et la loupe)
+   sont posées sur :root par <AppTint> ; la lumière suit l'app : sa lumière en sombre, sa teinte en clair.
+   ========================================================= */
+.page {
+  --accent: var(--lumiere);
+  --nx-c: var(--nx-l);
+  overflow-x: clip;
+}
+
+:global(html[data-theme="light"]) .page {
+  --word-c: var(--fonce);
+  --accent: var(--fonce);
+  --nx-c: var(--nx-f);
+}
+
+/* Le grand titre de chapitre (Melodrama) */
+.h2 {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(46px, 6.4vw, 100px);
+  line-height: .92;
+  letter-spacing: -.01em;
+}
+
+/* Une phrase forte */
+.say {
+  margin: 0;
+  font-size: clamp(32px, 4.6vw, 68px);
+  line-height: 1.06;
+  letter-spacing: -.035em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.say :global(.word) {
+  text-shadow: var(--glow);
+}
+
+/* La légende en Instrument Serif */
+.cap {
+  margin: 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--fs-cap);
+  line-height: 1.3;
+  letter-spacing: 0;
+  color: var(--faint);
+}
+
+/* Contenant « double biseau » : une coque, un cœur */
+.bezel {
+  position: relative;
+  padding: 6px;
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+}
+
+.bezelCore {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--r-xl) - 6px);
+  background: var(--core);
+  box-shadow: var(--core-hl);
+}
+
+/* Un lien discret, souligné d'un filet */
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target);
+  padding: 0 2px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .4s var(--expo);
+}
+
+.link:hover {
+  color: var(--fg);
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 10px;
+  height: 1px;
+  background: currentColor;
+  opacity: .5;
+  transition: opacity .4s;
+}
+
+.link:hover::after {
+  opacity: 1;
+}
+
+/* Le motif d'Escapades Libres (deux arcs dorés), à la place d'une icône d'app */
+.mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  color: var(--teinte);
+}

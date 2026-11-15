@@ -1,0 +1,278 @@
+/* =========================================================
+   5. En vrai (Escapades Libres) : la plateforme dans une fenêtre de navigateur ; la landing entière défile
+   dedans (app.html). Sans JS ou en mouvement réduit : la fenêtre se fait défiler à la main.
+   ========================================================= */
+.real {
+  position: relative;
+  padding: var(--sec) 0 calc(var(--sec) * .55);
+}
+
+.zone {
+  position: relative;
+  margin-top: clamp(28px, 4vw, 52px);
+}
+
+.window {
+  position: relative;
+  margin: 0;
+  padding: 6px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+}
+
+.in {
+  overflow: hidden;
+  border-radius: 18px;
+  background: #121A2B;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 76px;
+  align-items: center;
+  height: 46px;
+  padding: 0 16px;
+  background: linear-gradient(180deg, #1D2538, #171E2F);
+  box-shadow: inset 0 -1px 0 rgba(244, 239, 230, .07);
+}
+
+.dots {
+  display: flex;
+  gap: 7px;
+}
+
+.dots i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(244, 239, 230, .16);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .08);
+}
+
+.url {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.address {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  height: 28px;
+  padding: 0 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  letter-spacing: .005em;
+  color: rgba(244, 239, 230, .74);
+  background: rgba(244, 239, 230, .06);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .07);
+}
+
+.address svg {
+  flex: none;
+  width: 11px;
+  height: 11px;
+}
+
+.state {
+  --el-etat: #F2BE4E;
+  justify-self: end;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--el-etat);
+}
+
+.view {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow-y: auto;
+  background: #121A2B;
+}
+
+.page {
+  position: relative;
+  aspect-ratio: 804 / 4890;
+  overflow: hidden;
+}
+
+.landing {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Le haut de la landing, net, posé sur la page tant qu'elle n'a pas défilé (pendant l'animation seulement) */
+.hero {
+  display: none;
+}
+
+.view[data-anim] {
+  overflow: hidden;
+}
+
+.view[data-anim] .page {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  will-change: transform;
+}
+
+.view[data-anim] .hero {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+}
+
+/* La vignette : la page du test, en second plan */
+.mini {
+  width: min(58%, 300px);
+  margin: -11% 0 0 auto;
+  padding: 5px;
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px var(--surface-edge), 0 30px 60px -24px rgba(0, 0, 0, .75);
+}
+
+.mini .in {
+  border-radius: 14px;
+}
+
+.mini .bar {
+  grid-template-columns: auto;
+  height: 26px;
+  padding: 0 11px;
+}
+
+.mini .dots {
+  gap: 5px;
+}
+
+.mini .dots i {
+  width: 7px;
+  height: 7px;
+}
+
+.miniImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+}
+
+@media (max-width: 899px) {
+  .view {
+    aspect-ratio: 4 / 5;
+  }
+
+  .view[data-anim] .hero {
+    object-position: 13% top;
+  }
+
+  .bar {
+    grid-template-columns: 44px minmax(0, 1fr) 58px;
+    padding: 0 12px;
+    height: 42px;
+  }
+
+  .dots {
+    gap: 5px;
+  }
+
+  .dots i {
+    width: 8px;
+    height: 8px;
+  }
+
+  .address {
+    padding: 0 11px;
+    font-size: 12px;
+  }
+
+  .state {
+    font-size: 15px;
+  }
+}
+
+/* Ordinateur : la section est épinglée, le défilement fait défiler la landing dans la fenêtre */
+.pin {
+  position: relative;
+}
+
+.real[data-pin] {
+  padding: 0;
+}
+
+.real[data-pin] > [data-fil-trait] {
+  display: none;
+}
+
+.real[data-pin] .pin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  padding: 76px 0 30px;
+}
+
+.real[data-pin] .pin > div {
+  width: 100%;
+}
+
+.real[data-pin] .title {
+  font-size: clamp(52px, 5vw, 88px);
+}
+
+.real[data-pin] .zone {
+  width: min(calc(100% - min(30%, 320px) * .72), calc((100vh - 330px) * 1.6 + 12px));
+  margin-top: clamp(18px, 2.6vh, 30px);
+}
+
+.real[data-pin] .mini {
+  position: absolute;
+  right: calc(min(30%, 320px) * -.72);
+  bottom: 7%;
+  width: min(30%, 320px);
+  margin: 0;
+}
+
+/* Mode clair */
+:global(html[data-theme="light"]) .in {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .06);
+}
+
+:global(html[data-theme="light"]) .bar {
+  background: linear-gradient(180deg, #FFFFFF, #F4F1EC);
+  box-shadow: inset 0 -1px 0 rgba(26, 25, 24, .08);
+}
+
+:global(html[data-theme="light"]) .dots i {
+  background: rgba(26, 25, 24, .13);
+  box-shadow: none;
+}
+
+:global(html[data-theme="light"]) .address {
+  color: var(--muted);
+  background: rgba(26, 25, 24, .045);
+  box-shadow: inset 0 0 0 1px rgba(26, 25, 24, .06);
+}
+
+:global(html[data-theme="light"]) .state {
+  --el-etat: #8A5E0A;
+}
+
+:global(html[data-theme="light"]) .mini {
+  box-shadow: inset 0 0 0 1px var(--surface-edge), 0 2px 4px rgba(26, 25, 24, .06), 0 30px 60px -24px rgba(26, 25, 24, .45);
+}

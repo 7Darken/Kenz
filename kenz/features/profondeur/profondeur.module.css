@@ -1,0 +1,162 @@
+/* ==========================================================================
+   La profondeur des heros (shared/profondeur.css). Le conteneur couvre la scène du hero ; chaque plan prend
+   sa place dans la pile du portrait : loin (z 0, avant le halo et l'arche) < portrait (1) < milieu (2) < près (3).
+     .item[data-plan]   sa place (--x, --y : son centre), sa largeur (--t), son rapport (--k) ; le défilement (GSAP)
+       .float           l'entrée (opacity, scale), la souris (translate), la flottaison (transform, en boucle)
+         .render        le rendu du plan : flou, ombre, halo, opacité
+   Posés par le moteur : data-in (révélé), data-vis (montré), data-absent, data-fixe (mouvement réduit).
+   ========================================================================== */
+
+.prof {
+  --prof-ombre: 3 5 9;
+  /* Sombre : un halo très doux de la lumière de l'univers, pour que les objets sombres se détachent du ciel */
+  --prof-halo: drop-shadow(0 0 16px rgb(var(--lum) / .2));
+  --prof-loin-op: .62;
+  --mx: 0;
+  --my: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:global(html[data-theme="light"]) .prof {
+  --prof-ombre: 58 42 26;
+  --prof-halo: drop-shadow(0 0 0 transparent);
+  --prof-loin-op: .74;
+}
+
+.filters {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.item {
+  --flou: 0px;
+  --op: 1;
+  --ombre: drop-shadow(0 14px 16px rgb(var(--prof-ombre) / .34));
+  --halo-o: var(--prof-halo);
+  position: absolute;
+  z-index: 2;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: var(--t, 120px);
+  /* centré par ses marges (GSAP écrit transform au défilement) */
+  margin: calc(var(--t, 120px) * var(--k, 1) * -.5) 0 0 calc(var(--t, 120px) * -.5);
+  visibility: hidden;
+}
+
+.item[data-vis] {
+  visibility: visible;
+}
+
+.item[data-absent] {
+  display: none;
+}
+
+.item[data-plan="loin"] {
+  --flou: 2.4px;
+  --op: var(--prof-loin-op);
+  --ombre: drop-shadow(0 5px 6px rgb(var(--prof-ombre) / .2));
+  z-index: 0;
+}
+
+.item[data-plan="pres"] {
+  --flou: 1.1px;
+  --ombre: drop-shadow(0 28px 30px rgb(var(--prof-ombre) / .4));
+  z-index: 3;
+}
+
+.item[data-type="polaroid"] {
+  --halo-o: drop-shadow(0 0 0 transparent);
+}
+
+/* L'entrée (après le portrait et le titre), la souris, la flottaison lente et désynchronisée */
+.float {
+  display: block;
+  opacity: 0;
+  scale: var(--e-s, .94);
+  transform: rotate(var(--r, 0deg));
+  translate: calc(var(--mx) * var(--ax, 0px)) calc(var(--my) * var(--ax, 0px) * .6);
+}
+
+.item[data-plan="pres"] .float {
+  --e-s: 1.06;
+}
+
+/* Un objet montré plus tard (image lente, redimensionnement) arrive aussi en fondu */
+.prof[data-in] .item[data-vis] .float {
+  opacity: 1;
+  scale: 1;
+  transition: opacity 1.4s var(--expo) var(--ed, 0s), scale 2.2s var(--expo) var(--ed, 0s);
+  animation: flotte var(--fd, 9s) ease-in-out var(--fdl, 0s) infinite;
+}
+
+@keyframes flotte {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  32% { transform: translate3d(var(--fx, 1px), calc(var(--fy, 6px) * -1), 0) rotate(calc(var(--r, 0deg) + var(--fr, 2deg))); }
+  68% { transform: translate3d(calc(var(--fx, 1px) * -1), calc(var(--fy, 6px) * -.35), 0) rotate(calc(var(--r, 0deg) - var(--fr, 2deg) * .55)); }
+}
+
+.render {
+  display: block;
+  opacity: var(--op);
+  filter: blur(var(--flou)) var(--ombre) var(--halo-o);
+}
+
+.img,
+.neon > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Néon Lagon des objets Pro : la copie filtrée, superposée en écran */
+.neon {
+  --neon-strength: .4;
+  position: relative;
+  display: block;
+  isolation: isolate;
+}
+
+.neon > .neonGlow {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  pointer-events: none;
+  filter: url(#kz-prof-neon);
+  opacity: var(--neon-strength);
+  mix-blend-mode: screen;
+}
+
+:global(html[data-theme="light"]) .neon > .neonGlow {
+  opacity: calc(var(--neon-strength) * .55);
+}
+
+/* Mouvement réduit : les objets restent fixes (un simple fondu à l'arrivée) */
+.prof[data-fixe] .float {
+  translate: none;
+  scale: 1;
+}
+
+.prof[data-fixe][data-in] .item[data-vis] .float {
+  animation: none;
+  transition: opacity .6s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    translate: none !important;
+    scale: 1 !important;
+  }
+
+  .prof[data-in] .item[data-vis] .float {
+    animation: none !important;
+    transition: opacity .6s linear !important;
+  }
+}

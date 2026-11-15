@@ -1,0 +1,116 @@
+/* La Terre (maquettes/v6/shared/terre.css) : le ciel, puis le calque du globe (l'ombre portée, le canevas ou l'image
+   de repli). Deux calques fixes : le ciel passe sous le paysage du hero, le globe dessus.
+   Sombre : la nuit, un noir d'encre. Clair : le jour, la crème. */
+.sky,
+.layer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  pointer-events: none;
+}
+
+.layer {
+  overflow: hidden;
+  contain: strict;
+}
+
+/* La nuit : un noir d'encre bleuté, à peine éclairé du côté du soleil */
+.sky {
+  background:
+    radial-gradient(60% 70% at 78% 40%, rgba(40, 62, 84, .22), rgba(40, 62, 84, 0) 70%),
+    linear-gradient(180deg, #04070A 0%, #060A0F 55%, #080E14 100%);
+}
+
+/* Le jour : la crème, une lumière douce venue du soleil */
+:global(html[data-theme="light"]) .sky {
+  background:
+    radial-gradient(60% 70% at 72% 36%, rgba(255, 252, 245, .9), rgba(255, 252, 245, 0) 70%),
+    linear-gradient(180deg, #F6F2EB 0%, #F3EFE8 60%, #EEECE6 100%);
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fallback {
+  position: absolute;
+  left: 0;
+  top: 0;
+  max-width: none;
+  border-radius: 50%;
+  user-select: none;
+  will-change: transform;
+}
+
+/* Posée comme un objet : l'ombre portée douce et la caustique sous la sphère (placées et dosées par le globe) */
+.floor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.shadow,
+.caustic {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.shadow {
+  inset: 0;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, .62), rgba(0, 0, 0, .28) 55%, rgba(0, 0, 0, 0));
+  filter: blur(6px);
+}
+
+.caustic {
+  left: 34%;
+  top: 22%;
+  width: 52%;
+  height: 48%;
+  background: radial-gradient(closest-side, rgba(255, 228, 176, .55), rgba(255, 238, 210, .2) 48%, rgba(255, 238, 210, 0));
+  mix-blend-mode: screen;
+  filter: blur(3px);
+}
+
+:global(html[data-theme="light"]) .shadow {
+  background: radial-gradient(closest-side, rgba(36, 44, 46, .26), rgba(36, 44, 46, .1) 55%, rgba(36, 44, 46, 0));
+}
+
+:global(html[data-theme="light"]) .caustic {
+  background: radial-gradient(closest-side, rgba(255, 252, 244, .95), rgba(255, 220, 160, .45) 42%, rgba(255, 220, 160, 0));
+  mix-blend-mode: normal;
+}
+
+/* L'arrivée : le globe se pose en fondu (le ciel est déjà là) */
+.canvas,
+.fallback {
+  opacity: 0;
+}
+
+.layer[data-ready] .canvas,
+.layer[data-ready] .fallback {
+  opacity: 1;
+  transition: opacity 1.4s var(--expo);
+}
+
+/* Arrivée par la plongée : la Terre est déjà là sous l'éclat, elle finit la descente */
+.layer[data-plunge][data-ready] .canvas {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer[data-ready] .canvas,
+  .layer[data-ready] .fallback {
+    transition: opacity .5s linear;
+  }
+}

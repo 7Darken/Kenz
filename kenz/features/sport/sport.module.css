@@ -1,0 +1,9 @@
+/* Le grand titre k15ze (sport.html, .k-h2) : Inter gras, serré */
+.title {
+  font-family: var(--k-title);
+  font-weight: 700;
+  font-size: clamp(46px, 7.4vw, 108px);
+  line-height: .94;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}

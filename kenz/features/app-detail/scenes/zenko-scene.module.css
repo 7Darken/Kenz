@@ -1,0 +1,213 @@
+/* Zenko : un budget, une journée qui se recompose (app.html, « Scènes ») */
+.scene {
+  --tint: 214 146 88;
+  --sc-a: #2C1D12;
+  --sc-b: #1A110B;
+}
+
+.budget {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 8cqw;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.label {
+  font-size: max(11px, 3.4cqw);
+  color: var(--muted);
+}
+
+.value {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2cqw;
+  font-size: max(26px, 11cqw);
+  font-weight: 600;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.value small {
+  font-size: .56em;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.roll {
+  transform: translateY(-93.75%);
+}
+
+.track {
+  position: relative;
+  height: 2cqw;
+  margin-top: 6cqw;
+  border-radius: 2cqw;
+  background: rgba(244, 239, 230, .12);
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #B97A47, #F0B987);
+  transform-origin: left;
+  transform: scaleX(.5);
+}
+
+.knobWrap {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 0;
+  transform: translateX(50%);
+}
+
+.knob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7.4cqw;
+  height: 7.4cqw;
+  margin: -3.7cqw 0 0 -3.7cqw;
+  border-radius: 50%;
+  background: var(--creme);
+  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .5), 0 0 0 1.4cqw rgba(240, 185, 135, .2);
+}
+
+.ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3.4cqw;
+  font-size: max(9px, 2.7cqw);
+  color: var(--faint);
+}
+
+.day {
+  position: absolute;
+  left: 7cqw;
+  right: 7cqw;
+  top: 45cqw;
+  display: grid;
+  gap: 3cqw;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 4cqw;
+  height: 18cqw;
+  padding: 0 4cqw;
+  border-radius: 4.4cqw;
+  background: rgba(244, 239, 230, .07);
+  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+}
+
+.act {
+  position: relative;
+  flex: none;
+  width: 11cqw;
+  height: 11cqw;
+  border-radius: 3cqw;
+  background: rgba(240, 185, 135, .16);
+}
+
+.icon {
+  position: absolute;
+  left: 2.2cqw;
+  top: 2.2cqw;
+  width: 6.6cqw;
+  height: 6.6cqw;
+  color: #F3C79C;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  backface-visibility: hidden;
+}
+
+/* L'état final : l'activité moins chère */
+.iconBefore {
+  opacity: 0;
+}
+
+.text {
+  display: grid;
+  gap: 2cqw;
+  flex: 1;
+}
+
+.when {
+  font-size: max(12px, 4cqw);
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.cost {
+  position: relative;
+  height: 1.2cqw;
+  border-radius: 1cqw;
+  background: rgba(244, 239, 230, .1);
+  overflow: hidden;
+}
+
+.cost i {
+  position: absolute;
+  inset: 0;
+  background: #E2A877;
+  transform-origin: left;
+  transform: scaleX(var(--c2));
+}
+
+:global(html[data-theme="light"]) .scene {
+  --tint: 160 97 58;
+  --sc-a: #FFFFFF;
+  --sc-b: #FBF4EC;
+}
+
+:global(html[data-theme="light"]) .label,
+:global(html[data-theme="light"]) .value small,
+:global(html[data-theme="light"]) .ends {
+  color: var(--faint);
+}
+
+:global(html[data-theme="light"]) .track {
+  background: rgba(26, 25, 24, .09);
+}
+
+:global(html[data-theme="light"]) .fill {
+  background: linear-gradient(90deg, #C98A57, #A0613A);
+}
+
+:global(html[data-theme="light"]) .knob {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1cqw 3cqw rgba(26, 25, 24, .3), 0 0 0 1.4cqw rgba(160, 97, 58, .16);
+}
+
+:global(html[data-theme="light"]) .card {
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .24);
+}
+
+:global(html[data-theme="light"]) .act {
+  background: rgba(160, 97, 58, .12);
+}
+
+:global(html[data-theme="light"]) .icon {
+  color: #8A4F2C;
+}
+
+:global(html[data-theme="light"]) .cost {
+  background: rgba(26, 25, 24, .07);
+}
+
+:global(html[data-theme="light"]) .cost i {
+  background: #C98A57;
+}

@@ -1,0 +1,190 @@
+/* « Ce que je partage » (sport.html, .partage, .shorts, .short) : les sujets, chacun dans un cadre de Short */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.format {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 16px;
+  margin: 0;
+}
+
+.duration {
+  font-family: var(--f-num);
+  font-weight: 400;
+  letter-spacing: .01em;
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: .9;
+  color: var(--fg);
+}
+
+.formats {
+  max-width: 26ch;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .head {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  .format {
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+.shorts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: clamp(32px, 4.4vw, 60px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .shorts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(14px, 1.6vw, 24px);
+  }
+}
+
+.frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: clamp(18px, 2vw, 26px);
+  isolation: isolate;
+  background: radial-gradient(90% 46% at 50% 104%, rgb(var(--lum) / .1), rgb(var(--lum) / 0) 70%), var(--k-card);
+  box-shadow: inset 0 0 0 1px var(--line), var(--sh-1);
+  transition: transform .8s var(--expo);
+}
+
+.frame:hover {
+  transform: translateY(-4px);
+}
+
+.bar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(var(--fg-rgb) / .16);
+  overflow: hidden;
+}
+
+.bar i {
+  position: absolute;
+  inset: 0;
+  background: var(--k-vert);
+  transform-origin: left;
+  transform: scaleX(1);
+}
+
+.art {
+  width: 66%;
+  height: auto;
+  overflow: visible;
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.art .accent {
+  stroke: var(--k-vert);
+}
+
+.art .filled {
+  fill: var(--k-card);
+}
+
+.name {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -.01em;
+  color: var(--fg);
+}
+
+/* L'entrée : le cadre monte, la barre se remplit, le dessin se trace (avec JS) */
+:global(.js) .art :is(path, circle, ellipse, rect) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset .2s var(--out);
+}
+
+:global(.js) .short[data-in] .art :is(path, circle, ellipse, rect) {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.5s var(--io) calc(.2s + var(--i) * .16s);
+}
+
+:global(.js) .short[data-in] .art .accent {
+  transition-delay: calc(.9s + var(--i) * .16s);
+}
+
+:global(.js) .bar i {
+  transform: scaleX(0);
+  transition: transform .2s var(--out);
+}
+
+:global(.js) .short[data-in] .bar i {
+  transform: scaleX(1);
+  transition: transform 3.4s linear calc(.2s + var(--i) * .16s);
+}
+
+:global(.js) .short {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .short[data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s var(--expo) calc(var(--i) * .1s), transform 1.2s var(--expo) calc(var(--i) * .1s);
+}
+
+/* Mouvement réduit : des fondus seulement */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .short {
+    transform: none !important;
+  }
+
+  :global(.js) .art :is(path, circle, ellipse, rect) {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+
+  :global(.js) .bar i {
+    transform: scaleX(1) !important;
+    transition: none !important;
+  }
+
+  .frame {
+    transition: none !important;
+  }
+}

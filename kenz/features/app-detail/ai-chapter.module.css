@@ -1,0 +1,229 @@
+/* =========================================================
+   4. L'IA, en clair (ou « Mon rôle ») + « Sous le capot » : la chaîne devient un fil lumineux (app.html)
+   ========================================================= */
+.ai {
+  position: relative;
+  padding: var(--sec) 0 calc(var(--sec) * .5);
+}
+
+.title {
+  margin-bottom: clamp(40px, 5vw, 76px);
+}
+
+.chain {
+  --cp: 1;
+  position: relative;
+  display: grid;
+  gap: 34px;
+  padding-left: 44px;
+}
+
+.chain::before,
+.chain::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+}
+
+.chain::before {
+  background: var(--line);
+}
+
+.chain::after {
+  background: linear-gradient(180deg, var(--fg), rgb(var(--lum)));
+  box-shadow: 0 0 10px rgb(var(--lum) / .55);
+  transform-origin: top;
+  transform: scaleY(var(--cp));
+}
+
+:global(html[data-theme="light"]) .chain::after {
+  box-shadow: 0 0 8px rgb(var(--lum) / .3);
+}
+
+.step {
+  position: relative;
+}
+
+.step p {
+  max-width: 22ch;
+  font-size: clamp(21px, 2vw, 30px);
+  line-height: 1.22;
+  letter-spacing: -.025em;
+  font-weight: 500;
+  transition: opacity .7s var(--expo), color .7s var(--expo);
+}
+
+.node {
+  position: absolute;
+  left: -44px;
+  top: -2px;
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  transition: opacity .7s var(--expo);
+}
+
+.node::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--fg);
+  box-shadow: 0 0 0 5px rgb(var(--fg-rgb) / .07), 0 0 14px rgb(var(--lum) / .45);
+  transition: background-color .6s var(--expo), box-shadow .6s var(--expo);
+}
+
+/* L'étape faite par un modèle d'IA : une étincelle */
+.isAi .node {
+  background: rgb(var(--teinte-rgb) / .2);
+  box-shadow: inset 0 0 0 1px rgb(var(--teinte-rgb) / .7), 0 0 26px rgb(var(--teinte-rgb) / .5);
+}
+
+:global(html[data-theme="light"]) .isAi .node {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgb(var(--teinte-rgb) / .55), 0 8px 20px -8px rgb(var(--teinte-rgb) / .6);
+}
+
+.isAi .node::before {
+  display: none;
+}
+
+.node svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.isAi p {
+  color: var(--accent);
+}
+
+.chain[data-driven] .step:not([data-lit]) p {
+  opacity: .3;
+}
+
+.chain[data-driven] .step:not([data-lit]) .node {
+  opacity: .45;
+}
+
+.chain[data-driven] .step:not([data-lit]) .node::before {
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .5);
+}
+
+@media (min-width: 900px) {
+  .chain {
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 48px);
+    padding: 60px 0 0;
+  }
+
+  .chain::before,
+  .chain::after {
+    left: 16px;
+    right: 0;
+    top: 16px;
+    bottom: auto;
+    width: auto;
+    height: 1px;
+  }
+
+  .chain::after {
+    transform-origin: left;
+    transform: scaleX(var(--cp));
+    background: linear-gradient(90deg, var(--fg), rgb(var(--lum)));
+  }
+
+  .node {
+    left: 0;
+    top: -60px;
+  }
+
+  .step p {
+    max-width: 15ch;
+  }
+}
+
+/* Sans IA (Croc) : une phrase, et sa raison */
+.say {
+  max-width: 17ch;
+}
+
+.sub {
+  margin-top: 24px;
+  max-width: 36ch;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* « Mon rôle » (Escapades Libres) : quatre étapes imagées, au trait fin, puis une ligne de synthèse */
+.role .step p {
+  font-size: clamp(21px, 1.9vw, 29px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+}
+
+@media (min-width: 900px) {
+  .role .step p {
+    max-width: 13ch;
+  }
+}
+
+.ill {
+  display: block;
+  width: clamp(104px, 10vw, 150px);
+  aspect-ratio: 1;
+  margin: 0 0 14px -6px;
+  color: var(--fg);
+  transition: opacity .7s var(--expo);
+}
+
+.ill svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ill .or {
+  stroke: rgb(var(--lum));
+}
+
+.ill .orFill {
+  fill: rgb(var(--lum));
+  stroke: none;
+}
+
+.ill .ink {
+  fill: currentColor;
+  stroke: none;
+}
+
+.ill text {
+  fill: currentColor;
+  stroke: none;
+  font-family: var(--f-text);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.chain[data-driven] .step:not([data-lit]) .ill {
+  opacity: .28;
+}
+
+.end {
+  margin-top: clamp(48px, 6vw, 88px);
+  max-width: 22ch;
+}

@@ -1,0 +1,77 @@
+/* Me suivre, côté voyage (voyage.html, .links, .bio) : le paysage derrière le lien en bio, à la tombée de la nuit */
+.links {
+  --links-f: saturate(.86) brightness(.5) contrast(1.06);
+  --links-veil: linear-gradient(180deg, var(--bg) 0%, rgba(10, 17, 23, .25) 24%, rgba(10, 17, 23, .3) 76%, var(--bg) 100%);
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--sec);
+}
+
+:global(html[data-theme="light"]) .links {
+  --links-f: saturate(.72) brightness(1.08) contrast(.86);
+  --links-veil: radial-gradient(46% 62% at 50% 52%, rgba(246, 242, 235, .55), rgba(246, 242, 235, 0) 100%), linear-gradient(180deg, var(--bg) 0%, rgba(246, 242, 235, .45) 24%, rgba(246, 242, 235, .55) 76%, var(--bg) 100%);
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.background img {
+  object-fit: cover;
+  object-position: 60% 60%;
+  transform: scaleX(-1);
+  filter: var(--links-f);
+}
+
+.background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--links-veil);
+}
+
+.bio {
+  max-width: 520px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.arch {
+  width: 96px;
+  margin: 0 auto 26px;
+  box-shadow: var(--arche-glow);
+}
+
+.arch > div {
+  background: var(--media-bg);
+}
+
+.arch img {
+  object-position: 50% 24%;
+}
+
+/* La ligne de sol, plus large sous une si petite arche */
+.arch > i {
+  left: -40%;
+  right: -40%;
+}
+
+.bio .name {
+  margin: 0 auto;
+  font-size: clamp(54px, 7vw, 88px);
+}
+
+.sub {
+  margin: 14px auto 0;
+  max-width: 30ch;
+  font-size: 16px;
+  line-height: 1.45;
+  color: rgb(var(--fg-rgb) / .92);
+}
+
+.socials {
+  justify-content: center;
+  margin-top: 30px;
+}

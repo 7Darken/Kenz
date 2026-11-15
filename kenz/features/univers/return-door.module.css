@@ -1,0 +1,94 @@
+/* Le retour vers la landing (voyage.html et sport.html, .retour / .retour__porte) */
+.retour {
+  padding: calc(var(--sec) * .7) 0 calc(var(--sec) * .35);
+}
+
+.k15ze {
+  padding: calc(var(--sec) * .5) 0 calc(var(--sec) * .35);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.door {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 68px;
+  padding: 8px 28px 8px 8px;
+  border-radius: 999px;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(26px, 3vw, 40px);
+  line-height: 1;
+  color: var(--fg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--ghost-line), var(--sh-1);
+  isolation: isolate;
+  transition: transform .6s var(--expo);
+}
+
+.k15ze .door {
+  font-family: var(--k-title);
+  font-size: clamp(20px, 2.2vw, 28px);
+  letter-spacing: -.03em;
+  line-height: 1.1;
+}
+
+.door::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--ghost-hover);
+  opacity: 0;
+  transition: opacity .45s var(--expo);
+}
+
+.door:hover::before {
+  opacity: 1;
+}
+
+.door:active {
+  transform: scale(.98);
+}
+
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  transition: transform .7s var(--expo);
+}
+
+.k15ze .icon {
+  background: rgb(var(--fg-rgb) / .1);
+  color: var(--fg);
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.door:hover .icon {
+  transform: translateX(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door,
+  .icon {
+    transition: none;
+  }
+}

@@ -1,0 +1,223 @@
+/* La dernière vidéo (voyage.html, .latest, .poster, .play) */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "poster" "meta";
+  gap: 28px;
+}
+
+.head {
+  grid-area: head;
+}
+
+.poster {
+  grid-area: poster;
+  margin: 0;
+}
+
+.core {
+  aspect-ratio: 16 / 9;
+  background: var(--media-bg);
+}
+
+.link {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+  transform-origin: 50% 50%;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(20deg, rgba(10, 8, 6, .6) 0%, rgba(10, 8, 6, 0) 42%);
+}
+
+.link:focus-visible {
+  outline-offset: -4px;
+  outline-color: var(--creme);
+}
+
+/* Le masque : piloté par --m (0 → 1) au défilement */
+.poster[data-mask] .core {
+  clip-path: inset(calc((1 - var(--m, 0)) * 10%) calc((1 - var(--m, 0)) * 14%) round calc(26px + (1 - var(--m, 0)) * 22px));
+}
+
+.poster[data-mask] .link {
+  transform: scale(calc(1.14 - var(--m, 0) * .14));
+}
+
+/* Souris : l'image reçoit la loupe, le pavé « lecture » reste le bouton (un clic sur l'image ouvre aussi la vidéo) */
+@media (hover: hover) and (pointer: fine) {
+  .link {
+    pointer-events: none;
+  }
+
+  .link .play {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+}
+
+.play {
+  --ph: 76px;
+  --pw: 196px;
+  position: absolute;
+  z-index: 1;
+  left: clamp(12px, 3.4%, 40px);
+  bottom: clamp(12px, 5.5%, 44px);
+  display: flex;
+  align-items: center;
+  width: calc(var(--ph) + var(--pw));
+  height: var(--ph);
+  border-radius: 999px;
+  color: var(--creme);
+  clip-path: inset(0 var(--pw) 0 0 round 999px);
+  transition: clip-path .85s var(--expo);
+}
+
+.playIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--ph);
+  height: var(--ph);
+  transition: transform .85s var(--expo);
+}
+
+.playIcon svg {
+  width: 22px;
+  height: 22px;
+  margin-left: 4px;
+}
+
+.playLabel {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateX(-12px);
+  transition: opacity .4s var(--expo), filter .5s var(--expo), transform .85s var(--expo);
+}
+
+.link:hover .play,
+.link:focus-visible .play {
+  clip-path: inset(0 0 0 0 round 999px);
+}
+
+.link:hover .playIcon {
+  transform: scale(.92);
+}
+
+.link:hover .playLabel,
+.link:focus-visible .playLabel {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  transition-delay: .06s;
+}
+
+@media (hover: none) {
+  .play {
+    --ph: 56px;
+    --pw: 184px;
+    clip-path: inset(0 0 0 0 round 999px);
+  }
+
+  .playIcon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .playLabel {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    font-size: 14px;
+  }
+}
+
+/* L'entrée : la carte monte, puis le pavé « lecture » apparaît */
+:global(.js) .poster {
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .poster[data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s var(--expo), transform 1.2s var(--expo);
+}
+
+:global(.js) .poster .play {
+  opacity: 0;
+  transition: clip-path .85s var(--expo), opacity .8s var(--expo) .95s;
+}
+
+:global(.js) .poster[data-in] .play {
+  opacity: 1;
+}
+
+.meta {
+  grid-area: meta;
+  margin: 0;
+  max-width: 24ch;
+  font-size: clamp(21px, 2vw, 28px);
+  line-height: 1.28;
+  font-weight: 500;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+
+.date {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    grid-template-areas: "head poster" "meta poster";
+    column-gap: clamp(40px, 5vw, 88px);
+    row-gap: 28px;
+    align-items: end;
+  }
+
+  .head {
+    align-self: end;
+  }
+
+  .head .title {
+    font-size: clamp(56px, 6.2vw, 100px);
+  }
+
+  .meta {
+    align-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .poster {
+    transform: none !important;
+  }
+
+  .play {
+    transition: none !important;
+  }
+}

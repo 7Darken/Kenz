@@ -1,0 +1,8 @@
+/* « Et chez vous ? » (shared/ia.css, .kz-ia__chez) */
+.section {
+  padding: var(--sec) 0 calc(var(--sec) * .5);
+}
+
+.title {
+  margin: 0 0 clamp(28px, 4vw, 56px);
+}

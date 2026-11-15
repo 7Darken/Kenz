@@ -25,11 +25,6 @@ export const common = {
     back: "Création de contenu",
     backShort: "Création",
   },
-  /** Passages secrets (features/passages, agent 6) : seul cet agent modifie ce bloc. */
-  passages: {
-    /** Nom accessible du point du logo quand il porte le cordon (la maquette ne trahit rien : « Kenz »). */
-    dotLabel: "Kenz",
-  },
   actions: {
     backToTop: "Revenir en haut",
     close: "Fermer",

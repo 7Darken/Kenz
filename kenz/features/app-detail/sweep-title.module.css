@@ -1,0 +1,44 @@
+/* Le titre en balayage (app.html, [data-sweep]) ; l'état de départ n'existe qu'avec JS */
+:global(.js) .sweep {
+  clip-path: inset(-15% 100% -25% -3%);
+  filter: blur(12px);
+  transition: clip-path .24s var(--out), filter .24s var(--out);
+}
+
+:global(.js) .sweep[data-in] {
+  clip-path: inset(-15% -3% -25% -3%);
+  filter: none;
+  transition: clip-path 1.4s var(--expo), filter 1.2s var(--expo);
+}
+
+/* Un nombre qui monte de sa fente quand le titre arrive (le « 1 » de « 1re place ») */
+.rise {
+  display: inline-block;
+}
+
+:global(.js) .sweep .rise {
+  transform: translateY(110%);
+}
+
+:global(.js) .sweep[data-in] .rise {
+  transform: none;
+  transition: transform 1.3s var(--expo) .35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .sweep {
+    clip-path: none;
+    filter: none;
+    opacity: 0;
+    transition: opacity .4s;
+  }
+
+  :global(.js) .sweep[data-in] {
+    opacity: 1;
+    transition: opacity 1s var(--expo);
+  }
+
+  :global(.js) .sweep .rise {
+    transform: none;
+  }
+}

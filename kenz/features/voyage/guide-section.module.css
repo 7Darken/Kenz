@@ -1,0 +1,174 @@
+/* Tu pars en Chine ? (voyage.html, .guide, .gcard, .days) */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(32px, 4.4vw, 56px);
+}
+
+.card {
+  --g-art: radial-gradient(90% 100% at 15% 100%, rgba(63, 176, 194, .2), rgba(63, 176, 194, 0) 70%), linear-gradient(160deg, #13212A, #0B141A);
+  width: 100%;
+  max-width: 920px;
+}
+
+:global(html[data-theme="light"]) .card {
+  --g-art: radial-gradient(90% 100% at 15% 100%, rgba(15, 93, 107, .14), rgba(15, 93, 107, 0) 70%), linear-gradient(160deg, #F7F8F5, #E9EFEE);
+}
+
+.core {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.art {
+  position: relative;
+  padding: clamp(22px, 3vw, 36px);
+  background: var(--g-art);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(6px, 1vw, 10px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.days li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: clamp(9px, 1.2vw, 13px);
+  font-size: clamp(11px, 1.1vw, 13px);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--fg-rgb) / .86);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .12);
+  isolation: isolate;
+}
+
+.days li::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgb(var(--lum) / .42), rgb(var(--lum) / .16));
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .5);
+}
+
+:global(html[data-theme="light"]) .days li::before {
+  background: linear-gradient(160deg, rgb(var(--lum) / .24), rgb(var(--lum) / .08));
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .34);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+  padding: clamp(24px, 3.4vw, 44px);
+}
+
+.title {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(24px, 2.4vw, 34px);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+
+.bases {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  margin: -8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.bases li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.bases li + li::before {
+  content: "→";
+  margin-right: 4px;
+  color: rgb(var(--lum));
+}
+
+.bases span {
+  font-family: var(--f-ja);
+  font-size: 13px;
+  letter-spacing: .08em;
+  color: var(--faint);
+}
+
+.soon {
+  margin: 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+@media (min-width: 760px) {
+  .core {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .art {
+    display: flex;
+    align-items: center;
+  }
+
+  .days {
+    width: 100%;
+  }
+}
+
+/* L'entrée : la carte monte, puis les jours s'allument un à un (avec JS) */
+:global(.js) .card {
+  opacity: 0;
+  transform: translateY(34px) scale(.965);
+  transition: opacity .24s var(--out), transform .24s var(--out);
+}
+
+:global(.js) .card[data-in] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .9s var(--expo), transform 1.2s var(--expo);
+}
+
+:global(.js) .days li::before {
+  opacity: 0;
+  transform: scale(.7);
+  transition: opacity .2s var(--out), transform .2s var(--out);
+}
+
+:global(.js) .card[data-in] .days li::before {
+  opacity: 1;
+  transform: none;
+  transition: opacity .7s var(--expo), transform .9s var(--expo);
+  transition-delay: calc(.5s + var(--i) * 75ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .card,
+  :global(.js) .days li::before {
+    transform: none !important;
+  }
+}

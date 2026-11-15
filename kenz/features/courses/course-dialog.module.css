@@ -1,0 +1,370 @@
+/* ==========================================================================
+   La fiche d'une course (port de courses.css, .kcd*) : compacte et centrée, une feuille qui monte du bas
+   sur mobile, sur un fond flouté. Elle prolonge le Dialog du design system (sélecteurs `dialog.sheet`,
+   plus précis que les siens) ; les couleurs k15ze viennent de .courses (le <dialog> en hérite).
+   ========================================================================== */
+dialog.sheet {
+  width: min(680px, calc(100vw - 32px));
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--kcd-bg);
+  color: var(--kc-text);
+  font-family: var(--f-text);
+  box-shadow: 0 0 0 1px var(--kc-line), 0 40px 100px -30px rgba(0, 0, 0, .75);
+  transform: translateY(12px) scale(.98);
+  transition: opacity .18s var(--out), transform .22s var(--out), overlay .22s allow-discrete, display .22s allow-discrete;
+}
+
+:global(html[data-theme="light"]) dialog.sheet {
+  box-shadow: 0 0 0 1px var(--kc-line), 0 40px 90px -30px rgba(13, 15, 14, .35);
+}
+
+dialog.sheet[open] {
+  opacity: 1;
+  transform: none;
+  transition: opacity .3s var(--expo), transform .6s var(--expo), overlay .6s allow-discrete, display .6s allow-discrete;
+}
+
+@starting-style {
+  dialog.sheet[open] {
+    opacity: 0;
+    transform: translateY(18px) scale(.97);
+  }
+}
+
+dialog.sheet[open]::backdrop {
+  background: rgba(5, 7, 6, .58);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+}
+
+:global(html[data-theme="light"]) dialog.sheet[open]::backdrop {
+  background: rgba(232, 236, 230, .6);
+}
+
+/* Pendant le vol de la photo, la fiche est déjà à sa place : la photo atterrit juste sur sa vignette */
+dialog.sheet.flight[open] {
+  transform: none;
+  transition: opacity .25s var(--expo), overlay .6s allow-discrete, display .6s allow-discrete;
+}
+
+@starting-style {
+  dialog.sheet.flight[open] {
+    transform: none;
+  }
+}
+
+.flight [data-target] img {
+  opacity: 0;
+}
+
+.flyer {
+  position: fixed;
+  z-index: 5;
+  margin: 0;
+  max-width: none;
+  object-fit: cover;
+  pointer-events: none;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .7);
+}
+
+/* Le contenu défile dans la fiche (Lenis le laisse faire : data-lenis-prevent) */
+.body {
+  position: relative;
+  max-height: min(80vh, 760px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px 22px;
+  scrollbar-width: thin;
+}
+
+@media (max-width: 639px) {
+  dialog.sheet {
+    width: 100vw;
+    border-radius: 22px 22px 0 0;
+    transform: translateY(40%);
+  }
+
+  dialog.sheet[open] {
+    transform: none;
+    transition: opacity .2s var(--expo), transform .55s var(--expo), overlay .55s allow-discrete, display .55s allow-discrete;
+  }
+
+  @starting-style {
+    dialog.sheet[open] {
+      transform: translateY(100%);
+    }
+  }
+
+  .body {
+    height: 85svh;
+    max-height: none;
+    padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- Le haut : la date et le lieu, le titre, « Fermer » en petit ---------- */
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.when {
+  font-size: 13.5px;
+}
+
+.title {
+  margin: 4px 0 0;
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: clamp(38px, 5vw, 46px);
+  line-height: .95;
+  letter-spacing: .004em;
+}
+
+.close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 4px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font: 600 13px/1 var(--f-text);
+  color: var(--kc-text);
+  background: rgb(var(--kc-text-rgb) / .07);
+  box-shadow: inset 0 0 0 1px var(--kc-line);
+  transition: background-color .4s var(--expo);
+}
+
+.close span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgb(var(--kc-text-rgb) / .08);
+}
+
+.close svg {
+  width: 12px;
+  height: 12px;
+}
+
+.close:hover {
+  background: rgb(var(--kc-green-rgb) / .16);
+}
+
+.close:focus-visible,
+.thumb:focus-visible,
+.video:focus-visible,
+.zoomClose:focus-visible {
+  outline: 2px solid var(--kc-green);
+  outline-offset: 3px;
+}
+
+/* ---------- La scène (et la photo agrandie, par-dessus) ---------- */
+.stage {
+  position: relative;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgb(var(--kc-text-rgb) / .035);
+  box-shadow: inset 0 0 0 1px var(--kc-line);
+  transition: min-height .5s var(--expo);
+}
+
+.zoomed .stage {
+  min-height: min(50vh, 420px);
+}
+
+.zoomed .scene {
+  visibility: hidden;
+}
+
+.zoom {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 10px;
+  border-radius: 16px;
+  background: var(--kcd-bg);
+  cursor: zoom-out;
+}
+
+/* jamais au-delà de la taille réelle de la photo (--nw × --nh) */
+.zoom img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(100%, var(--nw, 100%));
+  max-height: min(calc(min(50vh, 420px) - 20px), var(--nh, 420px));
+  border-radius: 10px;
+  object-fit: contain;
+  transform-origin: 0 0;
+}
+
+.zoomClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(13, 15, 14, .55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.zoomClose svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ---------- Une ou deux phrases ; les vignettes ; la vidéo ---------- */
+.paragraphs p {
+  margin: 14px 0 0;
+  max-width: 60ch;
+  font-size: 15.5px;
+  line-height: 1.5;
+  color: rgb(var(--kc-text-rgb) / .9);
+  text-wrap: pretty;
+}
+
+.paragraphs p + p {
+  margin-top: 4px;
+}
+
+.thumbs {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 2px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.thumb {
+  display: block;
+  height: 124px;
+  aspect-ratio: var(--ar, .66);
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: var(--kc-media);
+  transition: transform .5s var(--expo), box-shadow .4s var(--expo);
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.thumb:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--kc-green);
+}
+
+@media (max-width: 639px) {
+  .thumb {
+    height: 108px;
+  }
+}
+
+.actions {
+  display: flex;
+  margin-top: 16px;
+}
+
+.video {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 4px 16px 4px 4px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--kc-text);
+  background: rgb(var(--kc-text-rgb) / .06);
+  box-shadow: inset 0 0 0 1px var(--kc-line);
+  transition: background-color .4s var(--expo);
+}
+
+.video:hover {
+  background: rgb(var(--kc-green-rgb) / .14);
+}
+
+.play {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--kc-green);
+  color: #0D0F0E;
+}
+
+:global(html[data-theme="light"]) .play {
+  color: #F7F7F2;
+}
+
+.play svg {
+  width: 13px;
+  height: 13px;
+  margin-left: 2px;
+}
+
+.duration {
+  margin-left: 2px;
+  font-family: var(--f-num);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--kc-soft);
+}
+
+/* ---------- Mouvement réduit : la fiche apparaît en fondu ---------- */
+@media (prefers-reduced-motion: reduce) {
+  dialog.sheet,
+  dialog.sheet[open] {
+    transform: none;
+    transition: opacity .2s linear, overlay .2s allow-discrete, display .2s allow-discrete;
+  }
+
+  @starting-style {
+    dialog.sheet[open] {
+      transform: none;
+    }
+  }
+
+  .thumb {
+    transition: none !important;
+  }
+}

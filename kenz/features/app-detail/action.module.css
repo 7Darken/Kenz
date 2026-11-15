@@ -1,0 +1,64 @@
+/* 6. L'action (app.html, #action) : l'icône, « À toi d'essayer. », les badges des stores, le site */
+.action {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: calc(var(--sec) * .55) var(--gr) var(--sec) var(--gl);
+  text-align: center;
+  isolation: isolate;
+}
+
+.action::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: -1;
+  width: min(1100px, 150vw);
+  aspect-ratio: 1.7;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--teinte-rgb) / .2), transparent);
+  pointer-events: none;
+}
+
+:global(html[data-theme="light"]) .action::before {
+  background: radial-gradient(closest-side, rgb(var(--teinte-rgb) / .1), transparent);
+}
+
+.icon {
+  display: block;
+  width: clamp(76px, 7vw, 100px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 23%;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 26px 50px -22px rgb(var(--teinte-rgb) / .8);
+}
+
+:global(html[data-theme="light"]) .icon {
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .06), 0 26px 50px -22px rgb(var(--teinte-rgb) / .75);
+}
+
+.mark {
+  display: block;
+  width: clamp(96px, 8vw, 124px);
+}
+
+.mark svg {
+  filter: drop-shadow(0 12px 22px rgb(var(--teinte-rgb) / .5));
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.buttons .light {
+  box-shadow: var(--btn-sh), 0 16px 36px -20px rgb(var(--lum) / .7);
+}

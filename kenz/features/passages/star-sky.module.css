@@ -1,0 +1,278 @@
+/* ==========================================================================
+   Le ciel en arche (port de maquettes/v6/shared/etoiles.css) : une bande de 9 étoiles fines dans le pied de page
+   Créateur, comme une poussière de l'aura. Aucune légende, aucun indice : au plus un scintillement au survol direct.
+   Sombre : points crème ou dorés. Clair : points d'encre ou dorés, très légers.
+   --point (crème / encre), --gold (doré), --stroke (le tracé), --fire (l'embrasement : le bleu de l'univers Pro).
+   ========================================================================== */
+
+.sky {
+  --point: 244 239 230;
+  --gold: 242 180 90;
+  --stroke: 244 239 230;
+  --fire: 157 184 255;
+  --dose: 1;
+  --halo: 1;
+  --haze: .05;
+  position: relative;
+  display: block;
+  /* Bande centrée de 420 px au plus ; sur mobile, toute la largeur moins 16 px de chaque côté,
+     même si le pied de page a de grandes marges. */
+  margin: 0 calc(50% - min(210px, 50vw - 16px));
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Une lueur à peine visible derrière la bande : la même lumière que l'aura de la page */
+.sky::before {
+  content: "";
+  position: absolute;
+  inset: -18% 0;
+  background: radial-gradient(closest-side, rgb(var(--lum) / var(--haze)), rgb(var(--lum) / 0));
+  pointer-events: none;
+}
+
+.svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 360 / 130;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Les zones de prise : invisibles, seules à bloquer le défilement (le doigt part d'une étoile). */
+.hit {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- Les étoiles ---------- */
+.star {
+  --c: var(--point);
+  transition: opacity .6s var(--expo);
+}
+
+.gold {
+  --c: var(--gold);
+}
+
+.core {
+  fill: rgb(var(--c) / calc(var(--a, .7) * var(--dose)));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform .4s var(--expo), fill .4s cubic-bezier(.33, 1, .68, 1);
+}
+
+.glow {
+  fill: rgb(var(--c));
+  opacity: calc(var(--h, .06) * var(--halo));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity .4s cubic-bezier(.33, 1, .68, 1), transform .4s var(--expo), fill .4s cubic-bezier(.33, 1, .68, 1);
+}
+
+.rays {
+  fill: none;
+  stroke: rgb(var(--c) / calc(.3 * var(--dose)));
+  stroke-width: .55;
+  stroke-linecap: round;
+  transition: stroke .4s cubic-bezier(.33, 1, .68, 1);
+}
+
+/* Prise par le tracé : l'étoile s'allume */
+.taken .core {
+  fill: rgb(var(--c));
+  transform: scale(1.7);
+}
+
+.taken .glow {
+  opacity: calc(.15 * var(--halo));
+  transform: scale(1.35);
+}
+
+.taken .rays {
+  stroke: rgb(var(--c) / .55);
+}
+
+/* Le bon code : l'étoile prend la lumière de l'autre univers */
+.fire {
+  --c: var(--fire);
+}
+
+.fire .core {
+  fill: rgb(var(--fire));
+  transform: scale(2.1);
+  transition-duration: .5s;
+}
+
+.fire .glow {
+  opacity: .28;
+  transform: scale(1.7);
+  transition-duration: .5s;
+}
+
+/* Au plus un scintillement, au survol direct d'une étoile (souris seulement) */
+@media (hover: hover) and (pointer: fine) {
+  .twinkle .core {
+    animation: twinkle 1.1s var(--expo);
+  }
+
+  .twinkle .glow {
+    animation: twinkle-glow 1.1s var(--expo);
+  }
+}
+
+@keyframes twinkle {
+  0% { transform: scale(1); }
+  24% { transform: scale(1.75); fill: rgb(var(--c)); }
+  100% { transform: scale(1); }
+}
+
+@keyframes twinkle-glow {
+  0% { opacity: calc(var(--h, .06) * var(--halo)); }
+  24% { opacity: calc(.22 * var(--halo)); }
+  100% { opacity: calc(var(--h, .06) * var(--halo)); }
+}
+
+/* ---------- Le tracé ---------- */
+.line {
+  fill: none;
+  stroke: rgb(var(--stroke) / .66);
+  stroke-width: 1;
+  stroke-linecap: round;
+  transition: stroke .45s cubic-bezier(.33, 1, .68, 1), stroke-width .45s cubic-bezier(.33, 1, .68, 1);
+}
+
+.lineHalo {
+  fill: none;
+  stroke: rgb(var(--stroke) / calc(.11 * var(--halo)));
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke .45s cubic-bezier(.33, 1, .68, 1), stroke-width .45s cubic-bezier(.33, 1, .68, 1);
+}
+
+/* Le trait qui suit le pointeur, un peu plus pâle que les segments fixés */
+.live .line {
+  stroke: rgb(var(--stroke) / .42);
+}
+
+.live .lineHalo {
+  stroke: rgb(var(--stroke) / calc(.07 * var(--halo)));
+}
+
+.segFire .line {
+  stroke: rgb(var(--fire));
+  stroke-width: 1.4;
+}
+
+.segFire .lineHalo {
+  stroke: rgb(var(--fire) / .3);
+  stroke-width: 8;
+}
+
+/* ---------- L'embrasement et le symbole ---------- */
+.brasier {
+  opacity: 0;
+  transition: opacity .8s var(--expo);
+}
+
+.ablaze .brasier {
+  opacity: 1;
+}
+
+.stop0 {
+  stop-color: rgb(var(--fire));
+  stop-opacity: .5;
+}
+
+.stop1 {
+  stop-color: rgb(var(--fire));
+  stop-opacity: .14;
+}
+
+.stop2 {
+  stop-color: rgb(var(--fire));
+  stop-opacity: 0;
+}
+
+.ablaze .others .star {
+  opacity: .1;
+}
+
+.symbol {
+  opacity: 0;
+}
+
+.symStroke {
+  fill: none;
+  stroke: rgb(var(--fire));
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.symFill {
+  fill: rgb(var(--fire));
+  opacity: 0;
+}
+
+.symHalo .symStroke {
+  stroke: rgb(var(--fire) / .26);
+  stroke-width: 17;
+}
+
+.symHalo .symFill {
+  fill: rgb(var(--fire) / .3);
+}
+
+/* Pendant le tracé : rien ne se sélectionne */
+:global(html).tracing,
+:global(html).tracing * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* ---------- Mode clair : encre et or, très légers ---------- */
+:global(html[data-theme="light"]) .sky {
+  --point: 26 25 24;
+  --gold: 176 112 40;
+  --stroke: 26 25 24;
+  --fire: 64 92 170;
+  --dose: .62;
+  --halo: .45;
+  --haze: .025;
+}
+
+:global(html[data-theme="light"]) .stop0 {
+  stop-opacity: .3;
+}
+
+:global(html[data-theme="light"]) .stop1 {
+  stop-opacity: .09;
+}
+
+/* ---------- Mouvement réduit : pas d'échelle, des fondus ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .taken .core,
+  .fire .core,
+  .taken .glow,
+  .fire .glow {
+    transform: none;
+  }
+
+  .twinkle .core,
+  .twinkle .glow {
+    animation: none;
+  }
+}

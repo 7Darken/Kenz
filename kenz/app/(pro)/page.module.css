@@ -1,0 +1,32 @@
+/* A3 « Pour votre équipe » (pro.html) : la phrase à gauche, l'aperçu de la machine à droite */
+.team {
+  padding: calc(var(--sec) * .6) 0 var(--sec);
+}
+
+.grid {
+  display: grid;
+  gap: clamp(40px, 5vw, 88px);
+  align-items: center;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(28px, 3vw, 40px);
+}
+
+.question {
+  max-width: 19ch;
+  font-size: clamp(32px, 4.2vw, 66px);
+  line-height: 1.05;
+  letter-spacing: -.04em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+@media (min-width: 960px) {
+  .grid {
+    grid-template-columns: 5fr 6fr;
+  }
+}

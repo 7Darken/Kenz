@@ -1,0 +1,262 @@
+/* Mes séries (voyage.html, .series, .serie) : la liste dans l'ordre réel ; la bille, épinglée à côté */
+.sub {
+  margin: 14px 0 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(19px, 1.5vw, 22px);
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px;
+  column-gap: 14px;
+  margin-top: clamp(36px, 5vw, 64px);
+}
+
+.side {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+}
+
+.pin {
+  position: sticky;
+  top: calc(env(safe-area-inset-top) + 84px);
+}
+
+/* L'emplacement de la bille (features/terre la pose ici) */
+.bille {
+  width: 84px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.country {
+  display: none;
+}
+
+.list {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  gap: clamp(48px, 8vh, 88px);
+}
+
+.serie {
+  position: relative;
+  transition: opacity .7s var(--expo);
+}
+
+.number {
+  margin: 0 0 8px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  margin: 0;
+  max-width: 15ch;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: .96;
+  letter-spacing: -.005em;
+  text-wrap: balance;
+}
+
+.meta {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.meta span[lang] {
+  margin-left: .35em;
+  font-family: var(--f-ja);
+  letter-spacing: .06em;
+}
+
+.note {
+  margin: 8px 0 0;
+  max-width: 36ch;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: rgb(var(--fg-rgb) / .92);
+  text-wrap: pretty;
+}
+
+.media {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 18px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--media-bg);
+  box-shadow: var(--media-sh);
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s var(--expo);
+}
+
+.media:hover img {
+  transform: scale(1.04);
+}
+
+.media:focus-visible {
+  outline-offset: 3px;
+}
+
+.mediaLabel {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mediaLabel svg {
+  width: 12px;
+  height: 12px;
+}
+
+.upcoming .name {
+  color: transparent;
+  -webkit-text-stroke: 1.2px rgb(var(--fg-rgb) / .9);
+}
+
+.next {
+  margin: 12px 0 0;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1.1;
+  color: var(--word-c);
+}
+
+/* La série à l'écran : les autres s'effacent un peu (pas en mouvement réduit : tout reste net) */
+[data-scrub] .serie {
+  opacity: .34;
+}
+
+[data-scrub] .serie[data-on] {
+  opacity: 1;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(40px, 6vw, 112px);
+  }
+
+  .side {
+    grid-column: 1;
+  }
+
+  /* en bas, assez de marge pour que la dernière série atteigne le milieu de l'écran pendant que la bille reste épinglée */
+  .list {
+    grid-column: 2;
+    padding-block: 16vh calc(50vh - 40px);
+  }
+
+  .pin {
+    top: 0;
+    height: 100vh;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+  }
+
+  .bille {
+    width: min(40vh, 26vw, 380px);
+  }
+
+  .country {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    min-height: 5.2em;
+    text-align: center;
+  }
+
+  .countryName {
+    font-family: var(--f-title);
+    font-weight: 600;
+    font-size: clamp(34px, 3.2vw, 48px);
+    line-height: 1;
+  }
+
+  .countryLocal {
+    font-family: var(--f-ja);
+    font-size: 17px;
+    letter-spacing: .1em;
+    color: var(--muted);
+  }
+
+  .country > * {
+    animation: countryIn .8s var(--expo) both;
+  }
+
+  .country > :nth-child(2) {
+    animation-delay: .08s;
+  }
+}
+
+@keyframes countryIn {
+  from {
+    transform: translateY(40%);
+    filter: blur(4px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    filter: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country > * {
+    animation-name: fade;
+  }
+
+  .media img,
+  .serie {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Les passages secrets entre les univers, DA Terre (port de maquettes/v6/shared/cordon.css, BRIEF-V6-TERRE.md) :
+   vers Créateur, la plongée vers la Terre ; vers Pro, le décollage vers les étoiles. Calques posés dans <body>
+   par portal.ts ; les mêmes au départ et à l'arrivée :
+     .eclat  l'éclat d'atmosphère (Lagon et bleu ciel ; plus clair en mode clair)
+     .stars  l'espace et ses étoiles (motif en dégradés, identique sur les deux pages)
+     .globe  la Terre (image ronde, halo compris), posée par transform
+   ========================================================================== */
+
+.dive,
+.liftoff,
+.arrival {
+  --eclat: radial-gradient(70% 60% at 50% 58%, #F4FCFF 0%, #BAE6F0 26%, #4EA6C0 58%, #164A60 100%);
+  --espace: radial-gradient(120% 90% at 50% 112%, #0B1D27 0%, #070D14 48%, #04060A 100%);
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-passage) + 41);
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+:global(html[data-theme="light"]) .dive,
+:global(html[data-theme="light"]) .arrival {
+  --eclat: radial-gradient(70% 60% at 50% 58%, #FFFFFF 0%, rgb(240 249 251) 34%, rgb(196 228 236) 70%, rgb(150 200 214) 100%);
+}
+
+.liftoff {
+  background: var(--espace);
+  opacity: 0;
+}
+
+.arrivalSky {
+  background: var(--espace);
+}
+
+.eclat {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--eclat);
+  opacity: 0;
+}
+
+.arrival .eclat {
+  opacity: 1;
+}
+
+.stars {
+  position: absolute;
+  inset: -12%;
+  display: block;
+  background:
+    radial-gradient(1.8px 1.8px at 23px 41px, #FFFBF2 55%, transparent 100%) 0 0 / 173px 173px,
+    radial-gradient(1.4px 1.4px at 97px 113px, rgb(255 246 230 / .95) 55%, transparent 100%) 0 0 / 229px 229px,
+    radial-gradient(2.2px 2.2px at 151px 63px, #DCE8FF 50%, transparent 100%) 0 0 / 311px 311px,
+    radial-gradient(1.3px 1.3px at 41px 207px, rgb(255 255 255 / .85) 55%, transparent 100%) 0 0 / 263px 263px,
+    radial-gradient(2.6px 2.6px at 263px 281px, #FFE6C2 45%, transparent 100%) 0 0 / 397px 397px,
+    radial-gradient(1.3px 1.3px at 301px 23px, rgb(255 255 255 / .8) 55%, transparent 100%) 0 0 / 353px 353px,
+    radial-gradient(1.6px 1.6px at 189px 377px, rgb(230 238 255 / .95) 55%, transparent 100%) 0 0 / 449px 449px,
+    radial-gradient(1.2px 1.2px at 71px 19px, rgb(255 255 255 / .75) 55%, transparent 100%) 0 0 / 97px 131px,
+    radial-gradient(1px 1px at 12px 88px, rgb(255 250 240 / .6) 55%, transparent 100%) 0 0 / 61px 107px,
+    var(--espace);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+/* La Terre : une image de 400 px dont le disque fait 42 % du côté, échelonnée pour un rayon apparent donné */
+.globe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 400px;
+  height: 400px;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.globeImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  user-select: none;
+}
+
+/* Le point de lumière d'où naît la planète (--flash : 1 → 0) */
+.glow {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #FFFFFF 0%, rgb(214 244 250 / .85) 22%, rgb(120 200 222 / .35) 52%, rgb(120 200 222 / 0) 100%);
+  opacity: var(--flash, 0);
+  transform: scale(calc(1 + var(--flash, 0) * 1.6));
+  mix-blend-mode: screen;
+}
+
+.glow + .globeImg {
+  filter: brightness(calc(1 + var(--flash, 0) * 1.4));
+}
