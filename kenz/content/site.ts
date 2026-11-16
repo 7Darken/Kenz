@@ -47,6 +47,18 @@ export const PORTRAITS: Readonly<Record<"pro" | "createur", ImageAsset>> = {
   createur: { src: "/assets/img/kenz-moi.webp", width: 1080, height: 1920 },
 };
 
+/** Le monogramme KZ de chaque univers, détouré au plus près (la nav, le pied de page) : graphite côté Pro, cognac
+ *  côté Créateur (k15ze compris). Le même trait Lagon relie les deux. L'icône d'onglet et de Google est celle du Pro
+ *  (app/favicon.ico, app/icon.png, app/apple-icon.png, public/icons/). */
+export const BRAND_MARKS: Readonly<Record<Universe, ImageAsset>> = {
+  pro: { src: "/assets/brand/kz-pro.webp", width: 189, height: 120 },
+  createur: { src: "/assets/brand/kz-createur.webp", width: 189, height: 120 },
+  k15ze: { src: "/assets/brand/kz-createur.webp", width: 189, height: 120 },
+};
+
+/** Le logo carré du Pro (fond transparent, 512 px), pour les données structurées. */
+export const BRAND_LOGO = { src: "/assets/brand/kz-pro-512.webp", width: 512, height: 512 } as const;
+
 /** L'année du © du pied de page (celle de la maquette ; à faire évoluer avec le site). */
 export const COPYRIGHT_YEAR = 2026;
 

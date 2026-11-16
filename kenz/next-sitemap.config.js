@@ -20,7 +20,7 @@ const config = {
   priority: 0.7,
 
   // Fichiers de métadonnées et API : pas des pages.
-  exclude: ['/icon.png', '/favicon.ico', '/manifest.webmanifest', '/icons/*', '/api/*'],
+  exclude: ['/icon.png', '/apple-icon.png', '/favicon.ico', '/manifest.webmanifest', '/icons/*', '/api/*'],
 
   // Personnalisation fine de chaque URL du sitemap.
   transform: async (config, path) => {

@@ -1,0 +1,23 @@
+/* Le monogramme : centré sur la hauteur du texte, même dans un parent aligné sur la ligne de base. Au survol du lien
+   qui le porte, il se lève et s'incline un peu, comme un objet qu'on prend en main. */
+.mark {
+  flex: none;
+  align-self: center;
+  width: auto;
+  height: var(--mark-h, 1em);
+  margin-right: var(--mark-gap, .32em);
+  transform-origin: 50% 70%;
+  transition: transform .55s var(--expo);
+  user-select: none;
+}
+
+:is(a, button):hover > .mark,
+:is(a, button):focus-visible > .mark {
+  transform: translateY(-1px) rotate(-5deg) scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark { transition: none; }
+  :is(a, button):hover > .mark,
+  :is(a, button):focus-visible > .mark { transform: none; }
+}

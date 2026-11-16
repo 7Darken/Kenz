@@ -17,6 +17,7 @@ import { useId, useRef, type ReactNode } from "react";
 
 import { COPYRIGHT_YEAR, passageAttributes, ROUTES, type PassageTarget, type Universe } from "@/content/site";
 import { socialsOf, type Social } from "@/content/socials";
+import { BrandMark } from "@/design-system/components/brand-mark";
 import { Icon } from "@/design-system/components/icon";
 import { LanguageToggle } from "@/design-system/components/language-toggle";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
@@ -131,6 +132,7 @@ export function Footer({ variant, sky }: FooterProps) {
         <div className={styles.grid}>
           <div className={styles.brand}>
             <p className={styles.logo}>
+              <BrandMark universe={variant} />
               Kenz<i className={styles.point} />
             </p>
             <p className={styles.phrase}>{phrase}</p>

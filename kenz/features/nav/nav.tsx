@@ -21,6 +21,7 @@ import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import type { NavApp } from "@/content/apps";
 import { passageAttributes, ROUTES, type Universe } from "@/content/site";
+import { BrandMark } from "@/design-system/components/brand-mark";
 import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
@@ -83,7 +84,12 @@ export function Nav({ variant, dot, apps }: NavProps) {
   const homeHref = variant === "pro" ? ROUTES.home : ROUTES.createur;
   const logoHref = pathname === homeHref ? "#top" : homeHref;
   const logoPassage = variant !== "pro" && pathname !== homeHref ? passageAttributes("createur") : undefined;
-  const logo = <>Kenz{dot ?? <span className={styles.dot} aria-hidden="true" />}</>;
+  const logo = (
+    <>
+      <BrandMark universe={variant} />
+      Kenz{dot ?? <span className={styles.dot} aria-hidden="true" />}
+    </>
+  );
 
   const cls = [styles.nav, isCreateurHome && styles.withStory].filter(Boolean).join(" ");
 

@@ -58,6 +58,10 @@
 }
 
 .logo {
+  display: flex;
+  align-items: baseline;
+  --mark-h: 1.15em;                  /* le monogramme KZ (BrandMark) */
+  --mark-gap: .34em;
   font-family: var(--f-title);
   font-weight: 600;
   font-size: 22px;

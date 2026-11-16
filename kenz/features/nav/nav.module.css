@@ -76,6 +76,8 @@
   letter-spacing: -.01em;
   color: var(--fg);
   white-space: nowrap;
+  --mark-h: .98em;                   /* le monogramme KZ (BrandMark) */
+  --mark-gap: .3em;
   -webkit-user-drag: none;
   -webkit-touch-callout: none;
 }
