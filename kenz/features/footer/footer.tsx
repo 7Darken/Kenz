@@ -8,6 +8,8 @@
  * - k15ze : la promesse ; Ce que je partage, Mes courses, Toute ma création de contenu ; YouTube k15ze.
  * Il ne lie ni ne nomme jamais l'autre univers. Le lien de la page courante devient une ancre (#top) avec
  * aria-current ; les liens vers une autre page portent les attributs du passage (couleur d'arrivée).
+ * Le sélecteur de langue (absent de la maquette) est en ligne 2 ; sur téléphone, il se pose sur la ligne du logo,
+ * pour que le pied de page garde la hauteur de la maquette.
  */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +20,7 @@ import { socialsOf, type Social } from "@/content/socials";
 import { Icon } from "@/design-system/components/icon";
 import { LanguageToggle } from "@/design-system/components/language-toggle";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import styles from "./footer.module.css";
@@ -92,22 +94,26 @@ export function Footer({ variant, sky }: FooterProps) {
 
   const renderLink = (link: FooterLink, className?: string) => {
     const target = resolve(link.href, pathname);
-    const passage = link.passage && !target.href.startsWith("#") ? passageAttributes(link.passage) : undefined;
-    return (
-      <Link
-        className={className ? `${styles.link} ${className}` : styles.link}
-        href={target.href}
-        aria-current={target.current ? "page" : undefined}
-        {...passage}
-      >
+    const anchor = target.href.startsWith("#");
+    const props = {
+      className: className ? `${styles.link} ${className}` : styles.link,
+      href: target.href,
+      "aria-current": target.current ? ("page" as const) : undefined,
+      ...(link.passage && !anchor ? passageAttributes(link.passage) : undefined),
+    };
+    const body = (
+      <>
         {link.back ? (
           <i className={`${styles.ico} ${styles.icoBack}`}>
             <Icon name="arrow-left" />
           </i>
         ) : null}
         <span className={styles.text}>{link.label}</span>
-      </Link>
+      </>
     );
+    // Une ancre de la page reste un simple <a> : next/link prendrait le clic, et MotionProvider ne pourrait plus
+    // défiler en douceur ni donner le focus à la section (comme Button).
+    return anchor ? <a {...props}>{body}</a> : <Link {...props}>{body}</Link>;
   };
 
   // Créateur : la chaîne k15ze se distingue de la chaîne voyage par son libellé.
@@ -165,7 +171,7 @@ export function Footer({ variant, sky }: FooterProps) {
             </span>
           ))}
           <div className={styles.end}>
-            <LanguageToggle />
+            <LanguageToggle className={styles.lang} />
             {variant === "pro" ? <ThemeToggle bare /> : null}
             <a className={styles.link} href="#top">
               <span className={styles.text}>{t.common.actions.backToTop}</span>

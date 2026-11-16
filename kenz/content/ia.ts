@@ -86,6 +86,12 @@ export interface IaCase {
   done: Localized<string>;
 }
 
+/**
+ * Des cas de la machine, par id : tous (/agents) ou le seul cas de l'aperçu. Le serveur les passe à la machine
+ * (composant client), qui n'importe pas ce module : l'aperçu de l'accueil n'embarque que son cas.
+ */
+export type IaCaseMap = Readonly<Partial<Record<IaCaseId, IaCase>>>;
+
 export const IA_CASES: Readonly<Record<IaCaseId, IaCase>> = {
   recette: {
     title: { fr: "Une vidéo devient une recette", en: "A video becomes a recipe" },

@@ -61,7 +61,7 @@
   --r-md: 16px;
   --r-pill: 999px;
 
-  /* Mouvement (équivalents GSAP dans features/motion/easings.ts) */
+  /* Mouvement (équivalents GSAP dans design-system/motion/easings.ts) */
   --expo: cubic-bezier(.16, 1, .3, 1);       /* expo.out : les arrivées */
   --out: cubic-bezier(.55, 0, .75, .2);      /* les sorties rapides */
   --io: cubic-bezier(.65, 0, .35, 1);        /* power3.inOut : les tracés */

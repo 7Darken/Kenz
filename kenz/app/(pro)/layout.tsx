@@ -1,6 +1,7 @@
 /** Univers Pro (`/`, `/apps/[slug]`, `/agents`) : l'espace, la nav Pro, le pied de page Pro. */
 import type { ReactNode } from "react";
 
+import { navApps } from "@/content/apps";
 import { SITE_NAME, SITE_URL } from "@/content/site";
 import { socialsOf } from "@/content/socials";
 import { UniverseShell } from "../_components/universe-shell";
@@ -16,7 +17,7 @@ const personJsonLd = {
 
 export default function ProLayout({ children }: { children: ReactNode }) {
   return (
-    <UniverseShell universe="pro">
+    <UniverseShell universe="pro" navApps={navApps()}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
       {children}
     </UniverseShell>

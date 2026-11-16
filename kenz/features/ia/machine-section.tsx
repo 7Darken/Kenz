@@ -1,4 +1,5 @@
 /** La machine sur /agents (mode complet) : le premier chapitre du fil, juste sous la phrase forte. */
+import { IA_CASES } from "@/content/ia";
 import { Section } from "@/design-system/components/section";
 import { T } from "@/i18n/text";
 import { IaMachine } from "./ia-machine";
@@ -9,7 +10,7 @@ export function MachineSection() {
       <h2 id="machine-t" className="sr">
         <T k="agents.machine.label" />
       </h2>
-      <IaMachine mode="complete" caseId="recette" />
+      <IaMachine mode="complete" caseId="recette" cases={IA_CASES} />
     </Section>
   );
 }

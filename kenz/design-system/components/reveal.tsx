@@ -7,7 +7,7 @@
  */
 import { useRef, type CSSProperties, type ReactNode } from "react";
 
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import styles from "./reveal.module.css";
 
 interface RevealProps {

@@ -6,7 +6,7 @@ import { Anton, Instrument_Serif, Inter } from "next/font/google";
 import localFont from "next/font/local";
 
 /** Le texte : Inter variable (graisse et taille optique). */
-export const inter = Inter({
+const inter = Inter({
   subsets: ["latin"],
   axes: ["opsz"],
   variable: "--font-inter",
@@ -14,7 +14,7 @@ export const inter = Inter({
 });
 
 /** Le mot mis en valeur : Instrument Serif, droit et italique. */
-export const instrumentSerif = Instrument_Serif({
+const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
@@ -23,7 +23,7 @@ export const instrumentSerif = Instrument_Serif({
 });
 
 /** Les chiffres k15ze. Pas de préchargement : seulement sur les pages sport. */
-export const anton = Anton({
+const anton = Anton({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-anton",
@@ -32,7 +32,7 @@ export const anton = Anton({
 });
 
 /** Les titres et le logo : Melodrama variable (300 à 700), extraite de maquettes/v6/assets/melodrama.css. */
-export const melodrama = localFont({
+const melodrama = localFont({
   src: "./fonts/Melodrama-Variable.woff2",
   weight: "300 700",
   variable: "--font-melodrama",

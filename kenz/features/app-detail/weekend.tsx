@@ -7,12 +7,11 @@ import { startupWeekend } from "@/content/startup-weekend";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import { Words } from "@/design-system/components/words";
 import { T } from "@/i18n/text";
 import page from "./app-detail.module.css";
 import { ContentImage } from "./content-image";
-import { SweepTitle } from "./sweep-title";
-import sweep from "./sweep-title.module.css";
 import { WeekendCaption } from "./weekend-caption";
 import styles from "./weekend.module.css";
 
@@ -25,9 +24,9 @@ export function Weekend({ app }: { app: WebApp }) {
     <Section id="weekend" className={styles.weekend} aura="centre" aria-labelledby={TITLE_ID}>
       <Container className={styles.inner}>
         <div className={styles.text}>
-          <SweepTitle id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
+          <SweepTitle variant="pro" id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
             <span className={styles.slit}>
-              <span className={`${styles.num} ${sweep.rise}`}>{rank}</span>
+              <span className={styles.num}>{rank}</span>
             </span>
             <sup>
               <T value={ordinal} />

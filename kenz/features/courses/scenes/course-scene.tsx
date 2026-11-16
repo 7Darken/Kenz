@@ -6,7 +6,7 @@
  * content/courses.ts (COURSE_SCENES), un composant et son pilote ici.
  */
 import { COURSE_SCENES, type CourseSceneId } from "@/content/courses";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { BoxingScene } from "./boxing-scene";
 import { HyroxScene } from "./hyrox-scene";
 import { SpartanScene } from "./spartan-scene";

@@ -15,6 +15,14 @@ export const createur = {
     sport: "Le sport",
     suivre: "Me suivre",
   },
+  /** C0 : le hero partagé (features/hero), variante Créateur. */
+  hero: {
+    /** Le titre (et le nom du chapitre pour les lecteurs d'écran). */
+    title: "Kenz",
+    line: "Je voyage en Asie, je m’entraîne entre deux voyages, et je te raconte tout, *vraiment*.",
+    down: "Partir avec moi",
+    portraitAlt: "Kenz en t-shirt vert anis, le regard tourné vers l’horizon",
+  },
   /** C1 : le trajet sur le globe, d'escale en escale. */
   voyage: {
     title: "Le voyage",

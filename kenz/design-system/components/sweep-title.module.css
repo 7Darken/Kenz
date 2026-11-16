@@ -1,0 +1,37 @@
+/* Le titre en balayage doux avec flou ([data-sweep] des maquettes) ; l'état de départ n'existe qu'avec JS */
+.sweep {
+  width: fit-content;
+  max-width: 100%;
+}
+
+:global(.js) .sweep {
+  clip-path: inset(-15% 100% -25% -3%);
+  filter: blur(12px);
+  transition: clip-path .24s var(--out), filter .24s var(--out);
+}
+
+:global(.js) .sweep[data-in] {
+  clip-path: inset(-15% -3% -25% -3%);
+  filter: none;
+  transition: clip-path 1.4s var(--expo), filter 1.2s var(--expo);
+}
+
+/* Mouvement réduit : immobile (createur, voyage, sport), ou un fondu côté Pro (app.html, agents.html) */
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .sweep,
+  :global(.js) .sweep[data-in] {
+    clip-path: none;
+    filter: none;
+    transition: none;
+  }
+
+  :global(.js) .pro {
+    opacity: 0;
+    transition: opacity .4s;
+  }
+
+  :global(.js) .pro[data-in] {
+    opacity: 1;
+    transition: opacity 1s var(--expo);
+  }
+}

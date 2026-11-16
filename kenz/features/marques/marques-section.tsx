@@ -1,6 +1,7 @@
 /**
- * Marques & collaborations (voyage.html, `#marques`) : la phrase, et le formulaire (marque, idée, ordre de budget)
- * qui part vers `POST /api/contact` (type « marques »). On y arrive aussi par le lien discret du pied de page.
+ * Marques & collaborations (voyage.html, `#marques`) : la phrase, et le formulaire (marque, e-mail ou @, idée,
+ * ordre de budget) qui part vers `POST /api/contact` (type « marques »). On y arrive aussi par le lien discret du
+ * pied de page.
  */
 import { Container } from "@/design-system/components/container";
 import { Section } from "@/design-system/components/section";

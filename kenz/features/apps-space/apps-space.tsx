@@ -19,7 +19,7 @@ export function AppsSpace() {
   const code = CONSTELLATION_CODE.map((slug) => SPACE_ORDER.indexOf(slug)).filter((i) => i >= 0);
 
   return (
-    <Section id="apps" aura="calme" className={styles.space} aria-labelledby={TITLE_ID}>
+    <Section id="apps" aura="calme" className={styles.space} tabIndex={-1} aria-labelledby={TITLE_ID}>
       <SpaceScene apps={items} code={code} portrait={PORTRAIT} titleId={TITLE_ID} />
     </Section>
   );

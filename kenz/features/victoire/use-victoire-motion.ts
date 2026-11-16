@@ -3,8 +3,8 @@
 import { useLayoutEffect, type RefObject } from "react";
 
 import { startupWeekend } from "@/content/startup-weekend";
-import { gsap } from "@/features/motion/gsap";
-import { useMotion } from "@/features/motion/motion-provider";
+import { gsap } from "@/design-system/motion/gsap";
+import { useMotion } from "@/design-system/motion/motion-provider";
 import type { Lang } from "@/i18n/config";
 
 import { flowMode, pinMode } from "./victoire-modes";

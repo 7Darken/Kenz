@@ -1,9 +1,11 @@
 "use client";
 
 /** Miru : le thème s'écrit, les cartes se battent puis se distribuent à cinq joueurs, un téléphone passe de main en main. */
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import { all, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./miru-scene.module.css";
 
 /** Les cinq joueurs (visages au trait, couleurs douces) : fond, cheveux, encre, bouche. */
@@ -112,3 +114,12 @@ export const buildMiru: SceneBuilder = (el) => {
   });
   return tl;
 };
+
+/** « Comment ça marche » de Miru, monté autour de son écran (chargé à part : ./registry). */
+export default function MiruChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildMiru} tint={styles.scene} sample={"bottom"}>
+      <MiruScene />
+    </HowItWorks>
+  );
+}

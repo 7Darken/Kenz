@@ -28,17 +28,12 @@ export async function generateMetadata({ params }: AppPageProps): Promise<Metada
   if (!app) return {};
   const path = ROUTES.app(app.slug);
   const { meta } = getDictionary("fr").apps;
-  const base = pageMetadata({
+  return pageMetadata({
     title: format(meta.title, { app: app.name }),
     description: `${plain(app.story.hook.fr)} ${meta.description}`,
     path,
     universe: "pro",
   });
-  // Le rendu serveur est en français ; l'anglais se partage avec ?lang=en (même page, traduite au client).
-  return {
-    ...base,
-    alternates: { canonical: path, languages: { fr: path, en: `${path}?lang=en` } },
-  };
 }
 
 export default async function AppPage({ params }: AppPageProps) {

@@ -6,6 +6,7 @@
  * - Ordinateur : le chapitre est épinglé, le défilement fait défiler la landing.
  * - Mobile : la landing défile pendant que la fenêtre traverse l'écran.
  * - Mouvement réduit : la fenêtre se fait défiler à la main (défilement natif).
+ * La loupe grossit la landing qui défile (`data-loupe-source`), ou le haut de la landing tant qu'il est visible.
  */
 import { useLayoutEffect, useRef } from "react";
 
@@ -13,12 +14,12 @@ import type { WebApp } from "@/content/apps";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
-import { gsap } from "@/features/motion/gsap";
+import { SweepTitle } from "@/design-system/components/sweep-title";
+import { gsap } from "@/design-system/motion/gsap";
 import { useLanguage } from "@/i18n/language-provider";
 import page from "./app-detail.module.css";
 import styles from "./browser-showcase.module.css";
 import { ContentImage } from "./content-image";
-import { SweepTitle } from "./sweep-title";
 
 const PIN_QUERY = "(min-width: 900px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)";
 const TITLE_ID = "vrai-titre";
@@ -90,7 +91,7 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
     <Section className={styles.real} aura="droite" aria-labelledby={TITLE_ID}>
       <div ref={pinRef} className={styles.pin}>
         <Container>
-          <SweepTitle id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
+          <SweepTitle variant="pro" id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
             {t.apps.real.title}
           </SweepTitle>
           <div className={styles.zone}>
@@ -109,8 +110,8 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
                   </span>
                   <span className={styles.state}>{t.apps.real.online}</span>
                 </div>
-                <div ref={viewRef} className={styles.view} data-lenis-prevent="">
-                  <div ref={pageRef} className={styles.page}>
+                <div ref={viewRef} className={styles.view} data-lenis-prevent="" data-loupe="">
+                  <div ref={pageRef} className={styles.page} data-loupe-source="">
                     <ContentImage className={styles.landing} image={browser.page} sizes="(min-width: 900px) 900px, 100vw" />
                   </div>
                   <ContentImage ref={heroRef} className={styles.hero} image={browser.hero} sizes="(min-width: 900px) 900px, 100vw" loupe />

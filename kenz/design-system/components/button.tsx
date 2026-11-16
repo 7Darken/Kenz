@@ -1,7 +1,8 @@
 /**
  * Bouton de la maquette (« le bouton dans le bouton ») : variantes light (principal), ghost (secondaire),
  * accent (lumière de l'univers), tailles md / sm, icône ronde à droite. Rend un <a> (lien interne via
- * next/link, externe dans un nouvel onglet) ou un <button>.
+ * next/link, externe dans un nouvel onglet) ou un <button>. Une ancre de la page (`#contact`) reste un simple <a> :
+ * next/link prendrait le clic, et MotionProvider ne pourrait plus défiler en douceur ni donner le focus.
  */
 import Link from "next/link";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
@@ -63,6 +64,13 @@ export function Button(props: ButtonProps) {
     if (external) {
       return (
         <a className={cls} href={href} target="_blank" rel="noopener" {...rest}>
+          {content}
+        </a>
+      );
+    }
+    if (href.startsWith("#")) {
+      return (
+        <a className={cls} href={href} {...rest}>
           {content}
         </a>
       );

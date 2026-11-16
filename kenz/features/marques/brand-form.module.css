@@ -1,4 +1,4 @@
-/* Le formulaire Marques (voyage.html, .form ; champs de shared/theme.css : .field, .input, .choices, .choice) */
+/* Le formulaire Marques (voyage.html, .form ; les champs : FormField du design system) */
 .form {
   position: relative;
 }
@@ -30,135 +30,9 @@
   pointer-events: none;
 }
 
-.field {
-  display: grid;
-  gap: 10px;
-  margin: 0 0 20px;
-  padding: 0;
-  border: 0;
-  min-width: 0;
-}
-
-.field label,
-.field legend {
-  padding: 0;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.field legend {
+/* L'ordre de budget : un peu d'air sous sa légende (voyage.html) */
+.budget legend {
   margin-bottom: 8px;
-}
-
-.field small {
-  font-weight: 400;
-  color: var(--faint);
-}
-
-.input {
-  width: 100%;
-  min-height: 54px;
-  padding: 14px 16px;
-  border-radius: var(--r-md);
-  border: 0;
-  outline: none;
-  background: var(--field-bg);
-  box-shadow: inset 0 0 0 1px var(--field-line);
-  font-size: 16px;
-  line-height: 1.4;
-  color: var(--fg);
-  transition: box-shadow .4s var(--expo);
-}
-
-.input::placeholder {
-  color: var(--placeholder);
-}
-
-.input:hover {
-  box-shadow: inset 0 0 0 1px var(--field-line-2);
-}
-
-.input:focus-visible {
-  box-shadow: inset 0 0 0 1.5px var(--field-focus), 0 0 0 4px rgb(var(--lum) / .12);
-}
-
-.input[aria-invalid="true"] {
-  box-shadow: inset 0 0 0 1.5px var(--warn-line);
-}
-
-textarea.input {
-  min-height: 132px;
-  resize: vertical;
-}
-
-.choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.choice {
-  position: relative;
-}
-
-.choice input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.choice span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-size: 15px;
-  line-height: 1.2;
-  color: var(--muted);
-  background: var(--ghost-bg);
-  box-shadow: inset 0 0 0 1px var(--field-line);
-  transition: background-color .35s var(--expo), color .35s var(--expo), box-shadow .35s var(--expo), transform .5s var(--expo);
-}
-
-.choice input:hover + span {
-  color: var(--fg);
-  box-shadow: inset 0 0 0 1px var(--field-line-2);
-}
-
-.choice input:checked + span {
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  box-shadow: none;
-}
-
-.choice input:focus-visible + span {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
-}
-
-.choice input:active + span {
-  transform: scale(.97);
-}
-
-.choices[aria-invalid="true"] .choice span {
-  box-shadow: inset 0 0 0 1px var(--warn-line);
-}
-
-.error {
-  margin: 0;
-  font-size: 13px;
-  color: var(--warn);
-}
-
-.error:empty {
-  display: none;
 }
 
 /* Le piège à robots : hors de l'écran, jamais lu */
@@ -183,6 +57,11 @@ textarea.input {
   margin: 0;
   font-size: 14px;
   color: var(--warn);
+}
+
+/* Vide, la région reste dans l'arbre d'accessibilité (son message sera annoncé) mais sort du flux */
+.failure:empty {
+  position: absolute;
 }
 
 /* Le merci : il prend la place du formulaire */
@@ -276,9 +155,5 @@ textarea.input {
 
   .ok > :not(svg) {
     filter: none !important;
-  }
-
-  .choice span {
-    transition: none;
   }
 }

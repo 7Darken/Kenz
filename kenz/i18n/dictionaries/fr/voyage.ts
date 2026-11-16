@@ -46,6 +46,9 @@ export const voyage = {
     title: "Une marque, une destination, une *idée* ?",
     brand: "Votre marque",
     brandPlaceholder: "Le nom de votre marque",
+    /** Pour pouvoir répondre : une adresse e-mail ou un pseudo de réseau. */
+    reply: "Votre e-mail ou @",
+    replyPlaceholder: "contact@marque.com ou @marque",
     idea: "Votre idée",
     ideaPlaceholder: "Une destination, un format, une envie…",
     budget: "Ordre de budget",
@@ -54,6 +57,10 @@ export const voyage = {
     sending: "Envoi…",
     errors: {
       brand: "Indiquez le nom de votre marque.",
+      reply: "Indiquez un e-mail ou un @pseudo, pour que je puisse vous répondre.",
+      replyInvalid: "Entrez un e-mail complet ou un pseudo précédé de @.",
+      /** `{min}` : la longueur minimale du pseudo, après le @ (content/contact.ts). */
+      replyShort: "Un @pseudo compte au moins {min} caractères.",
       idea: "Décrivez votre idée en quelques mots (10 caractères au moins).",
       tooLong: "C’est un peu long : raccourcissez, s’il vous plaît.",
       budget: "Choisissez un ordre de budget dans la liste.",

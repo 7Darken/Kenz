@@ -46,7 +46,6 @@
 
 .serie {
   position: relative;
-  transition: opacity .7s var(--expo);
 }
 
 .number {
@@ -153,13 +152,17 @@
   color: var(--word-c);
 }
 
-/* La série à l'écran : les autres s'effacent un peu (pas en mouvement réduit : tout reste net) */
-[data-scrub] .serie {
-  opacity: .34;
+/*
+ * La série à l'écran : les autres s'effacent un peu (pas en mouvement réduit : tout reste net).
+ * La maquette efface toute la ligne à .34 ; ici, seuls le nom (grand titre : 3:1 au moins à .55, clair et sombre)
+ * et la vignette s'effacent, pour que le numéro et la ligne de détails gardent 4,5:1 pendant la lecture.
+ */
+.serie > * {
+  transition: opacity .7s var(--expo);
 }
 
-[data-scrub] .serie[data-on] {
-  opacity: 1;
+[data-scrub] .serie:not([data-on]) :is(.name, .next, .media) {
+  opacity: .55;
 }
 
 @media (min-width: 900px) {
@@ -256,7 +259,7 @@
   }
 
   .media img,
-  .serie {
+  .serie > * {
     transition: none !important;
   }
 }

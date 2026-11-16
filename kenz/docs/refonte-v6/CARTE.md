@@ -19,22 +19,25 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `theme.js` : le mode (script avant affichage, bouton) | `design-system/theme/*`, `design-system/components/theme-toggle.tsx` | `useTheme()` ; événement DOM `kz-theme:change`. |
 | `theme.js` : l'aura et le grain | `design-system/components/aura.tsx` | Monté par `UniverseShell` ; `<Section aura="…">` en pilote la place. |
 | `theme.js` : le fil (rail, nœuds, filet de progression, traits) | `design-system/components/fil.tsx`, `fil-trait.tsx`, `design-system/lib/chapters.ts` | Un chapitre = `<Section>`. |
-| `theme.js` : l'arche (`kz-arche`, tracé, lumière, sol) | `design-system/components/arch.tsx`, `arch-trace.tsx` | `trace` ou `trace={{ traced }}` (contrôlé). |
-| `theme.js` : la loupe (`[data-loupe]`) | `design-system/components/loupe.tsx` | Monté par `UniverseShell` ; il suffit de poser `data-loupe` sur l'image. |
-| `.btn`, `.btn--light`, `.btn--ghost`, `.btn--sm`, `.btn__ico` | `design-system/components/button.tsx` | Variantes `light`, `ghost`, `accent` ; tailles `md`, `sm`. |
+| `theme.js` : l'arche (`kz-arche`, tracé, lumière, sol) | `design-system/components/arch.tsx`, `arch-trace.tsx` | `trace` ou `trace={{ traced }}` (contrôlé) ; `traceDuration` (s), `floorOverhang` (%) ; délais en CSS (`--fil-delay`, `--shadow-delay`, `--floor-delay`). |
+| `theme.js` : la loupe (`[data-loupe]`) | `design-system/components/loupe.tsx` | Monté par `UniverseShell` ; il suffit de poser `data-loupe` sur l'image. Option `source` : `data-loupe-source` sur le descendant à grossir (ex. la page qui défile dans une fenêtre). |
+| `.btn`, `.btn--light`, `.btn--ghost`, `.btn--sm`, `.btn__ico` | `design-system/components/button.tsx` | Variantes `light`, `ghost`, `accent` ; tailles `md`, `sm`. Une ancre (`#contact`) rend un simple `<a>` (défilement doux de `MotionProvider`). |
 | `.round`, `.kz-mode` | `icon-button.tsx`, `theme-toggle.tsx` | |
 | `[data-words]`, `[data-reveal="card"\|"fade"]` | `words.tsx`, `reveal.tsx` | `play` / `show` pour piloter (ex. l'arrivée du hero). |
+| `[data-sweep]` (titre en balayage) | `design-system/components/sweep-title.tsx` | `variant` : `createur` (défaut) ou `pro` (app, agents). |
 | `.wrap` | `container.tsx` | |
 | `[data-chapitre]`, `data-aura`, `data-fil-trait` | `section.tsx` | |
-| Fiche des courses (`role="dialog"`) | `dialog.tsx` | `<dialog>` natif : focus piégé, Échap, retour du focus. |
+| Fiche des courses (`role="dialog"`) | `dialog.tsx` | `<dialog>` natif : focus piégé, retour du focus. `onClose(reason)` : `escape`, `backdrop`, `button` ou `browser`. |
+| `.field`, `.input`, `.choices`, `.choice`, `.field__err` | `design-system/components/form-field.tsx` | `FormField` (`htmlFor` ou `group`, `hint`, `error`), `Input`, `Textarea`, `Choices`, `Choice`. |
 | Polaroïd (`profondeur.css`) | `polaroid.tsx` | |
 | Icônes réseaux (sprite Simple Icons) | `social-icon.tsx` | YouTube, TikTok, Instagram, GitHub, LinkedIn. |
+| `.reseaux` / `.reseau` (icônes rondes, bulle) | `design-system/components/social-links.tsx` | `size` : `md` (48 px) ou `sm` (46 px) ; `tone` : `k15ze`, `glass`, ou les couleurs du parent (`--u`, `--ic`, `--ring`). |
 | Badges des stores (`app.html`) | `store-badge.tsx` | |
-| Motif d'Escapades Libres (`MARQUE`) | `escapades-mark.tsx` | |
+| Motif d'Escapades Libres (`MARQUE` d'app.html, symbole de `victoire.js`) | `escapades-mark.tsx` | `variant` : `page` (défaut : nav, arrivée, action) ou `logo` (mur de post-it) ; `ESCAPADES_LOGO` pour composer l'icône du passage. |
 | Sélecteur de langue (ancien site) | `language-toggle.tsx` | Dans le pied de page, ligne 2. |
 | `.nav` + variantes de `pro`, `app`, `agents`, `createur` (barre « stories »), `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
 | `shared/footer.*` | `features/footer/footer.tsx` | Variantes pro, createur, k15ze. |
-| Lenis, GSAP, ScrollTrigger, ancres | `features/motion/*` | `useMotion()`, `useGsap()`, `useInView()`, `useReducedMotion()`, `useMediaQuery()`. |
+| Lenis, GSAP, ScrollTrigger, ancres | `design-system/motion/*` | `useMotion()`, `useGsap()`, `useInView()`, `useReducedMotion()`, `useMediaQuery()`. |
 | Polices : Melodrama (data URI), Inter, Instrument Serif, Anton | `app/fonts.ts`, `app/fonts/Melodrama-Variable.woff2` | Jetons `--f-title`, `--f-text`, `--f-word`, `--f-num`. |
 | Données en tête des modules `shared/*.js` | `content/*.ts` | Voir la dernière section. |
 | Assets référencés | `public/assets/` | Voir `CONVENTIONS.md`, section « Images ». |
@@ -86,6 +89,7 @@ L'agent 6 peut monter son composant racine dans `app/_components/universe-shell.
 - `shared/revue.js` (outil de revue)
 - `maquettes/v6/index.html` (sommaire des maquettes)
 - Les portes de test `?clair` / `?sombre` et `?test-code` : retirées de la production. Pour tester un mode, utiliser le bouton ou les DevTools.
+- `voyage.html` `#guide`, le bouton de la carte « Tu pars en Chine ? » : la maquette affiche « Ouvrir l'itinéraire » vers `https://kenzenbien.fr/itineraire/chine`, une page qui n'existe pas encore (404). Le site affiche donc « Voir l'itinéraire en vidéo » vers la vidéo YouTube du même itinéraire. Le libellé et le lien de la maquette reviennent d'eux-mêmes quand la page est en ligne : passer `CHINA_GUIDE.page.online` à `true` dans `content/series.ts`. **À valider par Kenz.**
 
 ## Contenu typé (`content/`) et dictionnaires
 

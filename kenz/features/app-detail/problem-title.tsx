@@ -8,9 +8,9 @@ import { Fragment, useRef } from "react";
 
 import { Rich } from "@/design-system/components/rich";
 import { Words } from "@/design-system/components/words";
-import { gsap } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { gsap } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import type { Localized } from "@/i18n/localize";
 import { useText } from "@/i18n/text";
 import styles from "./problem.module.css";

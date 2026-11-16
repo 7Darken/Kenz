@@ -1,10 +1,12 @@
 "use client";
 
 /** Wado : une assiette est scannée, les macros apparaissent, puis l'anneau de la journée se remplit (exemple). */
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import kit from "./scene.module.css";
 import { all, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./wado-scene.module.css";
 
 /** Les valeurs d'exemple. */
@@ -114,3 +116,12 @@ export const buildWado: SceneBuilder = (el) => {
     .to(values, { yPercent: 0, duration: 1, stagger: 0.12 }, 1.8)
     .to(ring, { strokeDashoffset: 0.24, duration: 1.3, ease: "power2.out" }, 2.35);
 };
+
+/** « Comment ça marche » de Wado, monté autour de son écran (chargé à part : ./registry). */
+export default function WadoChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildWado} tint={styles.scene} sample={"bottom"}>
+      <WadoScene />
+    </HowItWorks>
+  );
+}

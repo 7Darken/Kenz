@@ -2,7 +2,7 @@
  * Les outils communs aux animations « Comment ça marche » : la case cochée, et la recherche des pièces
  * animées par leurs ancres `data-s` (le style, lui, vit dans les CSS Modules des scènes).
  */
-import type { gsap } from "@/features/motion/gsap";
+import type { gsap } from "@/design-system/motion/gsap";
 import styles from "./scene.module.css";
 
 /** Construit la timeline (en pause) d'une scène à partir de son écran ; l'état final est celui du CSS. */

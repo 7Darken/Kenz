@@ -16,10 +16,10 @@ import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
-import { gsap } from "@/features/motion/gsap";
-import { CSS_EASE } from "@/features/motion/easings";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { gsap } from "@/design-system/motion/gsap";
+import { CSS_EASE } from "@/design-system/motion/easings";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { usePassageArrival } from "@/features/passages";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
@@ -133,7 +133,17 @@ export function Arrival({ app }: { app: App }) {
         data-arrived={arrived ? "" : undefined}
       >
         <div className={styles.light} aria-hidden="true" />
-        <Arch className={styles.arche} variant="lumiere" trace={{ traced: arrived }} traceGap={26} floor aria-hidden="true" data-passage-arche="" />
+        <Arch
+          className={styles.arche}
+          variant="lumiere"
+          trace={{ traced: arrived }}
+          traceGap={26}
+          traceDuration={2.6}
+          floor
+          floorOverhang={34}
+          aria-hidden="true"
+          data-passage-arche=""
+        />
         <div ref={innerRef} className={styles.inner}>
           {app.kind === "mobile" ? (
             <Image

@@ -5,7 +5,7 @@
  * unités de défilement en mode épinglé, secondes à l'entrée en mode « à la suite »).
  * Les éléments sont trouvés par leurs ancres `data-kv` (le style, lui, vit dans victoire.module.css).
  */
-import { gsap } from "@/features/motion/gsap";
+import { gsap } from "@/design-system/motion/gsap";
 
 import { CROWN, DOORS, GAP, OURS, PERSPECTIVE, SPARKS, WALL } from "./victoire-geometry";
 

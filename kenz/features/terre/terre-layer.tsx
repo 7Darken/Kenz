@@ -11,7 +11,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { announceTerreReady, usePassageArrival } from "@/features/passages";
 import type { GlobeMode } from "./engine/globe";
 import { HERO_DRIFT, HERO_VIEW, STOPS } from "./stops";

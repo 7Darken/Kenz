@@ -9,7 +9,7 @@
  *   Mouvement réduit : objets fixes, un simple fondu.
  * Tout ce qu'il pose (attributs, minuteurs, écouteurs, ScrollTrigger) est retiré par la fonction rendue.
  */
-import { gsap } from "@/features/motion/gsap";
+import { gsap } from "@/design-system/motion/gsap";
 import { FOOTPRINT, PLANS, type PlacedObject } from "./profondeur-planes";
 
 const DELAY_S = 1.05;

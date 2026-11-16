@@ -13,7 +13,7 @@
  * hors du cadre, la fiche se replie dans l'icône ; puis le passage (openPassage) : l'icône vole vers la page.
  * Mouvement réduit : ciel fixe sans scintillement, pas de caméra, des fondus.
  */
-import { CSS_EASE } from "@/features/motion/easings";
+import { CSS_EASE } from "@/design-system/motion/easings";
 import { openPassage } from "@/features/passages";
 import { createSky, type Zone } from "./space-sky";
 import { playAnimation, playGallery, type PreviewController } from "./space-preview";

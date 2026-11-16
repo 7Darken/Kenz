@@ -80,7 +80,9 @@
   text-shadow: 0 0 .8em rgb(var(--sport-vert) / .18);
 }
 
+/* le bas des grandes photos fond dans le fond k15ze (contrat de features/courses : --courses-bg) */
 .cards {
+  --courses-bg: var(--sport-fond);
   grid-area: cartes;
 }
 

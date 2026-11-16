@@ -9,7 +9,7 @@ import { Fragment, useRef, type CSSProperties } from "react";
 
 import type { Course } from "@/content/courses";
 import { Icon } from "@/design-system/components/icon";
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";

@@ -3,19 +3,6 @@
   padding: calc(var(--sec) * .7) 0 var(--sec);
 }
 
-/* Le titre se dévoile d'un balayage (avec JS seulement) */
-:global(.js) .title {
-  clip-path: inset(-15% 100% -25% -3%);
-  filter: blur(12px);
-  transition: clip-path .24s var(--out), filter .24s var(--out);
-}
-
-:global(.js) .title[data-in] {
-  clip-path: inset(-15% -3% -25% -3%);
-  filter: none;
-  transition: clip-path 1.4s var(--expo), filter 1.2s var(--expo);
-}
-
 .list {
   position: relative;
   margin-top: clamp(40px, 5vw, 72px);
@@ -111,20 +98,5 @@
   .step::before {
     left: 0;
     top: -44px;
-  }
-}
-
-/* Mouvement réduit : un fondu à la place du balayage */
-@media (prefers-reduced-motion: reduce) {
-  :global(.js) .title {
-    clip-path: none;
-    filter: none;
-    opacity: 0;
-    transition: opacity .4s;
-  }
-
-  :global(.js) .title[data-in] {
-    opacity: 1;
-    transition: opacity 1s var(--expo);
   }
 }

@@ -3,7 +3,7 @@
  * `tween` interpole 0 → 1 avec une courbe GSAP et laisse l'appelant poser les valeurs : c'est ainsi que la maquette
  * pilote les clip-path, la planète et les tracés image par image, sans dépendre du format des chaînes CSS.
  */
-import { gsap } from "@/features/motion/gsap";
+import { gsap } from "@/design-system/motion/gsap";
 
 export interface Track {
   tween: (

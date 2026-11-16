@@ -26,8 +26,25 @@
 }
 
 .num {
+  display: inline-block;
   color: var(--accent);
   text-shadow: var(--glow);
+}
+
+/* Le « 1 » monte de sa fente quand le titre arrive (SweepTitle pose data-in) ; l'état de départ n'existe qu'avec JS */
+:global(.js) .title .num {
+  transform: translateY(110%);
+}
+
+:global(.js) .title[data-in] .num {
+  transform: none;
+  transition: transform 1.3s var(--expo) .35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .title .num {
+    transform: none;
+  }
 }
 
 .title sup {

@@ -4,17 +4,17 @@
  */
 import Image from "next/image";
 
-import type { MobileApp } from "@/content/apps";
+import { RELEASES_CHECKED_ON, type MobileApp } from "@/content/apps";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import { T } from "@/i18n/text";
 import page from "./app-detail.module.css";
 import { ContentImage } from "./content-image";
 import styles from "./in-real-life.module.css";
 import { ParallaxShot } from "./parallax-shot";
 import { ReleaseSince, ReleaseVersion } from "./release-lines";
-import { SweepTitle } from "./sweep-title";
 
 const TITLE_ID = "vrai-titre";
 
@@ -27,7 +27,7 @@ export function InRealLife({ app }: { app: MobileApp }) {
   return (
     <Section className={`${styles.real} ${styles[shots.layout]}`} aura="droite" aria-labelledby={TITLE_ID}>
       <Container>
-        <SweepTitle id={TITLE_ID} className={page.h2}>
+        <SweepTitle variant="pro" id={TITLE_ID} className={page.h2}>
           <T k="apps.real.title" />
         </SweepTitle>
         <div className={styles.bento}>
@@ -69,7 +69,7 @@ export function InRealLife({ app }: { app: MobileApp }) {
                   </svg>
                 </span>
                 <p className={styles.line}>
-                  <ReleaseVersion release={release} />
+                  <ReleaseVersion release={release} checkedOn={RELEASES_CHECKED_ON} />
                 </p>
               </div>
             </div>

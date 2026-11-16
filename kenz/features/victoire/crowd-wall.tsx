@@ -4,7 +4,8 @@
  */
 import type { CSSProperties } from "react";
 
-import { ArcsMark } from "./escapades-symbol";
+import { EscapadesMark } from "@/design-system/components/escapades-mark";
+
 import styles from "./victoire.module.css";
 import { OURS, PICTOS, WALL } from "./victoire-geometry";
 
@@ -22,7 +23,7 @@ export function CrowdWall({ label }: { label: string }) {
         >
           <b className={styles.piIn}>
             {n === OURS ? (
-              <ArcsMark className={styles.mark} />
+              <EscapadesMark variant="logo" className={styles.mark} />
             ) : (
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d={PICTOS[p.picto]} />

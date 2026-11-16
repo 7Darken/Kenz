@@ -11,6 +11,12 @@ export const createur: CreateurDictionary = {
     sport: "Sport",
     suivre: "Follow me",
   },
+  hero: {
+    title: "Kenz",
+    line: "I travel across Asia, train between trips, and tell you everything, *for real*.",
+    down: "Come along",
+    portraitAlt: "Kenz in a lime-green T-shirt, gazing toward the horizon",
+  },
   voyage: {
     title: "The journey",
     sub: "{count} countries filmed, in the order of the series.",

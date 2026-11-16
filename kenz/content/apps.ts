@@ -8,6 +8,7 @@
  * Tailles d'images relevées avec `sips` sur `maquettes/v6/assets/`.
  */
 import type { Localized } from "@/i18n/localize";
+import { ESCAPADES_LIBRES } from "@/content/escapades-libres";
 import type { HexColor, ImageAsset, IsoDate, RgbTriplet, RichText } from "@/content/types";
 
 export const APP_SLUGS = ["oshii", "wado", "sago", "croc", "miru", "zenko", "escapades-libres"] as const;
@@ -834,10 +835,10 @@ export const apps: AppsBySlug = {
 
   "escapades-libres": {
     kind: "web",
-    slug: "escapades-libres",
-    name: "Escapades Libres",
+    slug: ESCAPADES_LIBRES.slug,
+    name: ESCAPADES_LIBRES.name,
     nameLines: ["Escapades", "Libres"],
-    colors: { tint: "#E3A21A", tintRgb: "227 162 26", light: "#F2BE4E", lightRgb: "242 190 78", dark: "#8A5E0A" },
+    colors: { tint: ESCAPADES_LIBRES.tint, tintRgb: "227 162 26", light: "#F2BE4E", lightRgb: "242 190 78", dark: "#8A5E0A" },
     mark: {
       label: {
         fr: "Le motif d’Escapades Libres : deux arcs dorés",
@@ -942,12 +943,29 @@ export const apps: AppsBySlug = {
           },
         },
       },
-      site: "https://escapades-libres.vercel.app",
+      site: ESCAPADES_LIBRES.site,
     },
   },
 };
 
 export const isAppSlug = (value: string): value is AppSlug => (APP_SLUGS as readonly string[]).includes(value);
+
+/** Ce que la nav montre de l'app de la page : son nom, son type, son icône. */
+export interface NavApp {
+  name: string;
+  kind: App["kind"];
+  /** L'icône (apps mobiles) ; Escapades Libres a son motif. */
+  icon?: string;
+}
+
+/**
+ * Les apps vues par la nav, calculées côté serveur et passées par le layout Pro : la nav (composant client)
+ * n'embarque ainsi ni l'histoire des apps ni ce module.
+ */
+export const navApps = (): Readonly<Record<AppSlug, NavApp>> => {
+  const entry = (app: App): NavApp => ({ name: app.name, kind: app.kind, icon: app.kind === "mobile" ? app.icon.src : undefined });
+  return Object.fromEntries(APP_SLUGS.map((slug) => [slug, entry(apps[slug])])) as Record<AppSlug, NavApp>;
+};
 
 /** Garde des routes `/apps/[slug]` : `undefined` pour un slug inconnu. */
 export const getApp = (slug: string): App | undefined => (isAppSlug(slug) ? apps[slug] : undefined);

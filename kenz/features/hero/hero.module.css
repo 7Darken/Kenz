@@ -65,6 +65,18 @@
   will-change: transform, opacity;
 }
 
+/* Créateur : le paysage et la scène s'effacent au défilement (--hero-scroll, posé par HeroDirector) ; sur l'écran
+   statique « vu une fois » de la Terre, ils suivent son fondu (--hero-fade, posé par setHeroFade), qui prime */
+.createur .bg,
+.createur .scene {
+  opacity: var(--hero-scroll, 1);
+}
+
+.createur[data-fade] .bg,
+.createur[data-fade] .scene {
+  opacity: var(--hero-fade, 1);
+}
+
 .bgIn {
   position: absolute;
   inset: 0;

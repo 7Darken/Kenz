@@ -3,18 +3,20 @@
 /** Oshii : une vidéo de recette est partagée à l'app, se replie dans l'icône et devient une fiche pesée. */
 import Image from "next/image";
 
-import { apps } from "@/content/apps";
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import type { ImageAsset } from "@/content/types";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import kit from "./scene.module.css";
 import { all, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./oshii-scene.module.css";
 
-const ICON = apps.oshii.icon;
 /** Les quantités d'exemple de la fiche. */
 const QUANTITIES = { pasta: "200 g", parmesan: "40 g", lemon: "1", cream: "10 cl" } as const;
 
-export function OshiiScene() {
+/** `icon`, `name` : ceux de l'app (content/apps.ts), passés par le chapitre. */
+export function OshiiScene({ icon, name }: { icon: ImageAsset; name: string }) {
   const s = useTranslation().apps.scenes.oshii;
   return (
     <>
@@ -81,8 +83,8 @@ export function OshiiScene() {
         <p className={styles.sheetTitle}>{s.shareTo}</p>
         <div className={styles.row}>
           <span className={styles.app}>
-            <Image src={ICON.src} width={ICON.width} height={ICON.height} alt="" sizes="64px" data-s="share-icon" />
-            <span>{apps.oshii.name}</span>
+            <Image src={icon.src} width={icon.width} height={icon.height} alt="" sizes="64px" data-s="share-icon" />
+            <span>{name}</span>
             <span className={styles.tap} data-s="tap" />
           </span>
           {[0, 1, 2].map((n) => (
@@ -95,7 +97,7 @@ export function OshiiScene() {
       </div>
       <div className={styles.recipe} data-s="recipe">
         <div className={styles.recipeHead} data-s="recipe-head">
-          <Image src={ICON.src} width={ICON.width} height={ICON.height} alt="" sizes="48px" />
+          <Image src={icon.src} width={icon.width} height={icon.height} alt="" sizes="48px" />
           <p className={styles.recipeTitle}>{s.recipe}</p>
         </div>
         <ul className={styles.ing}>
@@ -155,3 +157,12 @@ export const buildOshii: SceneBuilder = (el) => {
     .to(nums, { yPercent: 0, duration: 0.9, stagger: 0.16 }, 2.68)
     .to(steps, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 }, 3.3);
 };
+
+/** « Comment ça marche » de Oshii, monté autour de son écran (chargé à part : ./registry). */
+export default function OshiiChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildOshii} tint={styles.scene} sample={"top"}>
+      {app.kind === "mobile" ? <OshiiScene icon={app.icon} name={app.name} /> : null}
+    </HowItWorks>
+  );
+}

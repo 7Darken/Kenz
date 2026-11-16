@@ -90,7 +90,8 @@
   --kv-bubble-sh: 0 0 0 1px rgba(26, 25, 24, .06), 0 4px 10px -4px rgba(26, 25, 24, .08), 0 28px 56px -26px rgba(26, 25, 24, .28);
   --kv-av-ring: #F5F3EF;
   --kv-une-l: #8A6410;
-  --kv-une-1: #D99A1C;
+  /* Le « 1re » : l'or de la maquette (#D99A1C) n'a que 2,2:1 sur ce fond ; cet or plus profond a 3,4:1 */
+  --kv-une-1: #B07A10;
   --kv-beam-0: rgba(227, 162, 26, 0);
   --kv-beam-1: rgba(227, 162, 26, .12);
   --kv-beam-2: rgba(227, 162, 26, .26);

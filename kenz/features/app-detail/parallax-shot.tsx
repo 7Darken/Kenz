@@ -7,9 +7,9 @@
 import { useRef } from "react";
 
 import type { ImageAsset } from "@/content/types";
-import { gsap } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { gsap } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { ContentImage } from "./content-image";
 
 interface ParallaxShotProps {

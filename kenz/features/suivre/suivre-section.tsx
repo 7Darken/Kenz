@@ -6,7 +6,7 @@
 import { Container } from "@/design-system/components/container";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
-import { SweepTitle } from "@/features/terre/sweep-title";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import { FOLLOW_DOORS } from "./doors";
 import { FollowDoor } from "./follow-door";
 import styles from "./suivre-section.module.css";

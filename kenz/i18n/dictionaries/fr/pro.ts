@@ -1,7 +1,6 @@
 /**
  * Univers Pro, accueil (`/`) : hero, scène des apps, « Pour votre équipe », contact.
  * Module « Pro accueil » (agent 1). `meta` sert aux métadonnées de la route.
- * `hero.createur` : les textes de la variante Créateur du hero partagé (features/hero, même module).
  * `*mot*` : le mot en Instrument Serif italique. Espace insécable (U+00A0) avant « ? ! : ; ».
  */
 export const pro = {
@@ -9,19 +8,13 @@ export const pro = {
     title: "Kenz — Pro",
     description: "Je construis des apps où l’IA fait le vrai travail.",
   },
+  /** Le hero partagé (features/hero), variante Pro ; la variante Créateur lit `createur.hero`. */
   hero: {
     /** Le titre (et le nom du chapitre pour les lecteurs d'écran). */
     title: "Kenz",
-    pro: {
-      line: "Je construis des apps où l’IA fait le *vrai* travail.",
-      down: "Voir ce que je construis",
-      portraitAlt: "Kenz en costume bleu nuit et chemise blanche, regard caméra",
-    },
-    createur: {
-      line: "Je voyage en Asie, je m’entraîne entre deux voyages, et je te raconte tout, *vraiment*.",
-      down: "Partir avec moi",
-      portraitAlt: "Kenz en t-shirt vert anis, le regard tourné vers l’horizon",
-    },
+    line: "Je construis des apps où l’IA fait le *vrai* travail.",
+    down: "Voir ce que je construis",
+    portraitAlt: "Kenz en costume bleu nuit et chemise blanche, regard caméra",
   },
   space: {
     title: "Mes apps",
@@ -60,12 +53,22 @@ export const pro = {
       label: "Votre nom",
       placeholder: "Prénom et nom",
     },
+    /** Pour pouvoir répondre : une adresse e-mail ou un pseudo de réseau. */
+    reply: {
+      label: "Votre e-mail ou @",
+      placeholder: "nom@domaine.fr ou @pseudo",
+    },
     need: "Votre besoin",
     message: "Votre message",
     submit: "Envoyer",
     errors: {
       name: "Indiquez votre nom.",
       nameTooLong: "Ce nom est un peu long ({max} caractères au plus).",
+      reply: "Indiquez un e-mail ou un @pseudo, pour que je puisse vous répondre.",
+      replyInvalid: "Entrez un e-mail complet ou un pseudo précédé de @.",
+      /** `{min}` : la longueur minimale du pseudo, après le @ (content/contact.ts). */
+      replyShort: "Un @pseudo compte au moins {min} caractères.",
+      replyTooLong: "C’est un peu long ({max} caractères au plus).",
       need: "Choisissez ce qui vous amène.",
       /** `{min}` : la longueur minimale (content/contact.ts). */
       message: "Quelques mots de plus ({min} caractères au moins).",

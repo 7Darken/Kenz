@@ -12,10 +12,10 @@ import styles from "./app-detail.module.css";
 import { AppTint } from "./app-tint";
 import { Arrival } from "./arrival";
 import { BrowserShowcase } from "./browser-showcase";
-import { HowItWorks } from "./how-it-works";
 import { InRealLife } from "./in-real-life";
 import { NextStory } from "./next-story";
 import { Problem } from "./problem";
+import { HowItWorksChapter } from "./scenes/registry";
 import { Weekend } from "./weekend";
 
 export function AppDetail({ app }: { app: App }) {
@@ -25,7 +25,7 @@ export function AppDetail({ app }: { app: App }) {
       <AppTint app={app} next={next} />
       <Arrival app={app} />
       <Problem app={app} />
-      <HowItWorks app={app} />
+      <HowItWorksChapter app={app} />
       <AiChapter app={app} />
       {app.kind === "web" ? (
         <>

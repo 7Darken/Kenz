@@ -1,161 +1,117 @@
 "use client";
 
 /**
- * Le formulaire Marques & collaborations (voyage.html, `.form`) : la marque, l'idée, un ordre de budget
- * facultatif. Validation douce (au départ, puis à la frappe sur un champ en erreur), envoi vers
- * `POST /api/contact` (type « marques », contrat : content/contact.ts), puis « Merci, c'est noté. ».
- * `website` : un piège à robots, caché et laissé vide.
+ * Le formulaire Marques & collaborations (voyage.html, `.form`) : la marque, l'e-mail ou le @ (pour pouvoir
+ * répondre), l'idée, un ordre de budget facultatif. Validation douce (au départ, puis à la frappe sur un champ
+ * en erreur) avec le même code que le serveur (`validateContact`, content/contact.ts), envoi vers
+ * `POST /api/contact` (type « marques ») puis « Merci, c'est noté. » : `useContactSubmit`, partagé avec le
+ * contact Pro. `website` : un piège à robots, caché et laissé vide.
  */
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 
 import {
   BRAND_BUDGET_LABELS,
   BRAND_BUDGET_VALUES,
   CONTACT_LIMITS,
+  validateContact,
   type BrandBudget,
   type ContactFieldError,
+  type ContactFieldErrors,
   type ContactRequest,
-  type ContactResponse,
 } from "@/content/contact";
 import { Button } from "@/design-system/components/button";
-import { useMotion } from "@/features/motion/motion-provider";
-import { useInView } from "@/features/motion/use-in-view";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { Choice, Choices, FormField, Input, Textarea } from "@/design-system/components/form-field";
+import { useMotion } from "@/design-system/motion/motion-provider";
+import { useInView } from "@/design-system/motion/use-in-view";
+import { useContactSubmit } from "@/features/contact/use-contact-submit";
 import bezel from "@/features/univers/bezel.module.css";
+import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./brand-form.module.css";
 
-type FieldName = "nom" | "message" | "besoin";
+type FieldName = "nom" | "contact" | "message" | "besoin";
 type Errors = Partial<Record<FieldName, ContactFieldError>>;
 
-/** La même règle que le serveur (app/api/contact) : obligatoire, assez long, pas trop. */
-function check(value: string, min: number, max: number): ContactFieldError | null {
-  const length = value.trim().length;
-  if (!length) return "required";
-  if (length < min) return "tooShort";
-  if (length > max) return "tooLong";
-  return null;
-}
+const pick = ({ nom, contact, message, besoin }: ContactFieldErrors): Errors => ({ nom, contact, message, besoin });
 
 export function BrandForm({ labelledBy }: { labelledBy: string }) {
   const uid = useId();
-  const ids = { nom: `${uid}-marque`, message: `${uid}-idee` };
+  const ids = { nom: `${uid}-marque`, contact: `${uid}-contact`, message: `${uid}-idee` };
   const { lang, t } = useLanguage();
   const m = t.voyage.marques;
   const motion = useMotion();
-  const reduced = useReducedMotion();
   const formRef = useRef<HTMLFormElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
+  const contactRef = useRef<HTMLInputElement>(null);
   const ideaRef = useRef<HTMLTextAreaElement>(null);
   const trapRef = useRef<HTMLInputElement>(null);
-  const okTitleRef = useRef<HTMLHeadingElement>(null);
   const inView = useInView(formRef, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
   const [nom, setNom] = useState("");
+  const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
   const [budget, setBudget] = useState<BrandBudget | "">("");
   const [errors, setErrors] = useState<Errors>({});
-  const [sending, setSending] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [okShown, setOkShown] = useState(false);
-  const [revealed, setRevealed] = useState(false);
+  // Sur téléphone, le formulaire est plus haut que l'écran : au merci, on remonte pour le voir.
+  const { submit, again, sending, failed, okShown, sent, okRef, okTitleRef } = useContactSubmit({
+    focusDelay: 300,
+    onSent: () => {
+      const form = formRef.current;
+      if (form && form.getBoundingClientRect().top < 0) motion.scrollTo(form, { offset: -88 });
+    },
+  });
 
-  // Le merci apparaît une image après sa mise en place (sa transition part de l'état caché) ; sur mobile, le
-  // formulaire est plus haut que l'écran : on remonte pour le voir, puis son titre prend le focus.
-  useEffect(() => {
-    if (!okShown || revealed) return;
-    const raf = requestAnimationFrame(() => setRevealed(true));
-    const form = formRef.current;
-    if (form && form.getBoundingClientRect().top < 0) motion.scrollTo(form, { offset: -88 });
-    const timer = window.setTimeout(() => okTitleRef.current?.focus({ preventScroll: true }), reduced ? 50 : 300);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.clearTimeout(timer);
-    };
-  }, [okShown, revealed, motion, reduced]);
+  const body = (): ContactRequest => ({
+    type: "marques",
+    nom: nom.trim(),
+    contact: contact.trim(),
+    message: message.trim(),
+    ...(budget && { besoin: budget }),
+    website: trapRef.current?.value ?? "",
+  });
 
   const errorText = (field: FieldName, error: ContactFieldError | undefined) => {
     if (!error) return "";
     if (field === "besoin") return m.errors.budget;
     if (error === "tooLong") return m.errors.tooLong;
+    if (field === "contact") {
+      if (error === "tooShort") return format(m.errors.replyShort, { min: CONTACT_LIMITS.handleMin });
+      return error === "invalid" ? m.errors.replyInvalid : m.errors.reply;
+    }
     return field === "nom" ? m.errors.brand : m.errors.idea;
   };
 
   const focusFirst = (next: Errors) => {
     if (next.nom) nameRef.current?.focus();
+    else if (next.contact) contactRef.current?.focus();
     else if (next.message) ideaRef.current?.focus();
   };
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const next: Errors = {};
-    const nomError = check(nom, CONTACT_LIMITS.nameMin, CONTACT_LIMITS.nameMax);
-    const messageError = check(message, CONTACT_LIMITS.messageMin, CONTACT_LIMITS.messageMax);
-    if (nomError) next.nom = nomError;
-    if (messageError) next.message = messageError;
+    if (sending) return;
+    const next = pick(await submit(body()));
     setErrors(next);
-    if (next.nom || next.message) {
-      focusFirst(next);
-      return;
-    }
-    setSending(true);
-    setFailed(false);
-    const body: ContactRequest = {
-      type: "marques",
-      nom: nom.trim(),
-      message: message.trim(),
-      ...(budget && { besoin: budget }),
-      website: trapRef.current?.value ?? "",
-    };
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const result = (await response.json()) as ContactResponse;
-      if (result.ok) {
-        setOkShown(true);
-      } else if (result.error === "invalid") {
-        const fields: Errors = { nom: result.fields.nom, message: result.fields.message, besoin: result.fields.besoin };
-        setErrors(fields);
-        if (!fields.nom && !fields.message && !fields.besoin) setFailed(true);
-        focusFirst(fields);
-      } else {
-        setFailed(true);
-      }
-    } catch {
-      setFailed(true);
-    } finally {
-      setSending(false);
-    }
+    focusFirst(next);
   };
 
-  const again = () => {
+  const writeAgain = () => {
     setNom("");
+    setContact("");
     setMessage("");
     setBudget("");
     setErrors({});
-    setRevealed(false);
-    window.setTimeout(
-      () => {
-        setOkShown(false);
-        nameRef.current?.focus({ preventScroll: true });
-      },
-      reduced ? 0 : 320,
-    );
+    again(() => nameRef.current?.focus({ preventScroll: true }));
   };
 
-  const onEdit = (field: "nom" | "message", value: string) => {
+  const onEdit = (field: "nom" | "contact" | "message", value: string) => {
     if (field === "nom") setNom(value);
+    else if (field === "contact") setContact(value);
     else setMessage(value);
-    // Un champ en erreur se revérifie à la frappe.
+    // Un champ en erreur se revérifie à la frappe (la même règle qu'à l'envoi).
     if (errors[field]) {
-      const error =
-        field === "nom"
-          ? check(value, CONTACT_LIMITS.nameMin, CONTACT_LIMITS.nameMax)
-          : check(value, CONTACT_LIMITS.messageMin, CONTACT_LIMITS.messageMax);
-      setErrors((current) => ({ ...current, [field]: error ?? undefined }));
+      const error = validateContact({ ...body(), [field]: value })[field];
+      setErrors((current) => ({ ...current, [field]: error }));
     }
   };
 
@@ -164,80 +120,99 @@ export function BrandForm({ labelledBy }: { labelledBy: string }) {
       ref={formRef}
       className={`${bezel.bezel} ${styles.form}`}
       data-in={inView ? "" : undefined}
-      data-sent={revealed ? "" : undefined}
+      data-sent={sent ? "" : undefined}
       noValidate
       aria-labelledby={labelledBy}
-      onSubmit={submit}
+      onSubmit={onSubmit}
     >
       <div className={`${bezel.core} ${styles.core}`}>
-        <div className={styles.body} inert={okShown}>
-          <div className={styles.field}>
-            <label htmlFor={ids.nom}>{m.brand}</label>
-            <input
+        <div className={styles.body} inert={sent}>
+          <FormField label={m.brand} htmlFor={ids.nom} error={errorText("nom", errors.nom)} errorId={`${ids.nom}-err`}>
+            <Input
               ref={nameRef}
-              className={styles.input}
               id={ids.nom}
               name="marque"
               type="text"
               autoComplete="organization"
               placeholder={m.brandPlaceholder}
+              maxLength={CONTACT_LIMITS.nameMax}
               value={nom}
               onChange={(event) => onEdit("nom", event.target.value)}
               aria-invalid={errors.nom ? true : undefined}
               aria-describedby={`${ids.nom}-err`}
             />
-            <p className={styles.error} id={`${ids.nom}-err`} aria-live="polite">
-              {errorText("nom", errors.nom)}
-            </p>
-          </div>
-          <div className={styles.field}>
-            <label htmlFor={ids.message}>{m.idea}</label>
-            <textarea
+          </FormField>
+          <FormField
+            label={m.reply}
+            htmlFor={ids.contact}
+            error={errorText("contact", errors.contact)}
+            errorId={`${ids.contact}-err`}
+          >
+            <Input
+              ref={contactRef}
+              id={ids.contact}
+              name="contact"
+              type="text"
+              inputMode="email"
+              // Un @pseudo n'est pas une adresse : le navigateur ne propose alors plus d'e-mail enregistré.
+              autoComplete={contact.trimStart().startsWith("@") ? "off" : "email"}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={m.replyPlaceholder}
+              maxLength={CONTACT_LIMITS.contactMax}
+              value={contact}
+              onChange={(event) => onEdit("contact", event.target.value)}
+              aria-invalid={errors.contact ? true : undefined}
+              aria-describedby={`${ids.contact}-err`}
+            />
+          </FormField>
+          <FormField
+            label={m.idea}
+            htmlFor={ids.message}
+            error={errorText("message", errors.message)}
+            errorId={`${ids.message}-err`}
+          >
+            <Textarea
               ref={ideaRef}
-              className={styles.input}
               id={ids.message}
               name="idee"
               placeholder={m.ideaPlaceholder}
+              maxLength={CONTACT_LIMITS.messageMax}
               value={message}
               onChange={(event) => onEdit("message", event.target.value)}
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={`${ids.message}-err`}
             />
-            <p className={styles.error} id={`${ids.message}-err`} aria-live="polite">
-              {errorText("message", errors.message)}
-            </p>
-          </div>
-          <fieldset className={styles.field}>
-            <legend>
-              {m.budget} <small>{m.optional}</small>
-            </legend>
-            <div className={styles.choices} aria-invalid={errors.besoin ? true : undefined}>
+          </FormField>
+          <FormField
+            group
+            label={m.budget}
+            hint={m.optional}
+            error={errorText("besoin", errors.besoin)}
+            errorId={`${uid}-budget-err`}
+            className={styles.budget}
+          >
+            <Choices invalid={!!errors.besoin}>
               {BRAND_BUDGET_VALUES.map((value) => (
-                <label key={value} className={styles.choice}>
-                  <input
-                    type="radio"
-                    name="budget"
-                    value={value}
-                    checked={budget === value}
-                    onChange={() => setBudget(value)}
-                  />
-                  <span>{localize(BRAND_BUDGET_LABELS[value], lang)}</span>
-                </label>
+                <Choice
+                  key={value}
+                  name="budget"
+                  value={value}
+                  checked={budget === value}
+                  onChange={() => setBudget(value)}
+                  label={localize(BRAND_BUDGET_LABELS[value], lang)}
+                />
               ))}
-            </div>
-            <p className={styles.error} aria-live="polite">
-              {errorText("besoin", errors.besoin)}
-            </p>
-          </fieldset>
+            </Choices>
+          </FormField>
           <div className={styles.trap} aria-hidden="true">
             <input ref={trapRef} name="website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
           </div>
           <div className={styles.foot}>
-            {failed ? (
-              <p className={styles.failure} role="alert">
-                {m.errors.unavailable}
-              </p>
-            ) : null}
+            <p className={styles.failure} role="status">
+              {failed ? m.errors.unavailable : ""}
+            </p>
             <Button type="submit" disabled={sending}>
               {sending ? m.sending : m.send}
             </Button>
@@ -245,7 +220,7 @@ export function BrandForm({ labelledBy }: { labelledBy: string }) {
         </div>
       </div>
 
-      <div className={styles.ok} hidden={!okShown}>
+      <div ref={okRef} className={styles.ok} hidden={!okShown}>
         <svg className={styles.check} viewBox="0 0 48 48" aria-hidden="true">
           <circle pathLength={1} cx="24" cy="24" r="22" />
           <path pathLength={1} d="M15 24.5l6 6L33.5 18" />
@@ -254,7 +229,7 @@ export function BrandForm({ labelledBy }: { labelledBy: string }) {
           {m.sent.title}
         </h3>
         <p>{m.sent.text}</p>
-        <Button variant="ghost" size="sm" icon="arrow-right" onClick={again}>
+        <Button variant="ghost" size="sm" icon="arrow-right" onClick={writeAgain}>
           {m.sent.again}
         </Button>
       </div>

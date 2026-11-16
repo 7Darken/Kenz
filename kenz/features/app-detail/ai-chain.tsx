@@ -8,9 +8,9 @@
 import { useRef, type CSSProperties } from "react";
 
 import type { AppStep } from "@/content/apps";
-import { ScrollTrigger } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { ScrollTrigger } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./ai-chapter.module.css";

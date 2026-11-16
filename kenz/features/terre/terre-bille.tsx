@@ -7,12 +7,14 @@
  * - Un emplacement `data-bille="libre"` : la rotation lente, l'Asie face à nous, aucun pays allumé.
  * - Tout autre emplacement : la bille se tourne vers `focus` (le pays un peu au-dessus du centre) et l'allume ;
  *   sans `focus`, comme un emplacement libre.
+ * Comme le globe de /createur, elle annonce son premier rendu à features/passages (l'éclat d'une plongée s'y dissipe).
  */
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { EscaleId } from "@/content/series";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
+import { announceTerreReady } from "@/features/passages";
 import type { Globe, GlobeMode } from "./engine/globe";
 import { STOPS } from "./stops";
 import styles from "./terre-layer.module.css";
@@ -64,6 +66,11 @@ export function TerreBille({ focus = null }: TerreBilleProps) {
   const onGlobe = useCallback((g: Globe | null) => {
     setGlobe(g);
     if (!g) setMode(null);
+  }, []);
+
+  const onReady = useCallback((ready: GlobeMode) => {
+    setMode(ready);
+    announceTerreReady();
   }, []);
 
   /* Tourner la bille : vers le pays visé, ou la rotation lente sur l'Asie */
@@ -147,7 +154,7 @@ export function TerreBille({ focus = null }: TerreBilleProps) {
           observe={observe}
           classNames={CLASS_NAMES}
           onGlobe={onGlobe}
-          onReady={setMode}
+          onReady={onReady}
         />
       ) : null}
     </div>

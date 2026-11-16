@@ -51,10 +51,11 @@
     linear-gradient(180deg, #ECEFF0, rgba(245, 243, 239, 0) 72%);
 }
 
-/* L'arche : sa lumière (couleur de l'app) monte du sol, puis le fil la dessine */
+/* L'arche : sa lumière (couleur de l'app) monte du sol, puis le fil la dessine (2,6 s ; sol à -34 %, dans arrival.tsx) */
 .arche {
   --fil-delay: .95s;
   --shadow-delay: 1.25s;
+  --floor-delay: .8s;
   position: absolute;
   left: 50%;
   bottom: 0;

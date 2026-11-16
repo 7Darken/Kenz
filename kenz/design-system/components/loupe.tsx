@@ -3,6 +3,9 @@
 /**
  * La loupe, montée une fois par univers : toute image ou capture marquée `data-loupe` devient agrandissable
  * à la souris (×1,1 ; `data-loupe="1.15"` change l'échelle, `data-loupe-taille="200"` le diamètre en px).
+ * `data-loupe-source` sur un descendant de l'hôte (l'option `source` de theme.js) : la lentille grossit ce descendant,
+ * recloné à chaque entrée et suivi à chaque image (ex. la page qui défile dans une fenêtre de navigateur), tant que la
+ * souris reste sur l'hôte.
  * Une seule lentille pour la page, branchée par délégation : rien à faire dans les modules.
  * Souris seulement (jamais au toucher), jamais en mouvement réduit. Portage fidèle de shared/theme.js §6.
  */
@@ -51,6 +54,8 @@ function isVisible(el: Element) {
 
 interface Active {
   host: HTMLElement;
+  /** L'élément recloné : l'hôte, ou son descendant `[data-loupe-source]`. */
+  source: HTMLElement;
   node: HTMLElement;
   scale: number;
   w: number;
@@ -110,21 +115,26 @@ export function Loupe() {
       a.x += (a.tx - a.x) * 0.24;
       a.y += (a.ty - a.y) * 0.24;
       body.style.transform = `translate3d(${f1(a.x - a.radius)}px,${f1(a.y - a.radius)}px,0)`;
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
+      const rs = a.source === a.host ? r : a.source.getBoundingClientRect();
+      const cx = rs.left + rs.width / 2;
+      const cy = rs.top + rs.height / 2;
       const qx = a.radius - a.scale * (a.x - cx);
       const qy = a.radius - a.scale * (a.y - cy);
       a.node.style.transform = `translate(${f1(qx - a.w / 2)}px,${f1(qy - a.h / 2)}px) rotate(${a.angle.toFixed(4)}rad) scale(${(a.scale * a.k).toFixed(4)})`;
-      if (Math.abs(a.tx - a.x) > 0.3 || Math.abs(a.ty - a.y) > 0.3) raf = requestAnimationFrame(draw);
+      // Une source qui bouge seule (la page qui défile sous la souris) : la lentille la suit à chaque image.
+      const moving = a.source !== a.host;
+      if (moving || Math.abs(a.tx - a.x) > 0.3 || Math.abs(a.ty - a.y) > 0.3) raf = requestAnimationFrame(draw);
     };
 
     const start = (host: HTMLElement, x: number, y: number) => {
       stop();
       const scaleAttr = Number.parseFloat(host.dataset.loupe ?? "");
       const sizeAttr = Number.parseFloat(host.dataset.loupeTaille ?? "");
-      const node = host.cloneNode(true) as HTMLElement;
+      const source = host.querySelector<HTMLElement>("[data-loupe-source]") ?? host;
+      const node = source.cloneNode(true) as HTMLElement;
       node.removeAttribute("id");
       node.removeAttribute("data-loupe");
+      node.removeAttribute("data-loupe-source");
       node.querySelectorAll("[id]").forEach((child) => child.removeAttribute("id"));
       node.querySelectorAll("[data-loupe]").forEach((child) => child.removeAttribute("data-loupe"));
       const images = node instanceof HTMLImageElement ? [node] : Array.from(node.querySelectorAll("img"));
@@ -135,17 +145,18 @@ export function Loupe() {
       });
       node.classList.add(styles.clone);
       node.setAttribute("aria-hidden", "true");
-      const w = host.offsetWidth;
-      const h = host.offsetHeight;
+      const w = source.offsetWidth;
+      const h = source.offsetHeight;
       node.style.width = `${w}px`;
       node.style.height = `${h}px`;
       inner.replaceChildren(node);
       if (sizeAttr > 60) body.style.setProperty("--lt", `${sizeAttr}px`);
       else body.style.removeProperty("--lt");
-      const { angle, scale: k } = pose(host);
+      const { angle, scale: k } = pose(source);
       const hidesCursor = !host.matches("a, button, [role='button']") && !host.querySelector("a, button, input, textarea, select");
       active = {
         host,
+        source,
         node,
         scale: scaleAttr > 1 && scaleAttr < 2 ? scaleAttr : 1.1,
         w,

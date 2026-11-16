@@ -7,7 +7,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import styles from "./arch.module.css";
 
 const f1 = (v: number) => Math.round(v * 10) / 10;

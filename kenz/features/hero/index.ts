@@ -8,5 +8,9 @@
  *   - `behind` : un calque posé entre le paysage et l'arche (côté Créateur : l'horizon de la Terre).
  * Composant serveur ; c'est le chapitre `#top` de la page (aura « droite », sans trait du fil).
  * L'arrivée se joue au chargement, ou à la fin d'un passage (`passage:arrivee`, `porte:arrivee`).
+ *
+ * `setHeroFade(hero, value)` : côté Créateur, le paysage et la scène du portrait suivent un fondu piloté de l'extérieur
+ * (l'écran statique « vu une fois » de features/terre), au lieu du défilement ; `null` rend la main au défilement.
  */
 export { Hero, type HeroProps } from "./hero";
+export { setHeroFade } from "./hero-fade";

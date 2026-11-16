@@ -9,10 +9,12 @@
  * - Vu une fois (sessionStorage « kz-terre-vu ») : dès la dernière escale atteinte (ou si l'on arrive plus bas), le
  *   trajet n'est plus épinglé ni piloté. La section devient un écran statique, mis en page comme l'écran épinglé : le
  *   globe avec tous ses arcs, la liste compacte des escales (cliquable : le globe tourne vers le pays). Le hero ne
- *   rejoue plus le dézoom : deux compositions fixes, « hero » et « voyage », reliées par un fondu court.
+ *   rejoue plus le dézoom : deux compositions fixes, « hero » et « voyage », reliées par un fondu court (le globe, son
+ *   ciel, et le paysage et la scène du portrait du hero, par `setHeroFade` de features/hero).
  * - Mouvement réduit : pas d'épinglage, une liste ; le globe (l'image de repli) reste dans le hero, puis s'efface.
  * Le ciel suit l'opacité du globe : il s'efface avec lui après le trajet, et dans le fondu de l'écran statique.
  */
+import { setHeroFade } from "@/features/hero";
 import type { Globe, GlobeArc, GlobeFrame, LatLon } from "./engine/globe";
 import { HERO_DRIFT, HERO_VIEW, STOPS } from "./stops";
 
@@ -325,8 +327,10 @@ export function createJourney(el: JourneyElements, options: JourneyOptions): Jou
     }
     placeSeen(window.scrollY, true);
   }
+  /** Le globe, son ciel, et le paysage et le portrait du hero (seulement quand le hero est la composition montrée). */
   function seenOpacities() {
     layerOpacity(fade);
+    setHeroFade(hero, shownZone === "hero" ? fade : 0);
   }
   /* Le fondu : l'ancienne composition s'efface (0,14 s), la nouvelle est posée, elle apparaît (0,3 s) */
   function fadeStep(t: number) {
@@ -553,6 +557,7 @@ export function createJourney(el: JourneyElements, options: JourneyOptions): Jou
       section.removeAttribute("data-pin");
       section.removeAttribute("data-vu");
       section.style.removeProperty("height");
+      setHeroFade(hero, null);
       stage.style.removeProperty("--va");
       if (sky) {
         sky.style.removeProperty("opacity");

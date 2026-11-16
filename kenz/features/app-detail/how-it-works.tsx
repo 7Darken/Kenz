@@ -6,26 +6,40 @@
  *   l'horizontale le long du fil, et chaque nœud qui passe fait avancer l'animation.
  * - Ailleurs : l'animation se joue une fois à l'entrée à l'écran, la légende suit ; « Rejouer » à la fin.
  * - Mouvement réduit : l'état final, tout de suite.
+ * La scène de l'app (son écran, sa timeline, sa teinte) arrive de ./scenes : chacune est chargée à part
+ * (voir ./scenes/registry), et monte ce chapitre autour de son écran.
  */
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 import type { App } from "@/content/apps";
 import { Container } from "@/design-system/components/container";
 import { Icon } from "@/design-system/components/icon";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
-import { gsap, ScrollTrigger } from "@/features/motion/gsap";
+import { SweepTitle } from "@/design-system/components/sweep-title";
+import { gsap, ScrollTrigger } from "@/design-system/motion/gsap";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import page from "./app-detail.module.css";
 import styles from "./how-it-works.module.css";
 import kit from "./scenes/scene.module.css";
-import { SCENES } from "./scenes/registry";
-import { SweepTitle } from "./sweep-title";
+import type { SceneBuilder } from "./scenes/scene-kit";
 
 const PIN_QUERY = "(min-width: 900px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)";
 
-export function HowItWorks({ app }: { app: App }) {
+interface HowItWorksProps {
+  app: App;
+  /** Construit la timeline de la scène à partir de son écran. */
+  build: SceneBuilder;
+  /** La teinte de l'écran (--tint, --sc-a, --sc-b), clair et sombre. */
+  tint: string;
+  /** « exemple » : en bas, en haut, ou absent (rien d'inventé à signaler). */
+  sample: "bottom" | "top" | null;
+  /** Le contenu de l'écran. */
+  children: ReactNode;
+}
+
+export function HowItWorks({ app, build, tint, sample, children }: HowItWorksProps) {
   const pinRef = useRef<HTMLDivElement>(null);
   const winRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -35,8 +49,6 @@ export function HowItWorks({ app }: { app: App }) {
   const replayRef = useRef<HTMLButtonElement>(null);
   const replayAction = useRef<(() => void) | null>(null);
   const { lang, t } = useLanguage();
-  const entry = SCENES[app.slug];
-  const { Content } = entry;
   const beats = app.story.beats;
 
   useLayoutEffect(() => {
@@ -56,7 +68,7 @@ export function HowItWorks({ app }: { app: App }) {
     const mm = gsap.matchMedia(pin);
     mm.add({ pin: PIN_QUERY, reduced: "(prefers-reduced-motion: reduce)", all: "(min-width: 0px)" }, (context) => {
       const { pin: pinned, reduced } = context.conditions as { pin: boolean; reduced: boolean };
-      const tl = entry.build(core);
+      const tl = build(core);
       if (reduced) {
         tl.progress(1, true);
         return;
@@ -154,13 +166,13 @@ export function HowItWorks({ app }: { app: App }) {
       mm.revert();
       captions.forEach((li) => li.removeAttribute("data-on"));
     };
-  }, [entry, beats, lang]);
+  }, [build, beats, lang]);
 
   return (
     <Section id="comment" className={styles.how} aura="droite" aria-labelledby="comment-titre">
       <div ref={pinRef} className={styles.pin}>
         <Container className={styles.inner}>
-          <SweepTitle id="comment-titre" className={`${page.h2} ${styles.title}`}>
+          <SweepTitle variant="pro" id="comment-titre" className={`${page.h2} ${styles.title}`}>
             {t.apps.how.title}
           </SweepTitle>
           <div ref={winRef} className={styles.win}>
@@ -176,12 +188,12 @@ export function HowItWorks({ app }: { app: App }) {
             </div>
           </div>
           <Reveal variant="card" className={styles.stage}>
-            <div ref={sceneRef} className={`${kit.sc} ${styles.scene} ${entry.className}`}>
+            <div ref={sceneRef} className={`${kit.sc} ${styles.scene} ${tint}`}>
               <div className={kit.view}>
                 <div ref={coreRef} className={kit.core} role="img" aria-label={localize(app.story.demoAlt, lang)}>
-                  <Content />
-                  {entry.sample ? (
-                    <span className={entry.sample === "top" ? `${kit.ex} ${kit.exTop}` : kit.ex}>{t.apps.scenes.sample}</span>
+                  {children}
+                  {sample ? (
+                    <span className={sample === "top" ? `${kit.ex} ${kit.exTop}` : kit.ex}>{t.apps.scenes.sample}</span>
                   ) : null}
                 </div>
               </div>

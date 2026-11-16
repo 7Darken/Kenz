@@ -10,7 +10,6 @@
  */
 import { useRef, type MouseEvent } from "react";
 
-import { apps } from "@/content/apps";
 import { ROUTES } from "@/content/site";
 import { startupWeekend } from "@/content/startup-weekend";
 import { Button } from "@/design-system/components/button";
@@ -22,7 +21,7 @@ import { localize } from "@/i18n/localize";
 import { ClockDigits, MiniClock } from "./clock-digits";
 import { CrowdWall } from "./crowd-wall";
 import { DesignDesk } from "./design-desk";
-import { PASSAGE_ICON } from "./escapades-symbol";
+import { PASSAGE_ICON } from "./passage-icon";
 import { Podium } from "./podium";
 import { SplitWords } from "./split-words";
 import { useVictoireMotion } from "./use-victoire-motion";
@@ -31,7 +30,6 @@ import { H14, H30, H54 } from "./victoire-geometry";
 import { VictoryArch } from "./victory-arch";
 
 const sw = startupWeekend;
-const project = apps[sw.project];
 const host = sw.site.replace(/^https?:\/\//, "").replace(/\/$/, "");
 const year = sw.dates.start.slice(0, 4);
 
@@ -153,7 +151,7 @@ export function VictoireStage() {
                   </span>
                 </p>
                 <p className={styles.uneName} data-kv="une-name">
-                  {project.name}
+                  {sw.projectName}
                 </p>
                 <p className={styles.uneLabel} data-kv="une-label">
                   {sw.result.rank}
@@ -180,7 +178,7 @@ export function VictoireStage() {
               check={{ image: sw.photos.check, alt: localize(sw.photos.check.alt, lang) }}
               credit={format(v.win.credit, { credit: sw.photos.win.credit ?? "" })}
             />
-            <Podium project={project.name} label={format(v.win.podiumLabel, { project: project.name })} />
+            <Podium project={sw.projectName} label={format(v.win.podiumLabel, { project: sw.projectName })} />
           </div>
         </div>
       </div>

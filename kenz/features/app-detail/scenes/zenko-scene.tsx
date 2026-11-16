@@ -3,10 +3,12 @@
 /** Zenko : le curseur du budget glisse de 40 € à 25 €, et le matin, l'après-midi et le soir se recomposent (exemple). */
 import type { CSSProperties } from "react";
 
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import kit from "./scene.module.css";
 import { all, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./zenko-scene.module.css";
 
 /** Le budget d'exemple : de 40 à 25. */
@@ -123,3 +125,12 @@ export const buildZenko: SceneBuilder = (el) => {
     .to(after, { rotationX: 0, opacity: 1, duration: 0.8, stagger: 0.14 }, 2)
     .to(costs, { scaleX: (i: number) => share(i, "c2"), duration: 1, stagger: 0.14 }, 1.9);
 };
+
+/** « Comment ça marche » de Zenko, monté autour de son écran (chargé à part : ./registry). */
+export default function ZenkoChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildZenko} tint={styles.scene} sample={"bottom"}>
+      <ZenkoScene />
+    </HowItWorks>
+  );
+}

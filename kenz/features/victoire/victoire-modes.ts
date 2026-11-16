@@ -8,7 +8,7 @@
  */
 import type Lenis from "lenis";
 
-import { gsap, ScrollTrigger } from "@/features/motion/gsap";
+import { gsap, ScrollTrigger } from "@/design-system/motion/gsap";
 
 import { H14, H30, H54, PIN_SCREENS } from "./victoire-geometry";
 import {

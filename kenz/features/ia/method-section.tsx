@@ -10,24 +10,21 @@ import { IA_METHOD_STEPS } from "@/content/ia";
 import { Container } from "@/design-system/components/container";
 import { Rich } from "@/design-system/components/rich";
 import { Section } from "@/design-system/components/section";
-import { ScrollTrigger } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useInView } from "@/features/motion/use-in-view";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { SweepTitle } from "@/design-system/components/sweep-title";
+import { ScrollTrigger } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
-import { SectionTitle } from "./section-title";
 import styles from "./method-section.module.css";
+import heading from "./section-title.module.css";
 
 /** La progression (0 → 1) à laquelle chaque étape s'allume : en ligne (≥ 900 px), puis en colonne. */
 const LIT_AT = { row: [0.01, 0.35, 0.69], column: [0.01, 0.45, 0.9] } as const;
 
 export function MethodSection() {
   const { t, lang } = useLanguage();
-  const titleBoxRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  // Le titre est masqué par son balayage : on observe sa boîte, qui ne l'est pas.
-  const titleIn = useInView(titleBoxRef);
   const reduced = useReducedMotion();
 
   useGsap(
@@ -68,10 +65,11 @@ export function MethodSection() {
   return (
     <Section id="methode" aura="calme" className={styles.section} aria-labelledby="methode-t">
       <Container>
-        <div ref={titleBoxRef}>
-          <SectionTitle id="methode-t" className={styles.title} data-in={titleIn ? "" : undefined}>
+        {/* La boîte du titre : le balayage l'observe (le titre rogné, lui, ne franchit aucun seuil). */}
+        <div>
+          <SweepTitle variant="pro" id="methode-t" className={heading.title}>
             {t.agents.method.title}
-          </SectionTitle>
+          </SweepTitle>
         </div>
         <div ref={listRef} className={styles.list}>
           <span className={styles.line} aria-hidden="true">

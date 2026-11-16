@@ -4,6 +4,8 @@
  * La fiche d'une course, compacte (≈ 680 px, une feuille qui monte du bas sur mobile), sur le Dialog du design
  * system : la date et le lieu, le titre, « Fermer » ; la scène animée qui explique le sport ; une ou deux phrases ;
  * les photos en vignettes (une vignette cliquée s'agrandit dans la fiche) ; la vidéo.
+ * Photo agrandie : Échap, ou un clic sur elle, la réduit d'abord ; Échap une seconde fois, ou un clic sur le fond de la
+ * page, ferme la fiche (shared/courses.js).
  * La photo cliquée dans la composition vole jusqu'à sa vignette (Web Animations). Mouvement réduit : ni vol ni
  * agrandissement animé, la scène est figée dans son état final.
  */
@@ -13,8 +15,8 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties
 import { COURSE_SCENES, COURSES, type CourseId } from "@/content/courses";
 import { Dialog } from "@/design-system/components/dialog";
 import { Icon } from "@/design-system/components/icon";
-import { CSS_EASE } from "@/features/motion/easings";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { CSS_EASE } from "@/design-system/motion/easings";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
@@ -127,7 +129,7 @@ export function CourseDialog({ detail, open, onClose }: CourseDialogProps) {
   return (
     <Dialog
       open={open}
-      onClose={() => (zoomIndex !== null ? shrink() : onClose())}
+      onClose={(reason) => (reason === "escape" && zoomIndex !== null ? shrink() : onClose())}
       labelledBy={titleId}
       variant="sheet"
       closeButton={false}

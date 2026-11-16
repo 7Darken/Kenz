@@ -1,4 +1,5 @@
-/* Sélecteur FR / EN segmenté (repris de l'ancien LanguageToggle) : une pastille glisse sous la langue active */
+/* Sélecteur FR / EN segmenté (repris de l'ancien LanguageToggle) : une pastille glisse sous la langue active.
+   --lang-h : la hauteur d'une option (36 px ; le pied de page la réduit sur téléphone). */
 .toggle {
   position: relative;
   display: inline-flex;
@@ -29,7 +30,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 36px;
+  min-height: var(--lang-h, 36px);
   padding: 0 10px;
   border-radius: var(--r-pill);
   font-size: 12px;

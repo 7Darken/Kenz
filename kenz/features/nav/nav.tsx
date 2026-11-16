@@ -9,17 +9,22 @@
  * - k15ze : le retour « Création de contenu ».
  * `dot` : le point du logo. Par défaut un simple point ; côté Créateur, features/passages y branche le cordon.
  * Aucun lien visible vers l'autre univers.
+ * L'arrivée (app.html, agents.html, voyage.html, sport.html) : sur une page d'app, sur /agents et sur les pages
+ * d'univers, la barre apparaît en fondu quand la page arrive (au chargement, ou quand le voile du passage se lève :
+ * `usePassageArrival` de features/passages), 1,4 s après sur une page d'app ; pendant l'arrivée d'un passage,
+ * le retour reste masqué (shared/passage.css, `.kz-passage-arrivee .kz-back`).
  */
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
-import { apps, isAppSlug } from "@/content/apps";
+import type { NavApp } from "@/content/apps";
 import { passageAttributes, ROUTES, type Universe } from "@/content/site";
 import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
+import { usePassageArrival } from "@/features/passages";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import styles from "./nav.module.css";
@@ -29,9 +34,20 @@ interface NavProps {
   variant: Universe;
   /** Le point du logo (ex. le cordon, branché par features/passages). */
   dot?: ReactNode;
+  /** Pro : les apps (nom, type, icône), passées par le layout serveur pour ne pas embarquer content/apps. */
+  apps?: Readonly<Record<string, NavApp>>;
 }
 
 const STORY_IDS = ["top", "voyage", "sport", "suivre"] as const;
+
+/** Le fondu d'arrivée de la barre : `app` (1,4 s après l'arrivée), `page` (0,2 s après), ou aucun (accueils). */
+type NavFade = "app" | "page" | null;
+
+function navFade(variant: Universe, pathname: string, isApp: boolean): NavFade {
+  if (isApp) return "app";
+  if (variant === "pro") return pathname === ROUTES.agents ? "page" : null;
+  return pathname === ROUTES.createur ? null : "page";
+}
 
 /* Le voile de la nav apparaît dès qu'on a quitté le haut de la page. */
 const subscribeScroll = (onChange: () => void) => {
@@ -45,7 +61,7 @@ const useScrolled = () =>
     () => false,
   );
 
-export function Nav({ variant, dot }: NavProps) {
+export function Nav({ variant, dot, apps }: NavProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const scrolled = useScrolled();
@@ -53,7 +69,17 @@ export function Nav({ variant, dot }: NavProps) {
 
   const isCreateurHome = variant === "createur" && pathname === ROUTES.createur;
   const appSlug = variant === "pro" ? pathname.match(/^\/apps\/([^/]+)/)?.[1] : undefined;
-  const app = appSlug && isAppSlug(appSlug) ? apps[appSlug] : undefined;
+  const app = appSlug && apps && Object.hasOwn(apps, appSlug) ? apps[appSlug] : undefined;
+  const fade = navFade(variant, pathname, !!app);
+  const { via, ready } = usePassageArrival();
+  // La page arrivée (son chemin) : la barre apparaît une image après, et disparaît d'un coup à la page suivante.
+  const [arrivedPath, setArrivedPath] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!fade || !ready) return;
+    const frame = requestAnimationFrame(() => setArrivedPath(pathname));
+    return () => cancelAnimationFrame(frame);
+  }, [fade, ready, pathname]);
   const storyChapters = useMemo<StoryChapter[]>(
     () => STORY_IDS.map((id) => ({ id, label: t.createur.chapters[id] })),
     [t],
@@ -63,18 +89,32 @@ export function Nav({ variant, dot }: NavProps) {
   const homeHref = variant === "pro" ? ROUTES.home : ROUTES.createur;
   const logoHref = pathname === homeHref ? "#top" : homeHref;
   const logoPassage = variant !== "pro" && pathname !== homeHref ? passageAttributes("createur") : undefined;
+  const logo = <>Kenz{dot ?? <span className={styles.dot} aria-hidden="true" />}</>;
 
   const cls = [styles.nav, isCreateurHome && styles.withStory].filter(Boolean).join(" ");
 
   return (
-    <header className={cls} data-scrolled={scrolled ? "" : undefined}>
+    <header
+      className={cls}
+      data-scrolled={scrolled ? "" : undefined}
+      data-fade={fade ?? undefined}
+      data-in={fade && arrivedPath === pathname ? "" : undefined}
+      data-arriving={via && !ready ? "" : undefined}
+    >
       {isCreateurHome ? (
         <StoryBar chapters={storyChapters} label={t.common.nav.chapters} onChapterChange={setChapterIndex} />
       ) : null}
       <div className={styles.inner}>
-        <Link className={styles.logo} href={logoHref} {...logoPassage}>
-          Kenz{dot ?? <span className={styles.dot} aria-hidden="true" />}
-        </Link>
+        {logoHref === "#top" ? (
+          // Sur l'accueil, une ancre simple : MotionProvider remonte en douceur (next/link prendrait le clic).
+          <a className={styles.logo} href={logoHref}>
+            {logo}
+          </a>
+        ) : (
+          <Link className={styles.logo} href={logoHref} {...logoPassage}>
+            {logo}
+          </Link>
+        )}
 
         {isCreateurHome ? (
           <p className={styles.chapter} aria-hidden="true">
@@ -96,9 +136,9 @@ export function Nav({ variant, dot }: NavProps) {
 
         <ThemeToggle />
 
-        {app?.kind === "mobile" ? (
+        {app?.kind === "mobile" && app.icon ? (
           <a className={styles.app} href="#action" aria-label={format(t.common.nav.tryAppLabel, { app: app.name })}>
-            <Image src={app.icon.src} alt="" width={34} height={34} sizes="34px" />
+            <Image src={app.icon} alt="" width={34} height={34} sizes="34px" />
             <span>{t.common.nav.tryApp}</span>
           </a>
         ) : null}

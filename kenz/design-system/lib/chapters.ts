@@ -5,7 +5,7 @@
  * quand la hauteur de la page change, au chargement des polices et à chaque refresh de ScrollTrigger.
  * Les épinglages (ScrollTrigger, .pin-spacer) sont pris en compte.
  */
-import { ScrollTrigger } from "@/features/motion/gsap";
+import { ScrollTrigger } from "@/design-system/motion/gsap";
 
 export interface ChapterBox {
   el: HTMLElement;

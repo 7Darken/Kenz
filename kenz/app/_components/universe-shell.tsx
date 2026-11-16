@@ -5,6 +5,7 @@
  */
 import type { ReactNode } from "react";
 
+import type { NavApp } from "@/content/apps";
 import type { Universe } from "@/content/site";
 import { Aura } from "@/design-system/components/aura";
 import { Fil } from "@/design-system/components/fil";
@@ -21,17 +22,19 @@ interface UniverseShellProps {
   universe: Universe;
   navDot?: ReactNode;
   sky?: ReactNode;
+  /** Pro : les apps vues par la nav (voir `navApps`). */
+  navApps?: Readonly<Record<string, NavApp>>;
   children: ReactNode;
 }
 
-export function UniverseShell({ universe, navDot, sky, children }: UniverseShellProps) {
+export function UniverseShell({ universe, navDot, sky, navApps, children }: UniverseShellProps) {
   return (
     <div data-univers={universe}>
       <SkipLink target={MAIN_ID} />
       <Aura />
       <Fil />
       <Loupe />
-      <Nav variant={universe} dot={navDot} />
+      <Nav variant={universe} dot={navDot} apps={navApps} />
       <main id={MAIN_ID} className={styles.main} tabIndex={-1}>
         {children}
       </main>

@@ -3,13 +3,21 @@
  * L'entrée apparaît, le jeton de lumière avance de station en station (moins d'une seconde chacune),
  * puis s'arrête à « Vous validez » : rien ne bouge jusqu'à `approve()`. Alors la sortie apparaît.
  * Aperçu : la validation se fait seule après un temps lisible, puis la boucle repart en douceur
- * tant que la machine est à l'écran. Mouvement réduit : pas de trajet, l'état final.
+ * deux fois tant que la machine est à l'écran, puis elle garde l'état final (pas de mouvement sans fin, WCAG 2.2.2 ;
+ * elle rejoue si elle revient à l'écran). Mouvement réduit : pas de trajet, l'état final.
  *
  * Le rendu lit `SceneState` ; ce module ne touche pas au DOM (sauf le focus, demandé par `focusReplay`).
  */
-import { IA_CASES, type IaCaseId } from "@/content/ia";
+import type { IaCase, IaCaseId, IaCaseMap } from "@/content/ia";
 
 export type MachineMode = "complete" | "preview";
+
+/** Le cas `id` d'une sélection ; son absence est une erreur de programmation. */
+export function caseOf(cases: IaCaseMap, id: IaCaseId): IaCase {
+  const found = cases[id];
+  if (!found) throw new Error(`machine : cas « ${id} » absent`);
+  return found;
+}
 
 /** repos → marche → attente (du visiteur) → fait. */
 type Phase = "rest" | "running" | "waiting" | "done";
@@ -73,10 +81,14 @@ const FIRST_STEP_MS = 760;
 const TOKEN_IN_MS = 560;
 /** Temps de lecture avant que la machine démarre, à son entrée à l'écran. */
 const START_DELAY_MS: Readonly<Record<MachineMode, number>> = { complete: 600, preview: 300 };
+/** Aperçu : le nombre de passages tant qu'il reste à l'écran. */
+const PREVIEW_PLAYS = 2;
 
 interface StoryOptions {
   mode: MachineMode;
   caseId: IaCaseId;
+  /** Les cas jouables (pour le nombre de stations). */
+  cases: IaCaseMap;
   update: (next: (scene: SceneState) => SceneState) => void;
   /** Le focus est-il sur « Valider » (ou perdu) ? Alors « Rejouer » le reprendra. */
   approveHadFocus: () => boolean;
@@ -98,10 +110,12 @@ export interface MachineStory {
 
 const prefersReduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export function createMachineStory({ mode, caseId: initialCase, update, approveHadFocus }: StoryOptions): MachineStory {
+export function createMachineStory({ mode, caseId: initialCase, cases, update, approveHadFocus }: StoryOptions): MachineStory {
   let caseId = initialCase;
   let phase: Phase = "rest";
   let visible = false;
+  /** Aperçu : les passages joués depuis son entrée à l'écran. */
+  let plays = 0;
   let timers: number[] = [];
   let frames: number[] = [];
 
@@ -119,11 +133,12 @@ export function createMachineStory({ mode, caseId: initialCase, update, approveH
     timers = [];
     frames = [];
   };
-  const stationCount = () => IA_CASES[caseId].steps.length;
+  const stationCount = () => caseOf(cases, caseId).steps.length;
 
   function mount() {
     stop();
     phase = "rest";
+    plays = 0;
     update((scene) => restingScene(caseId, scene.key + 1));
   }
 
@@ -174,8 +189,9 @@ export function createMachineStory({ mode, caseId: initialCase, update, approveH
     after(reduced ? 0 : 520, () => patch({ lit: n + 1, output: true, announcement: "done" }));
     if (mode === "complete") {
       after(reduced ? 300 : 1700, () => patch({ replay: true, focusReplay: approveHadFocus() }));
-    } else if (!reduced) {
+    } else if (!reduced && ++plays < PREVIEW_PLAYS) {
       // Boucle douce : on laisse lire, on efface, puis on repart (ou on se remet au repos hors de l'écran).
+      // Au dernier passage, la sortie reste à l'écran.
       after(4200, () => patch({ ending: true }));
       after(4900, () => (visible ? play() : mount()));
     }

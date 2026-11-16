@@ -6,13 +6,13 @@ import type { App } from "@/content/apps";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import { Words } from "@/design-system/components/words";
 import { T } from "@/i18n/text";
 import { AiChain } from "./ai-chain";
 import styles from "./ai-chapter.module.css";
 import page from "./app-detail.module.css";
 import { Engine } from "./engine";
-import { SweepTitle } from "./sweep-title";
 
 const TITLE_ID = "ia-titre";
 
@@ -45,7 +45,7 @@ export function AiChapter({ app }: { app: App }) {
   return (
     <Section id="ia" className={web ? `${styles.ai} ${styles.role}` : styles.ai} aura="gauche" aria-labelledby={TITLE_ID}>
       <Container>
-        <SweepTitle id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
+        <SweepTitle variant="pro" id={TITLE_ID} className={`${page.h2} ${styles.title}`}>
           {web ? <T value={app.story.role.title} /> : <T k="apps.ai.title" />}
         </SweepTitle>
         <Body app={app} />

@@ -56,11 +56,11 @@ export function Hero({ variant, behind }: HeroProps) {
           <div className={styles.copy} data-hero-copy="">
             <h1 className={styles.title} id={TITLE_ID} data-hero-avoid="">
               <span className={`${styles.ttl} ${styles.ttlMain}`}>
-                <T k="pro.hero.title" />
+                <T k={config.title} />
                 <span className={styles.dot} aria-hidden="true" />
               </span>
               <span className={`${styles.ttl} ${styles.ttlGhost}`} aria-hidden="true">
-                <T k="pro.hero.title" />
+                <T k={config.title} />
                 <span className={styles.dot} />
               </span>
             </h1>

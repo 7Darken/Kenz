@@ -4,13 +4,16 @@
  * « La machine » (maquettes/v6/shared/ia.*) : l'entrée réelle → des stations simples → « Vous validez » → la sortie réelle.
  * - `complete` (/agents) : le choix parmi les quatre vrais cas, la machine, « Dans la vraie vie », « Rejouer ».
  *   Elle joue une fois à son entrée à l'écran ; le visiteur valide lui-même.
- * - `preview` (accueil Pro) : un seul cas, joué en boucle douce tant qu'il est à l'écran, puis « Voir comment ».
+ * - `preview` (accueil Pro) : un seul cas, joué deux fois tant qu'il est à l'écran, puis « Voir comment ».
+ *   Il se joue tout seul : pas de région `aria-live` (les annonces sont pour le mode complet, que le visiteur
+ *   déclenche lui-même).
+ * Les cas arrivent du serveur (`cases`) : ce composant client n'importe pas content/ia.
  * Le minutage est dans ./machine-story ; ici, le rendu, la géométrie du jeton et les commandes.
  * Disposition par la largeur de la machine (conteneur « kzia ») : verticale sous 420 px, horizontale au-delà.
  */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { IA_CASE_IDS, IA_CASES, type IaCaseId } from "@/content/ia";
+import type { IaCase, IaCaseId, IaCaseMap } from "@/content/ia";
 import { passageAttributes } from "@/content/site";
 import { Button } from "@/design-system/components/button";
 import { Container } from "@/design-system/components/container";
@@ -23,20 +26,29 @@ import { localize } from "@/i18n/localize";
 import { IaInput } from "./ia-input";
 import { IaOutput } from "./ia-output";
 import { IaPictogram } from "./ia-picto";
-import { createMachineStory, restingScene, type MachineMode, type MachineStory, type SceneState } from "./machine-story";
+import {
+  caseOf,
+  createMachineStory,
+  restingScene,
+  type MachineMode,
+  type MachineStory,
+  type SceneState,
+} from "./machine-story";
 import { useArrival } from "./use-arrival";
 import styles from "./ia-machine.module.css";
 
 interface IaMachineProps {
   mode: MachineMode;
   caseId: IaCaseId;
+  /** Les cas jouables, dans l'ordre des choix (aperçu : le seul cas joué). */
+  cases: IaCaseMap;
   /** Aperçu : la cible de « Voir comment » (vide : pas de lien). */
   href?: string;
 }
 
 const flag = (on: boolean) => (on ? "" : undefined);
 
-export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
+export function IaMachine({ mode, caseId, cases, href = "" }: IaMachineProps) {
   const { t, lang } = useLanguage();
   const [scene, setScene] = useState<SceneState>(() => restingScene(caseId));
   const storyRef = useRef<MachineStory | null>(null);
@@ -57,6 +69,7 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
     const story = createMachineStory({
       mode,
       caseId,
+      cases,
       update: setScene,
       approveHadFocus: () => {
         const active = document.activeElement;
@@ -82,7 +95,7 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
       story.destroy();
       storyRef.current = null;
     };
-  }, [mode, caseId]);
+  }, [mode, caseId, cases]);
 
   // Le jeton et la ligne suivent les stations (avant la peinture : pas d'image intermédiaire).
   useLayoutEffect(() => {
@@ -115,7 +128,7 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
     if (scene.replay && scene.focusReplay) replayRef.current?.focus({ preventScroll: true });
   }, [scene.replay, scene.focusReplay]);
 
-  const data = IA_CASES[scene.caseId];
+  const data = caseOf(cases, scene.caseId);
   const you = data.steps.length;
   const m = t.agents.machine;
 
@@ -212,9 +225,11 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
         {m.realLifeSeparator}
         <span>{localize(data.inRealLife, lang)}</span>
       </p>
-      <p className="sr" aria-live="polite">
-        {announcement(scene, t, lang)}
-      </p>
+      {complete ? (
+        <p className="sr" aria-live="polite">
+          {announcement(scene, data, t, lang)}
+        </p>
+      ) : null}
     </>
   );
 
@@ -223,7 +238,7 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
       <div className={`${styles.root} ${styles.complete}`}>
         <Container className={styles.column} data-in={flag(arrived)}>
           <div className={styles.choices} role="group" aria-label={m.choose}>
-            {IA_CASE_IDS.map((id) => (
+            {(Object.keys(cases) as IaCaseId[]).map((id) => (
               <button
                 key={id}
                 className={styles.choice}
@@ -232,9 +247,9 @@ export function IaMachine({ mode, caseId, href = "" }: IaMachineProps) {
                 onClick={() => storyRef.current?.choose(id)}
               >
                 <span className={styles.choicePicto}>
-                  <IaPictogram name={IA_CASES[id].picto} />
+                  <IaPictogram name={caseOf(cases, id).picto} />
                 </span>
-                <span className={styles.choiceText}>{localize(IA_CASES[id].title, lang)}</span>
+                <span className={styles.choiceText}>{localize(caseOf(cases, id).title, lang)}</span>
               </button>
             ))}
           </div>
@@ -266,9 +281,8 @@ function stationState(index: number, lit: number) {
 }
 
 /** L'annonce aux lecteurs d'écran, dans la langue active. */
-function announcement(scene: SceneState, t: Dictionary, lang: Lang): string {
+function announcement(scene: SceneState, data: IaCase, t: Dictionary, lang: Lang): string {
   const live = t.agents.machine.live;
-  const data = IA_CASES[scene.caseId];
   switch (scene.announcement) {
     case "working":
       return live.working;

@@ -82,7 +82,7 @@ Une section qu'on atteint par une ancre et qui doit recevoir le focus porte `tab
 | Composant serveur | `<T k="pro.contact.title" />`, `<T value={app.domain} />`, `<T value={app.story.hook} rich glow />` (une petite feuille client) |
 | Composant client | `const t = useTranslation()` puis `t.pro.contact.title` ; `const { lang } = useLanguage()` puis `localize(app.domain, lang)` ; `useText(source)` accepte une chaîne, un `Localized` ou `{ k }` |
 | Mots animés | `<Words text={{ k: "pro.hero.line" }} glow />` ou `<Words text={app.story.question} />` |
-| Métadonnées | `getDictionary().pro.meta` puis `pageMetadata({ …, path, universe })` (français, la langue du rendu serveur) |
+| Métadonnées | `getDictionary().pro.meta` puis `pageMetadata({ …, path, universe })` (français, la langue du rendu serveur ; pas de hreflang ni d'`alternateLocale` tant qu'aucune URL ne sert l'anglais) |
 | Attribut (`aria-label`, `alt`) | Dans un composant client : `useText()` ou `localize()` |
 
 Le serveur rend toujours le français. L'anglais (`?lang=en` ou le choix mémorisé) s'applique côté client.
@@ -92,7 +92,7 @@ Le serveur rend toujours le français. L'anglais (`?lang=en` ou le choix mémori
 Règles :
 
 - **`"use client"`** : seulement là où il y a du mouvement ou de l'interaction, aussi bas que possible.
-- **GSAP** : toujours importé de `@/features/motion/gsap`, où il est enregistré une seule fois avec ScrollTrigger.
+- **GSAP** : toujours importé de `@/design-system/motion/gsap`, où il est enregistré une seule fois avec ScrollTrigger.
 - **`useGsap`** : crée tout dans un `gsap.context()` limité au composant, et l'annule au démontage (tweens, timelines, ScrollTrigger).
 - **État final** : c'est celui du CSS par défaut. GSAP pose l'état de départ et joue vers l'état final. Sans JS et en mouvement réduit, tout reste lisible.
 - **Lenis** : il y a une seule instance, celle de `MotionProvider`. Ne jamais en créer une autre. `useMotion()` donne `scrollTo`, `stop` et `start`.
@@ -102,11 +102,10 @@ Règles :
 
 import { useRef } from "react";
 
-import { gsap } from "@/features/motion/gsap";
-import { EASE } from "@/features/motion/easings";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useMediaQuery } from "@/features/motion/use-media-query";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { gsap } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useMediaQuery } from "@/design-system/motion/use-media-query";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import styles from "./team-scene.module.css";
 
 /** La scène de l'équipe : épinglée sur ordinateur, jouée à l'entrée ailleurs. */
@@ -119,7 +118,7 @@ export function TeamScene({ items }: { items: readonly string[] }) {
     () => {
       if (reduced) return;                       // mouvement réduit : l'état final du CSS, rien à jouer
       const tl = gsap.timeline({
-        defaults: { ease: EASE.expo },
+        defaults: { ease: "expo.out" },          // la courbe --expo de la maquette
         scrollTrigger: pinnable
           ? { trigger: rootRef.current, start: "top top", end: "+=200%", scrub: 0.6, pin: true }
           : { trigger: rootRef.current, start: "top 80%", once: true },
@@ -143,7 +142,7 @@ export function TeamScene({ items }: { items: readonly string[] }) {
 D'autres ressources pour le mouvement :
 
 - **Hooks** :
-  - `useInView(ref)` : apparition à l'entrée à l'écran (un IntersectionObserver partagé) ;
+  - `useInView(ref)` : apparition à l'entrée à l'écran (un IntersectionObserver partagé), réglée par défaut comme les maquettes de l'univers (pro .16 / -6 %, createur .12 / -10 %, k15ze .14 / -10 %) ;
   - `useMediaQuery()` ;
   - `useReducedMotion()`.
 - **Composants** :
@@ -237,8 +236,12 @@ Les couleurs en « r g b » s'emploient ainsi : `rgb(var(--lum) / .5)`.
 - **Les passages** : les attributs posés par `passageAttributes()` (`data-passage`, `data-couleur`) sont repris par `features/passages`.
 - **Aucun lien visible** entre Pro et Créateur.
 - **Formulaires** : `POST /api/contact` (JSON). Le contrat est dans `content/contact.ts` :
-  - champs `{ type: "contact" | "marques", nom, besoin?, message, website: "" }` ;
+  - champs `{ type: "contact" | "marques", nom, contact, besoin?, message, website: "" }` ;
+  - `contact` : obligatoire, une adresse e-mail ou un @pseudo de réseau, vérifié par `checkContact()` ;
+  - toute la validation est dans `validateContact(body)` : le même code dans les formulaires et dans la route ;
+  - l'envoi, la réponse et l'état « Merci » : le hook `useContactSubmit` (`features/contact/use-contact-submit.ts`), partagé par les deux formulaires ; l'échec s'affiche dans une région `role="status"` permanente ;
   - le champ `website` est un piège à robots, caché et laissé vide ;
+  - la route n'accepte que du JSON de même origine, 20 Kio au plus, et quelques envois par IP et par 10 minutes ; un message trop long pour Telegram part en plusieurs envois ;
   - les erreurs de champ sont des codes (`required`, `tooShort`…) à traduire dans le dictionnaire.
 
 ## 8. Vérifier avant de rendre
@@ -255,4 +258,3 @@ npx eslint features/<module> app/<ta route> content/<ton fichier> i18n/dictionar
   - mouvement réduit ;
   - clavier ;
   - largeur de 375 px.
-- **Le squelette** : `app/_components/route-placeholder.tsx` est provisoire. Le remplacer dans ta page, puis le supprimer quand plus aucune page ne l'utilise.

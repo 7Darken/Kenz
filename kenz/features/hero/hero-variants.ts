@@ -13,6 +13,8 @@ interface HeroVariantConfig {
   portrait: ImageAsset;
   /** L'ancre du premier chapitre (« Voir ce que je construis » → #apps). */
   next: string;
+  /** Les textes : `pro.hero` côté Pro, `createur.hero` côté Créateur. */
+  title: DictKey;
   line: DictKey;
   down: DictKey;
   portraitAlt: DictKey;
@@ -23,16 +25,18 @@ export const HERO_VARIANTS: Readonly<Record<HeroVariant, HeroVariantConfig>> = {
     landscape: { src: "/assets/img/horizon-pro.jpg", width: 1672, height: 941 },
     portrait: { src: "/assets/img/kenz-pro.webp", width: 1080, height: 1920 },
     next: "apps",
-    line: "pro.hero.pro.line",
-    down: "pro.hero.pro.down",
-    portraitAlt: "pro.hero.pro.portraitAlt",
+    title: "pro.hero.title",
+    line: "pro.hero.line",
+    down: "pro.hero.down",
+    portraitAlt: "pro.hero.portraitAlt",
   },
   createur: {
     landscape: { src: "/assets/img/horizon-createur.jpg", width: 1672, height: 941 },
     portrait: { src: "/assets/img/kenz-moi.webp", width: 1080, height: 1920 },
     next: "voyage",
-    line: "pro.hero.createur.line",
-    down: "pro.hero.createur.down",
-    portraitAlt: "pro.hero.createur.portraitAlt",
+    title: "createur.hero.title",
+    line: "createur.hero.line",
+    down: "createur.hero.down",
+    portraitAlt: "createur.hero.portraitAlt",
   },
 };

@@ -7,7 +7,7 @@
 import { useId, useRef, useState } from "react";
 
 import { COURSES, isCourseId, type CourseId } from "@/content/courses";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { CourseDialog, type CourseDetail } from "./course-dialog";
 import { CourseItem, type CourseHeadingLevel } from "./course-item";
 import styles from "./courses.module.css";

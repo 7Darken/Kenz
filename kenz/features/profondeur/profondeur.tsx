@@ -10,8 +10,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useSyncExternalStore, type CSSProperties } from "react";
 
 import { Polaroid } from "@/design-system/components/polaroid";
-import { useMediaQuery } from "@/features/motion/use-media-query";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { useMediaQuery } from "@/design-system/motion/use-media-query";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { startDepth } from "./depth-engine";
 import { PLANS, place, type PlacedObject } from "./profondeur-planes";
 import { DEPTH_SERIES, type DepthSeriesId } from "./profondeur-series";

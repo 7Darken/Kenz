@@ -8,9 +8,9 @@ import { FOLLOW_MEDIA } from "@/content/series";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
+import { SocialLinks } from "@/design-system/components/social-links";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import page from "@/features/univers/page.module.css";
-import { SocialLinks } from "@/features/univers/social-links";
-import { SweepTitle } from "@/features/univers/sweep-title";
 import { Followers, FollowPortrait } from "./follow-bio";
 import styles from "./follow-section.module.css";
 

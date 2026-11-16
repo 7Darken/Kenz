@@ -39,6 +39,8 @@ export const voyage: VoyageDictionary = {
     title: "A brand, a destination, an *idea*?",
     brand: "Your brand",
     brandPlaceholder: "Your brand’s name",
+    reply: "Your email or @",
+    replyPlaceholder: "hello@brand.com or @brand",
     idea: "Your idea",
     ideaPlaceholder: "A destination, a format, a wish…",
     budget: "Budget range",
@@ -47,6 +49,9 @@ export const voyage: VoyageDictionary = {
     sending: "Sending…",
     errors: {
       brand: "Please enter your brand’s name.",
+      reply: "Please enter an email or an @handle so I can get back to you.",
+      replyInvalid: "Enter a full email address, or a handle starting with @.",
+      replyShort: "An @handle needs at least {min} characters.",
       idea: "Describe your idea in a few words (at least 10 characters).",
       tooLong: "That’s a bit long: please shorten it.",
       budget: "Please pick a budget range from the list.",

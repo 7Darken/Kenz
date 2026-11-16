@@ -8,7 +8,7 @@
  */
 import { Fragment, useRef, type CSSProperties } from "react";
 
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import { useText, type TextSource } from "@/i18n/text";
 import styles from "./words.module.css";
 

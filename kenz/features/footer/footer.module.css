@@ -294,6 +294,15 @@
     order: -1;
     flex-basis: 100%;
   }
+
+  /* La langue se pose à droite, sur la ligne du logo : la ligne 2 garde la composition de la maquette, sans retour à
+     la ligne. Plus compacte (34 px de haut), centrée sur « Kenz· » (milieu à 13 px : 2 px de marge, 22 px de haut). */
+  .lang {
+    --lang-h: 28px;
+    position: absolute;
+    top: -4px;
+    right: var(--gr);
+  }
 }
 
 @media (min-width: 960px) {

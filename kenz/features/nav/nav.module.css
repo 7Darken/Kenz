@@ -47,6 +47,21 @@
   pointer-events: auto;
 }
 
+/* L'arrivée (app.html, agents.html, voyage.html, sport.html) : la barre apparaît en fondu, 1,4 s après l'arrivée sur
+   une page d'app, 0,2 s après ailleurs. Seulement avec JS ; sans lui, elle est là. */
+:global(.js) .nav[data-fade] .inner {
+  opacity: 0;
+}
+
+:global(.js) .nav[data-fade][data-in] .inner {
+  opacity: 1;
+  transition: opacity 1.2s var(--expo) .2s;
+}
+
+:global(.js) .nav[data-fade="app"][data-in] .inner {
+  transition-delay: 1.4s;
+}
+
 /* « Kenz· » : le logo, en Melodrama */
 .logo {
   display: inline-flex;
@@ -268,6 +283,11 @@
 
 .back:active {
   transform: scale(.98);
+}
+
+/* Pendant l'arrivée d'un passage, le retour reste masqué (shared/passage.css) */
+.nav[data-arriving] .back {
+  opacity: 0;
 }
 
 .backIco {

@@ -1,53 +1,63 @@
 "use client";
 
 /**
- * Le formulaire de contact : nom, besoin (un choix), message → `POST /api/contact` (type « contact »),
+ * Le formulaire de contact : nom, e-mail ou @ (pour pouvoir répondre), besoin (un choix), message
+ * → `POST /api/contact` (type « contact »),
  * puis l'état « Merci » (le formulaire s'efface, la coche se dessine, le titre reçoit le focus).
- * Les erreurs s'affichent à l'envoi, puis se corrigent en direct ; le serveur revalide (content/contact.ts).
+ * Les erreurs s'affichent à l'envoi, puis se corrigent en direct ; le serveur revalide avec le même code
+ * (`validateContact`, content/contact.ts). L'envoi et le merci : `useContactSubmit`, partagé avec le formulaire Marques.
  */
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { flushSync } from "react-dom";
+import { useId, useRef, useState, type FormEvent } from "react";
 
 import {
   CONTACT_LIMITS,
   CONTACT_NEED_LABELS,
   CONTACT_NEEDS,
+  isContactNeed,
+  validateContact,
   type ContactFieldError,
   type ContactRequest,
-  type ContactResponse,
 } from "@/content/contact";
 import { Button } from "@/design-system/components/button";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { Choice, Choices, FormField, Input, Textarea } from "@/design-system/components/form-field";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./contact-form.module.css";
+import { useContactSubmit } from "./use-contact-submit";
 
 export type ContactVariant = "pro" | "agents";
 
-type Field = "nom" | "besoin" | "message";
+type Field = "nom" | "contact" | "besoin" | "message";
 type Errors = Partial<Record<Field, ContactFieldError>>;
 
-const FIELDS: readonly Field[] = ["nom", "besoin", "message"];
+const FIELDS: readonly Field[] = ["nom", "contact", "besoin", "message"];
 
-function checkLength(value: string, min: number, max: number): ContactFieldError | undefined {
-  const length = value.trim().length;
-  if (!length) return "required";
-  if (length < min) return "tooShort";
-  if (length > max) return "tooLong";
-  return undefined;
+/** Le corps de la requête, lu dans le formulaire (un besoin hors de la liste compte comme absent). */
+function bodyOf(form: HTMLFormElement): ContactRequest {
+  const data = new FormData(form);
+  const besoin = data.get("besoin");
+  return {
+    type: "contact",
+    nom: String(data.get("nom") ?? "").trim(),
+    contact: String(data.get("contact") ?? "").trim(),
+    besoin: isContactNeed(besoin) ? besoin : undefined,
+    message: String(data.get("message") ?? "").trim(),
+    website: String(data.get("website") ?? ""),
+  };
 }
 
-function validate(form: HTMLFormElement): Errors {
-  const data = new FormData(form);
+/** Les erreurs des champs du formulaire (le même code que le serveur). */
+function pick(fields: Partial<Record<Field | "type", ContactFieldError>>): Errors {
   const errors: Errors = {};
-  const nom = checkLength(String(data.get("nom") ?? ""), CONTACT_LIMITS.nameMin, CONTACT_LIMITS.nameMax);
-  const message = checkLength(String(data.get("message") ?? ""), CONTACT_LIMITS.messageMin, CONTACT_LIMITS.messageMax);
-  if (nom) errors.nom = nom;
-  if (!data.get("besoin")) errors.besoin = "required";
-  if (message) errors.message = message;
+  FIELDS.forEach((f) => {
+    const code = fields[f];
+    if (code) errors[f] = code;
+  });
   return errors;
 }
+
+const validate = (form: HTMLFormElement): Errors => pick(validateContact({ ...bodyOf(form) }));
 
 interface ContactFormProps {
   variant: ContactVariant;
@@ -58,21 +68,14 @@ interface ContactFormProps {
 export function ContactForm({ variant, labelledBy }: ContactFormProps) {
   const { lang, t } = useLanguage();
   const c = t.pro.contact;
-  const reduced = useReducedMotion();
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
-  const okRef = useRef<HTMLDivElement>(null);
-  const okTitleRef = useRef<HTMLHeadingElement>(null);
-  const timerRef = useRef(0);
   const [errors, setErrors] = useState<Errors>({});
-  const [sending, setSending] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [okShown, setOkShown] = useState(false);
-  const [sent, setSent] = useState(false);
+  const { submit, again, sending, failed, okShown, sent, okRef, okTitleRef } = useContactSubmit({ focusDelay: 700 });
+  // Un @pseudo n'est pas une adresse : le navigateur ne propose alors plus d'e-mail enregistré.
+  const [handle, setHandle] = useState(false);
 
-  useEffect(() => () => window.clearTimeout(timerRef.current), []);
-
-  const ids = { nom: `${id}-nom`, besoin: `${id}-besoin`, message: `${id}-msg` };
+  const ids = { nom: `${id}-nom`, contact: `${id}-contact`, besoin: `${id}-besoin`, message: `${id}-msg` };
   const errorId = (field: Field) => `${ids[field]}-err`;
 
   function errorText(field: Field): string {
@@ -80,6 +83,11 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
     if (!code) return "";
     if (field === "besoin") return c.errors.need;
     if (field === "nom") return code === "tooLong" ? format(c.errors.nameTooLong, { max: CONTACT_LIMITS.nameMax }) : c.errors.name;
+    if (field === "contact") {
+      if (code === "tooShort") return format(c.errors.replyShort, { min: CONTACT_LIMITS.handleMin });
+      if (code === "tooLong") return format(c.errors.replyTooLong, { max: CONTACT_LIMITS.contactMax });
+      return code === "invalid" ? c.errors.replyInvalid : c.errors.reply;
+    }
     return code === "tooLong"
       ? format(c.errors.messageTooLong, { max: CONTACT_LIMITS.messageMax })
       : format(c.errors.message, { min: CONTACT_LIMITS.messageMin });
@@ -110,70 +118,17 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
     if (sending) return;
-    const next = validate(form);
+    const next = pick(await submit(bodyOf(event.currentTarget)));
     setErrors(next);
-    setFailed(false);
-    if (Object.keys(next).length) {
-      focusFirst(next);
-      return;
-    }
-
-    const data = new FormData(form);
-    const body: ContactRequest = {
-      type: "contact",
-      nom: String(data.get("nom") ?? "").trim(),
-      besoin: String(data.get("besoin") ?? "") as ContactRequest["besoin"],
-      message: String(data.get("message") ?? "").trim(),
-      website: String(data.get("website") ?? ""),
-    };
-
-    setSending(true);
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const result = (await response.json()) as ContactResponse;
-      if (result.ok) {
-        // L'état « Merci » est rendu, puis le formulaire passe en « envoyé » (les transitions partent de là).
-        flushSync(() => setOkShown(true));
-        void okRef.current?.offsetWidth;
-        setSent(true);
-        window.clearTimeout(timerRef.current);
-        timerRef.current = window.setTimeout(() => okTitleRef.current?.focus({ preventScroll: true }), reduced ? 50 : 700);
-      } else if (result.error === "invalid" && !result.fields.type && Object.keys(result.fields).length) {
-        const fields: Errors = {};
-        FIELDS.forEach((f) => {
-          const code = result.fields[f];
-          if (code) fields[f] = code;
-        });
-        setErrors(fields);
-        focusFirst(fields);
-      } else {
-        setFailed(true);
-      }
-    } catch {
-      setFailed(true);
-    } finally {
-      setSending(false);
-    }
+    focusFirst(next);
   }
 
   function writeAgain() {
-    setSent(false);
     setErrors({});
+    setHandle(false);
     formRef.current?.reset();
-    window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(
-      () => {
-        setOkShown(false);
-        formRef.current?.querySelector<HTMLInputElement>('input[name="nom"]')?.focus();
-      },
-      reduced ? 0 : 320,
-    );
+    again(() => formRef.current?.querySelector<HTMLInputElement>('input[name="nom"]')?.focus());
   }
 
   const messagePlaceholder = variant === "agents" ? c.agents.messagePlaceholder : c.pro.messagePlaceholder;
@@ -190,12 +145,8 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
     >
       <div className={styles.core}>
         <div className={styles.body} inert={sent}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor={ids.nom}>
-              {c.name.label}
-            </label>
-            <input
-              className={styles.input}
+          <FormField label={c.name.label} htmlFor={ids.nom} error={errorText("nom")} errorId={errorId("nom")}>
+            <Input
               id={ids.nom}
               name="nom"
               type="text"
@@ -205,37 +156,42 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
               aria-invalid={errors.nom ? true : undefined}
               aria-describedby={errorId("nom")}
             />
-            <p className={styles.err} id={errorId("nom")} aria-live="polite">
-              {errorText("nom")}
-            </p>
-          </div>
+          </FormField>
 
-          <fieldset className={styles.field} aria-describedby={errorId("besoin")}>
-            <legend className={styles.label}>{c.need}</legend>
-            <div className={styles.choices} data-invalid={errors.besoin ? "" : undefined}>
+          <FormField label={c.reply.label} htmlFor={ids.contact} error={errorText("contact")} errorId={errorId("contact")}>
+            <Input
+              id={ids.contact}
+              name="contact"
+              type="text"
+              inputMode="email"
+              autoComplete={handle ? "off" : "email"}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={c.reply.placeholder}
+              maxLength={CONTACT_LIMITS.contactMax}
+              aria-invalid={errors.contact ? true : undefined}
+              aria-describedby={errorId("contact")}
+              onChange={(event) => setHandle(event.target.value.trimStart().startsWith("@"))}
+            />
+          </FormField>
+
+          <FormField group label={c.need} error={errorText("besoin")} errorId={errorId("besoin")}>
+            <Choices invalid={!!errors.besoin}>
               {CONTACT_NEEDS.map((need) => (
-                <label key={need} className={styles.choice}>
-                  <input
-                    type="radio"
-                    name="besoin"
-                    value={need}
-                    defaultChecked={variant === "agents" && need === "agents"}
-                  />
-                  <span>{localize(CONTACT_NEED_LABELS[need], lang)}</span>
-                </label>
+                <Choice
+                  key={need}
+                  name="besoin"
+                  value={need}
+                  defaultChecked={variant === "agents" && need === "agents"}
+                  label={localize(CONTACT_NEED_LABELS[need], lang)}
+                />
               ))}
-            </div>
-            <p className={styles.err} id={errorId("besoin")} aria-live="polite">
-              {errorText("besoin")}
-            </p>
-          </fieldset>
+            </Choices>
+          </FormField>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor={ids.message}>
-              {c.message}
-            </label>
-            <textarea
-              className={`${styles.input} ${styles.textarea}`}
+          <FormField label={c.message} htmlFor={ids.message} error={errorText("message")} errorId={errorId("message")}>
+            <Textarea
               id={ids.message}
               name="message"
               placeholder={messagePlaceholder}
@@ -243,10 +199,7 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errorId("message")}
             />
-            <p className={styles.err} id={errorId("message")} aria-live="polite">
-              {errorText("message")}
-            </p>
-          </div>
+          </FormField>
 
           {/* Piège à robots : invisible et hors du parcours clavier, un visiteur ne le remplit jamais. */}
           <div className={styles.trap} aria-hidden="true">

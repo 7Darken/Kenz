@@ -8,7 +8,7 @@
 import { useRef, type CSSProperties } from "react";
 
 import type { PriceTicket as PriceTicketData } from "@/content/series";
-import { useInView } from "@/features/motion/use-in-view";
+import { useInView } from "@/design-system/motion/use-in-view";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize, type Localized } from "@/i18n/localize";
 import { PhoneArt, PriceIcon } from "./price-icon";

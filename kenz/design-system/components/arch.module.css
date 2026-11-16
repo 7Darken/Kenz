@@ -79,21 +79,23 @@
   filter: drop-shadow(0 0 3px rgb(var(--arche-c) / .3));
 }
 
+/* La durée du tracé (--trace-dur, prop `traceDuration` de <Arch>) : le fil fantôme suit, 0,4 s plus lent.
+   Les délais (--fil-delay, --shadow-delay, --floor-delay) se règlent dans le CSS de l'arche qui les change. */
 .trace[data-traced] .fil {
   stroke-dashoffset: 0;
-  transition: stroke-dashoffset 2.4s var(--io) var(--fil-delay, .1s);
+  transition: stroke-dashoffset var(--trace-dur, 2.4s) var(--io) var(--fil-delay, .1s);
 }
 
 .trace[data-traced] .shadow {
   stroke-dashoffset: 0;
-  transition: stroke-dashoffset 2.8s var(--io) var(--shadow-delay, .5s);
+  transition: stroke-dashoffset calc(var(--trace-dur, 2.4s) + .4s) var(--io) var(--shadow-delay, .5s);
 }
 
-/* La ligne de sol */
+/* La ligne de sol : elle déborde de l'arche de --floor-x de chaque côté (prop `floorOverhang` de <Arch>) */
 .floor {
   position: absolute;
-  left: -30%;
-  right: -30%;
+  left: var(--floor-x, -30%);
+  right: var(--floor-x, -30%);
   bottom: 0;
   height: 1px;
   pointer-events: none;
@@ -105,7 +107,7 @@
 .trace[data-traced] ~ .floor,
 .floorStatic {
   transform: none;
-  transition: transform 2s var(--expo);
+  transition: transform 2s var(--expo) var(--floor-delay, 0s);
 }
 
 @media (prefers-reduced-motion: reduce) {

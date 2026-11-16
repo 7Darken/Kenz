@@ -11,9 +11,9 @@ import { passageAttributes } from "@/content/site";
 import { Arch } from "@/design-system/components/arch";
 import { Icon } from "@/design-system/components/icon";
 import { Reveal } from "@/design-system/components/reveal";
+import { SocialLinks } from "@/design-system/components/social-links";
 import { T } from "@/i18n/text";
 import type { FollowDoorConfig } from "./doors";
-import { FollowLinks } from "./follow-links";
 import styles from "./suivre-section.module.css";
 
 export function FollowDoor({ door, index }: { door: FollowDoorConfig; index: number }) {
@@ -73,7 +73,7 @@ export function FollowDoor({ door, index }: { door: FollowDoorConfig; index: num
           <p className={styles.line}>
             <T k={`${text}.line`} />
           </p>
-          <FollowLinks universe={socials} label={`${text}.accounts`} />
+          <SocialLinks universe={socials} label={{ k: `${text}.accounts` }} size="sm" className={styles.links} />
           <p className={styles.note}>
             <T k={`${text}.note`} />
           </p>

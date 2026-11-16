@@ -28,7 +28,7 @@ Branche : `refonte-v6`. Pas de push sans accord de Kenz. L'orchestrateur commite
   - bouton soleil / lune ;
   - préférence en `localStorage`, dans un try/catch ;
   - `data-univers="pro|createur|k15ze"` sur le conteneur de l'univers.
-- **Formulaires** (contact Pro, marques Créateur) : `POST /api/contact` (Telegram, existant), étendu aux champs nom, besoin, message, type, avec validation côté serveur. Les secrets restent en variables d'environnement.
+- **Formulaires** (contact Pro, marques Créateur) : `POST /api/contact` (Telegram, existant), étendu aux champs nom, contact (e-mail ou @pseudo, pour pouvoir répondre), besoin, message, type, avec validation côté serveur. Les secrets restent en variables d'environnement.
 
 ## Arborescence cible
 ```
@@ -52,8 +52,9 @@ design-system/
                              Loupe, Reveal, Words (mots qui montent), Section, Container, Dialog
                              (accessible), Polaroid, SocialIcon (Simple Icons CC0), StoreBadge,
                              ThemeToggle, LanguageToggle
+  motion/                    le socle du mouvement : MotionProvider (gsap + ScrollTrigger + Lenis), useGsap,
+                             useInView, useReducedMotion, useMediaQuery, courbes ; features/ en dépend, jamais l'inverse
 features/                    un dossier par module, avec composants, hooks et CSS propres :
-  motion/                    MotionProvider (gsap + ScrollTrigger + Lenis), useReducedMotion, useInView, utils
   nav/                       Nav (variante pro / createur / k15ze)
   footer/                    Footer compact (variantes pro / createur / k15ze), avec le ciel secret côté Créateur
   passages/                  Passage (transition couleur + icône entre pages), plongée et décollage (Pro <-> Créateur),
@@ -92,7 +93,7 @@ docs/refonte-v6/             ce document, la carte maquette -> code, et les rapp
   - pas de JS client pour du texte statique ;
   - polices via `next/font`.
 - **SEO** :
-  - `metadata` par route (titre, description, Open Graph), FR et EN ;
+  - `metadata` par route (titre, description, Open Graph), en français : le serveur rend le français et `?lang=en` n'est qu'un basculement client, donc ni hreflang ni `og:locale:alternate` (les `meta` anglais des dictionnaires attendent une vraie route EN) ;
   - `sitemap` à jour avec les nouvelles routes, sans exposer de lien croisé visible entre les univers ;
   - `robots` inchangé.
 - **Conventions** :

@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 
 import { ThemeProvider } from "@/design-system/theme/theme-provider";
-import { MotionProvider } from "@/features/motion/motion-provider";
+import { MotionProvider } from "@/design-system/motion/motion-provider";
 import { LanguageProvider } from "@/i18n/language-provider";
 
 export function Providers({ children }: { children: ReactNode }) {

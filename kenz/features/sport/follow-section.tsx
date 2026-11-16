@@ -2,9 +2,9 @@
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
-import { SocialLinks } from "@/features/univers/social-links";
+import { SocialLinks } from "@/design-system/components/social-links";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import page from "@/features/univers/page.module.css";
-import { SweepTitle } from "@/features/univers/sweep-title";
 import styles from "./follow-section.module.css";
 import k15ze from "./sport.module.css";
 

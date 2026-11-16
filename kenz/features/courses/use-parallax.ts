@@ -7,8 +7,8 @@
  */
 import type { RefObject } from "react";
 
-import { gsap } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
+import { gsap } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
 
 export function useParallax(rootRef: RefObject<HTMLElement | null>, enabled: boolean, count: number) {
   useGsap(

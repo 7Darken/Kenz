@@ -7,16 +7,9 @@ export const pro: ProDictionary = {
   },
   hero: {
     title: "Kenz",
-    pro: {
-      line: "I build apps where AI does the *real* work.",
-      down: "See what I build",
-      portraitAlt: "Kenz in a midnight-blue suit and a white shirt, looking at the camera",
-    },
-    createur: {
-      line: "I travel across Asia, train between trips, and tell you everything, *for real*.",
-      down: "Come along",
-      portraitAlt: "Kenz in a lime-green T-shirt, gazing toward the horizon",
-    },
+    line: "I build apps where AI does the *real* work.",
+    down: "See what I build",
+    portraitAlt: "Kenz in a midnight-blue suit and a white shirt, looking at the camera",
   },
   space: {
     title: "My apps",
@@ -52,12 +45,20 @@ export const pro: ProDictionary = {
       label: "Your name",
       placeholder: "First and last name",
     },
+    reply: {
+      label: "Your email or @",
+      placeholder: "name@domain.com or @handle",
+    },
     need: "What you need",
     message: "Your message",
     submit: "Send",
     errors: {
       name: "Please enter your name.",
       nameTooLong: "That name is a little long ({max} characters max).",
+      reply: "Please enter an email or an @handle so I can get back to you.",
+      replyInvalid: "Enter a full email address, or a handle starting with @.",
+      replyShort: "An @handle needs at least {min} characters.",
+      replyTooLong: "That’s a little long ({max} characters max).",
       need: "Pick what brings you here.",
       message: "A few more words, please ({min} characters minimum).",
       messageTooLong: "Your message is a little long ({max} characters max).",

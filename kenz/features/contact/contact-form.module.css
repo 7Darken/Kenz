@@ -1,4 +1,4 @@
-/* Le formulaire (pro.html A4 ; matière « double biseau », champs et choix de shared/theme.css) */
+/* Le formulaire (pro.html A4 ; matière « double biseau » ; les champs : FormField du design system) */
 .form {
   position: relative;
   padding: 6px;
@@ -27,128 +27,6 @@
   pointer-events: none;
 }
 
-/* ---------- Les champs ---------- */
-.field {
-  display: grid;
-  gap: 10px;
-  min-width: 0;
-  margin: 0 0 20px;
-  padding: 0;
-  border: 0;
-}
-
-.label {
-  padding: 0;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--muted);
-}
-
-.input {
-  width: 100%;
-  min-height: 54px;
-  padding: 14px 16px;
-  border: 0;
-  border-radius: var(--r-md);
-  outline: none;
-  background: var(--field-bg);
-  box-shadow: inset 0 0 0 1px var(--field-line);
-  font-size: 16px;
-  line-height: 1.4;
-  color: var(--fg);
-  transition: box-shadow .4s var(--expo);
-}
-
-.input::placeholder {
-  color: var(--placeholder);
-}
-
-.input:hover {
-  box-shadow: inset 0 0 0 1px var(--field-line-2);
-}
-
-.input:focus-visible {
-  box-shadow: inset 0 0 0 1.5px var(--field-focus), 0 0 0 4px rgb(var(--lum) / .12);
-}
-
-.input[aria-invalid="true"] {
-  box-shadow: inset 0 0 0 1.5px var(--warn-line);
-}
-
-.textarea {
-  min-height: 132px;
-  resize: vertical;
-}
-
-.choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 2px;
-}
-
-.choice {
-  position: relative;
-}
-
-.choice input {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.choice span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 10px 16px;
-  border-radius: var(--r-pill);
-  font-size: 15px;
-  line-height: 1.2;
-  color: var(--muted);
-  background: var(--ghost-bg);
-  box-shadow: inset 0 0 0 1px var(--field-line);
-  transition: background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo);
-}
-
-.choice input:hover + span {
-  color: var(--fg);
-  box-shadow: inset 0 0 0 1px var(--field-line-2);
-}
-
-.choice input:checked + span {
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  box-shadow: none;
-}
-
-.choice input:focus-visible + span {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
-}
-
-.choice input:active + span {
-  transform: scale(.97);
-}
-
-.choices[data-invalid] .choice span {
-  box-shadow: inset 0 0 0 1px var(--warn-line);
-}
-
-.err {
-  margin: 0;
-  font-size: 13px;
-  color: var(--warn);
-}
-
-.err:empty {
-  display: none;
-}
-
 /* Le piège à robots : hors de l'écran, jamais lu */
 .trap {
   position: absolute;
@@ -174,8 +52,9 @@
   color: var(--warn);
 }
 
+/* Vide, la région reste dans l'arbre d'accessibilité (son message sera annoncé) mais sort du flux */
 .failure:empty {
-  display: none;
+  position: absolute;
 }
 
 /* ---------- « Merci » : la coche se dessine, le texte sort du flou ---------- */
@@ -263,9 +142,5 @@
   .ok {
     transform: none !important;
     filter: none !important;
-  }
-
-  .choice span {
-    transition-property: opacity, background-color, color, box-shadow;
   }
 }

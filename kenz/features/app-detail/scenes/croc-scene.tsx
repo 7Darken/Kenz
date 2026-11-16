@@ -1,10 +1,12 @@
 "use client";
 
 /** Croc : le matin « Je m'engage » se coche, le soir « Tenu » ; les jours se cochent et la série monte à 12 (exemple). */
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import kit from "./scene.module.css";
 import { all, Check, checkParts, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./croc-scene.module.css";
 
 /** La série d'exemple : de 5 à 12 jours. */
@@ -109,3 +111,12 @@ export const buildCroc: SceneBuilder = (el) => {
     .to(smile, { opacity: 1, duration: 0.3 }, 3)
     .to(bravo, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 3.05);
 };
+
+/** « Comment ça marche » de Croc, monté autour de son écran (chargé à part : ./registry). */
+export default function CrocChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildCroc} tint={styles.scene} sample={"bottom"}>
+      <CrocScene />
+    </HowItWorks>
+  );
+}

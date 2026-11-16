@@ -3,9 +3,11 @@
 /** Sago : une phrase japonaise floue ; chaque mot prend une image (un chat, un cœur), puis la phrase prend son sens. */
 import { Fragment } from "react";
 
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import { all, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./sago-scene.module.css";
 
 export function SagoScene() {
@@ -75,3 +77,12 @@ export const buildSago: SceneBuilder = (el) => {
     .to(rule, { scaleX: 1, duration: 0.9 }, 2.35)
     .to(words, { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.8, stagger: 0.07 }, 2.5);
 };
+
+/** « Comment ça marche » de Sago, monté autour de son écran (chargé à part : ./registry). */
+export default function SagoChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildSago} tint={styles.scene} sample={null}>
+      <SagoScene />
+    </HowItWorks>
+  );
+}

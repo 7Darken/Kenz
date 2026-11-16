@@ -4,9 +4,11 @@
  * Escapades Libres : les 12 phrases du test se remplissent, une réponse est choisie ; le profil « Aventurier »
  * (l'un des six du site) apparaît, puis rejoint un petit groupe ; le voyage se trace et l'agence coche le reste.
  */
-import { gsap } from "@/features/motion/gsap";
+import type { App } from "@/content/apps";
+import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
 import { all, Check, checkParts, one, type SceneBuilder } from "./scene-kit";
+import { HowItWorks } from "../how-it-works";
 import styles from "./escapades-scene.module.css";
 
 const PIN = (
@@ -184,3 +186,12 @@ export const buildEscapades: SceneBuilder = (el) => {
   });
   return tl;
 };
+
+/** « Comment ça marche » de Escapades Libres, monté autour de son écran (chargé à part : ./registry). */
+export default function EscapadesChapter({ app }: { app: App }) {
+  return (
+    <HowItWorks app={app} build={buildEscapades} tint={styles.scene} sample={null}>
+      <EscapadesScene />
+    </HowItWorks>
+  );
+}

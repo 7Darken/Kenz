@@ -5,23 +5,24 @@
  * chacune ; au choix, une réponse simple (ce que la machine ferait, ce qui reste à vous) et l'action vers le contact.
  * La réponse tient la dernière case de la grille ; sur téléphone, elle se glisse sous la carte touchée.
  */
-import { useId, useState, type MouseEvent } from "react";
+import { useId, useState } from "react";
 
 import { IA_NEEDS } from "@/content/ia";
 import { Button } from "@/design-system/components/button";
-import { useMotion } from "@/features/motion/motion-provider";
-import { useMediaQuery } from "@/features/motion/use-media-query";
+import { useMediaQuery } from "@/design-system/motion/use-media-query";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import { IaPictogram } from "./ia-picto";
 import styles from "./ia-needs.module.css";
 
-/** La section du formulaire de contact de la page (ids attendus par la nav : voir CONVENTIONS.md). */
+/**
+ * La section du formulaire de contact de la page (ids attendus par la nav : voir CONVENTIONS.md).
+ * Le lien est une simple ancre : MotionProvider y défile en douceur et lui donne le focus.
+ */
 const CONTACT_ID = "contact";
 
 export function IaNeeds() {
   const { t, lang } = useLanguage();
-  const { scrollTo } = useMotion();
   const answerId = useId();
   const single = useMediaQuery("(max-width: 719px)");
   const [chosen, setChosen] = useState(-1);
@@ -33,16 +34,6 @@ export function IaNeeds() {
   const choose = (index: number) => {
     setChosen(index);
     setRound((value) => value + 1);
-  };
-
-  // Le lien garde son ancre (sans JS, il marche) ; avec JS, le défilement doux et le focus du formulaire.
-  const toContact = (event: MouseEvent<HTMLAnchorElement>) => {
-    const target = document.getElementById(CONTACT_ID);
-    if (!target) return;
-    event.preventDefault();
-    scrollTo(target);
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.setTimeout(() => target.focus({ preventScroll: true }), reduced ? 0 : 900);
   };
 
   const answer = (
@@ -62,7 +53,7 @@ export function IaNeeds() {
             <p className={styles.text}>{localize(need.machineDoes, lang)}</p>
             <p className={styles.label}>{n.leftToYou}</p>
             <p className={styles.text}>{localize(need.leftToYou, lang)}</p>
-            <Button href={`#${CONTACT_ID}`} icon="arrow-right" className={styles.cta} onClick={toContact}>
+            <Button href={`#${CONTACT_ID}`} icon="arrow-right" className={styles.cta}>
               {n.cta}
             </Button>
           </>

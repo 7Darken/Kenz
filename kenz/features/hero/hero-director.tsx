@@ -8,13 +8,14 @@
  *   avec `data-arriving` (délais plus courts côté Créateur) et `data-dive` après la plongée.
  * - Au défilement (ordinateur, sans mouvement réduit) : le texte monte et s'efface, le portrait et l'arche
  *   remontent à peine. Créateur : le paysage glisse plus lentement et s'efface, la scène s'efface au début.
+ *   Leur opacité passe par `--hero-scroll` : un fondu piloté de l'extérieur (setHeroFade) peut primer sur elle.
  */
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 
-import { gsap } from "@/features/motion/gsap";
-import { useGsap } from "@/features/motion/use-gsap";
-import { useMediaQuery } from "@/features/motion/use-media-query";
-import { useReducedMotion } from "@/features/motion/use-reduced-motion";
+import { gsap } from "@/design-system/motion/gsap";
+import { useGsap } from "@/design-system/motion/use-gsap";
+import { useMediaQuery } from "@/design-system/motion/use-media-query";
+import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { usePassageArrival } from "@/features/passages";
 import type { HeroVariant } from "./hero-variants";
 import styles from "./hero.module.css";
@@ -108,10 +109,10 @@ export function HeroDirector({ variant, children }: HeroDirectorProps) {
       // Chaque timeline dure 1 : sa position suit la part du hero déjà défilée.
       const height = () => section.offsetHeight || window.innerHeight;
       const tl = gsap.timeline({ scrollTrigger: { ...pass, scrub: true, invalidateOnRefresh: true } }).set({}, {}, 1);
-      tl.fromTo("[data-hero-bg]", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "none" }, 0);
+      tl.fromTo("[data-hero-bg]", { "--hero-scroll": 1 }, { "--hero-scroll": 0, duration: 0.5, ease: "none" }, 0);
       if (reduced) return;
       tl.fromTo("[data-hero-bg]", { y: 0 }, { y: () => height() * 0.78, duration: 1, ease: "none" }, 0);
-      tl.fromTo("[data-hero-scene]", { opacity: 1 }, { opacity: 0, duration: 0.22, ease: "none" }, 0.03);
+      tl.fromTo("[data-hero-scene]", { "--hero-scroll": 1 }, { "--hero-scroll": 0, duration: 0.22, ease: "none" }, 0.03);
     },
     sectionRef,
     [wide, reduced, variant],

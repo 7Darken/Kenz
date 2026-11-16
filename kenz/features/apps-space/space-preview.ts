@@ -5,8 +5,8 @@
  * - Animation (Zenko) : la mini-animation en boucle, puis la vraie capture, qui ressort avant que la scène reparte.
  * Le contrôleur rendu se met en pause hors écran et s'arrête à la fermeture (tout est annulé).
  */
-import { gsap } from "@/features/motion/gsap";
-import { CSS_EASE } from "@/features/motion/easings";
+import { gsap } from "@/design-system/motion/gsap";
+import { CSS_EASE } from "@/design-system/motion/easings";
 import { zenkoTimeline } from "./zenko-timeline";
 
 export interface PreviewController {

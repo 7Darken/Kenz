@@ -7,7 +7,7 @@
 import type { AppEngine } from "@/content/apps";
 import { Icon } from "@/design-system/components/icon";
 import { Reveal } from "@/design-system/components/reveal";
-import { ScrollTrigger } from "@/features/motion/gsap";
+import { ScrollTrigger } from "@/design-system/motion/gsap";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import page from "./app-detail.module.css";

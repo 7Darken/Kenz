@@ -78,9 +78,9 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* « / 10 » : la couleur du rang, sans effacement (une opacité le ferait passer sous 4,5:1 en clair) */
 .rank span {
   margin-left: .2em;
-  opacity: .7;
 }
 
 .name {

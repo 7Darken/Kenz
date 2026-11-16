@@ -3,11 +3,13 @@
  * Sources : `maquettes/v6/shared/victoire.js` et `maquettes/v6/BRIEF-V6-EL.md`.
  * Les phrases du récit sont dans le dictionnaire `victoire`. Aucun nom de personne de l'équipe ;
  * pas de classement publié (aucun autre projet n'est nommé).
- * Le lien du site et la couleur or viennent du projet (`content/apps.ts`) : une seule source.
+ * Le lien du site et la couleur or viennent du projet (`content/escapades-libres.ts`, partagé avec `content/apps.ts`) :
+ * une seule source, sans importer le contenu de toutes les apps dans la scène client.
  * Tailles d'images relevées avec `sips` sur `maquettes/v6/assets/`.
  */
 import type { Localized } from "@/i18n/localize";
-import { apps, type HttpsUrl, type WebAppSlug } from "@/content/apps";
+import type { HttpsUrl, WebAppSlug } from "@/content/apps";
+import { ESCAPADES_LIBRES as project } from "@/content/escapades-libres";
 import type { HexColor, ImageAsset, IsoDate } from "@/content/types";
 
 export interface StartupWeekendPhoto extends ImageAsset {
@@ -34,6 +36,8 @@ export interface StartupWeekend {
   /** Le rang, et son suffixe ordinal en exposant (1re, 1st). */
   result: { rank: number; ordinal: Localized<string> };
   project: WebAppSlug;
+  /** Le nom du projet (podium, légende de la photo). */
+  projectName: string;
   site: HttpsUrl;
   color: HexColor;
   photos: {
@@ -55,8 +59,6 @@ export interface StartupWeekend {
   live: ImageAsset;
 }
 
-const project = apps["escapades-libres"];
-
 /** Écran mobile de la plateforme (780 × 1688). */
 const platformScreen = (file: string): ImageAsset => ({ src: `/assets/el/${file}`, width: 780, height: 1688 });
 
@@ -72,8 +74,9 @@ export const startupWeekend: StartupWeekend = {
   durationHours: 54,
   result: { rank: 1, ordinal: { fr: "re", en: "st" } },
   project: project.slug,
-  site: project.story.site,
-  color: project.colors.tint,
+  projectName: project.name,
+  site: project.site,
+  color: project.tint,
   photos: {
     check: {
       src: "/assets/img/startup-weekend-1.jpg",
@@ -115,7 +118,7 @@ export const startupWeekend: StartupWeekend = {
     ],
     selectionSize: "390 × 844",
     // Le navy et l'or du site d'Escapades Libres.
-    swatches: ["#121A2B", project.colors.tint],
+    swatches: ["#121A2B", project.tint],
     typeface: "Cabinet Grotesk",
   },
   live: {

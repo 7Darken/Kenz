@@ -1,6 +1,10 @@
 /**
  * Métadonnées d'une route (titre, description, URL canonique, Open Graph, Twitter), en français :
  * la langue de base du rendu serveur. Les textes viennent du dictionnaire (`<espace>.meta`).
+ *
+ * Pas de hreflang ni d'`og:locale:alternate` : l'anglais n'est qu'un basculement côté client (`?lang=en` sert le
+ * même HTML français, canonique vers la page FR), donc aucune URL ne sert de version anglaise aux moteurs.
+ * Les `meta` anglais des dictionnaires attendent une vraie route EN ; il faudra alors déclarer les alternates.
  */
 import type { Metadata } from "next";
 
@@ -24,7 +28,6 @@ export function pageMetadata({ title, description, path, universe }: PageMetadat
       type: "website",
       siteName: SITE_NAME,
       locale: "fr_FR",
-      alternateLocale: ["en_GB"],
       url: path,
       title,
       description,

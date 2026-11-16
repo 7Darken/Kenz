@@ -2,7 +2,7 @@
  * La timeline de la mini-animation de Zenko (shared/apps.js, SC.zenko.tl) : l'état de départ, puis vers l'état
  * final du CSS. Rendue en pause dans une timeline parente (la fiche la joue en boucle).
  */
-import { gsap } from "@/features/motion/gsap";
+import { gsap } from "@/design-system/motion/gsap";
 
 export function zenkoTimeline(root: Element): gsap.core.Timeline {
   const q = (selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector));

@@ -8,7 +8,7 @@
  */
 import { useSyncExternalStore } from "react";
 
-import { RELEASES_CHECKED_ON, type AppRelease } from "@/content/apps";
+import type { AppRelease } from "@/content/apps";
 import type { IsoDate } from "@/content/types";
 import type { Lang } from "@/i18n/config";
 import { format } from "@/i18n/format";
@@ -48,7 +48,8 @@ export function ReleaseSince({ release }: { release: AppRelease }) {
   return <>{release.first ? format(r.sinceFirst, { date }) : `${format(r.since, { date })}${also}`}</>;
 }
 
-export function ReleaseVersion({ release }: { release: AppRelease }) {
+/** `checkedOn` : le jour du relevé des versions (`RELEASES_CHECKED_ON`, passé par le serveur : ce module reste léger). */
+export function ReleaseVersion({ release, checkedOn }: { release: AppRelease; checkedOn: IsoDate }) {
   const { lang, t } = useLanguage();
   const day = useSyncExternalStore(noSubscription, today, () => null);
   const r = t.apps.real;
@@ -56,7 +57,7 @@ export function ReleaseVersion({ release }: { release: AppRelease }) {
 
   const full = longDate(release.updated, lang);
   let when = format(r.on, { date: full });
-  const checked = Math.round(dayOf(RELEASES_CHECKED_ON).getTime() / DAY);
+  const checked = Math.round(dayOf(checkedOn).getTime() / DAY);
   if (day !== null && day - checked <= 60) {
     const n = day - Math.round(dayOf(release.updated).getTime() / DAY);
     when = n <= 0 ? r.today : n === 1 ? r.yesterday : n < 45 ? format(r.daysAgo, { n }) : format(r.monthsAgo, { n: Math.round(n / 30) });

@@ -8,9 +8,9 @@ import Image from "next/image";
 
 import { ESCALE_IDS, ESCALES } from "@/content/series";
 import { Reveal } from "@/design-system/components/reveal";
+import { SweepTitle } from "@/design-system/components/sweep-title";
 import { T } from "@/i18n/text";
 import { EscaleCard } from "./escale-card";
-import { SweepTitle } from "./sweep-title";
 import { VoyageJourney } from "./voyage-journey";
 import styles from "./voyage-section.module.css";
 
