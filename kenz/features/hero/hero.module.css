@@ -12,7 +12,26 @@
   --hero-shade: linear-gradient(180deg, rgba(11, 15, 27, .8) 0%, rgba(11, 15, 27, .42) 36%, rgba(11, 15, 27, 0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(14, 18, 32, .55) 12%, rgba(14, 18, 32, 0) 32%);
   --hero-shade-d: linear-gradient(180deg, rgba(11, 15, 27, .55) 0%, rgba(11, 15, 27, 0) 20%), linear-gradient(90deg, rgba(11, 15, 27, .7) 0%, rgba(11, 15, 27, .3) 34%, rgba(11, 15, 27, 0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(14, 18, 32, .5) 10%, rgba(14, 18, 32, 0) 30%);
   --hero-glow: rgba(118, 158, 228, .22);
+  /* Le bas du hero fond dans la page (son fond et l'aura), comme le haut de la scène des apps :
+     aucune bande, aucune ligne à la jonction. Même longueur de fondu que la scène des apps. */
+  --hero-fondu: clamp(140px, 22svh, 220px);
+  --hero-fin: linear-gradient(180deg, #000 calc(100% - var(--hero-fondu)), rgb(0 0 0 / .86) calc(100% - var(--hero-fondu) * .8),
+    rgb(0 0 0 / .5) calc(100% - var(--hero-fondu) * .5), rgb(0 0 0 / .14) calc(100% - var(--hero-fondu) * .2), transparent);
+}
+
+/* Pro : le paysage (et son fond), le voile et la scène (halo, arche, portrait, objets) s'effacent en fondu
+   avant le bas du hero, au lieu d'y être coupés net */
+.pro .bg {
+  bottom: 0;
   background: var(--hero-bg);
+  -webkit-mask-image: var(--hero-fin);
+  mask-image: var(--hero-fin);
+}
+
+.pro .shade,
+.pro .scene {
+  -webkit-mask-image: var(--hero-fin);
+  mask-image: var(--hero-fin);
 }
 
 /* Le même paysage, au matin : il s'éclaircit et fond dans le papier */

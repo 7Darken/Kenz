@@ -27,17 +27,20 @@
   mask-image: linear-gradient(180deg, transparent 0, #000 30%, #000 70%, transparent 100%);
 }
 
-/* le fond k15ze arrive en fondu depuis la couleur de la page : aucune frontière, et toujours opaque */
+/* le fond k15ze arrive en fondu depuis la couleur de la page, et y retourne : il déborde de 22vh au-dessus et
+   au-dessous du chapitre, transparent à ses deux bouts. Le chapitre reste opaque (il couvre la Terre), et la jonction
+   avec les chapitres voisins n'a ni ligne ni bande : l'aura de la page revient en douceur sous « Me suivre ». */
 .sport::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   top: -22vh;
-  bottom: 0;
+  bottom: -22vh;
   z-index: -2;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0, var(--bg) 22vh, var(--sport-fond) 38%, var(--sport-fond) 78%, var(--bg) 100%);
+  background: linear-gradient(180deg, transparent 0, var(--bg) 22vh, var(--sport-fond) 36%, var(--sport-fond) 64%,
+    var(--bg) calc(100% - 22vh), transparent 100%);
 }
 
 .inner {

@@ -1,5 +1,7 @@
 /* Le fil : rail fixe à gauche (≥ 1100 px), filet de progression en haut (< 1100 px),
-   trait qui descend en haut de chaque chapitre (≥ 900 px). Porté de shared/theme.css §8. */
+   trait qui descend en haut de chaque chapitre (≥ 900 px). Porté de shared/theme.css §8.
+   Une seule position pour tous : --fil-x (design-system/tokens.css). La ligne du rail et celle de chaque trait
+   occupent la même colonne de 1 px, de x = --fil-x à x = --fil-x + 1 (bord gauche de l'écran). */
 
 .rail {
   display: none;
@@ -10,7 +12,7 @@
     display: block;
     position: fixed;
     z-index: var(--z-rail);
-    left: 26px;
+    left: var(--fil-x);
     top: 21vh;
     bottom: 27vh;
     width: 1px;
@@ -110,7 +112,8 @@
     position: absolute;
     z-index: 12;
     top: 0;
-    left: var(--gl);
+    /* Le chapitre peut ne pas commencer au bord de l'écran : <Fil> pose son décalage (--fil-offset) */
+    left: calc(var(--fil-x) - var(--fil-offset, 0px));
     width: 7px;
     height: calc(var(--sec) * .55);
     margin-left: -3px;

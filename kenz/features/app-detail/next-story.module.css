@@ -1,4 +1,5 @@
-/* 7. L'histoire suivante : le fil continue vers l'app suivante, dans sa couleur (app.html, .next) */
+/* 7. L'histoire suivante : le fil continue vers l'app suivante, dans sa couleur (app.html, .next).
+   Pas de filet en haut : on ne voit jamais la séparation entre deux chapitres (le trait du fil suffit). */
 .next {
   position: relative;
   padding: clamp(84px, 10vw, 150px) 0 clamp(96px, 11vw, 160px);
@@ -18,21 +19,6 @@
 
 :global(html[data-theme="light"]) .next::before {
   background: radial-gradient(60% 70% at 28% 52%, rgb(var(--nx-rgb) / .12), transparent 72%);
-}
-
-.next::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: var(--gl);
-  right: var(--gr);
-  height: 1px;
-  background: linear-gradient(90deg, rgb(var(--nx-rgb) / 0), rgb(var(--nx-rgb) / .9) 30%, rgb(var(--nx-rgb) / 0));
-  box-shadow: 0 0 12px rgb(var(--nx-rgb) / .6);
-}
-
-:global(html[data-theme="light"]) .next::after {
-  box-shadow: none;
 }
 
 .next:hover::before,

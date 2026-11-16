@@ -48,6 +48,7 @@
   --maxw: 1240px;
   --sec: clamp(96px, 12vw, 176px);
   --nav-h: 72px;
+  --fil-x: 26px;             /* l'axe du fil depuis le bord gauche de l'écran : le rail ET les traits de chapitre */
   --space-xs: 8px;
   --space-s: 16px;
   --space-m: 24px;

@@ -1,31 +1,20 @@
-/* Le pied de page commun, classique et compact (shared/footer.css) : ≈ 160 à 200 px sur ordinateur.
-   Ligne 1 : « Kenz· » et la phrase ; la navigation ; les réseaux. Un filet. Ligne 2 : ©, (Marques), Revenir en haut. */
+/* Le pied de page : une grille de colonnes sur la même ligne de base, puis une barre du bas.
+   ≥ 1024 px : marque · navigation · réseaux (· ciel, Créateur, ≥ 1200 px) ; 560–1023 : la marque, puis deux colonnes ;
+   < 560 : une colonne. Espacements de l'échelle du design system (--space-*).
+   Pas de filet au-dessus : la page coule dans le pied de page sans séparation visible. */
 .footer {
   --ease: var(--expo);
   --vert: currentColor;
   position: relative;
   z-index: 1;
-  padding: 40px 0 calc(40px + env(safe-area-inset-bottom));
+  padding: var(--space-l) 0 calc(var(--space-m) + env(safe-area-inset-bottom));
   font-family: var(--f-text);
   font-size: 14px;
   line-height: 1.4;
   color: var(--muted);
 }
 
-/* Le seuil : un filet fin qui s'efface aux deux bouts */
-.footer::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: var(--gl);
-  right: var(--gr);
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgb(var(--fg-rgb) / 0), rgb(var(--fg-rgb) / .1) 12%, rgb(var(--fg-rgb) / .1) 88%, rgb(var(--fg-rgb) / 0));
-}
-
 .inner {
-  position: relative;
   max-width: calc(var(--maxw) + 2 * var(--gutter));
   margin-inline: auto;
   padding-left: var(--gl);
@@ -42,26 +31,33 @@
   transition: opacity .9s ease .05s;
 }
 
-/* Ligne 1 */
-.line1 {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 40px;
+/* =========================================================
+   La grille (zones nommées : marque, navigation, réseaux, ciel)
+   ========================================================= */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "brand" "nav" "social" "sky";
+  gap: var(--space-l) var(--space-m);
+  align-items: baseline;
 }
 
-.id {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
+.brand {
+  grid-area: brand;
   min-width: 0;
-  min-height: var(--target);
-  padding-top: 2px;
+}
+
+.nav {
+  grid-area: nav;
+  min-width: 0;
+}
+
+.social {
+  grid-area: social;
+  min-width: 0;
 }
 
 .logo {
-  flex: none;
   font-family: var(--f-title);
   font-weight: 600;
   font-size: 22px;
@@ -81,54 +77,101 @@
 }
 
 .phrase {
-  min-width: 0;
-  font-size: 14px;
+  max-width: 36ch;
+  margin-top: var(--space-s);
+  line-height: 1.55;
+  color: var(--faint);
+  text-wrap: pretty;
+}
+
+/* Le titre d'une colonne : discret, sur la ligne de base du logo */
+.title {
+  margin-bottom: var(--space-xs);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: .01em;
   color: var(--faint);
 }
 
-.nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 28px;
-}
-
 .list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 22px;
+  display: grid;
+  justify-items: start;
 }
 
-.social {
-  position: relative;
-  padding-left: 28px;
+/* Le ciel secret (Créateur) : 420 px au plus, son geste intact. Il prend la largeur de sa zone
+   (le ciel se centre lui-même sur l'écran par des marges négatives : ici, c'est la grille qui le place). */
+.sky {
+  grid-area: sky;
+  align-self: start;
+  justify-self: start;
+  width: min(420px, 100%);
 }
 
-.social::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 1px;
-  height: 14px;
-  margin-top: -7px;
-  background: var(--line);
+.footer .sky > * {
+  margin-inline: 0;
 }
 
-/* Un lien : 44 px de haut, un soulignement qui glisse au survol */
+/* Tablette : la marque sur toute la largeur, puis deux colonnes ; le ciel sous la navigation */
+@media (min-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "brand brand" "nav social";
+  }
+
+  .withSky .grid {
+    grid-template-areas: "brand brand" "nav social" "sky social";
+  }
+}
+
+/* Ordinateur : la marque prend la place libre, les colonnes de liens la largeur de leur plus long libellé
+   (jamais coupé sur deux lignes) ; le ciel sous la marque */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas: "brand nav social";
+    column-gap: var(--space-xl);
+  }
+
+  .withSky .grid {
+    grid-template-areas: "brand nav social" "sky nav social";
+  }
+}
+
+/* Grand écran, Créateur : le ciel prend la quatrième colonne, à droite */
+@media (min-width: 1200px) {
+  .withSky .grid {
+    grid-template-columns: minmax(0, 1fr) auto auto 420px;
+    grid-template-areas: "brand nav social sky";
+    column-gap: var(--space-l);
+  }
+
+  .withSky .sky {
+    justify-self: end;
+  }
+}
+
+/* =========================================================
+   Un lien : un soulignement qui glisse au survol ; 36 px de haut à la souris, 44 px au doigt
+   ========================================================= */
 .link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: var(--target);
+  min-height: 36px;
+  max-width: 100%;
   padding: 0 1px;
   font-size: 14px;
-  font-weight: 400;
   line-height: 1.3;
   color: var(--muted);
   -webkit-tap-highlight-color: transparent;
   transition: color .35s var(--ease);
+}
+
+@media (pointer: coarse) {
+  .link {
+    min-height: var(--target);
+  }
 }
 
 .text {
@@ -196,23 +239,30 @@
   transform: translateX(-2px);
 }
 
-/* Le ciel (Créateur), puis la ligne 2 */
-.sky {
-  margin-top: 12px;
-}
-
-.bottom {
+/* =========================================================
+   La barre du bas : ©, (Marques) à gauche ; les réglages et « Revenir en haut » à droite
+   ========================================================= */
+.bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0 22px;
-  margin-top: 16px;
+  justify-content: space-between;
+  gap: 0 var(--space-m);
+  margin-top: var(--space-l);
+  padding-top: var(--space-xs);
   border-top: 1px solid var(--line);
   font-size: 13px;
 }
 
-.sky + .bottom {
-  margin-top: 4px;
+.bar .link {
+  font-size: 13px;
+}
+
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-m);
 }
 
 .copy {
@@ -223,147 +273,43 @@
   font-variant-numeric: tabular-nums;
 }
 
-.bottom .link {
-  font-size: 13px;
-}
-
-.end {
+.settings {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-left: auto;
+  gap: var(--space-xs);
 }
 
-/* Téléphone : navigation et réseaux en deux colonnes, cibles de 44 px */
-@media (max-width: 639px) {
-  .footer {
-    padding: 36px 0 calc(64px + env(safe-area-inset-bottom));
-  }
+.top {
+  margin-left: var(--space-xs);
+  white-space: nowrap;
+}
 
-  .line1 {
-    display: block;
-  }
-
-  .id {
-    display: block;
-    min-height: 0;
-  }
-
-  .logo {
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .phrase {
-    display: block;
-    max-width: 34ch;
-    line-height: 1.5;
-  }
-
-  .nav {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
-    gap: 0 16px;
-    margin-top: 14px;
-  }
-
-  .list {
-    display: grid;
-    gap: 0;
-  }
-
-  .social {
-    padding-left: 0;
-  }
-
-  .social::before {
-    content: none;
-  }
-
-  .link {
-    max-width: 100%;
-  }
-
-  .sky {
-    margin-top: 16px;
-  }
-
-  /* Le lien discret (Marques & collaborations) passe au-dessus ; © et « Revenir en haut » restent sur une ligne */
-  .bottom > .discreet {
-    order: -1;
+/* Téléphone : les réglages passent sur leur ligne, « Revenir en haut » à droite */
+@media (max-width: 559px) {
+  .settings {
     flex-basis: 100%;
   }
 
-  /* La langue se pose à droite, sur la ligne du logo : la ligne 2 garde la composition de la maquette, sans retour à
-     la ligne. Plus compacte (34 px de haut), centrée sur « Kenz· » (milieu à 13 px : 2 px de marge, 22 px de haut). */
-  .lang {
-    --lang-h: 28px;
-    position: absolute;
-    top: -4px;
-    right: var(--gr);
+  .top {
+    margin-left: auto;
   }
 }
 
-@media (min-width: 960px) {
-  .phrase {
-    white-space: nowrap;
-  }
-}
-
-/* Grand écran, Créateur : le ciel à droite, hors du flux (il ne grossit pas le pied de page) */
-@media (min-width: 1100px) {
-  .createur {
-    padding-top: 44px;
-  }
-
-  .createur:has(.sky) .line1 {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 0;
-    padding-right: 460px;
-  }
-
-  .createur:has(.sky) .id {
-    min-height: 0;
-    padding-top: 0;
-  }
-
-  .createur .sky {
-    position: absolute;
-    right: var(--gr);
-    bottom: 46px;
-    width: 420px;
-    margin: 0;
-  }
-
-  .createur .sky + .bottom {
-    margin-top: 16px;
-  }
-
-  .createur:has(.sky)::before {
-    right: calc(var(--gr) + 460px);
-  }
-}
-
-/* k15ze : son identité (fond #0D0F0E, le vert au survol) */
+/* =========================================================
+   k15ze : le vert au survol (le fond #0D0F0E est déjà celui de la page)
+   ========================================================= */
 .k15ze {
   --vert: var(--k-vert);
-  background: linear-gradient(180deg, rgb(13 15 14 / 0), var(--bg) 48px);
 }
 
 .k15ze .link:hover,
-.k15ze .link:focus-visible {
+.k15ze .link:focus-visible,
+.k15ze .theme:hover {
   color: var(--vert);
 }
 
 .k15ze .link[aria-current="page"] .text {
   background-image: linear-gradient(var(--vert), var(--vert));
-}
-
-.k15ze .end :global(button):hover {
-  color: var(--vert);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -23,6 +23,9 @@
 }
 
 .arrival {
+  /* Le sol de l'arche, posé au-dessus du bas du chapitre : la ligne de sol est dans la scène,
+     jamais sur la jonction avec le chapitre suivant (aucune séparation visible) */
+  --ground: clamp(56px, 9svh, 96px);
   position: relative;
   display: grid;
   place-items: center;
@@ -30,14 +33,17 @@
   min-height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  padding: calc(env(safe-area-inset-top) + 88px) var(--gr) 112px var(--gl);
+  padding: calc(env(safe-area-inset-top) + 88px) var(--gr) calc(112px + var(--ground)) var(--gl);
   text-align: center;
 }
 
+/* La lumière de l'arrivée s'éteint avant le bas du chapitre (sinon le bord la couperait net) */
 .light {
   position: absolute;
   inset: 0;
   z-index: -2;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--ground) * 3), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - var(--ground) * 3), transparent);
   background:
     radial-gradient(38% 34% at 50% 30%, rgb(var(--teinte-rgb) / .3), transparent 72%),
     radial-gradient(75% 46% at 50% 112%, rgb(var(--teinte-rgb) / .3), transparent 70%),
@@ -58,10 +64,10 @@
   --floor-delay: .8s;
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: var(--ground);
   z-index: -1;
-  height: min(82vh, 760px, 128vw);
-  height: min(82svh, 760px, 128vw);
+  height: min(calc(82vh - var(--ground)), 760px, 128vw);
+  height: min(calc(82svh - var(--ground)), 760px, 128vw);
   translate: -50% 0;
   pointer-events: none;
 }
@@ -183,7 +189,7 @@
 .cue {
   position: absolute;
   left: 50%;
-  bottom: calc(26px + env(safe-area-inset-bottom));
+  bottom: calc(var(--ground) + 26px + env(safe-area-inset-bottom));
   translate: -50% 0;
   display: grid;
   place-items: center;

@@ -69,6 +69,9 @@ export function Fil() {
           const trait = box.el.querySelector<HTMLElement>(":scope > [data-fil-trait]");
           if (!trait) return [];
           trait.hidden = index === 0;
+          // Le trait se place par rapport à son chapitre : on retire le décalage du chapitre dans l'écran,
+          // pour qu'il tombe sur --fil-x, dans l'axe exact du rail.
+          trait.style.setProperty("--fil-offset", `${box.el.getBoundingClientRect().left}px`);
           return index === 0 ? [] : [trait];
         });
         drawn = traits.map((_, index) => drawn[index] ?? (reduced.matches ? 1 : 0));

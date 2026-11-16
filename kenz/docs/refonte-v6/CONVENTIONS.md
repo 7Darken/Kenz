@@ -218,7 +218,7 @@ Tous les jetons sont dans `design-system/tokens.css` :
 | Lumière | `--lum`, `--lum-2` (en « r g b ») |
 | Matière | `--surface`, `--core`, `--sh-1`, `--sh-2` |
 | Mouvement | `--expo`, `--out`, `--io` |
-| Mesures | `--gutter`, `--gl`, `--gr`, `--maxw`, `--sec`, `--r-xl`, `--r-lg`, `--r-md` |
+| Mesures | `--gutter`, `--gl`, `--gr`, `--maxw`, `--sec`, `--r-xl`, `--r-lg`, `--r-md`, `--fil-x` (l'axe du fil : rail et traits) |
 | Polices | `--f-title`, `--f-text`, `--f-word`, `--f-num` |
 | Couleurs de marque | `--creme`, `--encre`, `--nuit`, `--red`, `--lagon`, `--or` |
 | k15ze | `--k-vert`, `--k-card`, `--k-title` |

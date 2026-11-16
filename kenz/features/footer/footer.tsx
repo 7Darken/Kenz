@@ -1,19 +1,19 @@
 "use client";
 
 /**
- * Le pied de page compact, dans ses trois univers (monté par le layout de l'univers) :
- * - pro : la phrase ; Mes apps, Escapades Libres, Agents IA, Contact ; GitHub, LinkedIn ; le bouton de mode ;
- * - createur : la phrase ; Le voyage, Le sport ; les réseaux voyage et k15ze ; Marques & collaborations ;
- *   `sky` : l'emplacement du ciel secret (branché par features/passages) ;
- * - k15ze : la promesse ; Ce que je partage, Mes courses, Toute ma création de contenu ; YouTube k15ze.
+ * Le pied de page, classique et compact, dans ses trois univers (monté par le layout de l'univers).
+ * Une grille de colonnes alignées sur la même ligne de base :
+ *   la marque et la phrase · la navigation · les réseaux · (Créateur) le ciel secret ;
+ * puis une barre du bas : « © 2026 Kenz » (et « Marques & collaborations » côté Créateur) à gauche,
+ * les réglages (langue, thème) et « Revenir en haut » à droite.
+ * 1024 px et plus : les colonnes côte à côte (le ciel sous la marque, puis à droite dès 1200) ; 560 à 1023 : la marque,
+ * puis deux colonnes (le ciel sous la navigation) ; en dessous : une colonne.
  * Il ne lie ni ne nomme jamais l'autre univers. Le lien de la page courante devient une ancre (#top) avec
  * aria-current ; les liens vers une autre page portent les attributs du passage (couleur d'arrivée).
- * Le sélecteur de langue (absent de la maquette) est en ligne 2 ; sur téléphone, il se pose sur la ligne du logo,
- * pour que le pied de page garde la hauteur de la maquette.
  */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 
 import { COPYRIGHT_YEAR, passageAttributes, ROUTES, type PassageTarget, type Universe } from "@/content/site";
 import { socialsOf, type Social } from "@/content/socials";
@@ -52,6 +52,8 @@ export function Footer({ variant, sky }: FooterProps) {
   const { lang, t } = useLanguage();
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { threshold: 0, rootMargin: "0px 0px -4% 0px" });
+  const navTitleId = useId();
+  const socialTitleId = useId();
   const f = t.footer;
 
   const content: Record<Universe, { phrase: string; links: FooterLink[]; socials: Social[]; extra: FooterLink[] }> = {
@@ -92,11 +94,11 @@ export function Footer({ variant, sky }: FooterProps) {
   };
   const { phrase, links, socials, extra } = content[variant];
 
-  const renderLink = (link: FooterLink, className?: string) => {
+  const renderLink = (link: FooterLink) => {
     const target = resolve(link.href, pathname);
     const anchor = target.href.startsWith("#");
     const props = {
-      className: className ? `${styles.link} ${className}` : styles.link,
+      className: styles.link,
       href: target.href,
       "aria-current": target.current ? ("page" as const) : undefined,
       ...(link.passage && !anchor ? passageAttributes(link.passage) : undefined),
@@ -120,27 +122,36 @@ export function Footer({ variant, sky }: FooterProps) {
   const socialLabel = (social: Social) =>
     variant === "createur" && social.universe === "k15ze" ? f.createur.youtubeK15ze : social.label;
 
-  const cls = [styles.footer, variant === "createur" && styles.createur, variant === "k15ze" && styles.k15ze]
-    .filter(Boolean)
-    .join(" ");
+  const withSky = variant === "createur" && Boolean(sky);
+  const cls = [styles.footer, styles[variant], withSky && styles.withSky].filter(Boolean).join(" ");
 
   return (
     <footer ref={ref} className={cls} data-in={inView ? "" : undefined}>
       <div className={styles.inner}>
-        <div className={styles.line1}>
-          <p className={styles.id}>
-            <span className={styles.logo}>
+        <div className={styles.grid}>
+          <div className={styles.brand}>
+            <p className={styles.logo}>
               Kenz<i className={styles.point} />
-            </span>
-            <span className={styles.phrase}>{phrase}</span>
-          </p>
-          <nav className={styles.nav} aria-label={f.label}>
-            <ul className={styles.list} aria-label={f.navLabel}>
+            </p>
+            <p className={styles.phrase}>{phrase}</p>
+          </div>
+
+          <nav className={styles.nav} aria-labelledby={navTitleId}>
+            <h2 id={navTitleId} className={styles.title}>
+              {f.navLabel}
+            </h2>
+            <ul className={styles.list}>
               {links.map((link) => (
                 <li key={link.href}>{renderLink(link)}</li>
               ))}
             </ul>
-            <ul className={`${styles.list} ${styles.social}`} aria-label={f.socialLabel}>
+          </nav>
+
+          <div className={styles.social}>
+            <h2 id={socialTitleId} className={styles.title}>
+              {f.socialLabel}
+            </h2>
+            <ul className={styles.list} aria-labelledby={socialTitleId}>
               {socials.map((social) => (
                 <li key={social.id}>
                   <a
@@ -158,22 +169,22 @@ export function Footer({ variant, sky }: FooterProps) {
                 </li>
               ))}
             </ul>
-          </nav>
+          </div>
+
+          {withSky ? <div className={styles.sky}>{sky}</div> : null}
         </div>
 
-        {variant === "createur" && sky ? <div className={styles.sky}>{sky}</div> : null}
-
-        <div className={styles.bottom}>
-          <p className={styles.copy}>{format(f.copyright, { year: COPYRIGHT_YEAR })}</p>
-          {extra.map((link) => (
-            <span key={link.href} className={styles.discreet}>
-              {renderLink(link)}
-            </span>
-          ))}
-          <div className={styles.end}>
-            <LanguageToggle className={styles.lang} />
-            {variant === "pro" ? <ThemeToggle bare /> : null}
-            <a className={styles.link} href="#top">
+        <div className={styles.bar}>
+          <div className={styles.legal}>
+            <p className={styles.copy}>{format(f.copyright, { year: COPYRIGHT_YEAR })}</p>
+            {extra.map((link) => (
+              <span key={link.href}>{renderLink(link)}</span>
+            ))}
+          </div>
+          <div className={styles.settings}>
+            <LanguageToggle />
+            <ThemeToggle bare className={styles.theme} />
+            <a className={`${styles.link} ${styles.top}`} href="#top">
               <span className={styles.text}>{t.common.actions.backToTop}</span>
               <i className={`${styles.ico} ${styles.icoUp}`}>
                 <Icon name="arrow-up" />

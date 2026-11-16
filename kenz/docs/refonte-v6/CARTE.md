@@ -34,7 +34,7 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `.reseaux` / `.reseau` (icônes rondes, bulle) | `design-system/components/social-links.tsx` | `size` : `md` (48 px) ou `sm` (46 px) ; `tone` : `k15ze`, `glass`, ou les couleurs du parent (`--u`, `--ic`, `--ring`). |
 | Badges des stores (`app.html`) | `store-badge.tsx` | |
 | Motif d'Escapades Libres (`MARQUE` d'app.html, symbole de `victoire.js`) | `escapades-mark.tsx` | `variant` : `page` (défaut : nav, arrivée, action) ou `logo` (mur de post-it) ; `ESCAPADES_LOGO` pour composer l'icône du passage. |
-| Sélecteur de langue (ancien site) | `language-toggle.tsx` | Dans le pied de page, ligne 2. Drapeaux dessinés en SVG (aucune requête tierce). |
+| Sélecteur de langue | `language-toggle.tsx` | Compact, en texte (« FR · EN »), dans la barre du bas du pied de page. |
 | Porte de retour des pages d'univers (`.retour`), matière des cartes (`.bezel`), briques des pages d'univers | `design-system/components/return-door.tsx`, `design-system/styles/bezel.module.css`, `design-system/styles/univers-page.module.css` | Partagés par voyage, sport et marques. |
 | Page 404 | `app/not-found.tsx` | Hors univers ; le retour mène à l'accueil de l'univers de l'adresse. |
 | `.nav` + variantes de `pro`, `app`, `agents`, `createur` (barre « stories »), `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
