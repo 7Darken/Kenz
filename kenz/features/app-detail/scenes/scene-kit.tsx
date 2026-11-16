@@ -2,6 +2,7 @@
  * Les outils communs aux animations « Comment ça marche » : la case cochée, et la recherche des pièces
  * animées par leurs ancres `data-s` (le style, lui, vit dans les CSS Modules des scènes).
  */
+import { shownImage } from "@/design-system/components/themed-image";
 import type { gsap } from "@/design-system/motion/gsap";
 import styles from "./scene.module.css";
 
@@ -9,7 +10,8 @@ import styles from "./scene.module.css";
 export type SceneBuilder = (core: HTMLElement) => gsap.core.Timeline;
 
 export function one<T extends Element = HTMLElement>(scope: Element, name: string): T {
-  const el = scope.querySelector<T>(`[data-s="${name}"]`);
+  // Une pièce en deux versions (ThemedImage, clair et sombre) : celle qui est affichée.
+  const el = shownImage<T>(scope, `[data-s="${name}"]`);
   if (!el) throw new Error(`scène : pièce « ${name} » introuvable`);
   return el;
 }

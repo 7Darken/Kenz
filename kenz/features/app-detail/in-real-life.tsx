@@ -2,13 +2,13 @@
  * 5. En vrai (apps mobiles) : les vraies captures en bento, l'icône et la sortie sur l'App Store,
  * la dernière version. La loupe grossit les captures.
  */
-import Image from "next/image";
 
 import { RELEASES_CHECKED_ON, type MobileApp } from "@/content/apps";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
 import { SweepTitle } from "@/design-system/components/sweep-title";
+import { ThemedImage } from "@/design-system/components/themed-image";
 import { T } from "@/i18n/text";
 import page from "./app-detail.module.css";
 import { ContentImage } from "./content-image";
@@ -34,7 +34,7 @@ export function InRealLife({ app }: { app: MobileApp }) {
           <Reveal className={`${styles.cell} ${styles.info}`} index={0}>
             <div className={page.bezel}>
               <div className={`${page.bezelCore} ${styles.infoCore}`}>
-                <Image className={styles.infoIcon} src={app.icon.src} width={app.icon.width} height={app.icon.height} alt="" sizes="72px" />
+                <ThemedImage className={styles.infoIcon} src={app.icon.src} darkSrc={app.iconDark?.src} width={app.icon.width} height={app.icon.height} alt="" sizes="72px" />
                 <p className={styles.line}>
                   <ReleaseSince release={release} />
                 </p>

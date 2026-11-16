@@ -17,6 +17,7 @@
  * hors du cadre, la fiche se replie dans l'icône ; puis le passage (openPassage) : l'icône vole vers la page.
  * Mouvement réduit : ciel fixe sans scintillement, pas de caméra, des fondus.
  */
+import { shownImage } from "@/design-system/components/themed-image";
 import { CSS_EASE } from "@/design-system/motion/easings";
 import { noteFrame, subscribeQuality } from "@/design-system/motion/quality";
 import { getTheme } from "@/design-system/theme/theme-store";
@@ -33,6 +34,8 @@ interface SpaceEngineApp {
   color: string;
   href: string;
   icon: string;
+  /** La version sombre de l'icône (mode sombre), s'il y en a une. */
+  iconDark?: string;
   preview: "gallery" | "animation";
 }
 
@@ -346,7 +349,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     const vh = window.innerHeight || 1;
     // Toutes les lectures de mise en page avant les écritures de l'image (pas de mise en page forcée).
     const r = scene.getBoundingClientRect();
-    const iconBox = shown >= 0 && mode === "float" ? astres[shown]?.querySelector("img")?.getBoundingClientRect() : undefined;
+    const iconBox = shown >= 0 && mode === "float" ? shownImage(astres[shown])?.getBoundingClientRect() : undefined;
     const sp = rm ? 0 : clamp((r.top + r.height / 2 - vh / 2) / vh, -1, 1);
     const boost = open >= 0 ? 1.6 : 1;
     layers.forEach((layer, i) => {
@@ -569,7 +572,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
    *  `boxes` : la scène et l'icône déjà mesurées (la boucle les lit avant d'écrire) ; la fiche se déduit de sa place. */
   function drawLegend(boxes?: { scene: DOMRect; icon: DOMRect }) {
     if (mode !== "float") return;
-    const icon = astres[shown]?.querySelector("img");
+    const icon = shownImage(astres[shown]);
     if (!icon) return;
     const r = boxes?.scene ?? scene.getBoundingClientRect();
     const b = boxes?.icon ?? icon.getBoundingClientRect();
@@ -776,7 +779,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   function explore(k: number) {
     if (leaving || k < 0) return;
     const app = apps[k];
-    const icon = astres[k]?.querySelector("img");
+    const icon = shownImage(astres[k]);
     if (!app || !icon) return;
     const r = scene.getBoundingClientRect();
     const b = icon.getBoundingClientRect();
@@ -813,7 +816,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     camera(k, "dive");
     if (!raf && active) raf = requestAnimationFrame(loop);
     // Puis le passage : l'icône se détache et se pose au centre, la couleur de l'app remplit l'écran.
-    if (!openPassage(icon, app.href, { color: app.color, icon: app.icon, size: ICON_SIZE })) {
+    if (!openPassage(icon, app.href, { color: app.color, icon: getTheme() === "dark" && app.iconDark ? app.iconDark : app.icon, size: ICON_SIZE })) {
       restoreTimer = window.setTimeout(restore, 900);
     }
   }

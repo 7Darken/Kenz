@@ -7,7 +7,6 @@
  * Arrivée par un passage (features/passages) : c'est son voile qui se rétracte dans l'arche, l'icône y est posée ;
  * l'arrivée se joue quand il se lève.
  */
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import type { App } from "@/content/apps";
@@ -16,6 +15,7 @@ import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
+import { shownImage, ThemedImage } from "@/design-system/components/themed-image";
 import { gsap } from "@/design-system/motion/gsap";
 import { CSS_EASE } from "@/design-system/motion/easings";
 import { useGsap } from "@/design-system/motion/use-gsap";
@@ -37,7 +37,6 @@ function rectInset(r: DOMRect, radius: number) {
 export function Arrival({ app }: { app: App }) {
   const innerRef = useRef<HTMLDivElement>(null);
   const floodRef = useRef<HTMLDivElement>(null);
-  const markRef = useRef<HTMLElement>(null);
   const [arrived, setArrived] = useState(false);
   const passage = usePassageArrival();
   const reduced = useReducedMotion();
@@ -62,7 +61,7 @@ export function Arrival({ app }: { app: App }) {
     };
     const contract = () => {
       if (!flood || flood.hasAttribute("data-off") || getComputedStyle(flood).display === "none") return floodOff();
-      const target = markRef.current?.getBoundingClientRect();
+      const target = shownImage<HTMLElement>(innerRef.current, "[data-passage-icone]")?.getBoundingClientRect();
       const motionReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       if (motionReduced || !target?.width) {
         flood.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: "forwards" }).onfinish = floodOff;
@@ -146,24 +145,20 @@ export function Arrival({ app }: { app: App }) {
         />
         <div ref={innerRef} className={styles.inner}>
           {app.kind === "mobile" ? (
-            <Image
-              ref={(node) => {
-                markRef.current = node;
-              }}
+            <ThemedImage
               className={styles.icon}
               src={app.icon.src}
+              darkSrc={app.iconDark?.src}
               width={app.icon.width}
               height={app.icon.height}
               alt={app.icon.alt ? localize(app.icon.alt, lang) : ""}
               sizes="150px"
-              priority
+              // Une seule version : préchargée. Deux : chargement différé, la version cachée n'est pas téléchargée.
+              priority={!app.iconDark}
               data-passage-icone=""
             />
           ) : (
             <span
-              ref={(node) => {
-                markRef.current = node;
-              }}
               className={`${styles.icon} ${styles.markBox}`}
               role="img"
               aria-label={localize(app.mark.label, lang)}

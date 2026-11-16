@@ -3,7 +3,6 @@
  * (Oshii : App Store et Google Play ; les autres : App Store) et son site ; pour Escapades Libres, « Le site est
  * en ligne. » et « Voir le site ».
  */
-import Image from "next/image";
 
 import type { App } from "@/content/apps";
 import { Button } from "@/design-system/components/button";
@@ -11,6 +10,7 @@ import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
 import { StoreBadge } from "@/design-system/components/store-badge";
+import { ThemedImage } from "@/design-system/components/themed-image";
 import { Words } from "@/design-system/components/words";
 import { T } from "@/i18n/text";
 import styles from "./action.module.css";
@@ -24,7 +24,7 @@ export function Action({ app }: { app: App }) {
       {app.kind === "mobile" ? (
         <>
           <Reveal>
-            <Image className={styles.icon} src={app.icon.src} width={app.icon.width} height={app.icon.height} alt="" sizes="100px" />
+            <ThemedImage className={styles.icon} src={app.icon.src} darkSrc={app.iconDark?.src} width={app.icon.width} height={app.icon.height} alt="" sizes="100px" />
           </Reveal>
           <Words as="h2" id={TITLE_ID} className={page.say} text={{ k: "apps.action.title" }} />
           <Reveal variant="fade" index={4} className={styles.buttons}>

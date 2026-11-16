@@ -13,7 +13,7 @@ const TITLE_ID = "apps-title";
 export function AppsSpace() {
   const items: SpaceApp[] = SPACE_ORDER.map((slug) => {
     const app = apps[slug];
-    return { slug, name: app.name, color: app.colors.tint, icon: app.icon, card: app.space };
+    return { slug, name: app.name, color: app.colors.tint, icon: app.icon, iconDark: app.iconDark, card: app.space };
   });
   // Le code secret, en index des astres (un slug absent de la scène le rendrait impossible : il est ignoré).
   const code = CONSTELLATION_CODE.map((slug) => SPACE_ORDER.indexOf(slug)).filter((i) => i >= 0);

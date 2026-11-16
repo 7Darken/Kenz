@@ -7,6 +7,7 @@
  *   [data-passage-icone] (≈ 620 ms) pendant que le voile se rétracte dans [data-passage-arche] s'il existe.
  * Mouvement réduit : des fondus.
  */
+import { shownImage } from "@/design-system/components/themed-image";
 import {
   armSafety,
   beginPassage,
@@ -213,13 +214,13 @@ function placeIcon(target: HTMLElement | null) {
 
 /** L'icône du voile vole jusqu'à sa place sur la page ; le voile se rétracte dans l'arche de lumière. */
 function landIcon(v: Veil, size: number, reduced: boolean, finish: () => void) {
-  const first = document.querySelector<HTMLElement>("[data-passage-icone]");
+  const first = shownImage<HTMLElement>(document, "[data-passage-icone]");
   if (first) first.style.opacity = "0";
   let started = false;
   const go = () => {
     if (started) return;
     started = true;
-    const target = document.querySelector<HTMLElement>("[data-passage-icone]");
+    const target = shownImage<HTMLElement>(document, "[data-passage-icone]");
     const arch = document.querySelector<HTMLElement>("[data-passage-arche]");
     markArrivalReady();
     if (reduced || !target || !v.icon) {

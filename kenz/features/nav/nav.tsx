@@ -14,7 +14,6 @@
  * `usePageEntrance` de features/passages), 1,4 s après sur une page d'app ; pendant l'arrivée d'un passage,
  * le retour reste masqué (shared/passage.css, `.kz-passage-arrivee .kz-back`).
  */
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSyncExternalStore, type ReactNode } from "react";
@@ -25,6 +24,7 @@ import { BrandMark } from "@/design-system/components/brand-mark";
 import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
+import { ThemedImage } from "@/design-system/components/themed-image";
 import { usePageEntrance } from "@/features/passages";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
@@ -116,7 +116,7 @@ export function Nav({ variant, dot, apps }: NavProps) {
 
         {app?.kind === "mobile" && app.icon ? (
           <a className={styles.app} href="#action" aria-label={format(t.common.nav.tryAppLabel, { app: app.name })}>
-            <Image src={app.icon} alt="" width={34} height={34} sizes="34px" />
+            <ThemedImage src={app.icon} darkSrc={app.iconDark} alt="" width={34} height={34} sizes="34px" />
             <span>{t.common.nav.tryApp}</span>
           </a>
         ) : null}

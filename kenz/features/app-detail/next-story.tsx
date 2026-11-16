@@ -5,7 +5,6 @@
  * Sur écran tactile, elle s'allume quand elle passe au centre de l'écran. Le lien part avec le passage
  * coloré (features/passages), dans la teinte de l'app suivante.
  */
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
@@ -15,6 +14,7 @@ import { Container } from "@/design-system/components/container";
 import { Icon } from "@/design-system/components/icon";
 import { Rich } from "@/design-system/components/rich";
 import { Section } from "@/design-system/components/section";
+import { ThemedImage } from "@/design-system/components/themed-image";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
@@ -54,7 +54,7 @@ export function NextStory({ next }: { next: MobileApp }) {
         >
           <Rich text={localize(next.story.question, lang)} />
           {"⁠"}
-          <Image className={styles.icon} src={next.icon.src} width={next.icon.width} height={next.icon.height} alt="" sizes="120px" />
+          <ThemedImage className={styles.icon} src={next.icon.src} darkSrc={next.iconDark?.src} width={next.icon.width} height={next.icon.height} alt="" sizes="120px" />
         </Link>
         <p className={styles.caption} id={CAPTION_ID}>
           {format(t.apps.next.caption, { app: next.name })}

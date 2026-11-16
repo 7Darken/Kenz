@@ -151,6 +151,8 @@ export interface MobileApp extends AppBase {
   kind: "mobile";
   slug: MobileAppSlug;
   icon: ImageAsset;
+  /** La version sombre de l'icône, quand l'app en a une (icône « Dark » d'iOS) : affichée en mode sombre. */
+  iconDark?: ImageAsset;
   space: AppSpaceCard;
   story: MobileAppStory;
 }
@@ -173,8 +175,13 @@ type AppsBySlug = { readonly [S in MobileAppSlug]: MobileApp & { slug: S } } & {
 
 const APP_STORE = "https://apps.apple.com/";
 
-const appIcon = (slug: MobileAppSlug, alt: Localized<string>): ImageAsset => ({
-  src: `/assets/apps/${slug}-icone.jpg`,
+/**
+ * L'icône d'une app (320 px). Une app qui a une icône « Dark » d'iOS a deux fichiers : `-icone-clair` et
+ * `-icone-sombre` (posée sur le fond sombre du système) ; les autres, un seul `-icone`. Un fichier changé prend un
+ * nouveau nom : l'optimiseur d'images et les caches gardent une adresse 30 jours.
+ */
+const appIcon = (slug: MobileAppSlug, alt: Localized<string>, variant?: "clair" | "sombre"): ImageAsset => ({
+  src: `/assets/apps/${slug}-icone${variant ? `-${variant}` : ""}.jpg`,
   width: 320,
   height: 320,
   alt,
@@ -199,7 +206,8 @@ export const apps: AppsBySlug = {
     slug: "oshii",
     name: "Oshii",
     colors: { tint: "#E5483B", tintRgb: "229 72 59", light: "#FF9384", lightRgb: "255 147 132", dark: "#B8322A" },
-    icon: appIcon("oshii", { fr: "Icône d’Oshii", en: "Oshii app icon" }),
+    icon: appIcon("oshii", { fr: "Icône d’Oshii", en: "Oshii app icon" }, "clair"),
+    iconDark: appIcon("oshii", { fr: "Icône d’Oshii", en: "Oshii app icon" }, "sombre"),
     space: {
       domain: { fr: "Cuisine", en: "Cooking" },
       line: { fr: "Ta vidéo TikTok devient une vraie recette.", en: "Your TikTok video becomes a real recipe." },
@@ -313,7 +321,8 @@ export const apps: AppsBySlug = {
     slug: "wado",
     name: "Wado",
     colors: { tint: "#2F7A55", tintRgb: "47 122 85", light: "#8ADBAE", lightRgb: "138 219 174", dark: "#24684A" },
-    icon: appIcon("wado", { fr: "Icône de Wado", en: "Wado app icon" }),
+    icon: appIcon("wado", { fr: "Icône de Wado", en: "Wado app icon" }, "clair"),
+    iconDark: appIcon("wado", { fr: "Icône de Wado", en: "Wado app icon" }, "sombre"),
     space: {
       domain: { fr: "Sport & nutrition", en: "Fitness & nutrition" },
       line: { fr: "Une photo de ton plat, et ton plan s’ajuste.", en: "A photo of your meal, and your plan adjusts." },
@@ -415,7 +424,8 @@ export const apps: AppsBySlug = {
     slug: "sago",
     name: "Sago",
     colors: { tint: "#5B4BC4", tintRgb: "91 75 196", light: "#B3A8FF", lightRgb: "179 168 255", dark: "#4A3BB0" },
-    icon: appIcon("sago", { fr: "Icône de Sago", en: "Sago app icon" }),
+    icon: appIcon("sago", { fr: "Icône de Sago", en: "Sago app icon" }, "clair"),
+    iconDark: appIcon("sago", { fr: "Icône de Sago", en: "Sago app icon" }, "sombre"),
     space: {
       domain: { fr: "Japonais", en: "Japanese" },
       line: {
@@ -933,6 +943,8 @@ export interface NavApp {
   kind: App["kind"];
   /** L'icône (apps mobiles) ; Escapades Libres a son motif. */
   icon?: string;
+  /** Sa version sombre, s'il y en a une. */
+  iconDark?: string;
 }
 
 /**
@@ -940,7 +952,10 @@ export interface NavApp {
  * n'embarque ainsi ni l'histoire des apps ni ce module.
  */
 export const navApps = (): Readonly<Record<AppSlug, NavApp>> => {
-  const entry = (app: App): NavApp => ({ name: app.name, kind: app.kind, icon: app.kind === "mobile" ? app.icon.src : undefined });
+  const entry = (app: App): NavApp =>
+    app.kind === "mobile"
+      ? { name: app.name, kind: app.kind, icon: app.icon.src, iconDark: app.iconDark?.src }
+      : { name: app.name, kind: app.kind };
   return Object.fromEntries(APP_SLUGS.map((slug) => [slug, entry(apps[slug])])) as Record<AppSlug, NavApp>;
 };
 

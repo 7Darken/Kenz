@@ -17,6 +17,7 @@ import type { HexColor, ImageAsset } from "@/content/types";
 import { Icon } from "@/design-system/components/icon";
 import { Rich } from "@/design-system/components/rich";
 import { useLanguage } from "@/i18n/language-provider";
+import { ThemedImage } from "@/design-system/components/themed-image";
 import { localize } from "@/i18n/localize";
 import { AppsTotal } from "./apps-total";
 import { ENSEMBLE_EVENT, startSpace } from "./space-engine";
@@ -28,6 +29,7 @@ export interface SpaceApp {
   name: string;
   color: HexColor;
   icon: ImageAsset;
+  iconDark?: ImageAsset;
   card: AppSpaceCard;
 }
 
@@ -76,6 +78,7 @@ export function SpaceScene({ apps, code, portrait, titleId, users }: SpaceSceneP
         color: a.color,
         href: ROUTES.app(a.slug),
         icon: a.icon.src,
+        iconDark: a.iconDark?.src,
         preview: a.card.preview.kind,
       })),
       code,
@@ -155,7 +158,7 @@ export function SpaceScene({ apps, code, portrait, titleId, users }: SpaceSceneP
                   <i className={styles.aig} data-aig="" />
                 </span>
                 <span className={styles.puce} data-zone="">
-                  <Image src={a.icon.src} alt="" width={a.icon.width} height={a.icon.height} sizes="88px" draggable={false} />
+                  <ThemedImage src={a.icon.src} darkSrc={a.iconDark?.src} alt="" width={a.icon.width} height={a.icon.height} sizes="88px" draggable={false} />
                 </span>
                 {/* Le nom accessible est ce texte visible (« Oshii, Cuisine ») : la virgule, pour les lecteurs
                     d'écran, et l'espace séparent les mots sans se voir. */}
