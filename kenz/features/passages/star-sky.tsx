@@ -4,7 +4,8 @@
  * Le ciel en arche (port de maquettes/v6/shared/etoiles.js) : le passage secret du pied de page Créateur vers Pro.
  * Au repos, 9 étoiles fines à positions fixes ; rien ne les trahit (au plus un scintillement au survol direct).
  * Le geste part d'une étoile (souris ou doigt) : un trait lumineux suit le pointeur et s'accroche aux étoiles frôlées.
- * - Le bon code (l'arche : 3, 4, 5, 7, 8) : les segments s'illuminent un à un, la constellation s'embrase, se resserre
+ * - Le bon code (l'arche : 3, 4, 5, 7, 8, dans un sens ou dans l'autre, une étoile frôlée en trop pardonnée) : le tracé
+ *   se redessine au propre, les segments s'illuminent un à un, la constellation s'embrase, se resserre
  *   et devient la lune ; puis le décollage vers l'univers Pro.
  * - Autre chose : au lâcher, le tracé s'efface en 400 ms, sans un mot.
  * La bande est décorative (aria-hidden) : le chemin au clavier est le cordon du logo (Alt + Flèche bas).
@@ -45,8 +46,9 @@ const STARS: readonly Star[] = [
 ];
 const VB_W = 360;
 const VB_H = 130;
-const SNAP = 22; // px à l'écran : le tracé s'accroche à une étoile
-const GRAB = 26; // px : tolérance pour partir d'une étoile
+const SNAP = 30; // px à l'écran : le tracé s'accroche à une étoile (un doigt n'est pas une règle)
+const GRAB = 30; // px : tolérance pour partir d'une étoile
+const MAX_STRAY = 1; // étoiles frôlées en trop, pardonnées
 const FADE_MS = 400; // le mauvais tracé s'efface
 const SAFETY_S = 8; // navigation bloquée : le ciel revient au repos
 const BRASIER_R = 96;
@@ -56,6 +58,16 @@ const CENTER = {
   y: round2(CODE.reduce((sum, n) => sum + STARS[n - 1].y, 0) / CODE.length),
 };
 const isCode = (n: number) => (CODE as readonly number[]).includes(n);
+const CODE_BACK: readonly number[] = [...CODE].reverse();
+
+/** Le tracé est-il l'arche ? Ses étoiles du code, dans l'ordre du tracé (sens direct ou inverse), avec au plus
+ *  MAX_STRAY étoile en trop ; sinon null. */
+function archOf(seq: readonly number[]): readonly number[] | null {
+  const arch = seq.filter(isCode);
+  if (seq.length - arch.length > MAX_STRAY || arch.length !== CODE.length) return null;
+  const same = (ref: readonly number[]) => arch.every((n, i) => n === ref[i]);
+  return same(CODE) || same(CODE_BACK) ? arch : null;
+}
 
 /** La lune (dessinée dans un repère de 400) posée au centre de la forme. */
 const moonTransform = (k: number) =>
@@ -196,7 +208,8 @@ export function StarSky() {
       seq.push(n);
       stars[n - 1].classList.add(styles.taken);
       if (before) addSegment(before, n);
-      if (seq.length === CODE.length && seq.every((s, i) => s === CODE[i])) succeed();
+      const arch = archOf(seq);
+      if (arch) succeed(arch);
     };
 
     const clearTrace = () => {
@@ -250,13 +263,18 @@ export function StarSky() {
       symbolFills.forEach((path) => path.style.setProperty("opacity", String(round2(Math.max(0, k * 1.6 - 0.6)))));
     };
 
-    /* Le bon code : embrasement, la lune, puis le décollage. */
-    const succeed = () => {
+    /* Le bon code : le tracé redessiné au propre (l'arche seule, dans le sens du geste), embrasement, la lune, puis le
+       décollage. */
+    const succeed = (arch: readonly number[]) => {
       phase = "fire";
       releasePointer();
       live.setAttribute("display", "none");
+      segments.forEach((seg) => seg.remove());
+      segments = [];
+      stars.forEach((star, i) => star.classList.toggle(styles.taken, arch.includes(i + 1)));
+      arch.slice(1).forEach((n, i) => addSegment(arch[i], n));
       const reduced = prefersReducedMotion();
-      const codeStars = CODE.map((n) => stars[n - 1]);
+      const codeStars = arch.map((n) => stars[n - 1]);
       const lift = () => {
         track.after(SAFETY_S, reset);
         if (!startLiftoff()) reset();
