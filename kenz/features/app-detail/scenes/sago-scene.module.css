@@ -1,100 +1,188 @@
-/* Sago : le japonais devient lisible (app.html, « Scènes ») */
+/* Sago : l'essai de l'app, la phrase devient lisible. Couleurs de l'app (src/v2/design/tokens.ts) */
 .scene {
-  --tint: 150 128 255;
-  --sc-a: #1E1736;
-  --sc-b: #110D21;
+  --tint: 124 77 255;
+  --sc-a: #17151E;
+  --sc-b: #0C0B10;
+  --sg-ac: #7C4DFF;
+  --sg-ac-text: #B49BFF;
+  --sg-tx: #F5F3FA;
+  --sg-edge: rgba(255, 255, 255, .1);
+}
+
+/* La caisse du konbini, l'image du lieu dans l'app */
+.place {
+  position: absolute;
+  left: 6cqw;
+  right: 6cqw;
+  top: 7cqw;
+  aspect-ratio: 3 / 2;
+  border-radius: 5cqw;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--sg-edge), 0 4cqw 10cqw -4cqw rgba(0, 0, 0, .8);
+}
+
+.placeImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Un mot à sa place : le point de l'app et son étiquette */
+.pin {
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  width: 0;
+  height: 0;
+}
+
+.dot,
+.ring {
+  position: absolute;
+  left: -2.5cqw;
+  top: -2.5cqw;
+  width: 5cqw;
+  height: 5cqw;
+  border-radius: 50%;
+}
+
+.dot {
+  background: var(--sg-ac);
+  box-shadow: 0 0 0 .7cqw #fff, 0 1cqw 2.4cqw rgba(12, 11, 16, .55);
+}
+
+.ring {
+  box-shadow: 0 0 0 .5cqw rgba(255, 255, 255, .9);
+  opacity: 0;
+}
+
+.chip {
+  position: absolute;
+  left: 0;
+  bottom: 4.2cqw;
+  translate: -50% 0;
+  padding: 1cqw 2.2cqw;
+  border-radius: 1.6cqw;
+  background: #fff;
+  color: #16131F;
+  font-family: var(--f-ja);
+  font-size: max(10px, 3.6cqw);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: 0 1cqw 3cqw -1cqw rgba(12, 11, 16, .6);
+}
+
+.below .chip {
+  top: 4.2cqw;
+  bottom: auto;
+}
+
+/* Kuro, posé sur le coin de l'image */
+.kuro {
+  position: absolute;
+  right: 2cqw;
+  top: 42cqw;
+  width: 28cqw;
+  aspect-ratio: 1;
+  filter: drop-shadow(0 2cqw 2.4cqw rgba(0, 0, 0, .45));
+}
+
+.pose {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* L'état final : Kuro sourit */
+.before {
+  opacity: 0;
 }
 
 .line {
   position: absolute;
   left: 0;
   right: 0;
-  top: 52cqw;
+  top: 83cqw;
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 3.4cqw;
+  gap: 1.8cqw;
   margin: 0;
   font-family: var(--f-ja);
   font-weight: 600;
-  font-size: 13.5cqw;
+  font-size: 9.6cqw;
   line-height: 1;
-  letter-spacing: .02em;
+  color: var(--sg-tx);
 }
 
 .word {
-  position: relative;
   display: inline-block;
 }
 
-.kana {
-  display: inline-block;
+/* Le mot trouvé dans l'image garde la couleur de l'app */
+.found {
+  color: var(--sg-ac-text);
 }
 
-.draw {
+.line rt {
+  font-size: .32em;
+  font-weight: 500;
+  letter-spacing: .04em;
+  padding-bottom: .5cqw;
+}
+
+.rule {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 3.4cqw);
-  width: 24cqw;
-  height: auto;
-  translate: -50% 0;
-  overflow: visible;
-}
-
-.draw path {
-  fill: none;
-  stroke-width: 2.3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.cat path {
-  stroke: var(--creme);
-}
-
-.heart path {
-  stroke: #C2B3FF;
+  left: 22cqw;
+  right: 22cqw;
+  top: 99cqw;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(244, 239, 230, .25), transparent);
 }
 
 .fr {
   position: absolute;
   left: 6cqw;
   right: 6cqw;
-  top: 84cqw;
+  top: 103cqw;
+  margin: 0;
   text-align: center;
-  font-size: max(17px, 6.6cqw);
-  font-weight: 500;
-  letter-spacing: -.02em;
+  font-size: max(17px, 6.8cqw);
+  letter-spacing: -.01em;
   line-height: 1.2;
+  color: var(--sg-tx);
 }
 
 .frWord {
   display: inline-block;
 }
 
-.rule {
-  position: absolute;
-  left: 20cqw;
-  right: 20cqw;
-  top: 76cqw;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(244, 239, 230, .25), transparent);
-}
-
 :global(html[data-theme="light"]) .scene {
-  --tint: 91 75 196;
+  --tint: 106 60 240;
   --sc-a: #FFFFFF;
-  --sc-b: #F2F0FA;
+  --sc-b: #F6F4FA;
+  --sg-ac: #6A3CF0;
+  --sg-ac-text: #5B2EE0;
+  --sg-tx: #16131F;
+  --sg-edge: rgba(30, 20, 60, .08);
 }
 
-:global(html[data-theme="light"]) .cat path {
-  stroke: var(--fg);
+:global(html[data-theme="light"]) .place {
+  box-shadow: 0 0 0 1px var(--sg-edge), 0 2cqw 4cqw -1cqw rgba(30, 20, 60, .14), 0 8cqw 16cqw -6cqw rgba(30, 20, 60, .3);
 }
 
-:global(html[data-theme="light"]) .heart path {
-  stroke: #5B4BC4;
+:global(html[data-theme="light"]) .kuro {
+  filter: drop-shadow(0 1.6cqw 1.8cqw rgba(30, 20, 60, .25));
 }
 
 :global(html[data-theme="light"]) .rule {
   background: linear-gradient(90deg, transparent, rgba(26, 25, 24, .22), transparent);
+}
+
+/* Appareils moins puissants : sans ombre portée filtrée sur la mascotte */
+:global(html[data-quality="low"]) .kuro {
+  filter: none;
 }

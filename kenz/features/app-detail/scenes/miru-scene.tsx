@@ -1,116 +1,188 @@
 "use client";
 
-/** Miru : le thème s'écrit, les cartes se battent puis se distribuent à cinq joueurs, un téléphone passe de main en main. */
+/**
+ * Miru : le thème s'écrit dans le champ des thèmes IA, le personnage IA de l'app crée les cartes (leur vrai dos
+ * « MIRU. »), elles se battent puis se distribuent aux cinq joueurs (des personnages des jeux de l'app), et le
+ * téléphone passe de main en main, ouvert sur l'écran « Glisse » de l'app. Couleurs, police (Nunito) et pièces :
+ * celles de l'app (miru/src/design/tokens, docs/miruv2/mockups/kit.css).
+ */
+import { Nunito } from "next/font/google";
+import Image from "next/image";
+import type { CSSProperties } from "react";
+
+import { MIRU_SAMPLE } from "@/content/app-scenes";
 import type { App } from "@/content/apps";
 import { gsap } from "@/design-system/motion/gsap";
+import { getQuality } from "@/design-system/motion/quality";
 import { useTranslation } from "@/i18n/language-provider";
 import { all, one, type SceneBuilder } from "./scene-kit";
 import { HowItWorks } from "../how-it-works";
 import styles from "./miru-scene.module.css";
 
-/** Les cinq joueurs (visages au trait, couleurs douces) : fond, cheveux, encre, bouche. */
-const PLAYERS = [
-  { bg: "#FFB86B", hair: "M5 17c2-8 8-13 15-13s13 5 15 13c-5-3-9-4-15-4S10 14 5 17z", hairFill: "#7A4A1E", hairOpacity: 0.55, ink: "#2A1C3D", eyeY: 21, mouth: "M15.5 27q4.5 3.5 9 0" },
-  { bg: "#7FD1C7", hair: "M6 15c3-7 8-11 14-11 7 0 12 5 14 12-6-4-10-1-14-5-4 4-9 2-14 4z", hairFill: "#1F4F4A", hairOpacity: 0.55, ink: "#16302E", eyeY: 21, mouth: "M16 27h8" },
-  { bg: "#B9A5FF", hair: "M4 22c0-11 7-18 16-18s16 7 16 18c-3-5-8-8-16-8S7 17 4 22z", hairFill: "#3B2A7A", hairOpacity: 0.5, ink: "#221A45", eyeY: 22, mouth: "M15.5 28q4.5 3.5 9 0" },
-  { bg: "#FFA493", hair: "M8 13c3-6 7-9 12-9s9 3 12 9c-4-2-8-2-12-2s-8 0-12 2z", hairFill: "#6B2A22", hairOpacity: 0.5, ink: "#3A1A16", eyeY: 21, mouth: "M15.5 26.5q4.5 4 9 0" },
-  { bg: "#8EC5FF", hair: "M5 18c1-9 7-14 15-14s14 5 15 14c-4-4-8-6-15-6S9 14 5 18z", hairFill: "#1E3F66", hairOpacity: 0.5, ink: "#14263D", eyeY: 21, mouth: "M15.5 27q4.5 3 9 0" },
-] as const;
+/** La police de l'app, chargée avec sa scène seule. */
+const nunito = Nunito({ subsets: ["latin"], weight: ["800", "900"], display: "swap", preload: false });
 
-const AV_CLASS = [styles.av0, styles.av1, styles.av2, styles.av3, styles.av4];
-const CARD_CLASS = [styles.card0, styles.card1, styles.card2, styles.card3, styles.card4];
+/** Une position en cqw, et son inclinaison en degrés. */
+type Point = readonly [x: number, y: number, tilt?: number];
 
-/** Où vont les cartes (x %, y %, rotation) et où passe le téléphone (x %, y %). */
-const DEAL = [
-  [0, -250.75, -6],
-  [318, -77.5, 10],
-  [196.5, 202.8, 14],
-  [-196.5, 202.8, -12],
-  [-318, -77.5, -9],
-] as const;
-const HANDS = [
-  [0, -116.9],
-  [197.6, -36.1],
-  [122.1, 94.5],
-] as const;
+/** Le centre de la table (cqw) : la pioche, puis le téléphone posé au milieu. */
+const TABLE: Point = [50, 72];
+/** Tailles (cqw) d'une carte et du téléphone, comme dans le CSS ; la carte distribuée est réduite. */
+const CARD: Point = [13, 17];
+const CARD_DEALT = 0.72;
+const PHONE: Point = [15, 31];
 
-export function MiruScene() {
+/** Les cinq places (cqw) : le joueur, sa carte posée devant lui, et le téléphone quand il l'a en main (les trois premiers). */
+const SEATS: readonly { player: Point; card: Point; phone?: Point }[] = [
+  { player: [50, 38], card: [50, 52.5, -4], phone: [50, 59, -5] },
+  { player: [82.3, 61.5], card: [68.7, 66, 9], phone: [66.5, 67, 7] },
+  { player: [70, 99.5], card: [61.6, 88, 13], phone: [57.5, 82.5, 8] },
+  { player: [30, 99.5], card: [38.4, 88, -11] },
+  { player: [17.7, 61.5], card: [31.3, 66, -8] },
+];
+const HANDS = SEATS.flatMap((seat) => (seat.phone ? [seat.phone] : []));
+/** Le téléphone finit chez le dernier joueur qui l'a en main : c'est sa place dans le CSS. */
+const LAST = HANDS.length - 1;
+const REST = HANDS[LAST] ?? TABLE;
+
+/** Une pièce placée par ses variables (--x, --y en cqw, --r en degrés) : le CSS la pose, la timeline part de là. */
+const at = ([x, y, tilt]: Point) => ({ "--x": x, "--y": y, ...(tilt === undefined ? {} : { "--r": `${tilt}deg` }) }) as CSSProperties;
+const tone = (color: string) => ({ "--a": color }) as CSSProperties;
+/** Un écart en cqw, en pourcentage de la taille de la pièce (xPercent / yPercent : suit le redimensionnement). */
+const pct = (delta: number, size: number) => (delta / size) * 100;
+
+export function MiruScene({ name }: { name: string }) {
   const s = useTranslation().apps.scenes.miru;
+  const { players, ai } = MIRU_SAMPLE;
   return (
-    <>
+    <div className={`${styles.app} ${nunito.className}`}>
       <div className={styles.field}>
-        <span className={styles.fieldLabel}>{s.theme}</span>
-        <span className={styles.type}>
-          <span>
+        <span className={styles.fieldText}>
+          <span className={styles.fieldLabel}>{s.theme}</span>
+          <span className={styles.type}>
             {Array.from(s.typed).map((char, index) => (
               <span key={index} data-s="char">
                 {char}
               </span>
             ))}
+            <i className={styles.caret} data-s="caret" />
           </span>
-          <i className={styles.caret} data-s="caret" />
+        </span>
+        <span className={styles.create} data-s="create">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4z" />
+          </svg>
         </span>
       </div>
-      {CARD_CLASS.map((cls, index) => (
-        <span key={index} className={`${styles.card} ${cls}`} data-s="card" />
-      ))}
-      {PLAYERS.map((p, index) => (
-        <span key={index} className={`${styles.av} ${AV_CLASS[index]}`} data-s="avatar">
-          <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
-            <circle cx="20" cy="20" r="20" fill={p.bg} />
-            <path d={p.hair} fill={p.hairFill} opacity={p.hairOpacity} />
-            <circle cx="15" cy={p.eyeY} r="1.8" fill={p.ink} />
-            <circle cx="25" cy={p.eyeY} r="1.8" fill={p.ink} />
-            <path d={p.mouth} stroke={p.ink} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-          </svg>
-          <i className={styles.hi} data-s="highlight" />
+      <Image className={styles.ai} src={ai.src} width={ai.width} height={ai.height} alt="" sizes="180px" data-s="ai" />
+      {SEATS.map((seat, index) => (
+        <span key={index} className={styles.card} style={at(seat.card)} data-s="card">
+          <b className={styles.brand}>
+            {name}
+            <i />
+          </b>
         </span>
       ))}
-      <span className={styles.phone} data-s="phone">
-        <i />
+      {SEATS.map((seat, index) => {
+        const player = players[index];
+        if (!player) return null;
+        return (
+          <span key={index} className={styles.seat} style={at(seat.player)} data-s="seat" data-held={index === LAST ? "" : undefined}>
+            <span className={styles.avatar} style={tone(player.color)}>
+              <Image src={player.face.src} width={player.face.width} height={player.face.height} alt="" sizes="80px" />
+            </span>
+            <i className={styles.ring} data-s="ring" />
+          </span>
+        );
+      })}
+      <span className={styles.phone} style={at(REST)} data-s="phone">
+        <span className={styles.screen}>
+          <span className={styles.lid}>
+            <span className={styles.lidFace}>
+              {HANDS.map((_, index) => {
+                const player = players[index];
+                return player ? (
+                  <span key={index} className={styles.avatar} style={tone(player.color)} data-s="phone-face">
+                    <Image src={player.face.src} width={player.face.width} height={player.face.height} alt="" sizes="40px" />
+                  </span>
+                ) : null;
+              })}
+            </span>
+            <span className={styles.hint}>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 15l6-6 6 6" />
+              </svg>
+              {s.swipe}
+            </span>
+          </span>
+        </span>
       </span>
-    </>
+    </div>
   );
 }
 
 export const buildMiru: SceneBuilder = (el) => {
   const chars = all(el, "char");
   const caret = one(el, "caret");
+  const create = one(el, "create");
+  const ai = one(el, "ai");
   const cards = all(el, "card");
-  const avatars = all(el, "avatar");
-  const highlights = all(el, "highlight");
+  const seats = all(el, "seat");
+  const rings = all(el, "ring");
   const phone = one(el, "phone");
+  const faces = all(el, "phone-face");
+  // Appareil modeste : les cartes vont droit aux joueurs, sans se battre.
+  const lite = getQuality() === "low";
+  const deckX = (i: number) => pct(TABLE[0] - (SEATS[i]?.card[0] ?? TABLE[0]), CARD[0]);
+  const deckY = (i: number) => pct(TABLE[1] - (SEATS[i]?.card[1] ?? TABLE[1]), CARD[1]);
+  const phoneX = (p: Point) => pct(p[0] - REST[0], PHONE[0]);
+  const phoneY = (p: Point) => pct(p[1] - REST[1], PHONE[1]);
+
   gsap.set(chars, { display: "none" });
   gsap.set(caret, { opacity: 1 });
-  gsap.set(cards, { x: 0, y: 0, xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 0 });
-  gsap.set(avatars, { opacity: 0.35, scale: 0.9 });
-  gsap.set(highlights, { opacity: 0 });
-  gsap.set(phone, { x: 0, y: 0, xPercent: 0, yPercent: 0, opacity: 0, scale: 0.8 });
+  gsap.set(create, { scale: 1 });
+  gsap.set(ai, { autoAlpha: 0, yPercent: 8, scale: 0.9 });
+  gsap.set(cards, { xPercent: deckX, yPercent: deckY, rotation: 0, scale: 0.7, opacity: 0 });
+  gsap.set(seats, { opacity: 0.35, scale: 0.9 });
+  gsap.set(rings, { opacity: 0 });
+  gsap.set(faces, { opacity: (i: number) => (i === 0 ? 1 : 0) });
+  gsap.set(phone, { xPercent: phoneX(TABLE), yPercent: phoneY(TABLE), rotation: 0, opacity: 0, scale: 0.8 });
+
   const tl = gsap
     .timeline({ paused: true, defaults: { ease: "expo.out" } })
     .to(chars, { display: "inline", duration: 0, stagger: 0.034 }, 0.15)
-    .to(avatars, { opacity: 1, scale: 1, duration: 0.8, stagger: 0.06 }, 0.25)
+    .to(seats, { opacity: 1, scale: 1, duration: 0.8, stagger: 0.06 }, 0.25)
+    .to(ai, { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.9 }, 0.3)
+    // Le thème est écrit : « Créer », et le personnage IA sort les cartes.
+    .to(create, { scale: 0.86, duration: 0.12, ease: "power2.out" }, 1)
+    .to(create, { scale: 1, duration: 0.6 }, 1.12)
     .to(caret, { opacity: 0, duration: 0.2 }, 1.1)
-    .to(cards, { opacity: 1, duration: 0.3, stagger: 0.03 }, 1.1)
-    .to(cards, { xPercent: (i: number) => (i % 2 ? 58 : -58), rotation: (i: number) => (i % 2 ? 8 : -8), duration: 0.28, ease: "power2.out" }, 1.3)
-    .to(cards, { xPercent: 0, rotation: (i: number) => (i - 2) * 2, yPercent: (i: number) => -i * 4, duration: 0.32, ease: "power3.inOut", stagger: 0.03 }, 1.6)
-    .to(
+    .to(cards, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.05 }, 1.1)
+    .to(ai, { autoAlpha: 0, yPercent: 6, scale: 0.92, duration: 0.45, ease: "expo.in" }, 1.15);
+  if (!lite) {
+    tl.to(cards, { xPercent: (i: number) => deckX(i) + (i % 2 ? 58 : -58), rotation: (i: number) => (i % 2 ? 8 : -8), duration: 0.28, ease: "power2.out" }, 1.35).to(
       cards,
-      {
-        xPercent: (i: number) => DEAL[i]?.[0] ?? 0,
-        yPercent: (i: number) => DEAL[i]?.[1] ?? 0,
-        rotation: (i: number) => DEAL[i]?.[2] ?? 0,
-        scale: 0.75,
-        duration: 0.7,
-        stagger: 0.09,
-      },
-      2.0,
-    )
-    .to(phone, { opacity: 1, scale: 1, duration: 0.5 }, 2.6);
-  HANDS.forEach(([x, y], k) => {
+      { xPercent: deckX, yPercent: (i: number) => deckY(i) - i * 4, rotation: (i: number) => (i - 2) * 2, duration: 0.32, ease: "power3.inOut", stagger: 0.03 },
+      1.65,
+    );
+  }
+  tl.to(cards, { xPercent: 0, yPercent: 0, rotation: (i: number) => SEATS[i]?.card[2] ?? 0, scale: CARD_DEALT, duration: 0.7, stagger: 0.09 }, 2).to(
+    phone,
+    { opacity: 1, scale: 1, duration: 0.5 },
+    2.6,
+  );
+  // Le téléphone passe de main en main : l'anneau de l'app suit celui qui l'a, l'écran montre son avatar.
+  HANDS.forEach((hand, k) => {
     const t = 2.85 + k * 0.36;
-    tl.to(phone, { xPercent: x, yPercent: y, duration: 0.4, ease: "power3.inOut" }, t).to(highlights[k] ?? [], { opacity: 1, duration: 0.3 }, t + 0.28);
-    if (k > 0) tl.to(highlights[k - 1] ?? [], { opacity: 0, duration: 0.2 }, t + 0.1);
+    tl.to(phone, { xPercent: phoneX(hand), yPercent: phoneY(hand), rotation: hand[2] ?? 0, duration: 0.4, ease: "power3.inOut" }, t)
+      .to(rings[k] ?? [], { opacity: 1, duration: 0.3 }, t + 0.28)
+      .to(seats[k] ?? [], { scale: 1.1, duration: 0.5 }, t + 0.28);
+    if (k > 0) {
+      tl.to(faces[k] ?? [], { opacity: 1, duration: 0.25, ease: "power2.out" }, t + 0.15)
+        .to(faces[k - 1] ?? [], { opacity: 0, duration: 0.25, ease: "power2.out" }, t + 0.15)
+        .to(rings[k - 1] ?? [], { opacity: 0, duration: 0.2 }, t + 0.1)
+        .to(seats[k - 1] ?? [], { scale: 1, duration: 0.4 }, t + 0.1);
+    }
   });
   return tl;
 };
@@ -119,7 +191,7 @@ export const buildMiru: SceneBuilder = (el) => {
 export default function MiruChapter({ app }: { app: App }) {
   return (
     <HowItWorks app={app} build={buildMiru} tint={styles.scene} sample={"bottom"}>
-      <MiruScene />
+      <MiruScene name={app.name} />
     </HowItWorks>
   );
 }

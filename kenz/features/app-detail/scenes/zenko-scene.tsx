@@ -3,7 +3,7 @@
 /**
  * Zenko : le curseur du budget glisse de 40 € à 25 €, et le matin, l'après-midi et le soir se recomposent (exemple).
  * La mini-animation est celle de features/zenko-demo (partagée avec la fiche de l'accueil Pro) ; ici, son habillage
- * d'écran et son tempo.
+ * d'écran, aux couleurs chocolat de l'app (EnBueno, src/theme), et son tempo.
  */
 import type { App } from "@/content/apps";
 import { ZenkoDemo, zenkoTimeline, type ZenkoSkin } from "@/features/zenko-demo";
@@ -17,6 +17,7 @@ const SKIN: ZenkoSkin = {
   budget: styles.budget,
   head: styles.head,
   label: styles.label,
+  logo: styles.logo,
   value: styles.value,
   rollWindow: kit.rollW,
   roll: `${kit.roll} ${styles.roll}`,
@@ -28,8 +29,7 @@ const SKIN: ZenkoSkin = {
   day: styles.day,
   card: styles.card,
   act: styles.act,
-  icon: styles.icon,
-  iconBefore: styles.iconBefore,
+  moment: styles.moment,
   text: styles.text,
   when: styles.when,
   cost: styles.cost,

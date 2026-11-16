@@ -13,8 +13,7 @@ export function zenkoTimeline(root: Element, start: number): gsap.core.Timeline 
   const knobWrap = root.querySelector("[data-zk-knobwrap]");
   const knob = root.querySelector("[data-zk-knob]");
   const cards = q("[data-zk-card]");
-  const before = q('[data-zk-icon="before"]');
-  const after = q('[data-zk-icon="after"]');
+  const acts = q("[data-zk-act]");
   const costs = q("[data-zk-cost]");
   const share = (i: number, key: "before" | "after") => Number(cards[i]?.dataset[key]) || 0.6;
   // Le rouleau finit sur le dernier chiffre (25) : il remonte de tous les autres.
@@ -24,9 +23,7 @@ export function zenkoTimeline(root: Element, start: number): gsap.core.Timeline 
   gsap.set(roll, { y: 0, yPercent: 0 });
   gsap.set(fill, { scaleX: 0.8 });
   gsap.set(knobWrap, { x: 0, xPercent: 80 });
-  gsap.set([...before, ...after], { transformPerspective: 240 });
-  gsap.set(before, { opacity: 1, rotationX: 0 });
-  gsap.set(after, { opacity: 0, rotationX: -90 });
+  gsap.set(acts, { transformPerspective: 240, rotationX: 0 });
   gsap.set(costs, { scaleX: (i: number) => share(i, "before") });
   gsap.set(cards, { xPercent: (i: number) => [-3, 4, -2][i] ?? 0, rotation: (i: number) => [-1.4, 1.1, -0.7][i] ?? 0 });
 
@@ -38,7 +35,7 @@ export function zenkoTimeline(root: Element, start: number): gsap.core.Timeline 
     .to(roll, { yPercent: (-100 * (steps - 1)) / steps, duration: 1.4, ease: "power2.inOut" }, at(0.15))
     .to(knob, { scale: 1, duration: 0.4 }, at(1.55))
     .to(cards, { xPercent: 0, rotation: 0, duration: 0.9, stagger: 0.12 }, at(1.5))
-    .to(before, { rotationX: 90, opacity: 0, duration: 0.24, ease: "power2.in", stagger: 0.14 }, at(1.55))
-    .to(after, { rotationX: 0, opacity: 1, duration: 0.8, stagger: 0.14 }, at(1.8))
+    // Chaque moment se retourne comme une tuile : sa journée est recomposée.
+    .to(acts, { rotationX: -360, duration: 1.1, ease: "power3.inOut", stagger: 0.14 }, at(1.5))
     .to(costs, { scaleX: (i: number) => share(i, "after"), duration: 1, stagger: 0.14 }, at(1.7));
 }

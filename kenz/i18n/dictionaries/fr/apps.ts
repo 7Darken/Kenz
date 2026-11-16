@@ -59,34 +59,49 @@ export const apps = {
   /** Les animations de « Comment ça marche ». */
   scenes: {
     sample: "exemple",
+    /** La recette de la démo de l'app, avec ses textes (Oshii, locales/fr/onboarding.json). */
     oshii: {
-      caption: "pâtes crémeuses au citron",
+      caption: "Tarte aux cookies Nutella à la cuillère 🍫 Recette complète en vidéo !",
       shareTo: "Partager vers",
-      recipe: "Pâtes crémeuses au citron",
+      recipe: "Tarte aux cookies Nutella à la cuillère",
+      /** « {n} » est remplacé par le nombre (de minutes, de parts, d'étapes). */
+      time: "{n} min",
+      servings: "{n} parts",
+      ingredientsTitle: "Ingrédients",
       ingredients: {
-        pasta: "Pâtes",
-        parmesan: "Parmesan",
-        lemon: "Citron",
-        cream: "Crème",
+        flour: "Farine",
+        butter: "Beurre",
+        chocolate: "Pépites de chocolat",
+        brownSugar: "Sucre roux",
       },
-      steps: "4 étapes",
+      steps: "{n} étapes",
     },
     sago: {
-      translation: "J’aime les chats.",
+      /** La phrase de l'essai de l'app (お茶をください), traduite. */
+      translation: "Un thé, s’il vous plaît.",
     },
     wado: {
       protein: "Protéines",
       carbs: "Glucides",
       fat: "Lipides",
       day: "Ta journée",
+      /** Les unités de l'app : les grammes d'une macro, l'énergie d'un plat et de la journée. */
+      gram: "g",
+      kcal: "kcal",
     },
     croc: {
-      streak: "Série",
-      days: "jours",
-      morning: "Matin",
+      /** Le compteur de l'accueil de l'app, et son unité (« 12 j »). */
+      clean: "Sans mordre",
+      unit: "j",
+      /** L'anneau du pacte, comme dans l'app : son titre puis le mot en son centre, à chaque étape. */
       commit: "Je m’engage",
+      committed: "Promesse faite",
+      kept: "Pacte tenu",
+      hold: "Maintiens",
+      engaged: "Engagé",
+      held: "Tenu",
+      morning: "Matin",
       evening: "Soir",
-      kept: "Tenu",
       /** Les initiales des jours, du lundi au dimanche (séparées par des espaces). */
       week: "L M M J V S D",
       bravo: "Cette série tient. Bravo.",
@@ -94,6 +109,8 @@ export const apps = {
     miru: {
       theme: "Thème",
       typed: "Les films des années 2000",
+      /** L'invitation de l'écran « Passe le téléphone » de l'app : glisser vers le haut pour voir sa carte. */
+      swipe: "Glisse",
     },
     zenko: {
       budget: "Budget",
@@ -105,7 +122,10 @@ export const apps = {
       afternoon: "Après-midi",
       evening: "Soir",
     },
+    /** Les textes du site (vouvoiement) : la 2e des 12 phrases du test, puis la carte postale du résultat. */
     escapades: {
+      question: "J’aime essayer des choses nouvelles : plats, activités, lieux.",
+      yourProfile: "Votre profil",
       profile: "Aventurier",
     },
   },

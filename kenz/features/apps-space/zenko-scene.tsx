@@ -12,6 +12,7 @@ import styles from "./zenko-scene.module.css";
 const SKIN: ZenkoSkin = {
   head: styles.head,
   label: styles.label,
+  logo: styles.logo,
   value: styles.value,
   rollWindow: styles.rollWindow,
   roll: styles.roll,
@@ -23,8 +24,7 @@ const SKIN: ZenkoSkin = {
   day: styles.day,
   card: styles.card,
   act: styles.act,
-  icon: styles.icon,
-  iconBefore: styles.iconBefore,
+  moment: styles.moment,
   text: styles.txt,
   when: styles.when,
   cost: styles.cost,

@@ -1,8 +1,14 @@
-/* Zenko : un budget, une journée qui se recompose (app.html, « Scènes ») */
+/* Zenko : un budget, une journée qui se recompose. Couleurs chocolat de l'app (EnBueno, src/theme/dark.ts et light.ts) */
 .scene {
-  --tint: 214 146 88;
-  --sc-a: #2C1D12;
-  --sc-b: #1A110B;
+  --tint: 169 113 85;
+  --sc-a: #1A1A1A;
+  --sc-b: #0C0C0C;
+  --zk-card: #1A1A1A;
+  --zk-edge: #2F2F2F;
+  --zk-muted: #C8C8C8;
+  --zk-soft: rgba(169, 113, 85, .16);
+  --zk-fill: linear-gradient(90deg, #8B5A42, #C4977A);
+  --zk-cost: #C4977A;
 }
 
 .budget {
@@ -19,8 +25,19 @@
 }
 
 .label {
-  font-size: max(11px, 3.4cqw);
-  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 2.2cqw;
+  font-size: max(11px, 3.6cqw);
+  font-weight: 600;
+  color: var(--zk-muted);
+}
+
+/* Le biscuit, le logo de l'app */
+.logo {
+  flex: none;
+  width: 7.4cqw;
+  height: 7.4cqw;
 }
 
 .value {
@@ -36,7 +53,7 @@
 .value small {
   font-size: .56em;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--zk-muted);
 }
 
 .roll {
@@ -48,14 +65,14 @@
   height: 2cqw;
   margin-top: 6cqw;
   border-radius: 2cqw;
-  background: rgba(244, 239, 230, .12);
+  background: rgba(244, 239, 230, .1);
 }
 
 .fill {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #B97A47, #F0B987);
+  background: var(--zk-fill);
   transform-origin: left;
   transform: scaleX(.5);
 }
@@ -77,8 +94,8 @@
   height: 7.4cqw;
   margin: -3.7cqw 0 0 -3.7cqw;
   border-radius: 50%;
-  background: var(--creme);
-  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .5), 0 0 0 1.4cqw rgba(240, 185, 135, .2);
+  background: #FFFFFF;
+  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .5), 0 0 0 1.4cqw rgb(var(--tint) / .25);
 }
 
 .ends {
@@ -98,6 +115,7 @@
   gap: 3cqw;
 }
 
+/* Un moment de la journée, comme sur la carte de l'app : son pictogramme, son nom */
 .card {
   display: flex;
   align-items: center;
@@ -105,37 +123,24 @@
   height: 18cqw;
   padding: 0 4cqw;
   border-radius: 4.4cqw;
-  background: rgba(244, 239, 230, .07);
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+  background: var(--zk-card);
+  box-shadow: inset 0 0 0 1px var(--zk-edge);
 }
 
 .act {
-  position: relative;
+  display: grid;
+  place-items: center;
   flex: none;
   width: 11cqw;
   height: 11cqw;
   border-radius: 3cqw;
-  background: rgba(240, 185, 135, .16);
+  background: var(--zk-soft);
+  backface-visibility: visible;
 }
 
-.icon {
-  position: absolute;
-  left: 2.2cqw;
-  top: 2.2cqw;
-  width: 6.6cqw;
-  height: 6.6cqw;
-  color: #F3C79C;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  backface-visibility: hidden;
-}
-
-/* L'état final : l'activité moins chère */
-.iconBefore {
-  opacity: 0;
+.moment {
+  width: 7.6cqw;
+  height: 7.6cqw;
 }
 
 .text {
@@ -154,60 +159,41 @@
   position: relative;
   height: 1.2cqw;
   border-radius: 1cqw;
-  background: rgba(244, 239, 230, .1);
+  background: rgba(244, 239, 230, .08);
   overflow: hidden;
 }
 
 .cost i {
   position: absolute;
   inset: 0;
-  background: #E2A877;
+  background: var(--zk-cost);
   transform-origin: left;
   transform: scaleX(var(--c2));
 }
 
 :global(html[data-theme="light"]) .scene {
-  --tint: 160 97 58;
+  --tint: 105 49 23;
   --sc-a: #FFFFFF;
-  --sc-b: #FBF4EC;
-}
-
-:global(html[data-theme="light"]) .label,
-:global(html[data-theme="light"]) .value small,
-:global(html[data-theme="light"]) .ends {
-  color: var(--faint);
+  --sc-b: #F8F8F8;
+  --zk-card: #FFFFFF;
+  --zk-muted: rgba(0, 0, 0, .6);
+  --zk-soft: rgba(169, 113, 85, .14);
+  --zk-fill: linear-gradient(90deg, #A5653D, #693117);
+  --zk-cost: #A97155;
 }
 
 :global(html[data-theme="light"]) .track {
   background: rgba(26, 25, 24, .09);
 }
 
-:global(html[data-theme="light"]) .fill {
-  background: linear-gradient(90deg, #C98A57, #A0613A);
-}
-
 :global(html[data-theme="light"]) .knob {
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1cqw 3cqw rgba(26, 25, 24, .3), 0 0 0 1.4cqw rgba(160, 97, 58, .16);
+  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1cqw 3cqw rgba(26, 25, 24, .3), 0 0 0 1.4cqw rgb(var(--tint) / .14);
 }
 
 :global(html[data-theme="light"]) .card {
-  background: #fff;
   box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .24);
-}
-
-:global(html[data-theme="light"]) .act {
-  background: rgba(160, 97, 58, .12);
-}
-
-:global(html[data-theme="light"]) .icon {
-  color: #8A4F2C;
 }
 
 :global(html[data-theme="light"]) .cost {
   background: rgba(26, 25, 24, .07);
-}
-
-:global(html[data-theme="light"]) .cost i {
-  background: #C98A57;
 }

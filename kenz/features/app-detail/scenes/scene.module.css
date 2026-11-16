@@ -1,7 +1,8 @@
 /* =========================================================
    Le cadre des animations « Comment ça marche » (app.html, « Scènes ») : une coque, un écran en unités cqw.
    État final par défaut (lisible sans JS et en mouvement réduit) ; GSAP pose l'état de départ et joue.
-   Chaque scène pose --tint (« r g b »), --sc-a et --sc-b (le dégradé de l'écran) sur sa racine.
+   Chaque scène pose --tint (« r g b »), --sc-a et --sc-b (le dégradé de l'écran) sur sa racine ; un écran qui garde
+   sa couleur en clair (celle de l'app) y pose aussi --sc-ex, la couleur de la mention « exemple ».
    ========================================================= */
 .sc {
   position: relative;
@@ -34,7 +35,7 @@
   bottom: 4cqw;
   z-index: 5;
   font-size: max(11px, 2.9cqw);
-  color: rgba(244, 239, 230, .6);
+  color: var(--sc-ex, rgba(244, 239, 230, .6));
   letter-spacing: .01em;
 }
 
@@ -172,7 +173,7 @@
 }
 
 :global(html[data-theme="light"]) .ex {
-  color: var(--faint);
+  color: var(--sc-ex, var(--faint));
 }
 
 :global(html[data-theme="light"]) .replay {

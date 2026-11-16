@@ -1,8 +1,11 @@
-/* La mini-animation de Zenko (shared/apps.css, .kzs et .kzs--zenko). Unités du conteneur : cqw = l'écran. */
+/*
+ * La mini-animation de Zenko (shared/apps.css, .kzs et .kzs--zenko), aux couleurs chocolat de l'app (EnBueno,
+ * src/theme/dark.ts). Unités du conteneur : cqw = l'écran.
+ */
 .scene {
-  --t: 214 146 88;
-  --a: #2D1E13;
-  --b: #170F09;
+  --t: 169 113 85;
+  --a: #22170F;
+  --b: #0C0C0C;
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -45,8 +48,18 @@
 }
 
 .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.2cqw;
   font-size: max(9px, 3.6cqw);
   color: rgba(244, 239, 230, .72);
+}
+
+/* Le biscuit, le logo de l'app */
+.logo {
+  flex: none;
+  width: 8cqw;
+  height: 8cqw;
 }
 
 .value {
@@ -99,7 +112,7 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, #B97A47, #F0B987);
+  background: linear-gradient(90deg, #8B5A42, #C4977A);
   transform-origin: left;
   transform: scaleX(.5);
 }
@@ -122,7 +135,7 @@
   margin: -4cqw 0 0 -4cqw;
   border-radius: 50%;
   background: #F4EFE6;
-  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .5), 0 0 0 1.5cqw rgba(240, 185, 135, .2);
+  box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .5), 0 0 0 1.5cqw rgb(var(--t) / .25);
 }
 
 .ends {
@@ -153,31 +166,19 @@
 }
 
 .act {
-  position: relative;
+  display: grid;
+  place-items: center;
   flex: none;
   width: 12cqw;
   height: 12cqw;
   border-radius: 3.4cqw;
-  background: rgba(240, 185, 135, .16);
+  background: rgb(var(--t) / .16);
 }
 
-.icon {
-  position: absolute;
-  left: 2.4cqw;
-  top: 2.4cqw;
-  width: 7.2cqw;
-  height: 7.2cqw;
-  color: #F3C79C;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  backface-visibility: hidden;
-}
-
-.iconBefore {
-  opacity: 0;
+/* Le pictogramme du moment, celui de l'app */
+.moment {
+  width: 8.4cqw;
+  height: 8.4cqw;
 }
 
 .txt {
@@ -203,7 +204,7 @@
 .cost i {
   position: absolute;
   inset: 0;
-  background: #E2A877;
+  background: #C4977A;
   transform-origin: left;
   transform: scaleX(var(--c2));
 }

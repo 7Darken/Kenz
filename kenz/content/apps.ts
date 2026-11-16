@@ -236,8 +236,8 @@ export const apps: AppsBySlug = {
         { at: 2.25, text: { fr: "Elle devient une fiche pesée.", en: "It becomes a recipe card with exact quantities." } },
       ],
       demoAlt: {
-        fr: "Animation : une vidéo de recette, « pâtes crémeuses au citron », est partagée à Oshii. Elle se replie dans l’icône et devient une fiche pesée : pâtes 200 g, parmesan 40 g, citron 1, crème 10 cl, 4 étapes.",
-        en: "Animation: a recipe video, “creamy lemon pasta”, is shared to Oshii. It folds into the icon and becomes a recipe card with exact quantities: pasta 200 g, parmesan 40 g, 1 lemon, cream 10 cl, 4 steps.",
+        fr: "Animation : la vidéo TikTok d’une tarte aux cookies Nutella à la cuillère est partagée à Oshii. Elle se replie dans l’icône et devient la fiche pesée de l’app : 45 min, 15 parts, farine 475 g, beurre 230 g, pépites de chocolat 450 g, sucre roux 160 g, 11 étapes. La mascotte d’Oshii se réjouit. Recette d’exemple.",
+        en: "Animation: a TikTok video of a spoonable Nutella cookie pie is shared to Oshii. It folds into the icon and becomes the app’s recipe card with exact quantities: 45 min, 15 servings, flour 475 g, butter 230 g, chocolate chips 450 g, brown sugar 160 g, 11 steps. Oshii’s mascot cheers. Sample recipe.",
       },
       ai: {
         kind: "steps",
@@ -453,12 +453,12 @@ export const apps: AppsBySlug = {
       },
       beats: [
         { at: 0, text: { fr: "Une phrase que tu ne sais pas lire.", en: "A sentence you can’t read." } },
-        { at: 0.15, text: { fr: "Chaque mot prend une image.", en: "Each word gets a picture." } },
+        { at: 0.5, text: { fr: "Chaque mot prend une image.", en: "Each word gets a picture." } },
         { at: 2.3, text: { fr: "Et la phrase prend son sens.", en: "And the sentence makes sense." } },
       ],
       demoAlt: {
-        fr: "Animation : la phrase japonaise « ねこ が すき », d’abord floue. Un chat se dessine au-dessus de ねこ, un cœur au-dessus de すき, les mots deviennent nets et la traduction apparaît : « J’aime les chats. »",
-        en: "Animation: the Japanese sentence “ねこ が すき”, blurry at first. A cat is drawn above ねこ, a heart above すき, the words come into focus and the translation appears: “I like cats.”",
+        fr: "Animation : sous l’image de la caisse d’un konbini, la phrase japonaise « お茶をください » reste d’abord pâle. Les mots du lieu se posent à leur place sur l’image, お茶 (le thé), おにぎり, パン, et お茶 s’éclaire dans la phrase. Puis toute la phrase devient lisible et la traduction apparaît : « Un thé, s’il vous plaît. » Kuro, le chat mascotte, réfléchit, puis sourit.",
+        en: "Animation: below a picture of a konbini checkout, the Japanese sentence “お茶をください” starts out faded. The words of the place land on the picture, お茶 (tea), おにぎり, パン, and お茶 lights up in the sentence. Then the whole sentence becomes clear and the translation appears: “Tea, please.” Kuro, the cat mascot, thinks it over, then smiles.",
       },
       ai: {
         kind: "steps",
@@ -844,8 +844,8 @@ export const apps: AppsBySlug = {
         { at: 2.6, text: { fr: "Un groupe, un voyage.", en: "One group, one trip." } },
       ],
       demoAlt: {
-        fr: "Animation : les 12 phrases du test se remplissent, une réponse est choisie. Le profil « Aventurier » apparaît, puis rejoint un petit groupe de cinq voyageurs. Leur voyage se trace, et l’agence coche trajets, logement, activités et accessibilité.",
-        en: "Animation: the quiz’s 12 statements fill in and an answer is picked. The “Adventurer” profile appears, then joins a small group of five travelers. Their trip is mapped out, and the agency ticks off transport, accommodation, activities and accessibility.",
+        fr: "Animation : une des 12 phrases du test, « J’aime essayer des choses nouvelles : plats, activités, lieux », reçoit sa réponse, et le petit avion avance sur le tracé du parcours. Le profil « Aventurier » arrive en carte postale qui se retourne, et son timbre se pose. Puis un petit groupe de cinq voyageurs, une carte postale de Marseille, et Escapades Libres coche trajets, logement, activités et accessibilité. Exemple.",
+        en: "Animation: one of the quiz’s 12 statements, “I love trying new things: food, activities, places”, gets its answer, and the little plane moves along the journey’s route. The “Adventurer” profile arrives as a postcard that flips over, and its stamp lands. Then a small group of five travelers, a postcard from Marseille, and Escapades Libres ticks off transport, accommodation, activities and accessibility. Sample.",
       },
       role: {
         title: { fr: "Mon rôle", en: "My role" },

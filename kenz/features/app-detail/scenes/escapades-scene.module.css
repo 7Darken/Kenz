@@ -1,331 +1,397 @@
-/* Escapades Libres : un test, un profil, un petit groupe. Des formes, pas de phrases (app.html, « Scènes ») */
+/*
+ * Escapades Libres : un test, un profil, un groupe. Couleurs, ombres « pâte à modeler » et carte postale du site
+ * (EscapadesLibres : packages/brand/src/theme.css, apps/web/src/app/globals.css).
+ */
 .scene {
   --tint: 227 162 26;
-  --sc-a: #1B2438;
-  --sc-b: #10172A;
-  --el-or: #E3A21A;
-  --el-carte: #F6F0E4;
-  --el-encre: #121A2B;
-  --el-trait: rgba(244, 239, 230, .2);
+  --sc-a: #15233A;
+  --sc-b: #0E1A2B;
+  --el-mustard: #E3A21A;
+  --el-mustard-ink: #8A5A00;
+  --el-night: #0E1A2B;
+  --el-cream: #F6F1E7;
+  --el-sand: #EADFC8;
+  --el-coral: #FF6B4A;
+  /* Le fond de la scène (le site en nuit), et ce qui se pose dessus */
+  --el-ground: var(--el-night);
+  --el-on-ground: rgba(246, 241, 231, .3);
+  --el-clay: 0 1px 0 0 rgba(246, 241, 231, .7) inset, 0 4cqw 9cqw -4cqw rgba(0, 0, 0, .55), 0 1cqw 2.4cqw -1cqw rgba(0, 0, 0, .3);
+  --el-postcard: 0 7cqw 14cqw -6cqw rgba(0, 0, 0, .6), 0 2cqw 4cqw -2cqw rgba(0, 0, 0, .3);
 }
 
-.dots {
-  position: absolute;
-  left: 11cqw;
-  right: 11cqw;
-  top: 11cqw;
-  display: flex;
-  justify-content: space-between;
-}
-
-.dots li {
-  position: relative;
-  width: 3.6cqw;
-  height: 3.6cqw;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 .45cqw rgba(244, 239, 230, .22);
-}
-
-.dots i {
+.app {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  background: var(--el-or);
-  box-shadow: 0 0 2.2cqw rgb(227 162 26 / .5);
+  color: var(--el-night);
 }
 
-.question {
+/* ---------- Le tracé du parcours : pointillés, remplissage moutarde, escales, petit avion ---------- */
+.route {
   position: absolute;
   left: 13cqw;
   right: 13cqw;
-  top: 27cqw;
-  padding: 7.4cqw 6.6cqw 6.6cqw;
-  border-radius: 6cqw;
-  background: rgba(244, 239, 230, .06);
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
-  opacity: 0;
+  top: 10cqw;
+  height: 0;
 }
 
-.questionBar {
-  display: block;
-  height: 3.2cqw;
-  border-radius: 2cqw;
-  background: var(--el-trait);
+.route::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -.4cqw;
+  height: .8cqw;
+  background: radial-gradient(circle, var(--el-on-ground) .38cqw, transparent .44cqw) 0 50% / 2.4cqw .8cqw repeat-x;
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -.35cqw;
+  height: .7cqw;
+  border-radius: 1cqw;
+  background: var(--el-mustard);
   transform-origin: left;
 }
 
-.questionBar + .questionBar {
-  width: 62%;
-  margin-top: 2.8cqw;
+.stop {
+  --done: 1;
+  position: absolute;
+  top: 0;
+  width: 2.8cqw;
+  height: 2.8cqw;
+  margin: -1.4cqw 0 0 -1.4cqw;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--el-mustard) calc(var(--done) * 100%), var(--el-ground));
+  box-shadow: 0 0 0 .9cqw var(--el-ground), inset 0 0 0 .45cqw color-mix(in srgb, var(--el-mustard) calc(var(--done) * 100%), var(--el-on-ground));
+}
+
+/* L'avion avance le long du tracé : son support fait toute la largeur, il glisse de sa propre largeur */
+.planeWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 0;
+  transform: translateX(100%);
+}
+
+.plane {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 7.4cqw;
+  height: 7.4cqw;
+  margin: -3.7cqw 0 0 -3.7cqw;
+  border-radius: 50%;
+  background: var(--el-cream);
+  color: var(--el-night);
+  box-shadow: var(--el-clay);
+}
+
+.plane svg {
+  width: 4cqw;
+  height: 4cqw;
+  fill: currentColor;
+}
+
+/* ---------- 1. Une phrase du test ---------- */
+.question {
+  position: absolute;
+  left: 8cqw;
+  right: 8cqw;
+  top: 31cqw;
+  padding: 7cqw 6.4cqw 7.4cqw;
+  border-radius: 6cqw;
+  background: var(--el-cream);
+  box-shadow: var(--el-postcard);
+  opacity: 0;
+}
+
+.phrase {
+  font-family: var(--el-display), var(--f-text);
+  font-weight: 700;
+  font-size: max(16px, 6.4cqw);
+  line-height: 1.12;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+
+.quote {
+  font-family: var(--f-word);
+  font-weight: 400;
+  color: var(--el-mustard-ink);
 }
 
 .scale {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-top: 8.4cqw;
+  margin-top: 8cqw;
 }
 
 .scale li {
-  position: relative;
-  width: 9cqw;
-  height: 9cqw;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 .5cqw rgba(244, 239, 230, .24);
-}
-
-.scale i {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: var(--el-or);
-  box-shadow: 0 0 3cqw rgb(227 162 26 / .5);
-}
-
-.profile {
-  position: absolute;
-  left: 21cqw;
-  right: 21cqw;
-  top: 28cqw;
-  display: grid;
-  justify-items: center;
-  gap: 4.6cqw;
-  padding: 7cqw 5cqw;
-  border-radius: 6cqw;
-  background: var(--el-carte);
-  color: var(--el-encre);
-  opacity: 0;
-  box-shadow: 0 0 0 1px rgba(18, 26, 43, .08), 0 5cqw 12cqw -5cqw rgba(0, 0, 0, .85);
-}
-
-.profileIcon {
   display: grid;
   place-items: center;
-  width: 18cqw;
-  height: 18cqw;
-  border-radius: 4.4cqw;
-  background: rgba(227, 162, 26, .12);
-  border: .45cqw dashed rgba(227, 162, 26, .9);
+  width: 12cqw;
+  height: 12cqw;
 }
 
-.profileIcon svg {
-  width: 9.4cqw;
-  height: 9.4cqw;
-  fill: none;
-  stroke: var(--el-encre);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.profileName {
-  font-size: max(17px, 7.2cqw);
-  line-height: 1;
-  font-weight: 600;
-  letter-spacing: -.035em;
-}
-
-.links {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100cqw;
-  height: 125cqw;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.links path {
-  fill: none;
-  stroke: rgba(244, 239, 230, .26);
-  stroke-width: .32;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-}
-
-.av {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  width: 13cqw;
-  height: 13cqw;
-  margin: -6.5cqw 0 0 -6.5cqw;
+.dot {
+  display: block;
+  width: calc(4.6cqw + var(--i) * 1.6cqw);
+  aspect-ratio: 1;
   border-radius: 50%;
-  background: #232D46;
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .15), 0 2cqw 5cqw -2cqw rgba(0, 0, 0, .65);
+  box-shadow: inset 0 0 0 .55cqw rgba(14, 26, 43, .55);
 }
 
-.av svg {
-  width: 6.2cqw;
-  height: 6.2cqw;
-  fill: none;
-  stroke: #F4EFE6;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* La réponse choisie : le rond plein, moutarde, un peu plus grand */
+.picked {
+  --on: 1;
+  background: rgb(227 162 26 / var(--on));
+  box-shadow: inset 0 0 0 .55cqw color-mix(in srgb, var(--el-mustard) calc(var(--on) * 100%), rgba(14, 26, 43, .55));
+  scale: calc(1 + .1 * var(--on));
 }
 
-.me {
-  z-index: 1;
-  width: 18cqw;
-  height: 18cqw;
-  margin: -9cqw 0 0 -9cqw;
-  background: var(--el-or);
-  box-shadow: 0 0 0 1.4cqw rgb(227 162 26 / .18), 0 0 9cqw rgb(227 162 26 / .45);
-}
-
-.me svg {
-  width: 8.6cqw;
-  height: 8.6cqw;
-  stroke: var(--el-encre);
-  stroke-width: 2;
-}
-
-.trip {
+/* ---------- 2. Le profil, en carte postale ---------- */
+.postcard {
   position: absolute;
   left: 9cqw;
   right: 9cqw;
-  top: 70cqw;
-  padding: 5cqw 5.4cqw 5.4cqw;
-  border-radius: 5.4cqw;
-  background: rgba(244, 239, 230, .07);
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .11);
+  top: 38cqw;
+  border-radius: 6.4cqw;
+  overflow: hidden;
+  background: var(--el-cream);
+  box-shadow: var(--el-postcard), 0 0 0 1px rgba(246, 241, 231, .4);
+  rotate: -1deg;
+  opacity: 0;
 }
 
-.route {
-  display: flex;
-  align-items: center;
-  gap: 3cqw;
-  color: var(--el-or);
+/* Le bord de carte postale du site */
+.edge {
+  display: block;
+  height: 2cqw;
+  background: repeating-linear-gradient(90deg, var(--el-mustard) 0 4cqw, var(--el-cream) 4cqw 5.8cqw, var(--el-coral) 5.8cqw 9.8cqw, var(--el-cream) 9.8cqw 11.6cqw);
 }
 
-.route svg {
-  flex: none;
-  width: 6.4cqw;
-  height: 6.4cqw;
+.postcardBody {
+  position: relative;
+  padding: 6.4cqw 6.4cqw 8cqw;
+}
+
+.postcardTitle {
+  font-size: max(10px, 3.2cqw);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(14, 26, 43, .7);
+}
+
+.profile {
+  margin-top: 13cqw;
+  font-family: var(--el-display), var(--f-text);
+  font-weight: 700;
+  font-size: 13cqw;
+  line-height: .9;
+  letter-spacing: -.04em;
+}
+
+/* Le timbre : sable, bord en pointillés, le pictogramme du profil */
+.stamp {
+  position: absolute;
+  right: 6.4cqw;
+  top: 5.4cqw;
+  display: grid;
+  place-items: center;
+  width: 19cqw;
+  height: 19cqw;
+  border-radius: 3.6cqw;
+  border: .6cqw dashed rgba(138, 90, 0, .5);
+  background: var(--el-sand);
+  rotate: -6deg;
+}
+
+.stamp svg {
+  width: 10cqw;
+  height: 10cqw;
   fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
+  stroke: var(--el-night);
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.routeLine {
-  flex: 1;
-  height: 0;
-  border-top: .5cqw dashed rgb(227 162 26 / .7);
-  transform-origin: left;
-}
-
-.chips {
+/* ---------- 3. Le groupe, la destination, ce dont Escapades Libres s'occupe ---------- */
+.group {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 22cqw;
   display: flex;
-  justify-content: space-between;
-  margin-top: 5cqw;
+  justify-content: center;
 }
 
-.chip {
+.face {
+  width: 16cqw;
+  height: 16cqw;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 1cqw var(--el-ground);
+  rotate: calc(var(--k) * 4deg);
+  translate: 0 calc(var(--d) * .7cqw);
+}
+
+.face + .face {
+  margin-left: -4cqw;
+}
+
+/* La carte postale de la destination, comme sur le site */
+.dest {
+  position: absolute;
+  left: 15cqw;
+  right: 15cqw;
+  top: 45cqw;
+  padding: 2cqw 2cqw 3cqw;
+  border-radius: 4cqw;
+  background: var(--el-cream);
+  box-shadow: var(--el-postcard);
+  rotate: -3deg;
+}
+
+.destPhoto {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 2;
+  border-radius: 2.6cqw;
+  overflow: hidden;
+}
+
+.destPhoto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.city {
+  position: absolute;
+  left: 3.6cqw;
+  bottom: 2.4cqw;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: max(18px, 7.4cqw);
+  line-height: 1;
+  color: var(--el-cream);
+  text-shadow: 0 .6cqw 2.4cqw rgba(14, 26, 43, .6);
+}
+
+.agency {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 96cqw;
+  display: flex;
+  justify-content: center;
+  gap: 4.4cqw;
+}
+
+/* Une tuile « pâte à modeler » du site : moutarde, crème, sable, penchées */
+.tile {
   position: relative;
   display: grid;
   place-items: center;
-  width: 15.4cqw;
-  height: 15.4cqw;
-  border-radius: 4cqw;
-  background: rgba(244, 239, 230, .07);
-  box-shadow: inset 0 0 0 1px rgba(244, 239, 230, .1);
+  width: 14cqw;
+  height: 14cqw;
+  border-radius: 3.6cqw;
+  background: var(--el-cream);
+  box-shadow: var(--el-clay);
 }
 
-.chip > svg {
+.tile:nth-child(1) {
+  background: var(--el-mustard);
+  rotate: -6deg;
+}
+
+.tile:nth-child(2) {
+  rotate: 3deg;
+}
+
+.tile:nth-child(3) {
+  background: var(--el-sand);
+  rotate: -2deg;
+}
+
+.tile:nth-child(4) {
+  rotate: 4deg;
+}
+
+.tile > svg {
   width: 7cqw;
   height: 7cqw;
   fill: none;
-  stroke: #F4EFE6;
-  stroke-width: 1.7;
+  stroke: var(--el-night);
+  stroke-width: 1.75;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* La case de l'agence, posée en coin */
-.chip .chipCheck {
+/* La case cochée, posée en coin */
+.tile .tileCheck {
   position: absolute;
   right: -1.8cqw;
   top: -1.8cqw;
-  width: 6.2cqw;
-  height: 6.2cqw;
-  box-shadow: 0 0 0 .7cqw #1A2235;
+  width: 6cqw;
+  height: 6cqw;
+  box-shadow: 0 0 0 .7cqw var(--el-ground);
 }
 
-.chip .chipCheck > i {
-  background: var(--el-or);
+.tile .tileCheck > i {
+  background: var(--el-mustard);
 }
 
-.chip .chipCheck path {
-  stroke: var(--el-encre);
+.tile .tileCheck path {
+  stroke: var(--el-night);
 }
 
-/* La scène en mode clair : un écran clair, l'or et le bleu nuit du site gardent leurs couleurs */
+/* Mode clair : le site en crème ; les cartes et les tuiles gardent leurs couleurs */
 :global(html[data-theme="light"]) .scene {
-  --tint: 227 162 26;
   --sc-a: #FFFFFF;
-  --sc-b: #FBF5EA;
-  --el-trait: rgba(26, 25, 24, .12);
+  --sc-b: #F6F1E7;
+  --el-ground: #FBF8F2;
+  --el-on-ground: rgba(14, 26, 43, .25);
+  --el-clay: 0 1px 0 0 rgba(246, 241, 231, .7) inset, 0 4cqw 9cqw -4cqw rgba(14, 26, 43, .35), 0 1cqw 2.4cqw -1cqw rgba(14, 26, 43, .14);
+  --el-postcard: 0 7cqw 14cqw -6cqw rgba(14, 26, 43, .45), 0 2cqw 4cqw -2cqw rgba(14, 26, 43, .18);
 }
 
-:global(html[data-theme="light"]) .dots li,
-:global(html[data-theme="light"]) .scale li {
-  box-shadow: inset 0 0 0 .45cqw rgba(26, 25, 24, .16);
-}
-
-:global(html[data-theme="light"]) .dots i,
-:global(html[data-theme="light"]) .scale i {
-  box-shadow: 0 1cqw 2.4cqw -.6cqw rgb(227 162 26 / .6);
+:global(html[data-theme="light"]) .plane {
+  background: var(--el-night);
+  color: var(--el-cream);
 }
 
 :global(html[data-theme="light"]) .question,
-:global(html[data-theme="light"]) .trip {
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(26, 25, 24, .07), 0 1.6cqw 3.6cqw -1.6cqw rgba(26, 25, 24, .26);
+:global(html[data-theme="light"]) .postcard,
+:global(html[data-theme="light"]) .dest {
+  background: #FFFDF8;
+  box-shadow: var(--el-postcard), 0 0 0 1px rgba(14, 26, 43, .06);
 }
 
-:global(html[data-theme="light"]) .profile {
-  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 2cqw 4cqw -1cqw rgba(26, 25, 24, .14), 0 8cqw 16cqw -6cqw rgba(26, 25, 24, .34);
+:global(html[data-theme="light"]) .tile:nth-child(2n) {
+  background: #FFFDF8;
 }
 
-:global(html[data-theme="light"]) .links path {
-  stroke: rgba(26, 25, 24, .2);
+:global(html[data-theme="light"]) .tile .tileCheck > i {
+  background: var(--el-mustard);
 }
 
-:global(html[data-theme="light"]) .av {
-  background: #fff;
-  box-shadow: 0 0 0 1px rgba(26, 25, 24, .08), 0 1.6cqw 3.6cqw -1.4cqw rgba(26, 25, 24, .32);
+:global(html[data-theme="light"]) .tile .tileCheck path {
+  stroke: var(--el-night);
 }
 
-:global(html[data-theme="light"]) .av svg,
-:global(html[data-theme="light"]) .chip > svg {
-  stroke: var(--el-encre);
-}
-
-:global(html[data-theme="light"]) .me {
-  background: var(--el-or);
-  box-shadow: 0 0 0 1.4cqw rgb(227 162 26 / .16), 0 2cqw 5cqw -1cqw rgb(227 162 26 / .55);
-}
-
-:global(html[data-theme="light"]) .route {
-  color: #C8890C;
-}
-
-:global(html[data-theme="light"]) .chip {
-  background: #FBF6EC;
-  box-shadow: inset 0 0 0 1px rgba(26, 25, 24, .07);
-}
-
-:global(html[data-theme="light"]) .chip .chipCheck {
-  box-shadow: 0 0 0 .7cqw #fff;
-}
-
-:global(html[data-theme="light"]) .chip .chipCheck > i {
-  background: var(--el-or);
-}
-
-:global(html[data-theme="light"]) .chip .chipCheck path {
-  stroke: var(--el-encre);
+/* Appareils moins puissants : des ombres plus courtes */
+:global(html[data-quality="low"]) .scene {
+  --el-clay: 0 1cqw 2.4cqw -1cqw rgba(0, 0, 0, .3);
+  --el-postcard: 0 2cqw 4cqw -2cqw rgba(0, 0, 0, .35);
 }

@@ -1,9 +1,16 @@
 "use client";
 
 /**
- * Escapades Libres : les 12 phrases du test se remplissent, une réponse est choisie ; le profil « Aventurier »
- * (l'un des six du site) apparaît, puis rejoint un petit groupe ; le voyage se trace et l'agence coche le reste.
+ * Escapades Libres : le parcours du site. Une des 12 phrases du test reçoit sa réponse, l'avion avance sur le tracé ;
+ * le profil « Aventurier » arrive en carte postale qui se retourne, et son timbre se pose. Puis le petit groupe, la
+ * destination, et ce dont Escapades Libres s'occupe. Pictogrammes, avion, avatars, carte postale, couleurs et police
+ * (Cabinet Grotesk) : ceux du site (EscapadesLibres : packages/brand, apps/web/src/components).
  */
+import localFont from "next/font/local";
+import Image from "next/image";
+import type { CSSProperties, ReactNode } from "react";
+
+import { ESCAPADES_SAMPLE } from "@/content/app-scenes";
 import type { App } from "@/content/apps";
 import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
@@ -11,177 +18,193 @@ import { all, Check, checkParts, one, type SceneBuilder } from "./scene-kit";
 import { HowItWorks } from "../how-it-works";
 import styles from "./escapades-scene.module.css";
 
-const PIN = (
+/** La police des titres du site, chargée avec sa scène seule. */
+const cabinet = localFont({
+  src: "./fonts/cabinet-grotesk-bold.woff2",
+  weight: "700",
+  display: "swap",
+  preload: false,
+  variable: "--el-display",
+});
+
+/** Les pictogrammes de la marque (packages/brand/assets/icons), au trait. */
+const MAP_PIN = (
   <>
-    <path pathLength={1} d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
-    <circle pathLength={1} cx="12" cy="10" r="2.4" />
-  </>
-);
-const PLANE = (
-  <>
-    <path d="M20.5 4 3.5 11l6.5 2.5L12.5 20z" />
-    <path d="M10 13.5 20.5 4" />
+    <path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
   </>
 );
 
-/** Les quatre voyageurs autour du profil (position en cqw, pictogramme). */
-const TRAVELERS = [
-  { left: 21, top: 33, icon: <path d="M3.5 17h17M7 20.5h10M6.5 17a5.5 5.5 0 0 1 11 0M12 7V4.5M5.8 9.8 4.2 8.2M18.2 9.8l1.6-1.6" /> },
-  {
-    left: 79,
-    top: 33,
-    icon: (
-      <>
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M15.4 8.6l-2.2 4.6-4.6 2.2 2.2-4.6z" />
-      </>
-    ),
-  },
-  { left: 31, top: 55, icon: <path d="M12 3.5c.6 4.6 2.4 6.4 7 7-4.6.6-6.4 2.4-7 7-.6-4.6-2.4-6.4-7-7 4.6-.6 6.4-2.4 7-7z" /> },
-  { left: 69, top: 55, icon: PLANE },
-] as const;
-
-/** L'agence coche : trajets, logement, activités, accessibilité. */
-const SERVICES = [
-  <path key="transport" d="M7.5 4h9a2.5 2.5 0 0 1 2.5 2.5v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 14V6.5A2.5 2.5 0 0 1 7.5 4zM5 10.5h14M8.5 13.5h.01M15.5 13.5h.01M8.5 20l1.4-3.5M15.5 20l-1.4-3.5" />,
-  <g key="stay">
-    <path d="M3.5 19V7.5M3.5 15h17M20.5 19v-6a2 2 0 0 0-2-2H11v4" />
-    <circle cx="7.2" cy="11.6" r="1.8" />
+/** Ce dont Escapades Libres s'occupe : trajets, logement, activités, accessibilité. */
+const AGENCY: readonly ReactNode[] = [
+  <path key="plane-path" d="m13 3 8 6-7 1-2 6-2-2 1-5-4-2 1-2 5 1V3ZM3 21h2m2-1 1.5-1M3 14v1m0 3v1" />,
+  <g key="key">
+    <circle cx="8" cy="8" r="5" />
+    <path d="m11.6 11.6 9 9m-4-4 2.4-2.4m-5.1-.3 2.4-2.4" />
   </g>,
-  <path key="activities" d="M6 20.5V4.5M6 5h11l-2.4 3.6L17 12.2H6" />,
-  <g key="access">
-    <circle cx="10.5" cy="4.6" r="1.7" />
-    <path d="M10.5 7.6v5.6h5.2l2.3 5.6M10.5 10h4.6M7.8 10.6a5.2 5.2 0 1 0 6.9 7.2" />
+  <g key="compass">
+    <circle cx="12" cy="12" r="9" />
+    <path d="m16 8-2.6 5.4L8 16l2.6-5.4L16 8Z" />
+  </g>,
+  <g key="accessibility">
+    <circle cx="15.3" cy="4" r="1.8" />
+    <path d="m12.7 7-3.5 4.3 5.8 1.4 3.5 5.5 2.5-1.5M12.7 7l4.3 3 3-.5M8.4 9.6a6 6 0 1 0 6.6 8.8m-5.8-7.1L8 15h5" />
   </g>,
 ];
 
-const LINKS = ["M50 40L21 33", "M50 40L79 33", "M50 40L31 55", "M50 40L69 55", "M21 33L31 55", "M79 33L69 55", "M31 55L69 55"];
+/** Le petit avion vu de dessus du site (components/landing/plane-glyph.tsx). */
+const PLANE =
+  "M476 256C476 249 449 238 419 238H318L221 80Q216 70 208 70H186Q180 70 183 80L229 238H131L83 165Q79 159 73 159H57Q52 159 54 165L80 243L54 248Q48 250 48 256Q48 262 54 264L80 269L54 347Q52 353 57 353H73Q79 353 83 347L131 274H229L183 432Q180 442 186 442H208Q216 442 221 432L318 274H419C449 274 476 263 476 256Z";
+
+/** Les trois escales du parcours du site : le profil, l'espace, le voyage. */
+const STOPS = 3;
+/** L'échelle du test : cinq ronds de plus en plus grands, la réponse choisie (« Tout à fait moi »). */
+const SCALE = 5;
+const PICKED = SCALE - 1;
+
+const { group, destination, city } = ESCAPADES_SAMPLE;
+/** Le groupe en éventail, comme dans le site : chacun penché selon son écart au milieu. */
+const MIDDLE = (group.length - 1) / 2;
 
 export function EscapadesScene() {
-  const profile = useTranslation().apps.scenes.escapades.profile;
+  const s = useTranslation().apps.scenes.escapades;
   return (
-    <>
-      <ol className={styles.dots} aria-hidden="true">
-        {Array.from({ length: 12 }, (_, i) => (
-          <li key={i}>
-            <i data-s="dot" />
-          </li>
+    <div className={`${styles.app} ${cabinet.variable}`}>
+      <div className={styles.route} aria-hidden="true">
+        <i className={styles.fill} data-s="route-fill" />
+        {Array.from({ length: STOPS }, (_, i) => (
+          <i key={i} className={styles.stop} style={{ left: `${((i + 1) / STOPS) * 100}%` }} data-s="stop" />
         ))}
-      </ol>
-      <div className={styles.question} aria-hidden="true" data-s="question">
-        <i className={styles.questionBar} data-s="question-bar" />
-        <i className={styles.questionBar} data-s="question-bar" />
-        <ul className={styles.scale}>
-          <li />
-          <li />
-          <li />
-          <li />
-          <li>
-            <i data-s="pick" />
-          </li>
-        </ul>
-      </div>
-      <div className={styles.profile} data-s="profile">
-        <span className={styles.profileIcon} aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false" data-s="profile-pin">
-            {PIN}
-          </svg>
-        </span>
-        <span className={styles.profileName} data-s="profile-name">
-          {profile}
+        <span className={styles.planeWrap} data-s="plane">
+          <span className={styles.plane}>
+            <svg viewBox="0 0 512 512" focusable="false">
+              <path d={PLANE} />
+            </svg>
+          </span>
         </span>
       </div>
-      <svg className={styles.links} viewBox="0 0 100 125" aria-hidden="true" focusable="false">
-        {LINKS.map((d) => (
-          <path key={d} pathLength={1} d={d} data-s="link" />
-        ))}
-      </svg>
-      <span className={`${styles.av} ${styles.me}`} style={{ left: "50cqw", top: "40cqw" }} data-s="me">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          {PIN}
-        </svg>
-      </span>
-      {TRAVELERS.map((t) => (
-        <span key={`${t.left}-${t.top}`} className={styles.av} style={{ left: `${t.left}cqw`, top: `${t.top}cqw` }} data-s="traveler">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            {t.icon}
-          </svg>
-        </span>
-      ))}
-      <div className={styles.trip} aria-hidden="true" data-s="trip">
-        <div className={styles.route}>
-          <svg viewBox="0 0 24 24" focusable="false">
-            {PLANE}
-          </svg>
-          <i className={styles.routeLine} data-s="route" />
-          <svg viewBox="0 0 24 24" focusable="false">
-            {PIN}
-          </svg>
-        </div>
-        <ul className={styles.chips}>
-          {SERVICES.map((icon, i) => (
-            <li key={i} className={styles.chip} data-s="chip">
-              <svg viewBox="0 0 24 24" focusable="false">
-                {icon}
-              </svg>
-              <Check className={styles.chipCheck} name="agency" />
+      <div className={styles.question} data-s="question">
+        <p className={styles.phrase}>
+          <span className={styles.quote} aria-hidden="true">
+            «&nbsp;
+          </span>
+          {s.question}
+          <span className={styles.quote} aria-hidden="true">
+            &nbsp;»
+          </span>
+        </p>
+        <ul className={styles.scale} aria-hidden="true">
+          {Array.from({ length: SCALE }, (_, i) => (
+            <li key={i} data-s="choice">
+              <i className={i === PICKED ? `${styles.dot} ${styles.picked}` : styles.dot} style={{ "--i": i } as CSSProperties} data-s={i === PICKED ? "pick" : undefined} />
             </li>
           ))}
         </ul>
       </div>
-    </>
+      <div className={styles.postcard} data-s="postcard">
+        <i className={styles.edge} />
+        <div className={styles.postcardBody}>
+          <p className={styles.postcardTitle}>{s.yourProfile}</p>
+          <p className={styles.profile}>{s.profile}</p>
+          <span className={styles.stamp} aria-hidden="true" data-s="stamp">
+            <svg viewBox="0 0 24 24" focusable="false">
+              {MAP_PIN}
+            </svg>
+          </span>
+        </div>
+      </div>
+      <div className={styles.group} aria-hidden="true">
+        {group.map((face, i) => (
+          <Image
+            key={face.src}
+            className={styles.face}
+            src={face.src}
+            width={face.width}
+            height={face.height}
+            alt=""
+            sizes="96px"
+            style={{ "--k": i - MIDDLE, "--d": Math.abs(i - MIDDLE) } as CSSProperties}
+            data-s="face"
+          />
+        ))}
+      </div>
+      <div className={styles.dest} aria-hidden="true" data-s="dest">
+        <span className={styles.destPhoto}>
+          <Image src={destination.src} width={destination.width} height={destination.height} alt="" sizes="(min-width: 900px) 360px, 64vw" data-s="dest-img" />
+          <span className={styles.city}>{city}</span>
+        </span>
+      </div>
+      <ul className={styles.agency} aria-hidden="true">
+        {AGENCY.map((icon, i) => (
+          <li key={i} className={styles.tile} data-s="tile">
+            <svg viewBox="0 0 24 24" focusable="false">
+              {icon}
+            </svg>
+            <Check className={styles.tileCheck} name="agency" />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 export const buildEscapades: SceneBuilder = (el) => {
+  const fill = one(el, "route-fill");
+  const stops = all(el, "stop");
+  const plane = one(el, "plane");
   const question = one(el, "question");
-  const bars = all(el, "question-bar");
-  const dots = all(el, "dot");
+  const choices = all(el, "choice");
   const pick = one(el, "pick");
-  const profile = one(el, "profile");
-  const pin = Array.from(one(el, "profile-pin").querySelectorAll("path, circle"));
-  const name = one(el, "profile-name");
-  const me = one(el, "me");
-  const travelers = all(el, "traveler");
-  const links = all<SVGPathElement>(el, "link");
-  const trip = one(el, "trip");
-  const route = one(el, "route");
-  const chips = all(el, "chip");
+  const postcard = one(el, "postcard");
+  const stamp = one(el, "stamp");
+  const faces = all(el, "face");
+  const dest = one(el, "dest");
+  const destImg = one(el, "dest-img");
+  const tiles = all(el, "tile");
   const checks = all(el, "agency").map(checkParts);
+  const leg = 1 / STOPS;
+
+  gsap.set(fill, { scaleX: 0 });
+  gsap.set(plane, { x: 0, xPercent: 0 });
+  gsap.set(stops, { "--done": 0 });
   gsap.set(question, { opacity: 0, y: 14 });
-  gsap.set(bars, { scaleX: 0.25 });
-  gsap.set(dots, { scale: 0, opacity: 0 });
-  gsap.set(pick, { scale: 0, opacity: 0 });
-  gsap.set(profile, { opacity: 0, y: 34, yPercent: 0, scale: 0.965 });
-  gsap.set(pin, { strokeDasharray: 1, strokeDashoffset: 1 });
-  gsap.set(name, { opacity: 0, y: 8 });
-  gsap.set(me, { opacity: 0, scale: 0.4 });
-  gsap.set(travelers, { opacity: 0, xPercent: (i: number) => [-70, 70, -60, 60][i] ?? 0, scale: 0.8 });
-  gsap.set(links, { strokeDashoffset: 1 });
-  gsap.set(trip, { opacity: 0, y: 34, scale: 0.965 });
-  gsap.set(route, { scaleX: 0 });
-  gsap.set(chips, { opacity: 0, y: 10 });
+  gsap.set(choices, { opacity: 0, scale: 0.6 });
+  gsap.set(pick, { "--on": 0 });
+  gsap.set(postcard, { opacity: 0, y: 16, rotation: -4, rotationY: -32, transformPerspective: 1100 });
+  gsap.set(stamp, { opacity: 0, scale: 1.6, rotation: -12 });
+  gsap.set(faces, { opacity: 0, scale: 0.5, xPercent: (i: number) => (MIDDLE - i) * 40 });
+  gsap.set(dest, { opacity: 0, yPercent: 10, rotation: 6 });
+  gsap.set(destImg, { scale: 1.12 });
+  gsap.set(tiles, { opacity: 0, scale: 0.6, y: 10 });
   gsap.set(checks.map((c) => c.fill), { scale: 0, opacity: 0 });
   gsap.set(checks.map((c) => c.mark), { strokeDashoffset: 1 });
+
   const tl = gsap
     .timeline({ paused: true, defaults: { ease: "expo.out" } })
+    // 1. Le test : la phrase, ses cinq ronds, la réponse ; l'avion avance vers la première escale.
     .to(question, { opacity: 1, y: 0, duration: 0.8 }, 0.1)
-    .to(bars, { scaleX: 1, duration: 0.8, stagger: 0.1 }, 0.15)
-    .to(pick, { scale: 1, opacity: 1, duration: 0.45 }, 0.5)
-    .to(dots, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.055 }, 0.45)
-    .to(question, { opacity: 0, y: -10, duration: 0.24, ease: "power2.in" }, 1.24)
-    .to(profile, { opacity: 1, y: 0, scale: 1, duration: 1 }, 1.45)
-    .to(pin, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 1.6)
-    .to(name, { opacity: 1, y: 0, duration: 0.7 }, 1.62)
-    .to(profile, { opacity: 0, scale: 0.3, yPercent: -24, duration: 0.42, ease: "power3.in" }, 2.6)
-    .to(me, { opacity: 1, scale: 1, duration: 0.8 }, 2.92)
-    .to(travelers, { opacity: 1, xPercent: 0, scale: 1, duration: 0.9, stagger: 0.07 }, 2.98)
-    .to(links, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out", stagger: 0.04 }, 3.1)
-    .to(trip, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, 3.2)
-    .to(route, { scaleX: 1, duration: 0.8, ease: "power2.inOut" }, 3.32)
-    .to(chips, { opacity: 1, y: 0, duration: 0.7, stagger: 0.07 }, 3.36);
+    .to(choices, { opacity: 1, scale: 1, duration: 0.6, stagger: 0.05 }, 0.3)
+    .to(pick, { "--on": 1, duration: 0.5 }, 0.85)
+    .to(fill, { scaleX: leg, duration: 1.1, ease: "power2.inOut" }, 0.25)
+    .to(plane, { xPercent: leg * 100, duration: 1.1, ease: "power2.inOut" }, 0.25)
+    .to(stops[0] ?? [], { "--done": 1, duration: 0.4, ease: "power2.out" }, 1.25)
+    // 2. Le profil (à 1,45 s, content/apps.ts) : la carte postale se retourne, le timbre se pose comme un tampon.
+    .to(question, { opacity: 0, y: -10, duration: 0.24, ease: "power2.in" }, 1.45)
+    .to(postcard, { opacity: 1, y: 0, rotation: 0, rotationY: 0, duration: 0.9 }, 1.6)
+    .to(stamp, { opacity: 1, scale: 0.94, rotation: -3, duration: 0.45, ease: "power3.out" }, 1.95)
+    .to(stamp, { scale: 1, rotation: 0, duration: 0.25 }, 2.35)
+    // Le troisième temps commence à 2,6 s (content/apps.ts) : la carte s'en va à ce moment-là.
+    .to(postcard, { opacity: 0, scale: 0.92, y: -12, duration: 0.32, ease: "power2.in" }, 2.6)
+    // 3. Le groupe, la destination, et ce dont Escapades Libres s'occupe ; l'avion finit le tracé.
+    .to(faces, { opacity: 1, scale: 1, xPercent: 0, duration: 0.9, stagger: 0.07 }, 2.8)
+    .to(fill, { scaleX: 1, duration: 1, ease: "power2.inOut" }, 3)
+    .to(plane, { xPercent: 100, duration: 1, ease: "power2.inOut" }, 3)
+    .to(stops.slice(1), { "--done": 1, duration: 0.4, ease: "power2.out", stagger: 0.42 }, 3.45)
+    .to(dest, { opacity: 1, yPercent: 0, rotation: 0, duration: 1 }, 3.1)
+    .to(destImg, { scale: 1, duration: 1.4 }, 3.1)
+    .to(tiles, { opacity: 1, scale: 1, y: 0, duration: 0.8, stagger: 0.08 }, 3.45);
   checks.forEach((c, i) => {
-    const t = 3.55 + i * 0.1;
+    const t = 3.7 + i * 0.1;
     tl.to(c.fill, { scale: 1, opacity: 1, duration: 0.5 }, t).to(c.mark, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, t + 0.1);
   });
   return tl;
@@ -190,7 +213,7 @@ export const buildEscapades: SceneBuilder = (el) => {
 /** « Comment ça marche » de Escapades Libres, monté autour de son écran (chargé à part : ./registry). */
 export default function EscapadesChapter({ app }: { app: App }) {
   return (
-    <HowItWorks app={app} build={buildEscapades} tint={styles.scene} sample={null}>
+    <HowItWorks app={app} build={buildEscapades} tint={styles.scene} sample={"bottom"}>
       <EscapadesScene />
     </HowItWorks>
   );
