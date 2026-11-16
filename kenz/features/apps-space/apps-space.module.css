@@ -126,8 +126,7 @@
   height: 100%;
 }
 
-/* La signature : Kenz, « Mes apps », et ce que Kenz en fait (encre sur le papier en mode clair) ; dessous, aligné
-   sur le texte, le total des utilisateurs */
+/* La signature : Kenz, « Mes apps », et ce que Kenz en fait (encre sur le papier en mode clair) */
 .sig {
   position: absolute;
   z-index: 6;
@@ -195,11 +194,20 @@
 /* Le total des utilisateurs, toutes apps confondues : un grand chiffre (la police des titres) et sa légende en petit.
    Pendant le compte (data-run, posé par apps-total), le total rendu réserve la largeur et le chiffre qui monte se
    pose dessus : rien ne bouge autour. */
+/* La zone du total : sous la signature, alignée sur son texte (mobile, tablette) ; en haut à droite de la scène
+   sur ordinateur, comme le chiffre clé de la section */
+.totalZone {
+  position: absolute;
+  z-index: 6;
+  top: calc(var(--haut) + 64px);
+  left: calc(var(--gutter) + 67px);
+  text-shadow: 0 0 16px rgba(3, 4, 12, .9);
+}
+
 .total {
-  grid-column: 2;
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
 }
 
@@ -248,7 +256,8 @@
   text-wrap: balance;
 }
 
-:global(html[data-theme="light"]) .sig {
+:global(html[data-theme="light"]) .sig,
+:global(html[data-theme="light"]) .totalZone {
   text-shadow: none;
 }
 
@@ -1202,10 +1211,9 @@
     --rg: calc(var(--dz) + clamp(132px, 17%, 190px));  /* d'un rang à l'autre (le nom du dessus passe) */
   }
   .astre { top: calc(var(--zt) + var(--ry) * var(--rg) + var(--zy) * var(--dz)); }
-  /* Le total, plus petit, sa légende sur deux lignes : la signature reste au-dessus du premier rang */
-  .total { align-items: center; gap: 8px; }
+  /* Le total, plus petit : la signature et lui restent au-dessus du premier rang */
   .totalVal { font-size: 26px; }
-  .totalLeg { max-width: 14em; font-size: 12px; }
+  .totalLeg { font-size: 13px; }
   .astre:nth-child(1) { --x: 20; --ry: 0; --zy: 0; }
   .astre:nth-child(2) { --x: 50; --ry: 0; --zy: 1; }
   .astre:nth-child(3) { --x: 80; --ry: 0; --zy: 0; }
@@ -1231,8 +1239,11 @@
     --fondu: clamp(160px, 28svh, 300px);
     --st: clamp(62px, 4.8vw, 76px);
   }
-  .totalVal { font-size: 40px; }
-  .totalLeg { font-size: 14px; }
+  /* Le chiffre clé, en grand en haut à droite : il se lit comme le total de la section, pas d'une app */
+  .totalZone { top: var(--haut); left: auto; right: var(--gutter); }
+  .total { flex-direction: column; align-items: flex-end; gap: 6px; }
+  .totalVal { font-size: clamp(48px, 4.6vw, 68px); }
+  .totalLeg { font-size: 14px; letter-spacing: .02em; }
   .etiq b { font-size: 15.5px; }
   .etiq em { font-size: 17px; }
   .aig::after { height: calc(var(--st) * 3); }
@@ -1249,7 +1260,7 @@
 /* ---------- Ordinateur, écran bas : le total plus compact ---------- */
 @media (min-width: 900px) and (max-height: 760px) {
   .sig { row-gap: 6px; }
-  .totalVal { font-size: 30px; }
+  .totalVal { font-size: 44px; }
   .totalLeg { font-size: 13px; }
 }
 

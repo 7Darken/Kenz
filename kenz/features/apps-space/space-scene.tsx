@@ -129,6 +129,10 @@ export function SpaceScene({ apps, code, portrait, titleId, users }: SpaceSceneP
               <Rich text={s.sub} />
             </p>
           </div>
+        </div>
+
+        {/* Le total de toutes les apps : une zone à part, jamais près d'un astre (la fiche l'évite aussi) */}
+        <div className={styles.totalZone} data-zone="">
           <AppsTotal value={users} onDone={lightAll} />
         </div>
 

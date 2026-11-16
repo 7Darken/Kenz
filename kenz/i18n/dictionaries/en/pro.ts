@@ -19,7 +19,7 @@ export const pro: ProDictionary = {
     explore: "Explore",
     users: {
       amount: "{n}+",
-      label: "users across all my apps",
+      label: "users",
       full: "More than {n} users across all my apps",
     },
     scene: {
