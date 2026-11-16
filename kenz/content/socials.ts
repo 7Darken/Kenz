@@ -5,7 +5,7 @@
 import type { SocialNetwork } from "@/design-system/components/social-icon";
 import type { Localized } from "@/i18n/localize";
 
-export const SOCIAL_IDS = ["github", "linkedin", "youtube-asie", "tiktok-asie", "instagram-asie", "youtube-k15ze"] as const;
+const SOCIAL_IDS = ["github", "linkedin", "youtube-asie", "tiktok-asie", "instagram-asie", "youtube-k15ze"] as const;
 export type SocialId = (typeof SOCIAL_IDS)[number];
 
 /** L'univers d'un compte : pro, le voyage (Kenz en Asie) ou le sport (k15ze). */

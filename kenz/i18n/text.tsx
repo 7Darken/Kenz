@@ -11,7 +11,7 @@
  */
 import { Rich } from "@/design-system/components/rich";
 
-import { translate, type DictKey } from "./dictionaries";
+import { translate, type DictKey } from "./dictionaries/keys";
 import { format } from "./format";
 import { useLanguage } from "./language-provider";
 import { localize, type Localized } from "./localize";

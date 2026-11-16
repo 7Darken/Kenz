@@ -4,15 +4,17 @@
  * « Tu pars en Chine ? », Marques & collaborations, me suivre, le retour.
  */
 import { ROUTES } from "@/content/site";
-import { MarquesSection } from "@/features/marques/marques-section";
-import { ReturnDoor } from "@/features/univers/return-door";
-import { FollowSection } from "@/features/voyage/follow-section";
-import { GuideSection } from "@/features/voyage/guide-section";
-import { LatestVideo } from "@/features/voyage/latest-video";
-import { PriceSection } from "@/features/voyage/price-section";
-import { SeriesSection } from "@/features/voyage/series-section";
-import { VoyageBille } from "@/features/voyage/voyage-bille";
-import { VoyageHero } from "@/features/voyage/voyage-hero";
+import { ReturnDoor } from "@/design-system/components/return-door";
+import { MarquesSection } from "@/features/marques";
+import {
+  FollowSection,
+  GuideSection,
+  LatestVideo,
+  PriceSection,
+  SeriesSection,
+  VoyageBille,
+  VoyageHero,
+} from "@/features/voyage";
 import { getDictionary } from "@/i18n/server";
 import { pageMetadata } from "@/i18n/metadata";
 

@@ -20,11 +20,11 @@ import {
 } from "@/content/contact";
 import { Button } from "@/design-system/components/button";
 import { Choice, Choices, FormField, Input, Textarea } from "@/design-system/components/form-field";
+import { useContactSubmit } from "@/design-system/lib/use-contact-submit";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./contact-form.module.css";
-import { useContactSubmit } from "./use-contact-submit";
 
 export type ContactVariant = "pro" | "agents";
 

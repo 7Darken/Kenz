@@ -7,8 +7,8 @@
 import { Container } from "@/design-system/components/container";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
+import { usePageEntrance } from "@/features/passages";
 import { useLanguage } from "@/i18n/language-provider";
-import { useArrival } from "./use-arrival";
 import styles from "./agents-hero.module.css";
 
 /** L'écart entre deux mots qui montent (celui de <Words>). */
@@ -16,7 +16,8 @@ const WORD_STAGGER_S = 0.07;
 
 export function AgentsHero() {
   const { t } = useLanguage();
-  const arrived = useArrival();
+  // Juste après le premier affichage (60 ms), ou quand le voile du passage se lève.
+  const arrived = usePageEntrance({ delay: 60 }).entered;
   // La seconde phrase continue la cascade de la première, comme un seul titre.
   const leadWords = t.agents.hero.lead.trim().split(/[ \t\n\r]+/).length;
 

@@ -7,7 +7,7 @@
  */
 import { gsap } from "@/design-system/motion/gsap";
 import { CSS_EASE } from "@/design-system/motion/easings";
-import { zenkoTimeline } from "./zenko-timeline";
+import { zenkoTimeline } from "@/features/zenko-demo";
 
 export interface PreviewController {
   play: () => void;
@@ -143,7 +143,8 @@ export function playAnimation(panel: Element, reduced: boolean): PreviewControll
     return idle;
   }
 
-  const sceneTl = zenkoTimeline(scene);
+  // Le tempo de la fiche (la maquette), et une demi-seconde de pause à la fin avant de reboucler.
+  const sceneTl = zenkoTimeline(scene, 0.25).to({}, { duration: 0.5 }, 3);
   const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.25 });
   tl.add(sceneTl, 0.15);
   const end = 0.15 + sceneTl.duration();

@@ -1,5 +1,6 @@
-/* Sélecteur FR / EN segmenté (repris de l'ancien LanguageToggle) : une pastille glisse sous la langue active.
-   --lang-h : la hauteur d'une option (36 px ; le pied de page la réduit sur téléphone). */
+/* Sélecteur FR / EN segmenté : une pastille glisse sous la langue active.
+   --lang-h : la hauteur d'une option (36 px ; le pied de page la réduit sur téléphone).
+   La zone de clic garde 44 px de haut quelle que soit cette hauteur (pseudo-élément). */
 .toggle {
   position: relative;
   display: inline-flex;
@@ -41,11 +42,17 @@
   user-select: none;
 }
 
+.option::after {
+  content: "";
+  position: absolute;
+  inset: min(0px, (var(--lang-h, 36px) - 44px) / 2) 0;
+}
+
 .option[aria-pressed="true"] {
   color: var(--bg);
 }
 
-.option img {
+.option svg {
   display: block;
   border-radius: 3px;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, .15);
@@ -53,7 +60,7 @@
   transition: opacity .35s var(--expo);
 }
 
-.option[aria-pressed="true"] img {
+.option[aria-pressed="true"] svg {
   opacity: 1;
 }
 

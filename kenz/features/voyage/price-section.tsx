@@ -16,7 +16,7 @@ import { ScrollTrigger } from "@/design-system/motion/gsap";
 import { useGsap } from "@/design-system/motion/use-gsap";
 import { useMediaQuery } from "@/design-system/motion/use-media-query";
 import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
-import page from "@/features/univers/page.module.css";
+import page from "@/design-system/styles/univers-page.module.css";
 import { SweepTitle } from "@/design-system/components/sweep-title";
 import { T } from "@/i18n/text";
 import styles from "./price-section.module.css";

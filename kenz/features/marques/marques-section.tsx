@@ -6,7 +6,7 @@
 import { Container } from "@/design-system/components/container";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
-import page from "@/features/univers/page.module.css";
+import page from "@/design-system/styles/univers-page.module.css";
 import { BrandForm } from "./brand-form";
 import styles from "./marques-section.module.css";
 

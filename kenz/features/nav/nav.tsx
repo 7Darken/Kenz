@@ -11,20 +11,20 @@
  * Aucun lien visible vers l'autre univers.
  * L'arrivée (app.html, agents.html, voyage.html, sport.html) : sur une page d'app, sur /agents et sur les pages
  * d'univers, la barre apparaît en fondu quand la page arrive (au chargement, ou quand le voile du passage se lève :
- * `usePassageArrival` de features/passages), 1,4 s après sur une page d'app ; pendant l'arrivée d'un passage,
+ * `usePageEntrance` de features/passages), 1,4 s après sur une page d'app ; pendant l'arrivée d'un passage,
  * le retour reste masqué (shared/passage.css, `.kz-passage-arrivee .kz-back`).
  */
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import type { NavApp } from "@/content/apps";
 import { passageAttributes, ROUTES, type Universe } from "@/content/site";
 import { EscapadesMark } from "@/design-system/components/escapades-mark";
 import { Icon } from "@/design-system/components/icon";
 import { ThemeToggle } from "@/design-system/components/theme-toggle";
-import { usePassageArrival } from "@/features/passages";
+import { usePageEntrance } from "@/features/passages";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import styles from "./nav.module.css";
@@ -71,18 +71,12 @@ export function Nav({ variant, dot, apps }: NavProps) {
   const appSlug = variant === "pro" ? pathname.match(/^\/apps\/([^/]+)/)?.[1] : undefined;
   const app = appSlug && apps && Object.hasOwn(apps, appSlug) ? apps[appSlug] : undefined;
   const fade = navFade(variant, pathname, !!app);
-  const { via, ready } = usePassageArrival();
-  // La page arrivée (son chemin) : la barre apparaît une image après, et disparaît d'un coup à la page suivante.
-  const [arrivedPath, setArrivedPath] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!fade || !ready) return;
-    const frame = requestAnimationFrame(() => setArrivedPath(pathname));
-    return () => cancelAnimationFrame(frame);
-  }, [fade, ready, pathname]);
+  // L'entrée vaut pour le chemin : la barre apparaît une image après l'arrivée, et disparaît d'un coup à la page suivante.
+  const { entered, via, ready } = usePageEntrance({ enabled: fade !== null });
+  // Les chapitres de l'accueil Créateur : seul cet univers reçoit l'espace `createur` du dictionnaire.
   const storyChapters = useMemo<StoryChapter[]>(
-    () => STORY_IDS.map((id) => ({ id, label: t.createur.chapters[id] })),
-    [t],
+    () => (variant === "createur" ? STORY_IDS.map((id) => ({ id, label: t.createur.chapters[id] })) : []),
+    [t, variant],
   );
 
   // Le logo : sur la page d'accueil de l'univers, il remonte en haut ; ailleurs, il y mène.
@@ -98,7 +92,7 @@ export function Nav({ variant, dot, apps }: NavProps) {
       className={cls}
       data-scrolled={scrolled ? "" : undefined}
       data-fade={fade ?? undefined}
-      data-in={fade && arrivedPath === pathname ? "" : undefined}
+      data-in={fade && entered ? "" : undefined}
       data-arriving={via && !ready ? "" : undefined}
     >
       {isCreateurHome ? (

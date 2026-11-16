@@ -17,7 +17,7 @@ const t = getDictionary();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: t.pro.meta.title, template: `%s — ${SITE_NAME}` },
+  title: t.pro.meta.title,
   description: t.pro.meta.description,
   applicationName: SITE_NAME,
   robots: { index: true, follow: true },

@@ -16,7 +16,16 @@ i18n/dictionaries/{fr,en}/<espace>.ts   textes d'interface du module
 
 - **Fichiers** : en kebab-case (`apps-space.tsx`). **Composants** : en PascalCase (`AppsSpace`). Le CSS Module porte le nom du fichier du composant.
 - **Commentaires** : en français, brefs, sur le pourquoi.
-- **Imports** : avec l'alias `@/` (`@/design-system/components/button`). Pas de fichier barrel.
+- **Imports** : avec l'alias `@/` (`@/design-system/components/button`).
+- **Points d'entrée d'un module** : chaque module a un `index.ts`, son API publique. `app/` et les autres modules
+  n'importent que lui, jamais un fichier interne (`@/features/voyage`, pas `@/features/voyage/latest-video`).
+  - Un module qui sert à deux routes a un point d'entrée par route : `index.ts` pour ce que montrent les autres pages
+    (ex. `IaPreview` sur l'accueil), `page.ts` pour les chapitres de sa propre page, importé par sa route seule
+    (`@/features/ia/page`, `@/features/sport/page`). Un même fichier ferait entrer dans chaque route les composants
+    client de l'autre (Next suit tous les imports d'un point d'entrée).
+  - Ce que plusieurs modules partagent sans qu'il appartienne à l'un d'eux va dans le design system
+    (`useContactSubmit`, les styles `bezel` et `univers-page`).
+  - Pas d'autre fichier barrel.
 - **Interdit** :
   - le CSS-in-JS ;
   - Tailwind, styled-components et framer-motion dans le nouveau code ;
@@ -86,6 +95,16 @@ Une section qu'on atteint par une ancre et qui doit recevoir le focus porte `tab
 | Attribut (`aria-label`, `alt`) | Dans un composant client : `useText()` ou `localize()` |
 
 Le serveur rend toujours le français. L'anglais (`?lang=en` ou le choix mémorisé) s'applique côté client.
+
+**Les espaces de chaque univers.** Le provider de langue est monté par `UniverseShell` avec les seuls espaces de son
+univers (`universeMessages` d'i18n/server.ts) : Pro `common`, `footer`, `pro`, `apps`, `agents`, `victoire` ;
+Créateur `common`, `footer`, `createur`, `voyage`, `sport` ; k15ze `common`, `footer`, `sport`. Un composant ne lit
+que les espaces de l'univers où il est monté ; en développement, lire un autre espace lève une erreur claire.
+Un nouvel espace s'ajoute à son univers dans `universeMessages`.
+
+**L'entrée d'une page.** Le moment de jouer l'arrivée (hero, nav, /agents) vient de `usePageEntrance()`
+(features/passages) : après le voile d'un passage, sinon après les polices (`waitFonts`) ou après une image et
+`delay` ms.
 
 ## 4. Un composant client animé (GSAP, nettoyage complet)
 
@@ -239,7 +258,7 @@ Les couleurs en « r g b » s'emploient ainsi : `rgb(var(--lum) / .5)`.
   - champs `{ type: "contact" | "marques", nom, contact, besoin?, message, website: "" }` ;
   - `contact` : obligatoire, une adresse e-mail ou un @pseudo de réseau, vérifié par `checkContact()` ;
   - toute la validation est dans `validateContact(body)` : le même code dans les formulaires et dans la route ;
-  - l'envoi, la réponse et l'état « Merci » : le hook `useContactSubmit` (`features/contact/use-contact-submit.ts`), partagé par les deux formulaires ; l'échec s'affiche dans une région `role="status"` permanente ;
+  - l'envoi, la réponse et l'état « Merci » : le hook `useContactSubmit` (`design-system/lib/use-contact-submit.ts`), partagé par les deux formulaires ; l'échec s'affiche dans une région `role="status"` permanente ;
   - le champ `website` est un piège à robots, caché et laissé vide ;
   - la route n'accepte que du JSON de même origine, 20 Kio au plus, et quelques envois par IP et par 10 minutes ; un message trop long pour Telegram part en plusieurs envois ;
   - les erreurs de champ sont des codes (`required`, `tooShort`…) à traduire dans le dictionnaire.

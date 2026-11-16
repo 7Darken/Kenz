@@ -15,6 +15,16 @@
   border-radius: 4px;
 }
 
+/* La zone de clic : 44 px de haut, du haut de la barre vers la nav (le segment n'en montre que 18). Sous la nav,
+   elle ne prend que ses vides : les liens de la nav passent devant. */
+.hit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6px;
+  height: var(--target);
+}
+
 .segment::before,
 .fill {
   content: "";

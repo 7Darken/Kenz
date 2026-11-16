@@ -4,7 +4,7 @@ import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
 import { SocialLinks } from "@/design-system/components/social-links";
 import { SweepTitle } from "@/design-system/components/sweep-title";
-import page from "@/features/univers/page.module.css";
+import page from "@/design-system/styles/univers-page.module.css";
 import styles from "./follow-section.module.css";
 import k15ze from "./sport.module.css";
 

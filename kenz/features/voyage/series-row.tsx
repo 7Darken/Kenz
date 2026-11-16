@@ -10,7 +10,7 @@ import { Fragment } from "react";
 
 import { ESCALES, type PlaceLine, type Series, type SeriesMeta } from "@/content/series";
 import { Icon } from "@/design-system/components/icon";
-import bezel from "@/features/univers/bezel.module.css";
+import bezel from "@/design-system/styles/bezel.module.css";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";

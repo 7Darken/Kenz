@@ -3,7 +3,7 @@ import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
-import page from "@/features/univers/page.module.css";
+import page from "@/design-system/styles/univers-page.module.css";
 import { T } from "@/i18n/text";
 import { GuideCard } from "./guide-card";
 import styles from "./guide-section.module.css";

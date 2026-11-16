@@ -21,10 +21,10 @@ import {
 } from "@/content/contact";
 import { Button } from "@/design-system/components/button";
 import { Choice, Choices, FormField, Input, Textarea } from "@/design-system/components/form-field";
+import { useContactSubmit } from "@/design-system/lib/use-contact-submit";
 import { useMotion } from "@/design-system/motion/motion-provider";
 import { useInView } from "@/design-system/motion/use-in-view";
-import { useContactSubmit } from "@/features/contact/use-contact-submit";
-import bezel from "@/features/univers/bezel.module.css";
+import bezel from "@/design-system/styles/bezel.module.css";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";

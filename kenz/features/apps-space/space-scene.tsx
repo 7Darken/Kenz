@@ -148,9 +148,10 @@ export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
                 <span className={styles.puce} data-zone="">
                   <Image src={a.icon.src} alt="" width={a.icon.width} height={a.icon.height} sizes="88px" draggable={false} />
                 </span>
+                {/* Le nom accessible commence par ce texte visible (« Oshii Cuisine ») : l'espace entre les deux
+                    blocs ne se voit pas, mais sépare les mots pour la commande vocale. */}
                 <span className={styles.etiq} aria-hidden="true" data-zone="">
-                  <b>{a.name}</b>
-                  <em>{domain}</em>
+                  <b>{a.name}</b> <em>{domain}</em>
                 </span>
               </a>
             );

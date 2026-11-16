@@ -4,10 +4,7 @@
  */
 import { ROUTES } from "@/content/site";
 import { ContactSection } from "@/features/contact";
-import { AgentsHero } from "@/features/ia/agents-hero";
-import { MachineSection } from "@/features/ia/machine-section";
-import { MethodSection } from "@/features/ia/method-section";
-import { NeedsSection } from "@/features/ia/needs-section";
+import { AgentsHero, MachineSection, MethodSection, NeedsSection } from "@/features/ia/page";
 import { getDictionary } from "@/i18n/server";
 import { pageMetadata } from "@/i18n/metadata";
 

@@ -43,6 +43,8 @@ export const apps = {
     on: "le {date}",
     /** La fenêtre de navigateur d'Escapades Libres : l'état du site. */
     online: "en ligne",
+    /** Son nom quand on la fait défiler soi-même (mouvement réduit) : `{app}` est le nom du site. */
+    view: "{app}\u00a0: la page d’accueil, à faire défiler",
   },
   action: {
     title: "À toi d’*essayer*.",

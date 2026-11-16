@@ -36,6 +36,7 @@ export const apps: AppsDictionary = {
     monthsAgo: "{n} months ago",
     on: "on {date}",
     online: "live",
+    view: "{app}: the home page, scrollable",
   },
   action: {
     title: "Your turn to *try* it.",

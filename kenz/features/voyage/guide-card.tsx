@@ -10,7 +10,7 @@ import { useRef, type CSSProperties } from "react";
 import { CHINA_GUIDE } from "@/content/series";
 import { Button } from "@/design-system/components/button";
 import { useInView } from "@/design-system/motion/use-in-view";
-import bezel from "@/features/univers/bezel.module.css";
+import bezel from "@/design-system/styles/bezel.module.css";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./guide-section.module.css";

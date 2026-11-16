@@ -5,7 +5,8 @@
  * landing d'abord, puis la landing entière défile dedans ; la page du test en vignette, au second plan.
  * - Ordinateur : le chapitre est épinglé, le défilement fait défiler la landing.
  * - Mobile : la landing défile pendant que la fenêtre traverse l'écran.
- * - Mouvement réduit : la fenêtre se fait défiler à la main (défilement natif).
+ * - Mouvement réduit : la fenêtre se fait défiler à la main (défilement natif) ; elle est alors une région nommée,
+ *   atteignable au clavier (Safari ne rend pas focalisable une zone qui défile).
  * La loupe grossit la landing qui défile (`data-loupe-source`), ou le haut de la landing tant qu'il est visible.
  */
 import { useLayoutEffect, useRef } from "react";
@@ -16,6 +17,7 @@ import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
 import { SweepTitle } from "@/design-system/components/sweep-title";
 import { gsap } from "@/design-system/motion/gsap";
+import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import page from "./app-detail.module.css";
 import styles from "./browser-showcase.module.css";
@@ -42,6 +44,7 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
   const { lang, t } = useLanguage();
   const { browser, site } = app.story;
   const host = site.replace(/^https?:\/\//, "");
+  const viewLabel = format(t.apps.real.view, { app: app.name });
 
   useLayoutEffect(() => {
     const pin = pinRef.current;
@@ -55,6 +58,9 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
     mm.add({ pin: PIN_QUERY, reduced: "(prefers-reduced-motion: reduce)", all: "(min-width: 0px)" }, (context) => {
       const { pin: pinned, reduced } = context.conditions as { pin: boolean; reduced: boolean };
       if (reduced) return;
+      // Animée, la fenêtre ne défile plus à la main : ni région ni arrêt du clavier.
+      const scrollable = { tabindex: "0", role: "region", "aria-label": viewLabel };
+      Object.keys(scrollable).forEach((name) => view.removeAttribute(name));
       view.setAttribute("data-anim", "");
       view.removeAttribute("data-lenis-prevent");
       view.scrollTop = 0;
@@ -82,10 +88,11 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
         section.removeAttribute("data-pin");
         view.removeAttribute("data-anim");
         view.setAttribute("data-lenis-prevent", "");
+        Object.entries(scrollable).forEach(([name, value]) => view.setAttribute(name, value));
       };
     });
     return () => mm.revert();
-  }, [lang]);
+  }, [lang, viewLabel]);
 
   return (
     <Section className={styles.real} aura="droite" aria-labelledby={TITLE_ID}>
@@ -110,7 +117,15 @@ export function BrowserShowcase({ app }: { app: WebApp }) {
                   </span>
                   <span className={styles.state}>{t.apps.real.online}</span>
                 </div>
-                <div ref={viewRef} className={styles.view} data-lenis-prevent="" data-loupe="">
+                <div
+                  ref={viewRef}
+                  className={styles.view}
+                  tabIndex={0}
+                  role="region"
+                  aria-label={viewLabel}
+                  data-lenis-prevent=""
+                  data-loupe=""
+                >
                   <div ref={pageRef} className={styles.page} data-loupe-source="">
                     <ContentImage className={styles.landing} image={browser.page} sizes="(min-width: 900px) 900px, 100vw" />
                   </div>

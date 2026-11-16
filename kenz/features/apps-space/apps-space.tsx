@@ -3,12 +3,12 @@
  * Composant serveur : il lit le contenu (content/apps.ts) et le passe à la scène (client).
  */
 import { apps, CONSTELLATION_CODE, SPACE_ORDER } from "@/content/apps";
+import { PORTRAITS } from "@/content/site";
 import { Section } from "@/design-system/components/section";
 import { SpaceScene, type SpaceApp } from "./space-scene";
 import styles from "./apps-space.module.css";
 
 const TITLE_ID = "apps-title";
-const PORTRAIT = { src: "/assets/img/kenz-pro.webp", width: 1080, height: 1920 } as const;
 
 export function AppsSpace() {
   const items: SpaceApp[] = SPACE_ORDER.map((slug) => {
@@ -20,7 +20,7 @@ export function AppsSpace() {
 
   return (
     <Section id="apps" aura="calme" className={styles.space} tabIndex={-1} aria-labelledby={TITLE_ID}>
-      <SpaceScene apps={items} code={code} portrait={PORTRAIT} titleId={TITLE_ID} />
+      <SpaceScene apps={items} code={code} portrait={PORTRAITS.pro} titleId={TITLE_ID} />
     </Section>
   );
 }

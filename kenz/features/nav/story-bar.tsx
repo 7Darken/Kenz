@@ -79,6 +79,7 @@ export function StoryBar({ chapters, label, onChapterChange }: StoryBarProps) {
       {chapters.map((chapter) => (
         <a key={chapter.id} className={styles.segment} href={`#${chapter.id}`}>
           <i className={styles.fill} />
+          <i className={styles.hit} aria-hidden="true" />
           <span className="sr">{chapter.label}</span>
         </a>
       ))}

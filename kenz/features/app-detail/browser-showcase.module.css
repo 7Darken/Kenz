@@ -98,6 +98,11 @@
   background: #121A2B;
 }
 
+/* Au clavier (mouvement réduit), l'anneau du focus se dessine dedans : la fenêtre rogne ce qui dépasse */
+.view:focus-visible {
+  outline-offset: -3px;
+}
+
 .page {
   position: relative;
   aspect-ratio: 804 / 4890;

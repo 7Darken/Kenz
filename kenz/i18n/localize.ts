@@ -1,16 +1,14 @@
 import type { Lang } from "./config";
 
 /**
- * A value translated into every supported language.
- *   e.g. `Localized<string>` -> { fr: "Bonjour", en: "Hello" }
- *        `Localized<string[]>` -> { fr: [...], en: [...] }
+ * Une valeur traduite dans chaque langue du site, ex. `{ fr: "Bonjour", en: "Hello" }`.
  *
- * Used for translatable CONTENT that lives in data files (`data/*.ts`),
- * as opposed to static UI strings which live in `i18n/dictionaries`.
+ * Sert aux contenus (`content/*.ts`) ; les textes d'interface, eux, vivent dans les dictionnaires
+ * (`i18n/dictionaries/{fr,en}/<espace>.ts`).
  */
 export type Localized<T = string> = Record<Lang, T>;
 
-/** Picks the value for the active language. */
+/** La valeur de la langue active. */
 export function localize<T>(value: Localized<T>, lang: Lang): T {
   return value[lang];
 }

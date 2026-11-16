@@ -381,6 +381,7 @@
   }
 
   .logo {
+    padding-block: 9.5px; /* 44 px de cible avec le logo plus petit */
     font-size: 25px;
   }
 

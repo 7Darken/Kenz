@@ -6,7 +6,7 @@ import { K15ZE_TOPICS } from "@/content/courses";
 import { Container } from "@/design-system/components/container";
 import { Reveal } from "@/design-system/components/reveal";
 import { Section } from "@/design-system/components/section";
-import page from "@/features/univers/page.module.css";
+import page from "@/design-system/styles/univers-page.module.css";
 import { SweepTitle } from "@/design-system/components/sweep-title";
 import { T } from "@/i18n/text";
 import styles from "./partage-section.module.css";

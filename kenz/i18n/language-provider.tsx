@@ -5,14 +5,18 @@
  *
  * La langue vit dans un petit store hors de React, lu par `useSyncExternalStore` :
  * le serveur et l'hydratation rendent le français, puis le client passe à la langue
- * de l'URL ou du stockage, sans setState dans un effet.
+ * de l'URL ou du stockage, sans setState dans un effet. Le store survit au changement d'univers.
  * Priorité : `?lang=` dans l'URL > préférence mémorisée > français.
+ *
+ * Chaque univers monte son provider avec ses seuls espaces (`messages`, choisis par `universeMessages()`
+ * d'i18n/server.ts) : les textes Pro ne partent pas dans les pages Créateur, et inversement.
  */
 import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 import { DEFAULT_LANG, LANG_STORAGE_KEY, LANGUAGES, type Lang } from "./config";
-import { dictionaries, type Dictionary } from "./dictionaries";
+import type { Dictionary } from "./dictionaries";
+import type { Messages } from "./dictionaries/keys";
 
 interface LanguageContextValue {
   /** Langue active. */
@@ -87,7 +91,28 @@ function syncUrl(lang: Lang) {
   }
 }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
+const SPACE_NAMES: ReadonlySet<string> = new Set<keyof Dictionary>([
+  "common", "pro", "apps", "agents", "victoire", "createur", "voyage", "sport", "footer",
+]);
+
+/**
+ * Le dictionnaire de l'univers. En développement, lire un espace qu'il n'a pas reçu lève une erreur claire
+ * (en production, ce serait `undefined` plus loin) : il faut alors l'ajouter à l'univers dans i18n/server.ts.
+ */
+function universeDictionary(partial: Partial<Dictionary>): Dictionary {
+  // Les espaces de l'univers suffisent à ses composants (voir ci-dessus).
+  if (process.env.NODE_ENV === "production") return partial as Dictionary;
+  return new Proxy(partial, {
+    get(target, key, receiver) {
+      if (typeof key === "string" && SPACE_NAMES.has(key) && !(key in target)) {
+        throw new Error(`i18n : l'espace « ${key} » n'est pas chargé dans cet univers (voir universeMessages, i18n/server.ts)`);
+      }
+      return Reflect.get(target, key, receiver);
+    },
+  }) as Dictionary;
+}
+
+export function LanguageProvider({ messages, children }: { messages: Messages; children: ReactNode }) {
   const lang = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const pathname = usePathname();
 
@@ -102,9 +127,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       lang,
       setLang: setLanguage,
       toggleLang: () => setLanguage(lang === "fr" ? "en" : "fr"),
-      t: dictionaries[lang],
+      t: universeDictionary(messages[lang]),
     }),
-    [lang],
+    [lang, messages],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

@@ -6,11 +6,11 @@
  */
 import { ROUTES } from "@/content/site";
 import { Hero } from "@/features/hero";
+import { SportChapter } from "@/features/sport";
 import { SuivreSection } from "@/features/suivre";
 import { TerreLayer, TerreScene, TerreSky, VoyageSection } from "@/features/terre";
 import { getDictionary } from "@/i18n/server";
 import { pageMetadata } from "@/i18n/metadata";
-import { SportSection } from "./sport-section";
 
 const { meta } = getDictionary().createur;
 
@@ -24,7 +24,7 @@ export default function CreateurHomePage() {
         <Hero variant="createur" behind={<TerreLayer />} />
         <VoyageSection />
       </TerreScene>
-      <SportSection />
+      <SportChapter />
       <SuivreSection />
     </>
   );

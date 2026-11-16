@@ -7,6 +7,7 @@
  *     retombe sur `recette`) ;
  *   - `href` : la cible de « Voir comment » (défaut `/agents`, avec la transition Passage) ; `""` : pas de lien.
  *
- * La page /agents assemble ses propres sections (mode complet de la machine, « Et chez vous ? », la méthode).
+ * Les chapitres de la page /agents ont leur point d'entrée, ./page (importé par sa route seule : l'accueil
+ * n'embarque pas les composants client de /agents).
  */
 export { IaPreview, type IaPreviewProps } from "./ia-preview";

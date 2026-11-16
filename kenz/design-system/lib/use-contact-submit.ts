@@ -2,7 +2,8 @@
 
 /**
  * L'envoi d'un formulaire vers `POST /api/contact`, partagé par le contact Pro (features/contact) et
- * Marques & collaborations (features/marques) :
+ * Marques & collaborations (features/marques) ; dans le design system, pour qu'aucun des deux univers n'embarque
+ * le formulaire de l'autre :
  * - `submit(body)` valide avec `validateContact` (le même code que le serveur), envoie, lit la réponse, et rend
  *   les erreurs de champ à afficher : celles du navigateur, sinon celles du serveur. Vide quand le message est
  *   parti, ou quand l'envoi a échoué (alors `failed`, à afficher dans une région `role="status"` permanente).

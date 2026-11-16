@@ -18,6 +18,7 @@ import { passageAttributes } from "@/content/site";
 import { Button } from "@/design-system/components/button";
 import { Container } from "@/design-system/components/container";
 import { Icon } from "@/design-system/components/icon";
+import { usePageEntrance } from "@/features/passages";
 import type { Dictionary } from "@/i18n/dictionaries";
 import type { Lang } from "@/i18n/config";
 import { format } from "@/i18n/format";
@@ -34,7 +35,6 @@ import {
   type MachineStory,
   type SceneState,
 } from "./machine-story";
-import { useArrival } from "./use-arrival";
 import styles from "./ia-machine.module.css";
 
 interface IaMachineProps {
@@ -59,8 +59,8 @@ export function IaMachine({ mode, caseId, cases, href = "" }: IaMachineProps) {
   const replayRef = useRef<HTMLButtonElement>(null);
   const tokenAt = useRef(-1);
   const complete = mode === "complete";
-  // Mode complet : la colonne entre avec la phrase du hero de /agents.
-  const arrived = useArrival(complete);
+  // Mode complet : la colonne entre avec la phrase du hero de /agents (même règle que AgentsHero).
+  const arrived = usePageEntrance({ enabled: complete, delay: 60 }).entered;
 
   // Le récit : branché sur la visibilité de la machine (seuil de 40 %, comme la maquette).
   useEffect(() => {

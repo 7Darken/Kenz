@@ -34,7 +34,9 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `.reseaux` / `.reseau` (icônes rondes, bulle) | `design-system/components/social-links.tsx` | `size` : `md` (48 px) ou `sm` (46 px) ; `tone` : `k15ze`, `glass`, ou les couleurs du parent (`--u`, `--ic`, `--ring`). |
 | Badges des stores (`app.html`) | `store-badge.tsx` | |
 | Motif d'Escapades Libres (`MARQUE` d'app.html, symbole de `victoire.js`) | `escapades-mark.tsx` | `variant` : `page` (défaut : nav, arrivée, action) ou `logo` (mur de post-it) ; `ESCAPADES_LOGO` pour composer l'icône du passage. |
-| Sélecteur de langue (ancien site) | `language-toggle.tsx` | Dans le pied de page, ligne 2. |
+| Sélecteur de langue (ancien site) | `language-toggle.tsx` | Dans le pied de page, ligne 2. Drapeaux dessinés en SVG (aucune requête tierce). |
+| Porte de retour des pages d'univers (`.retour`), matière des cartes (`.bezel`), briques des pages d'univers | `design-system/components/return-door.tsx`, `design-system/styles/bezel.module.css`, `design-system/styles/univers-page.module.css` | Partagés par voyage, sport et marques. |
+| Page 404 | `app/not-found.tsx` | Hors univers ; le retour mène à l'accueil de l'univers de l'adresse. |
 | `.nav` + variantes de `pro`, `app`, `agents`, `createur` (barre « stories »), `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
 | `shared/footer.*` | `features/footer/footer.tsx` | Variantes pro, createur, k15ze. |
 | Lenis, GSAP, ScrollTrigger, ancres | `design-system/motion/*` | `useMotion()`, `useGsap()`, `useInView()`, `useReducedMotion()`, `useMediaQuery()`. |
@@ -55,6 +57,7 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `pro.html` A4 : contact (formulaire nom / besoin / message, envoi, état « Merci ») | `features/contact/` → `POST /api/contact` (`type: "contact"`) | 1 |
 | `app.html` : arrivée sous l'arche, problème, comment ça marche (épinglé), l'IA en clair, sous le capot, en vrai, action, histoire suivante | `features/app-detail/` + `app/(pro)/apps/[slug]/page.tsx` | 2 |
 | `app.html` `#escapades-libres` : motif, « Mon rôle », chapitre 54 h, captures du site | `features/app-detail/` | 2 |
+| La mini-animation de Zenko (`apps.js` SC.zenko, la fiche ; `app.html`, « Comment ça marche ») | `features/zenko-demo/` : un seul composant et une seule timeline, deux habillages (`features/apps-space/zenko-scene.tsx`, `features/app-detail/scenes/zenko-scene.tsx`) | 1 et 2 |
 | `agents.html` : la phrase forte, la machine (mode complet, 4 cas), « Et chez vous ? », la méthode | `features/ia/` + `app/(pro)/agents/page.tsx` | 3 |
 | `agents.html` : contact | Réutilise `features/contact/` (agent 1) | 3 |
 
@@ -65,12 +68,12 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `createur.html` C0 : hero Créateur (même composition que Pro, sur le tour de la Terre ; le dézoom au défilement) | `features/hero/` variante `createur` (agent 1) + la Terre de `features/terre/` | 4 |
 | `shared/terre.*` : un seul globe three.js (cristal, néon, relief), calque fixe, image de repli | `features/terre/` (`next/dynamic`, `ssr: false`) | 4 |
 | `createur.html` C1 : le voyage, épinglé d'escale en escale (`ESCALES`), écran statique « vu une fois » | `features/terre/` + section dans `app/(createur)/createur/(terre)/page.tsx` | 4 |
-| `createur.html` C2 : le sport en un écran (cartes HYROX et Spartan, variante `landing`) | Section de la page (agent 4), avec les compositions de `features/courses/` (agent 5) | 4 et 5 |
+| `createur.html` C2 : le sport en un écran (cartes HYROX et Spartan, variante `landing`) | `SportChapter` de `features/sport/` (agent 4), avec les compositions de `features/courses/` (agent 5) | 4 et 5 |
 | `createur.html` C3 : « Me suivre » (deux univers en arche, réseaux en icônes avec bulle) | `features/suivre/` | 4 |
 | Nav « stories » + nom du chapitre | Déjà faite : sections `#top`, `#voyage`, `#sport`, `#suivre` | Fondations |
 | `voyage.html` : arrivée (la bille), dernière vidéo, mes séries (la bille suit la liste), le vrai prix, « Tu pars en Chine ? », me suivre, retour | `app/(createur)/createur/(terre)/voyage/page.tsx` + sections dans `features/voyage/` ; la bille vient du mode `bille` de `features/terre/` (agent 4) | 5 |
 | `voyage.html` `#marques` : Marques & collaborations (marque / budget / idée) | `features/marques/` → `POST /api/contact` (`type: "marques"`) | 5 |
-| `sport.html` : la promesse, ce que je partage (`K15ZE_TOPICS`), mes courses, me suivre (YouTube), retour | `app/(createur)/createur/sport/page.tsx` + `features/courses/` | 5 |
+| `sport.html` : la promesse, ce que je partage (`K15ZE_TOPICS`), mes courses, me suivre (YouTube), retour | `app/(createur)/createur/sport/page.tsx` + `features/sport/page.ts` + `features/courses/` | 5 |
 | `shared/courses.*` : compositions en parallaxe, fiche détail (`Dialog`), scènes animées HYROX, Spartan et Boxe | `features/courses/` | 5 |
 
 ## Passages (agent 6)
@@ -95,7 +98,8 @@ L'agent 6 peut monter son composant racine dans `app/_components/universe-shell.
 
 | Fichier | Contenu | Qui peut le modifier |
 |---|---|---|
-| `content/apps.ts` | Les 7 apps : couleurs, fiche de la scène, histoire complète, captures, stores. Expose `SPACE_ORDER`, `STORY_ORDER`, `CONSTELLATION_CODE`, `getApp`, `getNextSlug`. | 2, en accord avec 1 |
+| `content/apps.ts` | Les 7 apps : couleurs, fiche de la scène, histoire complète, captures, stores. Expose `SPACE_ORDER`, `CONSTELLATION_CODE`, `getApp`, `getNextSlug` (la chaîne « L'histoire suivante »), `navApps` (le peu que la nav en lit). | 2, en accord avec 1 |
+| `content/app-scenes.ts` | Les valeurs d'exemple des animations des apps (Oshii, Wado, Croc, Zenko), séparées de `apps.ts` pour qu'une scène n'embarque qu'elles | 2 |
 | `content/startup-weekend.ts` | Faits et médias des 54 h | 2 |
 | `content/ia.ts` | Les 4 cas, « Et chez vous ? » (`IA_NEEDS`), la méthode | 3 |
 | `content/series.ts` | Bloc `ESCALES` ; séries, dernière vidéo, vrai prix, guide Chine | `ESCALES` : 4 ; le reste : 5 |

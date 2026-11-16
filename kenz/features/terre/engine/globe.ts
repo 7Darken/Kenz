@@ -1,6 +1,6 @@
 /**
  * La Terre : une bille de cristal en 3D (three.js), posée dans un calque fixe. Portage de maquettes/v6/shared/terre.js
- * (style « verre », le seul retenu). Textures de la NASA locales (/assets/terre), ramenées à 2048 px sur mobile.
+ * (style « verre », le seul retenu). Textures de la NASA locales (/assets/terre), en variantes de 2048 px sur mobile.
  *
  * Une instance = un canevas WebGL. Le calque est l'hôte : l'instance y ajoute l'ombre portée, le canevas, ou l'image de
  * repli (sans WebGL, contexte perdu, texture illisible, ou mouvement réduit). L'API reste la même en repli : `frame()`
@@ -128,9 +128,10 @@ export interface Globe {
   destroy(): void;
 }
 
+/** Les textures maîtres (4096 px) et leurs variantes de 2048 px pour mobile : on ne télécharge que ce qui sert. */
 const TEX = {
-  mask: "/assets/terre/terre-masque.png",
-  day: "/assets/terre/earth-blue-marble.jpg",
+  mask: { full: "/assets/terre/terre-masque.webp", small: "/assets/terre/terre-masque-2048.webp" },
+  day: { full: "/assets/terre/earth-blue-marble.jpg", small: "/assets/terre/earth-blue-marble-2048.jpg" },
   relief: "/assets/terre/earth-topology.png",
   fallbackDay: "/assets/terre/globe-jour.webp",
   fallbackNight: "/assets/terre/globe-nuit.webp",
@@ -448,11 +449,11 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
 
   /** Le masque (terre / mer, pays filmés), le relief (calculé une fois, pas de texture) et le jour (la couleur). */
   async function loadTextures() {
-    const max = small ? 2048 : 4096;
+    const [max, size] = small ? ([2048, "small"] as const) : ([4096, "full"] as const);
     const [mask, relief, day] = await Promise.all([
-      loadCanvas(TEX.mask, max),
+      loadCanvas(TEX.mask[size], max),
       loadCanvas(TEX.relief, 2048),
-      loadCanvas(TEX.day, max),
+      loadCanvas(TEX.day[size], max),
     ]);
     if (S.dead || mode !== "3d") return;
     uShell.uMasque.value = makeTexture(mask, 4);

@@ -3,7 +3,7 @@
  * Les routes sont la seule source des liens internes (nav, pied de page, passages).
  */
 import type { AppSlug } from "./apps";
-import type { HexColor } from "./types";
+import type { HexColor, ImageAsset } from "./types";
 
 export const SITE_URL = "https://kenzenbien.fr";
 export const SITE_NAME = "Kenz";
@@ -26,7 +26,7 @@ export const ROUTES = {
  */
 export type PassageTarget = "pro" | "agents" | "escapades" | "voyage" | "sport" | "createur";
 
-export const PASSAGE_COLORS: Readonly<Record<PassageTarget, { dark: HexColor; light?: HexColor }>> = {
+const PASSAGE_COLORS: Readonly<Record<PassageTarget, { dark: HexColor; light?: HexColor }>> = {
   pro: { dark: "#0E1220", light: "#F5F3EF" },
   agents: { dark: "#1A2440", light: "#E9EDEF" },
   escapades: { dark: "#E3A21A" },
@@ -40,6 +40,12 @@ export function passageAttributes(target: PassageTarget) {
   const { dark, light } = PASSAGE_COLORS[target];
   return { "data-passage": "", "data-couleur": dark, ...(light && { "data-couleur-clair": light }) };
 }
+
+/** Les portraits détourés de Kenz (vraies photos), un par univers : le hero, et la scène des apps côté Pro. */
+export const PORTRAITS: Readonly<Record<"pro" | "createur", ImageAsset>> = {
+  pro: { src: "/assets/img/kenz-pro.webp", width: 1080, height: 1920 },
+  createur: { src: "/assets/img/kenz-moi.webp", width: 1080, height: 1920 },
+};
 
 /** L'année du © du pied de page (celle de la maquette ; à faire évoluer avec le site). */
 export const COPYRIGHT_YEAR = 2026;

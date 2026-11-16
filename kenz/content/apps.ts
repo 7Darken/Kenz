@@ -20,7 +20,7 @@ export type MobileAppSlug = Exclude<AppSlug, WebAppSlug>;
 export const SPACE_ORDER: readonly MobileAppSlug[] = ["oshii", "wado", "sago", "croc", "miru", "zenko"];
 
 /** Chaîne « L'histoire suivante » : elle boucle ; Escapades Libres est hors chaîne et mène à son début. */
-export const STORY_ORDER: readonly MobileAppSlug[] = ["oshii", "sago", "wado", "croc", "miru", "zenko"];
+const STORY_ORDER: readonly MobileAppSlug[] = ["oshii", "sago", "wado", "croc", "miru", "zenko"];
 
 /** Le code secret : les astres à relier sans lâcher, dans cet ordre (seul passage Pro → Créateur). */
 export const CONSTELLATION_CODE: readonly MobileAppSlug[] = ["wado", "oshii", "sago", "croc"];
@@ -948,7 +948,7 @@ export const apps: AppsBySlug = {
   },
 };
 
-export const isAppSlug = (value: string): value is AppSlug => (APP_SLUGS as readonly string[]).includes(value);
+const isAppSlug = (value: string): value is AppSlug => (APP_SLUGS as readonly string[]).includes(value);
 
 /** Ce que la nav montre de l'app de la page : son nom, son type, son icône. */
 export interface NavApp {

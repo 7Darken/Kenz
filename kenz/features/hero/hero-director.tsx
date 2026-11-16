@@ -4,19 +4,20 @@
  * Le chef d'orchestre du hero : l'arrivée (au chargement, ou à la fin d'un passage) et le départ au défilement.
  * - L'arrivée pose `data-in` sur le chapitre (le CSS joue le paysage, le portrait, le titre, le lien) et
  *   la partage par contexte (les mots de la phrase, le fil de l'arche, les objets 3D).
- *   Après un passage (usePassageArrival de features/passages), elle attend que le voile se lève (2,5 s au plus),
- *   avec `data-arriving` (délais plus courts côté Créateur) et `data-dive` après la plongée.
+ *   Le moment vient de usePageEntrance (features/passages) : après un passage, quand le voile se lève (2,5 s au
+ *   plus), avec `data-arriving` (délais plus courts côté Créateur) et `data-dive` après la plongée ; sinon après les
+ *   polices côté Créateur, et juste après le premier affichage côté Pro.
  * - Au défilement (ordinateur, sans mouvement réduit) : le texte monte et s'efface, le portrait et l'arche
  *   remontent à peine. Créateur : le paysage glisse plus lentement et s'efface, la scène s'efface au début.
  *   Leur opacité passe par `--hero-scroll` : un fondu piloté de l'extérieur (setHeroFade) peut primer sur elle.
  */
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useLayoutEffect, useRef, type ReactNode } from "react";
 
 import { gsap } from "@/design-system/motion/gsap";
 import { useGsap } from "@/design-system/motion/use-gsap";
 import { useMediaQuery } from "@/design-system/motion/use-media-query";
 import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
-import { usePassageArrival } from "@/features/passages";
+import { usePageEntrance } from "@/features/passages";
 import type { HeroVariant } from "./hero-variants";
 import styles from "./hero.module.css";
 
@@ -34,58 +35,30 @@ interface HeroDirectorProps {
 }
 
 export function HeroDirector({ variant, children }: HeroDirectorProps) {
-  const [entered, setEntered] = useState(false);
   const sectionRef = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
   const wide = useMediaQuery("(min-width: 900px)");
-  const { via, ready } = usePassageArrival();
+  // Créateur : après les polices (le titre se mesure juste) ; Pro : 60 ms après le premier affichage.
+  const { entered, via } = usePageEntrance(
+    variant === "createur" ? { waitFonts: true, maxWait: ARRIVAL_MAX_MS } : { delay: 60, maxWait: ARRIVAL_MAX_MS },
+  );
 
   // Le chapitre (rendu par le composant serveur) : retrouvé depuis la sentinelle.
   const sentinelRef = useCallback((node: HTMLSpanElement | null) => {
     sectionRef.current = node?.closest("section") ?? null;
   }, []);
 
-  // L'arrivée : une seule fois par montage.
-  useEffect(() => {
+  // L'arrivée se lit sur le chapitre : `data-arriving` / `data-dive` pendant l'attente, puis `data-in` (le CSS la joue).
+  useLayoutEffect(() => {
     const section = sectionRef.current;
-    if (!section || entered) return;
-    const timers: number[] = [];
-    let frame = 0;
-    let dead = false;
-    const enter = () => {
-      if (dead) return;
+    if (!section) return;
+    if (entered) {
       section.setAttribute("data-in", "");
-      setEntered(true);
-    };
+      return;
+    }
     section.toggleAttribute("data-arriving", via !== null);
     section.toggleAttribute("data-dive", via === "dive");
-
-    if (via !== null) {
-      // Le voile se lève : l'entrée, raccourcie, se joue (au plus tard 2,5 s après l'arrivée).
-      if (ready) frame = requestAnimationFrame(enter);
-      else timers.push(window.setTimeout(enter, ARRIVAL_MAX_MS));
-    } else if (variant === "createur") {
-      // Créateur : après les polices (le titre se mesure juste), 0,7 s au plus.
-      let started = false;
-      const go = () => {
-        if (started || dead) return;
-        started = true;
-        frame = requestAnimationFrame(() => {
-          frame = requestAnimationFrame(enter);
-        });
-      };
-      timers.push(window.setTimeout(go, 700));
-      void document.fonts?.ready.then(go);
-    } else {
-      frame = requestAnimationFrame(() => timers.push(window.setTimeout(enter, 60)));
-    }
-
-    return () => {
-      dead = true;
-      timers.forEach(window.clearTimeout);
-      cancelAnimationFrame(frame);
-    };
-  }, [variant, via, ready, entered]);
+  }, [entered, via]);
 
   // Le départ au défilement : GSAP pose et retire tout (gsap.context, via useGsap).
   useGsap(

@@ -12,11 +12,11 @@ import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
 import { Courses } from "@/features/courses";
 import { T } from "@/i18n/text";
-import styles from "./sport-section.module.css";
+import styles from "./sport-chapter.module.css";
 
 const TITLE_ID = "sport-t";
 
-export function SportSection() {
+export function SportChapter() {
   return (
     <Section id="sport" aura="gauche" fil="none" aria-labelledby={TITLE_ID} className={styles.sport}>
       <Container className={styles.inner}>

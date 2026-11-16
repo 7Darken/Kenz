@@ -1,6 +1,7 @@
 "use client";
 
 /** Croc : le matin « Je m'engage » se coche, le soir « Tenu » ; les jours se cochent et la série monte à 12 (exemple). */
+import { CROC_SAMPLE } from "@/content/app-scenes";
 import type { App } from "@/content/apps";
 import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
@@ -8,9 +9,6 @@ import kit from "./scene.module.css";
 import { all, Check, checkParts, one, type SceneBuilder } from "./scene-kit";
 import { HowItWorks } from "../how-it-works";
 import styles from "./croc-scene.module.css";
-
-/** La série d'exemple : de 5 à 12 jours. */
-const STREAK = [5, 6, 7, 8, 9, 10, 11, 12];
 
 export function CrocScene() {
   const s = useTranslation().apps.scenes.croc;
@@ -37,7 +35,7 @@ export function CrocScene() {
           <span className={styles.streakValue}>
             <span className={kit.rollW}>
               <span className={`${kit.roll} ${styles.roll}`} data-s="roll">
-                {STREAK.map((n) => (
+                {CROC_SAMPLE.streak.map((n) => (
                   <b key={n}>{n}</b>
                 ))}
               </span>
@@ -100,11 +98,13 @@ export const buildCroc: SceneBuilder = (el) => {
   check(pacts[0], 0.3);
   check(pacts[1], 0.85);
   check(days[0], 1.3);
-  tl.to(roll, { yPercent: -12.5, duration: 0.5 }, 1.35);
+  // Un jour coché : le rouleau de la série monte d'un chiffre.
+  const step = 100 / CROC_SAMPLE.streak.length;
+  tl.to(roll, { yPercent: -step, duration: 0.5 }, 1.35);
   for (let k = 1; k < 7; k++) {
     const t = 1.55 + k * 0.2;
     check(days[k], t, 0.45);
-    tl.to(roll, { yPercent: -12.5 * (k + 1), duration: 0.45 }, t + 0.05);
+    tl.to(roll, { yPercent: -step * (k + 1), duration: 0.45 }, t + 0.05);
   }
   return tl
     .to(flat, { opacity: 0, duration: 0.2 }, 3)

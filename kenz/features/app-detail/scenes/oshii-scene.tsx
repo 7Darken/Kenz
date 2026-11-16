@@ -3,6 +3,7 @@
 /** Oshii : une vidéo de recette est partagée à l'app, se replie dans l'icône et devient une fiche pesée. */
 import Image from "next/image";
 
+import { OSHII_SAMPLE } from "@/content/app-scenes";
 import type { App } from "@/content/apps";
 import type { ImageAsset } from "@/content/types";
 import { gsap } from "@/design-system/motion/gsap";
@@ -12,8 +13,8 @@ import { all, one, type SceneBuilder } from "./scene-kit";
 import { HowItWorks } from "../how-it-works";
 import styles from "./oshii-scene.module.css";
 
-/** Les quantités d'exemple de la fiche. */
-const QUANTITIES = { pasta: "200 g", parmesan: "40 g", lemon: "1", cream: "10 cl" } as const;
+/** Les quantités d'exemple de la fiche (content/app-scenes.ts). */
+const QUANTITIES = OSHII_SAMPLE.quantities;
 
 /** `icon`, `name` : ceux de l'app (content/apps.ts), passés par le chapitre. */
 export function OshiiScene({ icon, name }: { icon: ImageAsset; name: string }) {

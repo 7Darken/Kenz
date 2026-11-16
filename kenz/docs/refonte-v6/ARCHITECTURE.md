@@ -33,7 +33,10 @@ Branche : `refonte-v6`. Pas de push sans accord de Kenz. L'orchestrateur commite
 ## Arborescence cible
 ```
 app/
-  layout.tsx                 racine : polices, script de thème, providers (i18n, thème, motion)
+  layout.tsx                 racine : polices, script de thème, providers (thème, motion)
+  not-found.tsx              la 404, hors univers (retour à l'accueil de l'univers de l'adresse)
+  _components/universe-shell.tsx   l'ossature d'un univers : provider de langue (les seuls espaces de l'univers),
+                             data-univers, aura, fil, loupe, nav, pied de page, passages
   (pro)/layout.tsx           univers Pro : nav Pro, footer Pro, data-univers="pro"
   (pro)/page.tsx             /
   (pro)/apps/[slug]/page.tsx /apps/oshii … /apps/escapades-libres (generateStaticParams)
@@ -51,7 +54,10 @@ design-system/
                              Button, IconButton, Arch (kz-arche + tracé), Fil (rail du fil), Aura,
                              Loupe, Reveal, Words (mots qui montent), Section, Container, Dialog
                              (accessible), Polaroid, SocialIcon (Simple Icons CC0), StoreBadge,
-                             ThemeToggle, LanguageToggle
+                             ThemeToggle, LanguageToggle, ReturnDoor (la porte de retour des pages d'univers)
+  styles/                    styles partagés sans composant : bezel (la matière des cartes), univers-page (les
+                             briques des pages d'univers : chapitre, écran, titre, phrase, chapeau)
+  lib/                       chapters (le fil), useContactSubmit (l'envoi des deux formulaires vers /api/contact)
   motion/                    le socle du mouvement : MotionProvider (gsap + ScrollTrigger + Lenis), useGsap,
                              useInView, useReducedMotion, useMediaQuery, courbes ; features/ en dépend, jamais l'inverse
 features/                    un dossier par module, avec composants, hooks et CSS propres :
@@ -70,9 +76,14 @@ features/                    un dossier par module, avec composants, hooks et CS
   courses/                   compositions parallaxe + fiche détail + animations (HYROX, Spartan, Boxe), liste évolutive
   suivre/                    « Me suivre » (deux univers, icônes réseaux)
   marques/                   section et formulaire Marques & collaborations
+  voyage/                    les chapitres de /createur/voyage
+  sport/                     le chapitre #sport de /createur (index) et les chapitres de /createur/sport (page.ts)
+  zenko-demo/                la mini-animation de Zenko, partagée par apps-space (la fiche) et app-detail
 content/                     données typées et localisées (une seule source) :
-                             apps.ts, startup-weekend.ts, ia.ts, series.ts (voyage), courses.ts, socials.ts, site.ts
-i18n/                        existant, découpé par espace de noms (voir plus haut)
+                             apps.ts, app-scenes.ts (valeurs d'exemple des animations), startup-weekend.ts, ia.ts,
+                             series.ts (voyage), courses.ts, socials.ts, site.ts, contact.ts
+i18n/                        existant, découpé par espace de noms (voir plus haut) ; chaque univers ne reçoit côté
+                             client que ses espaces (`universeMessages`, i18n/server.ts)
 public/assets/               assets de la maquette, rangés : img/, apps/<slug>/, sport/, sport3d/, hero3d/, terre/,
                              badges/, el/ ; uniquement les fichiers utilisés
 docs/refonte-v6/             ce document, la carte maquette -> code, et les rapports de vérification

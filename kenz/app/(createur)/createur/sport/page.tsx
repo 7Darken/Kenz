@@ -4,11 +4,8 @@
  * Rien sur l'Asie ni le voyage.
  */
 import { ROUTES } from "@/content/site";
-import { CoursesSection } from "@/features/sport/courses-section";
-import { FollowSection } from "@/features/sport/follow-section";
-import { PartageSection } from "@/features/sport/partage-section";
-import { SportHero } from "@/features/sport/sport-hero";
-import { ReturnDoor } from "@/features/univers/return-door";
+import { ReturnDoor } from "@/design-system/components/return-door";
+import { CoursesSection, FollowSection, PartageSection, SportHero } from "@/features/sport/page";
 import { getDictionary } from "@/i18n/server";
 import { pageMetadata } from "@/i18n/metadata";
 

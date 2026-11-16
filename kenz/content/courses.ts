@@ -102,24 +102,26 @@ export const SPORT_HERO_PHOTO: ImageAsset = {
    Les scènes animées de la fiche (icônes 3D)
    ------------------------------------------------------------------------ */
 
-/** Icônes 3D de chaque scène, dans l'ordre d'apparition (masters 1024 px : `/assets/sport3d/<id>.webp`). */
-export const SPORT_3D_ICON_IDS = {
-  hyrox: [
-    "hyrox-run",
-    "hyrox-01-skierg",
-    "hyrox-02-sled-push",
-    "hyrox-03-sled-pull",
-    "hyrox-04-burpee-broad-jump",
-    "hyrox-05-row",
-    "hyrox-06-farmers-carry",
-    "hyrox-07-sandbag-lunges",
-    "hyrox-08-wall-balls",
-    "hyrox-finish",
-  ],
-  spartan: ["spartan-mur", "spartan-boue", "spartan-portes", "spartan-filet", "spartan-saut"],
-  boxe: ["boxe-bandes", "boxe-sac", "boxe-gants"],
-} as const satisfies Record<CourseSceneId, readonly string[]>;
-export type Sport3dIconId = (typeof SPORT_3D_ICON_IDS)[CourseSceneId][number];
+/** Les icônes 3D des scènes, par sport (masters 1024 px : `/assets/sport3d/<id>.webp`). */
+type Sport3dIconId =
+  | "hyrox-run"
+  | "hyrox-01-skierg"
+  | "hyrox-02-sled-push"
+  | "hyrox-03-sled-pull"
+  | "hyrox-04-burpee-broad-jump"
+  | "hyrox-05-row"
+  | "hyrox-06-farmers-carry"
+  | "hyrox-07-sandbag-lunges"
+  | "hyrox-08-wall-balls"
+  | "hyrox-finish"
+  | "spartan-mur"
+  | "spartan-boue"
+  | "spartan-portes"
+  | "spartan-filet"
+  | "spartan-saut"
+  | "boxe-bandes"
+  | "boxe-sac"
+  | "boxe-gants";
 
 /** Une icône 3D : décorative (la scène est décrite par `summary`). */
 function sport3dIcon(id: Sport3dIconId): ImageAsset {

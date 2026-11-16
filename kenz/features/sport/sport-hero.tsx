@@ -14,14 +14,16 @@ import { Container } from "@/design-system/components/container";
 import { Icon } from "@/design-system/components/icon";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
-import { useHeroPlay } from "@/features/univers/use-hero-play";
+import { usePageEntrance } from "@/features/passages";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./sport-hero.module.css";
 
 export function SportHero() {
   const { lang, t } = useLanguage();
-  const { played, porte } = useHeroPlay();
+  // Après le voile du passage (`porte` : une entrée plus courte), sinon une fois les polices prêtes.
+  const { entered: played, via } = usePageEntrance({ waitFonts: true });
+  const porte = via !== null;
   const hero = t.sport.hero;
   const photo = SPORT_HERO_PHOTO;
 

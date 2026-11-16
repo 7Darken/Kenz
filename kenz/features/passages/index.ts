@@ -28,6 +28,9 @@
  *   usePassageArrival() → { via: null | "passage" | "dive" | "liftoff", withIcon, ready }
  *   Le hero raccourcit son entrée si `via` n'est pas null et la joue quand `ready` devient vrai ; la Terre finit la
  *   descente si `via === "dive"`. Drapeau sessionStorage « kz-passage » (repris si la navigation recharge la page).
+ *   usePageEntrance({ enabled?, waitFonts?, delay?, maxWait? }) → { entered, via, ready }
+ *   Le moment de jouer l'entrée d'une page (heros, /agents, nav) : après le voile, ou après les polices, ou après
+ *   une image et `delay` ms. Une seule règle pour tout le site.
  */
 export { PassageRoot } from "./passage-root";
 export { Cordon } from "./cordon";
@@ -36,3 +39,4 @@ export { openPassage, type OpenPassageOptions } from "./veil";
 export { announceTerreReady, DIVE_PLUNGE_DELAY, startDive, startLiftoff } from "./portal";
 export { isPassageBusy, type PassageArrival, type PassageKind } from "./passage-state";
 export { usePassageArrival } from "./use-passage-arrival";
+export { usePageEntrance, type PageEntrance, type PageEntranceOptions } from "./use-page-entrance";

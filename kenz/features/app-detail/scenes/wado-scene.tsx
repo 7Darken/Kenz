@@ -1,6 +1,7 @@
 "use client";
 
 /** Wado : une assiette est scannée, les macros apparaissent, puis l'anneau de la journée se remplit (exemple). */
+import { WADO_SAMPLE } from "@/content/app-scenes";
 import type { App } from "@/content/apps";
 import { gsap } from "@/design-system/motion/gsap";
 import { useTranslation } from "@/i18n/language-provider";
@@ -8,13 +9,6 @@ import kit from "./scene.module.css";
 import { all, one, type SceneBuilder } from "./scene-kit";
 import { HowItWorks } from "../how-it-works";
 import styles from "./wado-scene.module.css";
-
-/** Les valeurs d'exemple. */
-const MACROS = [
-  ["protein", "38 g"],
-  ["carbs", "62 g"],
-  ["fat", "14 g"],
-] as const;
 
 export function WadoScene() {
   const s = useTranslation().apps.scenes.wado;
@@ -60,7 +54,7 @@ export function WadoScene() {
         <i className={`${styles.br} ${styles.brD}`} data-s="bracket" />
       </div>
       <ul className={styles.pills}>
-        {MACROS.map(([key, value]) => (
+        {WADO_SAMPLE.macros.map(([key, value]) => (
           <li key={key} data-s="pill">
             <span>{s[key]}</span>
             <b className={kit.slit}>
@@ -73,7 +67,7 @@ export function WadoScene() {
         <li className={styles.kcal} data-s="pill">
           <b className={kit.slit}>
             <span className={kit.num} data-s="value">
-              ≈ 520 <small>kcal</small>
+              {WADO_SAMPLE.kcal} <small>kcal</small>
             </span>
           </b>
         </li>

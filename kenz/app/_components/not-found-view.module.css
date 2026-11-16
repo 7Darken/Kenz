@@ -1,0 +1,32 @@
+/* La page 404 : un seul écran, centré, aux couleurs de l'univers (jetons posés par data-univers). */
+.page {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 24px;
+  min-height: 100svh;
+  padding: 96px var(--gr) 96px var(--gl);
+  text-align: center;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.title {
+  max-width: 14ch;
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: var(--fs-statement);
+  line-height: 1;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+.text {
+  max-width: 38ch;
+  margin: 0 0 8px;
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  color: var(--muted);
+  text-wrap: pretty;
+}
