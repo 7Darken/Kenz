@@ -72,7 +72,7 @@ export const SOCIALS: Readonly<Record<SocialId, Social>> = {
     id: "youtube-k15ze",
     network: "youtube",
     universe: "k15ze",
-    href: "https://www.youtube.com/@K15ze-l6z",
+    href: "https://www.youtube.com/@K15ze",
     label: "YouTube",
     account: "k15ze",
     ariaLabel: { fr: "YouTube : k15ze", en: "YouTube: k15ze" },
