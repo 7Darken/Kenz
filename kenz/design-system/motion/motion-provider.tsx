@@ -102,6 +102,41 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
+  // Arrivée d'une autre page sur une ancre (« /#apps », le retour des pages d'app) : la page se met encore en place
+  // (polices, épinglage des 54 h retiré s'il est déjà vu, Terre) et déplacerait la cible. Elle reste alignée en haut
+  // de l'écran tant que la mise en page bouge, 2,5 s au plus, ou jusqu'à ce que le visiteur fasse défiler lui-même.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    const target = id && id !== "top" ? document.getElementById(id) : null;
+    if (!target) return;
+    const USER_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+    let done = false;
+    let frame = 0;
+    let timer = 0;
+    const snap = () => {
+      if (done) return;
+      const lenis = lenisRef.current;
+      if (lenis) {
+        lenis.resize();
+        lenis.scrollTo(target, { immediate: true, force: true });
+      } else window.scrollTo(0, resolveY(target));
+    };
+    const observer = new ResizeObserver(snap);
+    const stop = () => {
+      done = true;
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+      USER_EVENTS.forEach((type) => window.removeEventListener(type, stop));
+    };
+    observer.observe(document.body);
+    USER_EVENTS.forEach((type) => window.addEventListener(type, stop, { passive: true }));
+    frame = requestAnimationFrame(snap);
+    void document.fonts?.ready.then(snap);
+    timer = window.setTimeout(stop, 2500);
+    return stop;
+  }, [pathname]);
+
   // Ancres internes : #top remonte en haut, #id défile jusqu'à la cible (et lui donne le focus si focusable).
   useEffect(() => {
     const onClick = (event: MouseEvent) => {

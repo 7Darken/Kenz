@@ -324,6 +324,17 @@
   display: none;
 }
 
+/* Le retour des pages d'app : sur mobile, la flèche seule (la nav porte déjà le logo, le thème et « Essayer ») */
+@media (max-width: 600px) {
+  .backApps {
+    padding-right: 4px;
+  }
+
+  .backApps .backLong {
+    display: none;
+  }
+}
+
 @media (max-width: 370px) {
   .backLong {
     display: none;

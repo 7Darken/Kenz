@@ -112,6 +112,21 @@ export function Nav({ variant, dot, apps }: NavProps) {
           </Link>
         ) : null}
 
+        {app ? (
+          // Pages d'app : retour discret à la scène des apps de l'accueil (l'arrivée sur l'ancre la garde alignée).
+          <Link
+            className={`${styles.back} ${styles.backApps}`}
+            href={`${ROUTES.home}#apps`}
+            aria-label={t.common.nav.backAppsLabel}
+            {...passageAttributes("pro")}
+          >
+            <span className={styles.backIco} aria-hidden="true">
+              <Icon name="arrow-left" />
+            </span>
+            <span className={styles.backLong}>{t.common.nav.backApps}</span>
+          </Link>
+        ) : null}
+
         <ThemeToggle />
 
         {app?.kind === "mobile" && app.icon ? (

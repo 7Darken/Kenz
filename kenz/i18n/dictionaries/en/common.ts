@@ -19,6 +19,8 @@ export const common: CommonDictionary = {
     seeSiteLabel: "See the site for {app}",
     back: "Content creation",
     backShort: "Content",
+    backApps: "My apps",
+    backAppsLabel: "Back to my apps",
   },
   actions: {
     backToTop: "Back to top",

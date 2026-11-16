@@ -23,6 +23,9 @@ export const common = {
     seeSiteLabel: "Voir le site d’{app}",
     back: "Création de contenu",
     backShort: "Création",
+    /** Pages d'app : le retour à la scène des apps de l'accueil ; le nom accessible contient le texte visible */
+    backApps: "Mes apps",
+    backAppsLabel: "Revenir à mes apps",
   },
   actions: {
     backToTop: "Revenir en haut",
