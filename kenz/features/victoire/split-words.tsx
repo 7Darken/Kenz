@@ -4,6 +4,7 @@
  */
 import { Fragment, type CSSProperties, type ReactNode } from "react";
 
+import { descender } from "@/design-system/lib/descender";
 import styles from "./victoire.module.css";
 
 interface Segment {
@@ -46,7 +47,7 @@ export function SplitWords({ text, children }: SplitWordsProps) {
       {words.map((word, index) => (
         <Fragment key={index}>
           {index > 0 ? " " : null}
-          <span className={styles.w} data-kv-w="" style={{ "--i": index } as CSSProperties}>
+          <span className={styles.w} data-kv-w="" style={{ "--i": index } as CSSProperties} {...descender(word.map((segment) => segment.text).join(""))}>
             {word.map((segment, segmentIndex) =>
               segment.emphasis ? <em key={segmentIndex}>{segment.text}</em> : <Fragment key={segmentIndex}>{segment.text}</Fragment>,
             )}

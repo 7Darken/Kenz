@@ -8,6 +8,7 @@
  */
 import { Fragment, useRef, type CSSProperties } from "react";
 
+import { descender } from "@/design-system/lib/descender";
 import { useInView } from "@/design-system/motion/use-in-view";
 import { useText, type TextSource } from "@/i18n/text";
 import styles from "./words.module.css";
@@ -77,7 +78,7 @@ export function Words({ as: Tag = "p", text, glow = false, delay, play, id, clas
       {words.map((word, index) => (
         <Fragment key={index}>
           {index > 0 ? " " : null}
-          <span className={styles.word} style={{ "--i": index } as CSSProperties}>
+          <span className={styles.word} style={{ "--i": index } as CSSProperties} {...descender(word.map((segment) => segment.text).join(""))}>
             {word.map((segment, segmentIndex) =>
               segment.emphasis ? (
                 <em key={segmentIndex} className={glow ? "word glow" : "word"}>

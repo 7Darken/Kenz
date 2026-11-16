@@ -16,6 +16,7 @@ import { Icon } from "@/design-system/components/icon";
 import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
 import { shownImage, ThemedImage } from "@/design-system/components/themed-image";
+import { descender } from "@/design-system/lib/descender";
 import { gsap } from "@/design-system/motion/gsap";
 import { CSS_EASE } from "@/design-system/motion/easings";
 import { useGsap } from "@/design-system/motion/use-gsap";
@@ -117,7 +118,7 @@ export function Arrival({ app }: { app: App }) {
   );
 
   const nameText = web ? app.nameLines.map((line) => (
-    <span key={line} className={styles.nameLine}>
+    <span key={line} className={styles.nameLine} {...descender(line)}>
       {line}
     </span>
   )) : app.name;
@@ -167,7 +168,12 @@ export function Arrival({ app }: { app: App }) {
               <EscapadesMark className={page.mark} />
             </span>
           )}
-          <h1 className={web ? `${styles.name} ${styles.webName}` : styles.name} id={NAME_ID} tabIndex={-1}>
+          <h1
+            className={web ? `${styles.name} ${styles.webName}` : styles.name}
+            id={NAME_ID}
+            tabIndex={-1}
+            {...(web ? {} : descender(app.name))}
+          >
             <span className={`${styles.title} ${styles.main}`}>{nameText}</span>
           </h1>
           <Words className={web ? `${styles.line} ${styles.webLine}` : styles.line} text={app.story.hook} delay={1.3} play={arrived} />
