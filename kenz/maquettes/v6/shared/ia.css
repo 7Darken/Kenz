@@ -1,0 +1,277 @@
+/* ==========================================================================
+   La machine (shared/ia.js) : entrée réelle → stations simples → « Vous validez » → sortie réelle.
+   Clair et sombre : uniquement les jetons de shared/theme.css (--fg, --lum, --core, --surface…).
+   Disposition par la largeur de la machine (container query « kzia ») :
+     moins de 420 px : à la verticale (mobile, colonnes étroites) ; à partir de 420 px : à l'horizontale.
+   « Valider » est le seul rouge de l'écran. Mouvement réduit : des fondus seulement.
+   ========================================================================== */
+.kz-ia{position:relative; --ia-pas:.7s; --ia-io:cubic-bezier(.65,0,.35,1)}
+.kz-ia__ico{width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; overflow:visible}
+
+/* ---------- Mode complet : la colonne ---------- */
+.kz-ia--complet{padding-top:clamp(8px,2vw,24px)}
+.kz-ia__w{display:flex; flex-direction:column; gap:clamp(14px,2vw,22px)}
+
+/* ---------- Le choix du cas : quatre grandes touches (pas d'étiquette) ---------- */
+.kz-ia__choix{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px}
+@media (min-width:900px){ .kz-ia__choix{grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px} }
+.kz-ia__c{position:relative; display:flex; align-items:center; gap:12px; min-height:64px; padding:10px 14px 10px 10px; border-radius:20px; text-align:left; color:var(--muted);
+  background:var(--surface); box-shadow:inset 0 0 0 1px var(--line-2);
+  transition:color .5s var(--expo), background-color .5s var(--expo), box-shadow .5s var(--expo), transform .5s var(--expo)}
+.kz-ia__c:hover{color:var(--fg); box-shadow:inset 0 0 0 1px var(--line)}
+.kz-ia__c:active{transform:scale(.98)}
+.kz-ia__c[aria-pressed="true"]{color:var(--fg); background:rgb(var(--lum) / .08); box-shadow:inset 0 0 0 1px rgb(var(--lum) / .55), 0 0 26px -12px rgb(var(--lum) / .8)}
+.kz-ia__cpt{flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:50%; box-shadow:inset 0 0 0 1px var(--line); transition:color .5s var(--expo), box-shadow .5s var(--expo)}
+.kz-ia__c[aria-pressed="true"] .kz-ia__cpt{color:rgb(var(--lum)); box-shadow:inset 0 0 0 1px rgb(var(--lum) / .6)}
+.kz-ia__ct{font-size:15px; line-height:1.25; font-weight:500; letter-spacing:-.01em; text-wrap:balance}
+html[data-theme="light"] .kz-ia__c{background:rgba(255,255,255,.55); box-shadow:inset 0 0 0 1px rgba(26,25,24,.07)}
+html[data-theme="light"] .kz-ia__c:hover{background:rgba(255,255,255,.85)}
+html[data-theme="light"] .kz-ia__c[aria-pressed="true"]{background:#fff; box-shadow:inset 0 0 0 1px rgb(var(--lum) / .45), 0 12px 26px -16px rgba(26,25,24,.45)}
+@media (max-width:420px){ .kz-ia__c{min-height:58px; padding:9px 14px} .kz-ia__cpt{display:none} .kz-ia__ct{font-size:14.5px} }
+
+/* ---------- La machine : une coque, un cœur (double biseau du thème) ---------- */
+.kz-ia__machine{position:relative}
+.kz-ia__core{container:kzia / inline-size; position:relative; padding:22px 16px 20px;
+  background:radial-gradient(80% 55% at 50% 0%, rgb(var(--lum) / .1), transparent 70%), var(--core)}
+.kz-ia__core::before{content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(rgb(var(--fg-rgb) / .07) 1px, transparent 1.3px); background-size:22px 22px;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 50%, #000, transparent); mask-image:radial-gradient(70% 60% at 50% 50%, #000, transparent)}
+html[data-theme="light"] .kz-ia__core{background:radial-gradient(80% 55% at 50% 0%, rgba(214,226,233,.7), transparent 70%), linear-gradient(180deg, #FFFFFF, #F7F8F8)}
+@media (min-width:600px){ .kz-ia__core{padding:30px clamp(20px,3vw,40px) 30px} }
+.kz-ia__stage{position:relative}
+.kz-ia__machine .replay{bottom:12px; right:12px}
+
+/* La scène : verticale par défaut */
+.kz-ia__scene{position:relative; display:grid; grid-template-columns:minmax(0,1fr); justify-items:center; gap:16px}
+.kz-ia__zone{position:relative; margin:0; display:flex; flex-direction:column; align-items:center; gap:10px; min-width:0}
+.kz-ia__carte{position:relative; display:grid; place-items:center}
+.kz-ia__leg{font-family:var(--f-word); font-style:italic; font-size:17px; line-height:1.25; color:var(--faint); text-align:center; text-wrap:balance}
+
+/* ---------- La piste : la ligne (le fil), les stations, le jeton de lumière ---------- */
+.kz-ia__piste{position:relative; width:100%; max-width:320px}
+.kz-ia__ligne{position:absolute; z-index:0; left:0; top:0; width:100%; height:1px; background:rgb(var(--fg-rgb) / .14); pointer-events:none}
+.kz-ia__ligne > i{position:absolute; inset:0; transform-origin:0 50%; transform:scaleX(var(--p, 0));
+  background:linear-gradient(90deg, rgb(var(--lum) / .25), rgb(var(--lum))); box-shadow:0 0 10px rgb(var(--lum) / .55); transition:transform var(--ia-pas) var(--ia-io)}
+.kz-ia__piste.is-v .kz-ia__ligne{width:1px; height:100%}
+.kz-ia__piste.is-v .kz-ia__ligne > i{transform-origin:50% 0; transform:scaleY(var(--p, 0)); background:linear-gradient(180deg, rgb(var(--lum) / .25), rgb(var(--lum)))}
+.kz-ia__jeton{position:absolute; z-index:0; left:-6px; top:-6px; width:12px; height:12px; border-radius:50%; background:#FFF8EC; pointer-events:none; opacity:0;
+  box-shadow:0 0 0 3px rgb(var(--lum) / .25), 0 0 18px 4px rgb(var(--lum) / .85); transition:transform var(--ia-pas) var(--ia-io), opacity .4s var(--expo)}
+.kz-ia__piste.is-en .kz-ia__jeton{opacity:1}
+.kz-ia__piste.is-net .kz-ia__jeton,.kz-ia__piste.is-net .kz-ia__ligne > i{transition:none !important}
+html[data-theme="light"] .kz-ia__jeton{background:rgb(var(--lum)); box-shadow:0 0 0 3px #fff, 0 0 0 4px rgb(var(--lum) / .3), 0 4px 14px rgb(var(--lum) / .5)}
+html[data-theme="light"] .kz-ia__ligne > i{box-shadow:0 0 8px rgb(var(--lum) / .3)}
+
+.kz-ia__sts{position:relative; z-index:1; display:flex; flex-direction:column; gap:10px; margin:0; padding:6px 0; list-style:none}
+.kz-ia__st{position:relative; display:flex; align-items:center; gap:14px; min-height:48px}
+.kz-ia__pt{position:relative; flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; color:rgb(var(--fg-rgb) / .55); background:var(--bg);
+  box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .2); transition:color .5s var(--expo), background-color .5s var(--expo), box-shadow .5s var(--expo)}
+html[data-theme="light"] .kz-ia__pt{background:#fff; box-shadow:inset 0 0 0 1px rgba(26,25,24,.14), 0 6px 14px -10px rgba(26,25,24,.4)}
+.kz-ia__pt .kz-ia__ico{grid-area:1 / 1; transition:opacity .4s var(--expo), transform .6s var(--expo)}
+.kz-ia__v{font-size:17px; line-height:1.2; font-weight:500; letter-spacing:-.015em; color:rgb(var(--fg-rgb) / .48); transition:color .5s var(--expo)}
+/* La station qui travaille, puis celles déjà passées */
+.kz-ia__st.is-on .kz-ia__pt{color:rgb(var(--lum)); box-shadow:inset 0 0 0 1.5px rgb(var(--lum)), 0 0 0 5px rgb(var(--lum) / .12), 0 0 22px rgb(var(--lum) / .5)}
+.kz-ia__st.is-on .kz-ia__v{color:var(--fg)}
+.kz-ia__st.is-passe .kz-ia__pt{color:rgb(var(--lum) / .9); box-shadow:inset 0 0 0 1px rgb(var(--lum) / .55)}
+.kz-ia__st.is-passe .kz-ia__v{color:rgb(var(--fg-rgb) / .78)}
+html[data-theme="light"] .kz-ia__st.is-on .kz-ia__pt{box-shadow:inset 0 0 0 1.5px rgb(var(--lum)), 0 0 0 5px rgb(var(--lum) / .1), 0 8px 18px -8px rgb(var(--lum) / .55)}
+
+/* Le point humain : « Vous validez », mis en évidence ; la machine s'y arrête jusqu'au clic */
+.kz-ia__st--vous .kz-ia__pt{width:52px; height:52px; color:var(--fg); box-shadow:inset 0 0 0 1.5px rgb(var(--fg-rgb) / .45)}
+.kz-ia__st--vous .kz-ia__v{color:var(--fg); font-weight:600}
+.kz-ia__ico--ok{opacity:0; transform:scale(.6)}
+.kz-ia__v2{display:none}
+.kz-ia__st--vous.is-attente .kz-ia__pt{background:var(--fg); color:var(--bg); box-shadow:0 0 0 6px rgb(var(--fg-rgb) / .1), 0 0 30px rgb(var(--lum) / .55)}
+.kz-ia__st--vous.is-valide .kz-ia__pt{background:rgb(var(--lum)); color:var(--bg); box-shadow:0 0 0 6px rgb(var(--lum) / .14), 0 0 26px rgb(var(--lum) / .6)}
+html[data-theme="light"] .kz-ia__st--vous.is-valide .kz-ia__pt{color:#fff}
+.kz-ia__st--vous.is-valide .kz-ia__ico--vous{opacity:0; transform:scale(.6)}
+.kz-ia__st--vous.is-valide .kz-ia__ico--ok{opacity:1; transform:none}
+.kz-ia__st--vous.is-valide .kz-ia__v1{display:none}
+.kz-ia__st--vous.is-valide .kz-ia__v2{display:inline; color:rgb(var(--lum))}
+/* « Valider » : le seul rouge, au pouce */
+.kz-ia__ok{position:relative; flex:none; display:inline-flex; align-items:center; justify-content:center; min-height:46px; min-width:112px; margin-left:auto; padding:0 22px; border-radius:999px;
+  background:var(--red); color:#FFF8F2; font-size:16px; font-weight:700; letter-spacing:-.01em; white-space:nowrap;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), inset 0 1px 0 rgba(255,255,255,.22), 0 12px 26px -12px rgba(232,50,43,.75);
+  opacity:0; visibility:hidden; transform:translateY(6px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out), visibility 0s .24s}
+.kz-ia__ok::after{content:""; position:absolute; inset:-6px; border-radius:inherit}
+.kz-ia__st--vous.is-attente .kz-ia__ok{opacity:1; visibility:visible; transform:none; transition:opacity .7s var(--expo), transform .9s var(--expo), visibility 0s}
+.kz-ia__st--vous.is-attente .kz-ia__ok:hover{transform:translateY(-2px)}
+.kz-ia__st--vous.is-attente .kz-ia__ok:active,.kz-ia__ok.is-presse{transform:scale(.96)}
+.kz-ia__ok:focus-visible{outline:2px solid var(--focus); outline-offset:4px}
+
+/* ---------- L'entrée réelle (dessinée) ---------- */
+.kz-ia__zone--e .kz-ia__carte,.kz-ia__zone--e .kz-ia__leg{opacity:0; transform:translateY(16px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.kz-ia__scene.is-e .kz-ia__zone--e .kz-ia__carte,.kz-ia__scene.is-e .kz-ia__zone--e .kz-ia__leg{opacity:1; transform:none; transition:opacity .8s var(--expo), transform 1.1s var(--expo)}
+.kz-ia__scene.is-e .kz-ia__zone--e .kz-ia__leg{transition-delay:.12s}
+.kz-ia__e{position:relative; border-radius:14px; box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 18px 40px -18px rgba(0,0,0,.85); transition:box-shadow .7s var(--expo)}
+html[data-theme="light"] .kz-ia__e{box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 18px 40px -18px rgba(26,25,24,.42)}
+.kz-ia__scene.is-lu .kz-ia__e{box-shadow:0 0 0 1.5px rgb(var(--lum) / .85), 0 0 34px -6px rgb(var(--lum) / .7), 0 18px 40px -18px rgba(0,0,0,.85)}
+html[data-theme="light"] .kz-ia__scene.is-lu .kz-ia__e{box-shadow:0 0 0 1.5px rgb(var(--lum) / .7), 0 0 30px -8px rgb(var(--lum) / .5), 0 18px 40px -18px rgba(26,25,24,.42)}
+.kz-ia__e > svg{display:block; width:100%; height:100%}
+.kz-ia__e--video{width:104px; aspect-ratio:9 / 16; overflow:hidden}
+.kz-ia__lecture{transform-box:fill-box; transform-origin:0 50%; transform:scaleX(.16)}
+.kz-ia__scene.is-e .kz-ia__lecture{transform:scaleX(.74); transition:transform 2.6s cubic-bezier(.4,.1,.6,.9) .3s}
+.kz-ia__e--assiette{width:150px; aspect-ratio:1; overflow:hidden; border-radius:18px}
+/* Des rushs et une idée */
+.kz-ia__e--rushs,.kz-ia__e--notes{width:176px; height:150px; border-radius:0; box-shadow:none !important}
+.kz-ia__clip{position:absolute; left:var(--x); top:var(--y); width:70%; aspect-ratio:12 / 7; border-radius:9px; overflow:hidden; transform:rotate(var(--r));
+  box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 10px 22px -10px rgba(0,0,0,.8)}
+.kz-ia__clip svg{display:block; width:100%; height:100%}
+.kz-ia__idee{position:absolute; right:0; top:8%; display:grid; gap:5px; width:38%; padding:9px 9px 11px; border-radius:10px; background:#F4EFE6; color:#8A5418; transform:rotate(6deg);
+  box-shadow:0 10px 22px -10px rgba(0,0,0,.7)}
+.kz-ia__idee .kz-ia__ico{width:18px; height:18px}
+.kz-ia__idee i{display:block; height:4px; border-radius:2px; background:rgba(26,25,24,.2)}
+.kz-ia__idee i:last-child{width:62%}
+/* Des notes en vrac */
+.kz-ia__note{position:absolute; display:grid; gap:6px; width:60%; padding:11px 11px 13px; border-radius:8px; background:#F4EFE6; transform:rotate(var(--r));
+  box-shadow:0 0 0 1px rgba(26,25,24,.05), 0 10px 22px -10px rgba(0,0,0,.6)}
+.kz-ia__note i,.kz-ia__bulle i{display:block; height:4px; border-radius:2px; background:rgba(26,25,24,.2)}
+.kz-ia__note--a{left:0; top:2%}
+.kz-ia__note--b{right:0; top:20%; background:#E6ECF1}
+.kz-ia__note--c{left:12%; bottom:0; background:#F3E6D2}
+.kz-ia__bulle{position:absolute; z-index:1; right:4%; bottom:16%; display:grid; gap:5px; width:44%; padding:10px; border-radius:12px 12px 3px 12px; background:rgb(var(--lum));
+  box-shadow:0 10px 22px -10px rgba(0,0,0,.6)}
+.kz-ia__bulle i{background:rgba(255,255,255,.75)}
+html[data-theme="light"] .kz-ia__note,html[data-theme="light"] .kz-ia__clip,html[data-theme="light"] .kz-ia__idee,html[data-theme="light"] .kz-ia__bulle{box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 10px 22px -12px rgba(26,25,24,.4)}
+html[data-theme="light"] .kz-ia__note--a{background:#FFFFFF}
+
+/* ---------- La sortie réelle : son empreinte attend, puis elle apparaît avec un léger éclat ---------- */
+.kz-ia__zone--s .kz-ia__carte::before{content:""; position:absolute; inset:0; border-radius:14px; pointer-events:none; background:rgb(var(--fg-rgb) / .025);
+  box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .12); transition:opacity .6s var(--expo)}
+.kz-ia__scene.is-sortie .kz-ia__zone--s .kz-ia__carte::before{opacity:0}
+.kz-ia__s{position:relative; overflow:hidden; border-radius:var(--rs, 14px); background:#111;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 24px 48px -20px rgba(0,0,0,.85);
+  opacity:0; transform:scale(.965); filter:blur(8px); clip-path:inset(0 0 100% 0 round var(--rs, 14px)); transition:opacity .24s var(--out), transform .24s var(--out), filter .24s var(--out), clip-path .24s var(--out)}
+html[data-theme="light"] .kz-ia__s{box-shadow:0 0 0 1px rgba(26,25,24,.07), 0 24px 48px -20px rgba(26,25,24,.45)}
+.kz-ia__scene.is-sortie .kz-ia__s{opacity:1; transform:none; filter:none; clip-path:inset(0 0 0 0 round var(--rs, 14px));
+  transition:opacity .7s var(--expo), transform 1.1s var(--expo), filter .9s var(--expo), clip-path 1s var(--expo)}
+.kz-ia__s img{display:block; width:100%; height:100%; object-fit:cover}
+.kz-ia__s--portrait{width:160px; aspect-ratio:3 / 4; --rs:18px}
+.kz-ia__s--portrait img{object-position:50% 0}
+.kz-ia__s--paysage{width:260px; aspect-ratio:1000 / 703; --rs:12px}
+.kz-ia__s--video{width:260px; aspect-ratio:16 / 9; --rs:12px}
+.kz-ia__play{position:absolute; left:50%; top:50%; display:grid; place-items:center; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%;
+  background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
+.kz-ia__play svg{width:20px; height:20px; fill:#fff}
+/* La fiche du projet (le vrai format des fiches, sans données) */
+.kz-ia__s--fiche{display:grid; gap:9px; width:230px; padding:15px 16px 16px; background:#F4EFE6; color:#1A1918; --rs:16px}
+html[data-theme="light"] .kz-ia__s--fiche{background:#fff}
+.kz-ia__ft{display:flex; align-items:center; gap:8px; margin:0 0 2px; font-size:14px; line-height:1.2; font-weight:600; letter-spacing:-.01em}
+.kz-ia__ft .kz-ia__ico{width:18px; height:18px; color:#0F5D6B}
+.kz-ia__fl{display:grid; gap:5px; margin:0; padding-top:9px; border-top:1px solid rgba(26,25,24,.08)}
+.kz-ia__fl b{font-size:12px; line-height:1.2; font-weight:600; color:#4B4743}
+.kz-ia__fl i{display:block; height:5px; border-radius:3px; background:rgba(26,25,24,.13)}
+.kz-ia__zone--s .kz-ia__leg{opacity:0; transform:translateY(8px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.kz-ia__scene.is-sortie .kz-ia__zone--s .kz-ia__leg{opacity:1; transform:none; transition:opacity .9s var(--expo) .35s, transform 1.1s var(--expo) .35s}
+/* L'éclat : un reflet qui traverse, une lumière qui s'éteint (une seule fois) */
+.kz-ia__eclat{position:absolute; inset:0; z-index:2; border-radius:14px; overflow:hidden; pointer-events:none; opacity:0}
+.kz-ia__eclat::before{content:""; position:absolute; top:-20%; bottom:-20%; left:0; width:42%; background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); transform:translateX(-170%) skewX(-12deg)}
+.kz-ia__eclat::after{content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:inset 0 0 0 1.5px rgb(var(--lum)), 0 0 36px rgb(var(--lum) / .6)}
+.kz-ia__scene.is-sortie .kz-ia__eclat{animation:kzIaEclat 1.5s var(--expo) .3s both}
+.kz-ia__scene.is-sortie .kz-ia__eclat::before{animation:kzIaReflet 1.1s var(--ia-io) .4s both}
+@keyframes kzIaEclat{0%{opacity:0} 22%{opacity:1} 100%{opacity:0}}
+@keyframes kzIaReflet{to{transform:translateX(340%) skewX(-12deg)}}
+/* Aperçu : la boucle se referme en douceur */
+.kz-ia__scene.is-fin{opacity:0; transition:opacity .6s var(--out)}
+
+/* ---------- À l'horizontale, dès que la machine a la place ---------- */
+@container kzia (min-width: 420px){
+  .kz-ia__scene{grid-template-columns:minmax(72px, 18cqw) minmax(0, 1fr) minmax(104px, 25cqw); align-items:center; justify-items:stretch; gap:clamp(8px, 1.6cqw, 22px); padding-bottom:clamp(38px, 6cqw, 70px)}
+  .kz-ia__zone{gap:clamp(6px, 1cqw, 12px)}
+  .kz-ia__leg{font-size:clamp(13px, 1.45cqw, 18px)}
+  .kz-ia__piste{max-width:none}
+  .kz-ia__sts{flex-direction:row; justify-content:space-between; align-items:flex-start; gap:0; padding:clamp(22px, 2.8cqw, 34px) clamp(4px, 2cqw, 26px) 0}
+  .kz-ia__st{flex-direction:column; gap:clamp(6px, 1cqw, 12px); min-height:0; width:clamp(56px, 9.5cqw, 120px)}
+  .kz-ia__pt{width:clamp(34px, 5.4cqw, 64px); height:clamp(34px, 5.4cqw, 64px)}
+  .kz-ia__st--vous .kz-ia__pt{width:clamp(40px, 6.4cqw, 76px); height:clamp(40px, 6.4cqw, 76px)}
+  .kz-ia__pt .kz-ia__ico{width:clamp(16px, 2.2cqw, 26px); height:clamp(16px, 2.2cqw, 26px)}
+  .kz-ia__v{font-size:clamp(12px, 1.6cqw, 19px); text-align:center; white-space:nowrap}
+  .kz-ia__ok{position:absolute; left:50%; top:calc(100% + clamp(8px, 1.2cqw, 14px)); min-height:clamp(38px, 4.4cqw, 48px); min-width:0; margin:0; padding:0 clamp(14px, 2cqw, 24px); font-size:clamp(13px, 1.45cqw, 16px); translate:-50% 0}
+  .kz-ia__e--video{width:clamp(66px, 14cqw, 168px)}
+  .kz-ia__e--assiette{width:clamp(76px, 17cqw, 206px); border-radius:clamp(10px, 1.6cqw, 18px)}
+  .kz-ia__e--rushs,.kz-ia__e--notes{width:clamp(80px, 17.5cqw, 210px); height:clamp(70px, 15cqw, 180px)}
+  .kz-ia__note,.kz-ia__idee,.kz-ia__bulle{padding:clamp(5px, .9cqw, 11px)}
+  .kz-ia__note,.kz-ia__bulle{gap:clamp(3px, .5cqw, 6px)}
+  .kz-ia__note i,.kz-ia__bulle i,.kz-ia__idee i{height:clamp(2px, .4cqw, 4px)}
+  .kz-ia__idee .kz-ia__ico{width:clamp(11px, 1.6cqw, 18px); height:clamp(11px, 1.6cqw, 18px)}
+  .kz-ia__zone--e{justify-self:end}
+  .kz-ia__zone--s{justify-self:start}
+  .kz-ia__s--portrait{width:clamp(96px, 19cqw, 230px); --rs:clamp(10px, 1.6cqw, 18px)}
+  .kz-ia__s--paysage,.kz-ia__s--video{width:clamp(104px, 25cqw, 310px)}
+  .kz-ia__s--fiche{width:clamp(104px, 21cqw, 260px); gap:clamp(4px, .8cqw, 9px); padding:clamp(8px, 1.4cqw, 16px)}
+  .kz-ia__ft{font-size:clamp(10px, 1.3cqw, 14px); gap:clamp(4px, .7cqw, 8px)}
+  .kz-ia__ft .kz-ia__ico{width:clamp(12px, 1.6cqw, 18px); height:clamp(12px, 1.6cqw, 18px)}
+  .kz-ia__fl{gap:clamp(3px, .45cqw, 5px); padding-top:clamp(4px, .8cqw, 9px)}
+  .kz-ia__fl b{font-size:clamp(9px, 1.1cqw, 12px)}
+  .kz-ia__fl i{height:clamp(3px, .45cqw, 5px)}
+  .kz-ia__play{width:clamp(30px, 4cqw, 48px); height:clamp(30px, 4cqw, 48px); margin:calc(clamp(30px, 4cqw, 48px) / -2) 0 0 calc(clamp(30px, 4cqw, 48px) / -2)}
+}
+
+/* ---------- « Dans la vraie vie » ---------- */
+.kz-ia__vraie{max-width:62ch; margin:4px auto 0; text-align:center; font-size:16px; line-height:1.5; color:var(--muted); text-wrap:balance}
+.kz-ia__vraie em{font-family:var(--f-word); font-style:italic; font-size:1.14em; color:var(--fg)}
+
+/* ---------- Mode aperçu : une machine compacte (horizontale dès 420 px de large) ---------- */
+.kz-ia--apercu{display:flex; flex-direction:column; gap:14px}
+.kz-ia--apercu .kz-ia__core{padding:18px 12px 14px}
+.kz-ia--apercu .kz-ia__e--video{width:88px}
+.kz-ia--apercu .kz-ia__s--portrait{width:140px}
+@container kzia (min-width: 420px){
+  .kz-ia--apercu .kz-ia__scene{grid-template-columns:minmax(100px, 21cqw) minmax(0, 1fr) minmax(128px, 28cqw); gap:clamp(6px, 1.4cqw, 18px); padding-bottom:clamp(44px, 7cqw, 64px)}
+  .kz-ia--apercu .kz-ia__e--video{width:clamp(96px, 18cqw, 160px)}
+  .kz-ia--apercu .kz-ia__s--portrait{width:clamp(126px, 25cqw, 230px)}
+  .kz-ia--apercu .kz-ia__leg{font-size:clamp(12px, 1.45cqw, 17px)}
+  .kz-ia--apercu .kz-ia__sts{padding-left:2px; padding-right:2px}
+}
+.kz-ia__titre{margin:0; font-family:var(--f-word); font-style:italic; font-size:clamp(19px, 1.6vw, 22px); line-height:1.3; color:var(--faint)}
+.kz-ia--apercu .kz-ia__vraie{margin:0; text-align:left; font-size:15px}
+.kz-ia__voir{align-self:flex-start}
+
+/* =========================================================
+   « Et chez vous ? » : de grandes cartes, une réponse simple, l'action
+   ========================================================= */
+.kz-ia__chez{position:relative; padding:var(--sec) 0 calc(var(--sec) * .5)}
+.kz-ia__h2{width:fit-content; max-width:100%; margin:0 0 clamp(28px, 4vw, 56px); font-family:var(--f-title); font-weight:600; font-size:clamp(46px, 7vw, 112px); line-height:.92; letter-spacing:-.01em}
+.kz-ia__besoins{display:grid; grid-template-columns:minmax(0,1fr); gap:12px}
+@media (min-width:720px){ .kz-ia__besoins{grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px} }
+@media (min-width:1080px){ .kz-ia__besoins{grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px} }
+.kz-ia__b{position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; gap:24px; min-height:clamp(150px, 15vw, 206px); padding:20px 22px 24px; border-radius:var(--r-xl);
+  text-align:left; color:var(--fg); background:var(--surface); box-shadow:inset 0 0 0 1px var(--surface-edge), var(--sh-1);
+  transition:transform .6s var(--expo), box-shadow .6s var(--expo), background-color .6s var(--expo)}
+html[data-theme="light"] .kz-ia__b{background:rgba(255,255,255,.7); box-shadow:var(--sh-1), inset 0 1px 0 rgba(255,255,255,.9)}
+.kz-ia__b:hover{transform:translateY(-3px)}
+.kz-ia__b:active{transform:scale(.985)}
+.kz-ia__b.is-on{box-shadow:inset 0 0 0 1.5px rgb(var(--lum) / .75), 0 0 0 4px rgb(var(--lum) / .08), var(--sh-2)}
+html[data-theme="light"] .kz-ia__b.is-on{background:#fff; box-shadow:inset 0 0 0 1.5px rgb(var(--lum) / .55), var(--sh-2)}
+.kz-ia__bpt{display:grid; place-items:center; width:48px; height:48px; border-radius:50%; color:rgb(var(--lum)); box-shadow:inset 0 0 0 1px rgb(var(--lum) / .45);
+  transition:background-color .5s var(--expo), color .5s var(--expo)}
+.kz-ia__bpt .kz-ia__ico{width:22px; height:22px}
+.kz-ia__b.is-on .kz-ia__bpt{background:rgb(var(--lum)); color:var(--bg)}
+html[data-theme="light"] .kz-ia__b.is-on .kz-ia__bpt{color:#fff}
+.kz-ia__bt{max-width:22ch; font-size:clamp(20px, 1.8vw, 25px); line-height:1.2; letter-spacing:-.025em; font-weight:500; text-wrap:balance}
+/* La réponse : la dernière case de la grille (sous la carte touchée, sur téléphone) */
+.kz-ia__rep{min-height:clamp(150px, 15vw, 206px)}
+.kz-ia__repc{display:flex; flex-direction:column; align-items:flex-start; gap:6px; height:100%; padding:20px 22px 22px;
+  background:radial-gradient(80% 90% at 100% 0%, rgb(var(--lum) / .16), transparent 70%), var(--core)}
+html[data-theme="light"] .kz-ia__repc{background:radial-gradient(80% 90% at 100% 0%, rgba(214,226,233,.85), transparent 70%), linear-gradient(180deg, #FFFFFF, #FBFAF8)}
+.kz-ia__repi{margin:auto 0; font-family:var(--f-word); font-style:italic; font-size:clamp(21px, 1.9vw, 26px); line-height:1.25; color:var(--faint)}
+.kz-ia__rl{margin:0; font-family:var(--f-word); font-style:italic; font-size:17px; line-height:1.3; color:var(--faint)}
+.kz-ia__rt{margin:0 0 8px; font-size:16.5px; line-height:1.45; font-weight:500; color:var(--fg); text-wrap:pretty}
+.kz-ia__parlons{margin-top:auto}
+.kz-ia__repc > *{opacity:0; transform:translateY(12px); filter:blur(4px)}
+.kz-ia__repc > .kz-ia__repi,.kz-ia__repc.is-in > *{opacity:1; transform:none; filter:none}
+.kz-ia__repc.is-in > *{transition:opacity .8s var(--expo), transform 1s var(--expo), filter .8s var(--expo)}
+.kz-ia__repc.is-in > :nth-child(2){transition-delay:.06s}
+.kz-ia__repc.is-in > :nth-child(3){transition-delay:.12s}
+.kz-ia__repc.is-in > :nth-child(4){transition-delay:.18s}
+.kz-ia__repc.is-in > :nth-child(5){transition-delay:.26s}
+@media (max-width:719px){ .kz-ia__rep:not(.is-choisi){display:none} .kz-ia__rep{min-height:0} }
+
+/* ---------- Mouvement réduit : des fondus seulement ---------- */
+@media (prefers-reduced-motion: reduce){
+  .kz-ia__jeton{display:none}
+  .kz-ia__ligne > i{transition:none}
+  .kz-ia__zone--e .kz-ia__carte,.kz-ia__zone--e .kz-ia__leg,.kz-ia__zone--s .kz-ia__leg,.kz-ia__s,.kz-ia__ok,.kz-ia__repc > *{transform:none !important; filter:none !important}
+  .kz-ia__s,.kz-ia__scene.is-sortie .kz-ia__s{clip-path:none}
+  .kz-ia__eclat,.kz-ia__eclat::before{animation:none !important}
+  .kz-ia__b,.kz-ia__c{transition-property:background-color,box-shadow,color}
+  .kz-ia__b:hover{transform:none}
+}

@@ -1,0 +1,152 @@
+/* ==========================================================================
+   La profondeur des heros (V6) : des objets qui flottent sur trois plans autour du portrait.
+   Rempli par shared/profondeur.js (le branchement, l'API et les listes d'objets y sont décrits).
+
+   .kz-prof                    le conteneur, premier enfant de .hero__stage. Ni z-index, ni opacité, ni transformation :
+                               chaque plan prend sa place dans la pile du portrait, du fond vers l'avant :
+                               loin (z 0, avant le halo et l'arche) < halo, arche (0) < portrait (1) < milieu (2) < près (3).
+     .kz-prof__o[data-plan]    un objet : sa place (--x, --y : son centre, en %), sa largeur (--t), son rapport
+                               hauteur / largeur (--k), le défilement (GSAP : transform et opacity)
+       .kz-prof__f             l'entrée (opacity, scale), la souris (translate), la flottaison (transform, en boucle)
+         .kz-prof__c           le rendu du plan : flou, ombre, halo, opacité
+           img.kz-prof__img                        un objet 3D détouré (canal alpha)
+           .kz-prof__pola > .kz-prof__photo > img  un polaroïd : cadre blanc, la vraie miniature
+
+   Jetons, clair et sombre : --prof-ombre (r g b), --prof-halo, --prof-papier, --prof-papier-2, --prof-loin-op.
+   ========================================================================== */
+
+:root {
+  --prof-ombre: 3 5 9;
+  /* Sombre : un halo très doux de la lumière de l'univers, pour que les objets sombres se détachent du ciel */
+  --prof-halo: drop-shadow(0 0 16px rgb(var(--lum, 118 188 210) / .2));
+  --prof-papier: #F4F0E8;
+  --prof-papier-2: #E4DED2;
+  --prof-loin-op: .62;
+}
+html[data-theme="light"] {
+  --prof-ombre: 58 42 26;
+  --prof-halo: drop-shadow(0 0 0 transparent);
+  --prof-papier: #FFFFFF;
+  --prof-papier-2: #F3EFE8;
+  --prof-loin-op: .74;
+}
+
+.kz-prof {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --mx: 0;
+  --my: 0;
+}
+
+.kz-prof__o {
+  position: absolute;
+  z-index: 2;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: var(--t, 120px);
+  /* centré par ses marges (GSAP écrit transform au défilement : pas de translate ici) */
+  margin: calc(var(--t, 120px) * var(--k, 1) * -.5) 0 0 calc(var(--t, 120px) * -.5);
+  --flou: 0px;
+  --op: 1;
+  --ombre: drop-shadow(0 14px 16px rgb(var(--prof-ombre) / .34));
+  --halo-o: var(--prof-halo);
+}
+.kz-prof__o:not(.is-vis) { display: none; }
+.kz-prof__o[data-plan="loin"] {
+  z-index: 0;
+  --flou: 2.4px;
+  --op: var(--prof-loin-op);
+  --ombre: drop-shadow(0 5px 6px rgb(var(--prof-ombre) / .2));
+}
+.kz-prof__o[data-plan="pres"] {
+  z-index: 3;
+  --flou: 1.1px;
+  --ombre: drop-shadow(0 28px 30px rgb(var(--prof-ombre) / .4));
+}
+.kz-prof__o[data-type="polaroid"] { --halo-o: drop-shadow(0 0 0 transparent); }
+
+/* L'entrée (après le portrait et le titre), la souris, la flottaison lente et désynchronisée */
+.kz-prof__f {
+  display: block;
+  opacity: 0;
+  scale: var(--e-s, .94);
+  transform: rotate(var(--r, 0deg));
+  translate: calc(var(--mx) * var(--ax, 0px)) calc(var(--my) * var(--ax, 0px) * .6);
+}
+.kz-prof__o[data-plan="pres"] .kz-prof__f { --e-s: 1.06; }
+.kz-prof.is-in .kz-prof__f {
+  opacity: 1;
+  scale: 1;
+  transition: opacity 1.4s var(--expo, cubic-bezier(.16, 1, .3, 1)) var(--ed, 0s), scale 2.2s var(--expo, cubic-bezier(.16, 1, .3, 1)) var(--ed, 0s);
+  animation: kzProfFlotte var(--fd, 9s) ease-in-out var(--fdl, 0s) infinite;
+}
+/* Un objet qui trouve sa place après l'entrée (image lente, redimensionnement) arrive aussi en fondu */
+@starting-style {
+  .kz-prof.is-in .kz-prof__f { opacity: 0; scale: var(--e-s, .94); }
+}
+@keyframes kzProfFlotte {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  32% { transform: translate3d(var(--fx, 1px), calc(var(--fy, 6px) * -1), 0) rotate(calc(var(--r, 0deg) + var(--fr, 2deg))); }
+  68% { transform: translate3d(calc(var(--fx, 1px) * -1), calc(var(--fy, 6px) * -.35), 0) rotate(calc(var(--r, 0deg) - var(--fr, 2deg) * .55)); }
+}
+
+.kz-prof__c {
+  display: block;
+  opacity: var(--op);
+  filter: blur(var(--flou)) var(--ombre) var(--halo-o);
+}
+.kz-prof__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Le polaroïd : un vrai cadre blanc, plus large en bas ; la photo garde son format (16:9), un léger reflet */
+.kz-prof__pola {
+  padding: 5.6% 5.6% 19%;
+  border-radius: 2.5px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, .75), rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, var(--prof-papier), var(--prof-papier-2));
+  box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .07), 0 1px 1.5px rgb(var(--prof-ombre) / .28);
+}
+.kz-prof__photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: 1px;
+  background: #1A1816;
+}
+.kz-prof__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+.kz-prof__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 34%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1), inset 0 1px 5px rgba(0, 0, 0, .28);
+}
+
+/* Mouvement réduit : les objets restent fixes (un simple fondu à l'arrivée) */
+.kz-prof--fixe .kz-prof__f { translate: none; scale: 1; }
+.kz-prof--fixe.is-in .kz-prof__f { animation: none; transition: opacity .6s linear; }
+@media (prefers-reduced-motion: reduce) {
+  .kz-prof__f { translate: none !important; scale: 1 !important; }
+  .kz-prof.is-in .kz-prof__f { animation: none !important; transition: opacity .6s linear !important; }
+}
+
+/* Néon Lagon des objets Pro (composant livré par l'agent assets : assets/hero3d/neon.css) */
+.hero3d-neon{position:relative; display:block; isolation:isolate; --neon-strength:.4}
+.hero3d-neon > img{display:block; width:100%; height:auto; user-select:none; -webkit-user-drag:none}
+.hero3d-neon > .hero3d-neon__glow{position:absolute; inset:0; pointer-events:none; filter:url(#hero3d-lagon-neon); opacity:var(--neon-strength); mix-blend-mode:screen}
+html[data-theme="light"] .hero3d-neon > .hero3d-neon__glow{opacity:calc(var(--neon-strength) * .55)}

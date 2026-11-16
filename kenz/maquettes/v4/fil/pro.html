@@ -1,0 +1,1135 @@
+<!doctype html>
+<!--
+  Kenz — Pro (V5, style « Le fil »)
+  L'Encre, la lumière Lagon, et un fil lumineux qui relie les chapitres :
+  A0 le portrait dans une arche que le fil dessine → A1 les apps (module partagé shared/apps.*)
+  → A2 les 54 heures (module partagé shared/victoire.*) → A3 pour votre équipe → A4 contact.
+  Le fil descend dans chaque chapitre, modules compris ; le rail garde un nœud par chapitre.
+  Les deux modules prennent leur apparence dans les variables --kz-* de la page (bloc « Modules partagés »).
+  Ordinateur (≥ 900 × 600, sans mouvement réduit) : les 54 heures sont épinglées et jouées au défilement ; rail du fil à gauche dès 1100 px.
+  Mobile et mouvement réduit : aucun épinglage, chaque moment se déclenche à l'entrée à l'écran.
+  Transitions (shared/passage.*) et passage secret (shared/cordon.*) : contrat du brief V4 §3. La page fonctionne sans eux.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Pro</title>
+<meta name="description" content="Je construis des apps où l'IA fait le vrai travail.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#1A1918">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/kenz-pro.webp">
+<style>
+/* =========================================================
+   Jetons
+   ========================================================= */
+:root{
+  --bg:#1A1918;
+  --bg-2:#201E1D;
+  --creme:#F4EFE6;
+  --ink:#1A1918;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+  --dusk:111 186 197;
+  --fil:120 196 206;
+  --lagon-2:#5E9EA8;
+  --cordon-lumiere:#E2B26A;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.65,0,.35,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(96px,12vw,176px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,h1,h2,h3,figure{margin:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(46% 38% at 8% 0%, rgba(15,93,107,.3), transparent 72%), radial-gradient(40% 36% at 100% 72%, rgba(15,93,107,.14), transparent 72%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+main{overflow-x:clip}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:clamp(19px,1.5vw,22px); line-height:1.3; letter-spacing:0; color:var(--faint)}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); border:1px solid rgba(255,255,255,.16)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#24221F,#1C1A19); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(26,25,24,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.2)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link:hover{color:var(--creme)}
+
+/* Rejouer : discret, dans le coin de l'animation */
+.replay{position:absolute; z-index:4; bottom:16px; right:16px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:500; color:rgba(244,239,230,.86); background:rgba(26,25,24,.55); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+
+/* =========================================================
+   Navigation (markup commun : .kz-logo + point-cordon)
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,25,24,.86), rgba(26,25,24,.5)); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-flex; align-items:baseline; margin-right:auto; padding:8px 4px 8px 2px; border-radius:10px; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--creme)}
+/* Le point : un vrai disque de 7 px, sur la ligne de base, comme un point final. Rien d'autre. */
+.kz-dot{position:relative; display:inline-block; flex:none; width:7px; height:7px; margin-left:3px; padding:0; border:0; border-radius:50%; background:var(--creme); vertical-align:baseline; cursor:grab; touch-action:none}
+.kz-dot::before{content:""; position:absolute; inset:-4px; border-radius:50%}
+@media (pointer:coarse){ .kz-dot::before{inset:-14px} }
+.kz-dot:active{cursor:grabbing}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(26,25,24,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--creme); color:var(--ink); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+.progress{position:fixed; top:0; left:0; right:0; z-index:51; height:2px; pointer-events:none; background:linear-gradient(90deg, rgba(244,239,230,.15), rgba(244,239,230,.7)); transform-origin:left; transform:scaleX(0); opacity:0; transition:opacity .6s var(--expo)}
+.progress.is-on{opacity:.6}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .kz-logo{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* =========================================================
+   A0 Hero : l'Encre, une arche de lumière Lagon, le fil qui la dessine
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__light{position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(72% 40% at 50% 86%, rgba(20,112,127,.5), rgba(15,93,107,.12) 55%, transparent 80%), linear-gradient(180deg, #1B2325 0%, var(--bg) 70%)}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + 100px)}
+.hero__copy{position:relative; z-index:3}
+.hero__title{position:relative; margin:0 0 .16em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(92px,26vw,150px); line-height:.82; letter-spacing:-.015em; color:var(--creme)}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.ttl__dot{display:inline-block; width:.1em; height:.1em; margin-left:.035em; border-radius:50%; background:currentColor; vertical-align:baseline}
+.hero__line{margin:0 0 24px; max-width:22ch; font-size:clamp(19px,1.7vw,24px); line-height:1.42; color:rgba(244,239,230,.94); text-wrap:balance; --wd:1.05s}
+.hero__down{display:inline-flex; align-items:center; gap:14px; min-height:48px; padding-right:6px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.hero__downIco{display:grid; place-items:center; width:46px; height:46px; border-radius:50%; box-shadow:inset 0 0 0 1px rgb(var(--fil) / .45), 0 0 18px -4px rgb(var(--fil) / .5); transition:box-shadow .5s var(--expo), background .5s var(--expo)}
+.hero__downIco svg{width:15px; height:15px; transition:transform .7s var(--expo)}
+.hero__down:hover{color:var(--creme)}
+.hero__down:hover .hero__downIco{background:rgb(var(--fil) / .1); box-shadow:inset 0 0 0 1px rgb(var(--fil) / .8), 0 0 24px -4px rgb(var(--fil) / .7)}
+.hero__down:hover .hero__downIco svg{transform:translateY(3px)}
+.hero__arch{--arch-bg:radial-gradient(74% 50% at 50% 36%, rgba(40,152,168,.8), rgba(15,93,107,.44) 55%, rgba(15,93,107,.1) 84%), linear-gradient(180deg,#173238,#1A1918 94%);
+  align-self:center; height:clamp(300px, 50vh, 470px); height:clamp(300px, 50svh, 470px); margin-top:auto; flex:none}
+.hero__arch.is-lensing{cursor:none}
+@media (min-width:900px){
+  .hero__layout{flex-direction:row; align-items:flex-end; justify-content:space-between; gap:clamp(32px,5vw,96px); padding-top:0}
+  .hero__copy{padding-bottom:clamp(60px,12svh,132px); max-width:min(640px, 52%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__arch{align-self:flex-end; height:min(80vh, 780px, 64vw); height:min(80svh, 780px, 64vw); margin:0 clamp(0px,2vw,40px) 0 0}
+  .hero__light{background:radial-gradient(30% 58% at 73% 70%, rgba(20,112,127,.55), rgba(15,93,107,.14) 55%, transparent 80%), linear-gradient(180deg,#1B2325 0%, var(--bg) 72%)}
+}
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.hero-in .ttl--main{animation:ttlMain 1.7s var(--expo) .6s both}
+.hero-in .ttl--ghost{animation:ttlGhost 1.5s var(--expo) .42s both}
+.js .hero [data-anim]{opacity:0}
+.hero-in .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad, 0s)}
+.hero__down[data-anim]{--ad:1.85s}
+/* L'arche : le fil la dessine, la lumière monte, le portrait se pose */
+.js .hero__light{opacity:0}
+.hero-in .hero__light{opacity:1; transition:opacity 1.8s var(--expo)}
+.js .hero .arch__in{clip-path:inset(100% 0 0 0)}
+.hero-in .hero .arch__in{clip-path:inset(0 0 0 0); transition:clip-path 1.8s var(--expo) .55s}
+.js .hero .arch__img{opacity:0; filter:blur(14px); transform:translateY(5%) scale(1.04)}
+.hero-in .hero .arch__img{opacity:1; filter:none; transform:none; transition:opacity 1.2s var(--expo) .85s, filter 1.4s var(--expo) .85s, transform 2.2s var(--expo) .85s}
+.js .hero .arch__line path{stroke-dashoffset:1}
+.hero-in .hero .arch__line .arch__main{stroke-dashoffset:0; transition:stroke-dashoffset 2.6s var(--fil-io) .15s}
+.hero-in .hero .arch__line .arch__ghost{stroke-dashoffset:0; transition:stroke-dashoffset 3s var(--fil-io) .6s}
+.js .hero .arch__ground{transform:scaleX(0)}
+.hero-in .hero .arch__ground{transform:none; transition:transform 2s var(--expo) .1s}
+
+/* =========================================================
+   A3 Pour votre équipe
+   ========================================================= */
+.team{position:relative; padding:calc(var(--sec) * .6) 0 var(--sec); background:radial-gradient(50% 40% at 70% 40%, rgb(var(--dusk) / .07), transparent 70%)}
+.team__grid{display:grid; gap:clamp(40px,5vw,88px); align-items:center}
+.team__copy{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(28px,3vw,40px)}
+.team__q{max-width:19ch; font-size:clamp(32px,4.2vw,66px); line-height:1.05; letter-spacing:-.04em; font-weight:500; text-wrap:balance}
+@media (min-width:960px){ .team__grid{grid-template-columns:6fr 5fr} }
+
+.ag{position:relative; width:min(100%, 440px); margin-inline:auto; aspect-ratio:100 / 126; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -46px rgba(0,0,0,.9)}
+.ag__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgb(var(--dusk) / .15), transparent 70%), linear-gradient(180deg,#22201E,#191817); box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%}
+.ag-wires path{fill:none; stroke:rgba(244,239,230,.34); stroke-width:.4; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#2A2724; box-shadow:inset 0 0 0 1px rgba(244,239,230,.13), 0 2cqw 5cqw -2cqw rgba(0,0,0,.6)}
+.ag-src svg{width:4.4cqw; height:4.4cqw; color:var(--muted); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-src span{font-size:max(10px,3.3cqw); line-height:1.2; font-weight:500; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:#A8E6BE}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#1A1918; stroke-width:2.6}
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2.2cqw; border-radius:99px; background:#24221F; box-shadow:inset 0 0 0 1px rgba(244,239,230,.15); font-size:max(11px,3.5cqw); line-height:1; font-weight:500}
+.ag-node > i{flex:none; width:2.4cqw; height:2.4cqw; border-radius:50%; background:rgba(244,239,230,.5)}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1px rgba(126,198,208,.8), 0 0 6cqw rgba(94,158,168,.42); opacity:0; pointer-events:none}
+.ag-node--v{left:12cqw; top:30cqw; width:34cqw; height:10cqw}
+.ag-node--c{left:52cqw; top:30cqw; width:40cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(17px,5.6cqw); background:#0F3D45}
+.ag-node--h .ag-glow{opacity:1}
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:36cqw; transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:var(--creme); color:#1A1918; box-shadow:0 4cqw 10cqw -4cqw rgba(0,0,0,.8)}
+.ag-note__t{font-size:max(12px,4.2cqw); line-height:1.3; font-weight:600; letter-spacing:-.02em; margin-bottom:1.4cqw}
+.ag-line{display:flex; align-items:center; gap:3cqw; padding:2.3cqw 0; border-top:1px solid rgba(26,25,24,.1)}
+.ag-line i{flex:1; height:1.6cqw; border-radius:1cqw; background:rgba(26,25,24,.16)}
+.ag-line span{font-size:max(9.5px,2.9cqw); line-height:1.2; font-weight:500; color:#4D4842; white-space:nowrap}
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:#A8E6BE; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-size:max(16px,4.8cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; color:var(--creme); opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:106cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:#FFF8F2; font-size:max(18px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 3cqw 8cqw -3cqw rgba(232,50,43,.7); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--creme); outline-offset:4px}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{bottom:5.5%; right:auto; left:50%; translate:-50% 0}
+
+/* =========================================================
+   A4 Contact
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13.5px; font-weight:500; color:var(--muted)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.24); box-shadow:inset 0 0 0 1px rgba(244,239,230,.14); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.42)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.26)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.6), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,180,90,.9)}
+textarea.input{min-height:132px; resize:vertical}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; color:var(--muted); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); transition:background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo)}
+.choice input:hover + span{color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.34)}
+.choice input:checked + span{background:var(--creme); color:var(--ink); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--creme); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1px rgba(242,180,90,.7)}
+.field__err{margin:0; font-size:13px; color:#F2C48A}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:var(--creme); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{margin:0; outline:none; font-size:clamp(28px,3vw,40px); line-height:1.1; letter-spacing:-.03em; font-weight:500}
+.form__ok p{max-width:34ch; color:var(--muted)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+/* =========================================================
+   Pied de page (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:40px var(--gr) calc(36px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--creme)}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal],.js .hero__bgIn,.js .hero__stage,.form__ok,.ag-sent{transform:none !important; filter:none !important}
+  .js .hero .arch__in{clip-path:none !important}
+  .js .hero .arch__img{transform:none !important; filter:none !important}
+  .js .hero .arch__line path{stroke-dashoffset:0 !important}
+  .js .hero .arch__ground{transform:none !important}
+  .js .ttl--main{clip-path:none}
+  .hero-in .ttl--main,.hero-in .ttl--ghost,.hero-in .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .ag.is-sent .ag-noteW{transform:none}
+  .btn,.btn__ico,.choice span,.replay svg,.hero__downIco svg{transition-property:opacity,background,color,box-shadow}
+}
+/* =========================================================
+   LE FIL — couche commune aux quatre pages
+   Le fil lumineux relie les chapitres : un rail fixe à gauche (grand écran), un trait qui
+   descend dans chaque chapitre, les arches qu'il dessine autour des portraits, la lentille.
+   ========================================================= */
+:root{--fil-io:cubic-bezier(.65,0,.35,1)}
+
+/* ---------- Barre flottante : une pilule de verre, détachée du haut. Le point reste un simple point. ---------- */
+.nav{padding-top:max(10px, env(safe-area-inset-top))}
+.nav::before{display:none}
+.nav__in{width:min(1200px, calc(100% - 20px)); margin-inline:auto; height:60px; padding:0 6px 0 22px; border-radius:999px; isolation:isolate}
+.nav__in::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
+  background:rgba(26,25,24,.62); -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.09), inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -22px rgba(0,0,0,.7);
+  opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled .nav__in::before{opacity:1}
+@media (max-width:600px){ .nav__in{height:56px; padding-left:18px; padding-right:5px} }
+
+/* ---------- Le rail : le fil vertical, fixe, à gauche (grand écran, mouvement autorisé) ---------- */
+.fil-rail{display:none}
+@media (min-width:1100px){
+  .fil-on .fil-rail{display:block; position:fixed; z-index:40; left:26px; top:21vh; bottom:27vh; width:1px; pointer-events:none;
+    background:linear-gradient(180deg, rgba(244,239,230,0), rgba(244,239,230,.1) 10%, rgba(244,239,230,.1) 90%, rgba(244,239,230,0))}
+}
+.fil-rail__fill{position:absolute; inset:0; transform-origin:50% 0; transform:scaleY(var(--fp,0));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .85) 14%, rgb(var(--fil))); box-shadow:0 0 10px rgb(var(--fil) / .5)}
+.fil-rail__knots{position:absolute; inset:0}
+.fil-rail__k{position:absolute; left:-3px; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.36);
+  transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.fil-rail__k.is-lit{background:rgb(var(--fil)); box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 10px rgb(var(--fil) / .7)}
+.fil-rail__head{position:absolute; left:-4px; top:-4px; width:9px; height:9px; border-radius:50%; background:#FFF8EC;
+  box-shadow:0 0 0 3px rgb(var(--fil) / .22), 0 0 16px 3px rgb(var(--fil) / .75); transform:translateY(calc(var(--fp,0) * var(--rh,0px)))}
+
+/* ---------- Le fil de chapitre : un trait qui descend dans le chapitre, tracé au défilement ---------- */
+.fil-drop{position:absolute; z-index:1; top:0; left:var(--gl); width:7px; height:calc(var(--sec, 120px) * .6); margin-left:-3px; pointer-events:none; --dp:1}
+.fil-drop::before{content:""; position:absolute; left:3px; top:0; bottom:3px; width:1px; transform-origin:50% 0; transform:scaleY(var(--dp));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .9)); box-shadow:0 0 8px rgb(var(--fil) / .45)}
+.fil-drop::after{content:""; position:absolute; left:0; bottom:0; width:7px; height:7px; border-radius:50%; background:rgb(var(--fil));
+  box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 12px 2px rgb(var(--fil) / .6); opacity:clamp(0, calc(var(--dp) * 6 - 5), 1); transform:scale(clamp(.3, calc(var(--dp) * 4 - 3), 1))}
+.fil-drop--c{left:50%}
+
+/* ---------- L'arche : un portrait dans une arche, dessinée par le fil ---------- */
+.arch{position:relative; margin:0; aspect-ratio:5 / 7; isolation:isolate}
+.arch__in{position:absolute; inset:0; overflow:hidden; border-radius:999px 999px 0 0; background:var(--arch-bg, #201E1D)}
+.arch__in::after{content:""; position:absolute; left:0; right:0; bottom:0; height:24%; pointer-events:none; background:linear-gradient(180deg, rgba(26,25,24,0), var(--bg))}
+.arch__img{position:absolute; left:50%; top:var(--arch-top, 6%); height:var(--arch-h, 118%); width:auto; max-width:none; translate:-50% 0; -webkit-user-select:none; user-select:none; -webkit-user-drag:none}
+.arch__line{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none}
+.arch__line path{fill:none; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.arch__main{stroke:rgb(var(--fil)); stroke-width:2; filter:drop-shadow(0 0 5px rgb(var(--fil) / .75))}
+.arch__ghost{stroke:rgba(244,239,230,.16); stroke-width:1.6}
+.arch__ground{position:absolute; left:-34%; right:-34%; bottom:0; height:1px; pointer-events:none;
+  background:linear-gradient(90deg, rgb(var(--fil) / 0), rgb(var(--fil) / .7) 32%, rgb(var(--fil) / .7) 68%, rgb(var(--fil) / 0)); box-shadow:0 0 10px rgb(var(--fil) / .4)}
+
+/* ---------- La lentille (décorative) : une loupe qui suit la souris ---------- */
+.lens{position:fixed; inset:0; z-index:46; pointer-events:none; visibility:hidden; transition:visibility 0s .6s}
+.lens.is-on{visibility:visible; transition:none}
+.lens__body{position:absolute; left:0; top:0; width:var(--ls, 184px); height:var(--ls, 184px); will-change:transform}
+.lens__disc{position:absolute; inset:0; overflow:hidden; border-radius:50%; background:var(--lens-bg, var(--bg)); clip-path:circle(0% at 50% 50%); transition:clip-path .3s var(--out)}
+.lens.is-on .lens__disc{clip-path:circle(50% at 50% 50%); transition:clip-path .8s var(--expo)}
+.lens__in{position:absolute; inset:0}
+.lens__clone{position:absolute !important; left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; margin:0 !important; transform-origin:0 0; translate:none !important}
+.lens__img{position:absolute; left:-14%; top:-14%; width:128%; height:128%; max-width:none; object-fit:cover; object-position:50% 30%}
+.lens__ring{position:absolute; inset:0; border-radius:50%; opacity:0; transform:scale(.6);
+  box-shadow:inset 0 0 0 1.5px rgba(244,239,230,.88), 0 0 0 1px rgb(var(--fil) / .7), 0 0 34px rgb(var(--fil) / .45), 0 30px 60px -22px rgba(0,0,0,.8);
+  background:radial-gradient(circle at 32% 24%, rgba(255,255,255,.2), transparent 40%), radial-gradient(circle at 50% 50%, transparent 62%, rgba(26,25,24,.28));
+  transition:opacity .3s var(--out), transform .3s var(--out)}
+.lens.is-on .lens__ring{opacity:1; transform:none; transition:opacity .6s var(--expo), transform .9s var(--expo)}
+.lens__tether{position:absolute; left:0; top:0; width:100px; height:1px; margin-top:-.5px; transform-origin:0 50%; opacity:0;
+  background:linear-gradient(90deg, rgb(var(--fil) / .95), rgb(var(--fil) / .45)); box-shadow:0 0 6px rgb(var(--fil) / .6); transition:opacity .3s var(--out)}
+.lens.is-on.has-tether .lens__tether{opacity:1; transition:opacity .6s var(--expo) .1s}
+.is-lensing.lens-hide-cursor{cursor:none}
+
+/* ---------- Pied de page : le coin bas gauche reste libre pour l'outil de revue ---------- */
+.foot{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+
+@media (prefers-reduced-motion: reduce){
+  .fil-drop{--dp:1 !important}
+  .lens{display:none}
+}
+
+/* =========================================================
+   Pro : réglages Le fil
+   ========================================================= */
+.progress{background:linear-gradient(90deg, rgb(var(--fil) / .15), rgb(var(--fil))); box-shadow:0 0 8px rgb(var(--fil) / .5)}
+@media (min-width:1100px){ .fil-on .progress{display:none} }
+.btn--light{box-shadow:0 16px 36px -20px rgb(var(--fil) / .6)}
+.nav__ctaIco{box-shadow:0 0 16px -4px rgb(var(--fil) / .7)}
+/* L'aperçu agents : des fils Lagon */
+.ag-wires path{stroke:rgb(var(--fil) / .55)}
+.ag__core{background:radial-gradient(80% 50% at 50% 0%, rgba(15,93,107,.32), transparent 70%), linear-gradient(180deg,#22201E,#191817)}
+.team{background:radial-gradient(50% 40% at 72% 42%, rgba(15,93,107,.16), transparent 70%)}
+.contact{position:relative}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+<link rel="stylesheet" href="../shared/apps.css"><link rel="stylesheet" href="../shared/victoire.css">
+<style>
+/* =========================================================
+   Modules partagés (V5) : A1 les apps, A2 les 54 heures.
+   Raccord Le fil : l'Encre, la lumière Lagon ; le fil descend dans les deux modules (trait + nœud),
+   le rail garde un nœud par chapitre, le trait sous l'icône choisie et l'équipe de six sont du même fil.
+   ========================================================= */
+:root{
+  --kz-bg:#1A1918; --kz-surface:#24221F; --kz-ink:#F4EFE6; --kz-muted:rgba(244,239,230,.74); --kz-line:rgba(244,239,230,.12);
+  --kz-accent:rgb(var(--fil));
+  --kz-title:var(--f-title); --kz-text:var(--f-text); --kz-word:var(--f-word);
+  --kz-radius:var(--r-xl);
+  --kz-victoire-equipe:rgb(var(--fil));
+  --kz-victoire-nuit:#0B0B0A;
+}
+.kz-apps,.kz-victoire{background:transparent}
+.kz-apps__titre em{text-shadow:0 0 .5em rgb(var(--fil) / .5), 0 0 1.4em rgb(var(--fil) / .22)}
+.kz-apps__fil b{background:rgb(var(--fil)); box-shadow:0 0 8px rgb(var(--fil) / .7)}
+.kz-apps > .fil-drop,.kz-victoire > .fil-drop{z-index:12}
+/* Voir le contournement en fin de page : la légende du premier temps ne reste pas affichée */
+.kz-victoire.is-pin.kz-v-cap-off .kv-cap{visibility:hidden}
+</style>
+</head>
+<body>
+<a class="skip" href="#apps">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<i class="progress" aria-hidden="true" data-progress></i>
+
+<!-- ========== Navigation (markup commun du brief V4 §3) ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== A0 Hero ========== -->
+  <section class="hero" id="top" aria-label="Kenz">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__light" aria-hidden="true"></div>
+    <div class="wrap hero__layout">
+      <div class="hero__copy">
+        <h1 class="hero__title"><span class="ttl ttl--main">Kenz<span class="ttl__dot" aria-hidden="true"></span></span><span class="ttl ttl--ghost" aria-hidden="true">Kenz<span class="ttl__dot"></span></span></h1>
+        <p class="hero__line" data-words data-hero-words>Je construis des apps où l’IA fait le <em class="word glow">vrai</em> travail.</p>
+        <a class="hero__down" href="#apps" data-anim><span class="hero__downIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span>Voir ce que je construis</a>
+      </div>
+      <figure class="arch hero__arch">
+        <div class="arch__in">
+          <img class="arch__img" src="../assets/img/kenz-pro.webp" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920" fetchpriority="high">
+        </div>
+        <svg class="arch__line" viewBox="0 0 500 700" aria-hidden="true"><path class="arch__ghost" pathLength="1" d="M-26 700V250A276 276 0 0 1 526 250V700"/><path class="arch__main" pathLength="1" d="M1 700V250A249 249 0 0 1 499 250V700"/></svg>
+        <i class="arch__ground" aria-hidden="true"></i>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ========== A1 Les apps : choisis une app (module partagé, shared/apps.*) ========== -->
+  <section id="apps" class="kz-apps" data-kz-apps data-theme="dark" aria-label="Mes apps"></section>
+
+  <!-- ========== A2 Les 54 heures (module partagé, shared/victoire.*) ========== -->
+  <section id="victoire" class="kz-victoire" data-kz-victoire data-theme="dark" aria-label="Startup Weekend"></section>
+
+  <!-- ========== A3 Pour votre équipe ========== -->
+  <section class="team" id="equipe" aria-labelledby="equipe-q">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap team__grid">
+      <div class="team__copy">
+        <h2 class="team__q" id="equipe-q" data-words>Et si des agents IA travaillaient pour vous, <em class="word glow">sans</em> jamais rien envoyer sans votre accord&nbsp;?</h2>
+        <a class="btn btn--light" href="agents.html" data-passage data-couleur="#1A2440" data-reveal="fade" style="--wd:.6s">Voir comment<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></a>
+      </div>
+      <div class="ag" data-agents>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Aperçu : trois sources tombent, un site concurrent, un appel d’offres et un article. L’agent Veille les trie, l’agent Vérification les contrôle, puis Hermes les assemble en une note du lundi, qui attend votre validation.">
+            <svg class="ag-wires" viewBox="0 0 100 126" preserveAspectRatio="none" aria-hidden="true">
+              <path pathLength="1" d="M18 20C18 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M50 20C50 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M82 20C82 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M46 35H52"/>
+              <path pathLength="1" d="M72 40C72 44.5 50 43.5 50 47"/>
+              <path pathLength="1" d="M50 59V66"/>
+            </svg>
+            <div class="ag-src ag-src--0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-node ag-node--v"><i></i>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c"><i></i>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h">Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW">
+              <div class="ag-note">
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line"><i></i><span>Site concurrent</span></div>
+                <div class="ag-line"><i></i><span>Appel d’offres</span></div>
+                <div class="ag-line"><i></i><span>Article</span></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW"><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== A4 Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">idée</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA"><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/* =========================================================
+   LE FIL — module commun : le rail, les fils de chapitre, la lentille, le défilement horizontal.
+   Décoratif : tout est aria-hidden, et la page reste complète sans lui.
+   ========================================================= */
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = matchMedia('(hover: hover) and (pointer: fine)');
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  if (hasG) { G.registerPlugin(ST); if (!RM) d.classList.add('fil-on'); }
+
+  /* ---------- Le rail : un fil fixe à gauche qui s'allume au défilement, un nœud par chapitre ---------- */
+  function rail(getChapters) {
+    const none = { place() {}, kill() {} };
+    if (!hasG || RM) return none;
+    let el = $('.fil-rail');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'fil-rail';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<i class="fil-rail__fill"></i><span class="fil-rail__knots"></span><i class="fil-rail__head"></i>';
+      document.body.appendChild(el);
+    }
+    const box = $('.fil-rail__knots', el);
+    let ks = [], ps = [], p = 0;
+    const paint = () => {
+      el.style.setProperty('--fp', p.toFixed(4));
+      ks.forEach((k, i) => k.classList.toggle('is-lit', p >= ps[i] - .002));
+    };
+    const place = () => {
+      el.style.setProperty('--rh', el.offsetHeight + 'px');
+      const max = Math.max(1, ST.maxScroll(window));
+      box.textContent = '';
+      ps = getChapters().map(c => Math.min(1, Math.max(0, (c.getBoundingClientRect().top + scrollY - innerHeight * .5) / max)));
+      ks = ps.map(v => { const k = document.createElement('i'); k.className = 'fil-rail__k'; k.style.top = (v * 100).toFixed(3) + '%'; box.appendChild(k); return k; });
+      paint();
+    };
+    const st = ST.create({ start: 0, end: 'max', onUpdate: s => { p = s.progress; paint(); } });
+    ST.addEventListener('refresh', place);
+    place();
+    return { place, kill() { st.kill(); ST.removeEventListener('refresh', place); box.textContent = ''; ks = []; } };
+  }
+
+  /* ---------- Les fils de chapitre : chaque trait descend dans son chapitre au défilement ---------- */
+  function drops(root = document) {
+    const list = $$('[data-fil-drop]', root);
+    if (!hasG || RM) { list.forEach(x => x.style.setProperty('--dp', '1')); return () => {}; }
+    const tw = list.map(el => G.fromTo(el, { '--dp': 0 }, { '--dp': 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 94%', end: 'bottom 48%', scrub: .5 } }));
+    return () => tw.forEach(t => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+  }
+
+  /* ---------- La lentille : une loupe qui suit la souris (souris seulement, jamais en mouvement réduit) ---------- */
+  let L = null;
+  const lensEl = () => {
+    if (L) return L;
+    const el = document.createElement('div');
+    el.className = 'lens';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<i class="lens__tether"></i><div class="lens__body"><div class="lens__disc"><div class="lens__in"></div></div><span class="lens__ring"></span></div>';
+    document.body.appendChild(el);
+    L = { el, body: $('.lens__body', el), inner: $('.lens__in', el), tether: $('.lens__tether', el), owner: null };
+    return L;
+  };
+  function lens(host, o = {}) {
+    if (!host || RM || !FINE.matches) return () => {};
+    const S = o.scale || 1.4, off = o.offset || null;
+    let raf = 0, on = false, tx = 0, ty = 0, x = 0, y = 0, R = 92, node = null, src = null;
+    const fill = () => {
+      const l = lensEl();
+      l.owner = host;
+      l.inner.textContent = '';
+      if (o.bg) l.el.style.setProperty('--lens-bg', o.bg); else l.el.style.removeProperty('--lens-bg');
+      if (o.size) l.el.style.setProperty('--ls', o.size + 'px'); else l.el.style.removeProperty('--ls');
+      l.el.classList.toggle('has-tether', !!off);
+      if (o.src) {
+        const im = document.createElement('img');
+        im.className = 'lens__img'; im.alt = ''; im.decoding = 'async';
+        im.src = typeof o.src === 'function' ? o.src() : o.src;
+        l.inner.appendChild(im);
+        node = im; src = null;
+      } else {
+        src = (typeof o.clone === 'function' ? o.clone() : o.clone) || host;
+        node = src.cloneNode(true);
+        node.removeAttribute('id');
+        $$('[id]', node).forEach(n => n.removeAttribute('id'));
+        $$('img', node).forEach(im => { im.alt = ''; im.removeAttribute('fetchpriority'); im.loading = 'eager'; });
+        node.classList.add('lens__clone');
+        if (o.filter) node.style.filter = o.filter;
+        l.inner.appendChild(node);
+      }
+      R = (l.body.offsetWidth || 184) / 2;
+    };
+    const frame = () => {
+      raf = 0;
+      if (!L || L.owner !== host) return;
+      let ox = 0, oy = 0;
+      if (off) { ox = off[0]; oy = off[1]; if (tx + ox + R > innerWidth - 12) ox = -ox; if (ty + oy - R < 70) oy = Math.abs(oy); }
+      const gx = tx + ox, gy = ty + oy;
+      x += (gx - x) * .2; y += (gy - y) * .2;
+      L.body.style.transform = 'translate3d(' + (x - R).toFixed(1) + 'px,' + (y - R).toFixed(1) + 'px,0)';
+      if (off) {
+        const dx = x - tx, dy = y - ty, len = Math.max(0, Math.hypot(dx, dy) - R);
+        L.tether.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0) rotate(' + Math.atan2(dy, dx).toFixed(4) + 'rad) scaleX(' + (len / 100).toFixed(3) + ')';
+      }
+      if (src) {
+        const r = src.getBoundingClientRect();
+        node.style.width = r.width + 'px';
+        node.style.height = r.height + 'px';
+        node.style.transform = 'translate3d(' + (R - S * (x - r.left)).toFixed(1) + 'px,' + (R - S * (y - r.top)).toFixed(1) + 'px,0) scale(' + S + ')';
+      } else if (node) {
+        const r = host.getBoundingClientRect();
+        const px = (tx - r.left) / Math.max(1, r.width) - .5, py = (ty - r.top) / Math.max(1, r.height) - .5;
+        node.style.transform = 'translate3d(' + (-px * 18).toFixed(2) + '%,' + (-py * 12).toFixed(2) + '%,0)';
+      }
+      if (on || Math.abs(gx - x) > .4 || Math.abs(gy - y) > .4) raf = requestAnimationFrame(frame);
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const enter = e => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      fill();
+      tx = e.clientX; ty = e.clientY;
+      x = tx + (off ? off[0] : 0); y = ty + (off ? off[1] : 0);
+      on = true;
+      L.el.classList.add('is-on');
+      host.classList.add('is-lensing');
+      kick();
+    };
+    const move = e => { if (!on) return; tx = e.clientX; ty = e.clientY; kick(); };
+    const leave = () => {
+      if (!on) return;
+      on = false;
+      if (L && L.owner === host) L.el.classList.remove('is-on');
+      host.classList.remove('is-lensing');
+    };
+    const onScroll = () => { if (on) kick(); };
+    host.addEventListener('pointerenter', enter);
+    host.addEventListener('pointermove', move);
+    host.addEventListener('pointerleave', leave);
+    addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      leave();
+      host.removeEventListener('pointerenter', enter);
+      host.removeEventListener('pointermove', move);
+      host.removeEventListener('pointerleave', leave);
+      removeEventListener('scroll', onScroll);
+    };
+  }
+
+  /* ---------- Défilement horizontal épinglé : la piste glisse, le fil la traverse (ordinateur seulement) ---------- */
+  function hscroll(sec, track, o = {}) {
+    const dist = () => Math.max(0, track.scrollWidth - (o.viewport ? o.viewport.clientWidth : sec.clientWidth));
+    return G.to(track, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: {
+        trigger: sec, start: 'top top', end: () => '+=' + Math.max(dist() * (o.factor || 1), innerHeight * (o.min || 1)),
+        pin: true, scrub: o.scrub || .7, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: o.priority || 0,
+        onUpdate: o.onUpdate
+      }
+    });
+  }
+
+  window.KzFil = { rail, drops, lens, hscroll, hasG, RM };
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  $$('[data-words]').forEach(splitWords);
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal]').forEach(el => { if (!el.closest('.hero')) io.observe(el); });
+
+  /* ---------- A0 : entrée du hero (après un passage ou une porte, sinon au chargement) ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn, { once: true });
+  document.addEventListener('porte:arrivee', heroIn, { once: true });
+  let arriving = d.hasAttribute('data-porte-arrivee');
+  if (!arriving) {
+    try {
+      const p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null');
+      arriving = !!(p && Date.now() - p.t < 6000);
+    } catch (e) { arriving = false; }
+  }
+  if (arriving) setTimeout(heroIn, 2500);
+  else requestAnimationFrame(() => setTimeout(heroIn, 60));
+
+  /* ---------- Nav : fond au défilement ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+
+  /* ---------- Défilement doux (ordinateur) ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!window.Lenis || RM || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    if (hasG) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add(t => lenis.raf(t * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  });
+
+  /* ---------- Repère : un fil de progression, tout en haut ---------- */
+  safe('progress', () => {
+    const bar = $('[data-progress]');
+    if (!hasG || !bar) return;
+    bar.classList.add('is-on');
+    G.to(bar, { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .3 } });
+  });
+
+  /* ---------- Passage vers une autre page (repli : navigation directe) ---------- */
+  const go = (src, url, couleur) => {
+    const P = window.Passage;
+    if (P && typeof P.ouvrir === 'function') {
+      try { P.ouvrir(src, url, { couleur }); return; } catch (e) { console.error('[kz] passage : ' + e.message); }
+    }
+    location.href = url;
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-passage]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const src = (a.dataset.source && document.querySelector(a.dataset.source)) || a;
+    go(src, a.getAttribute('href'), a.dataset.couleur);
+  });
+
+  /* ---------- Ancres internes et logo ---------- */
+  const scrollToY = y => {
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+  };
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l || e.defaultPrevented) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    scrollToY(id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY);
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  });
+  /* Sur l'accueil, « Kenz » remonte en douceur. Le point garde son propre comportement (shared/cordon.js). */
+  safe('logo', () => {
+    const logo = $('.kz-logo');
+    logo.addEventListener('click', e => {
+      if (e.defaultPrevented || e.target.closest('.kz-dot') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      scrollToY(0);
+    });
+  });
+
+  /* =========================================================
+     Scènes. État final = CSS par défaut ; GSAP pose l'état de départ et joue vers l'état final.
+     ========================================================= */
+  const B = {
+    agents(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const srcs = q('.ag-src'), ticks = q('.ag-tick'), wires = q('.ag-wires path'), glows = q('.ag-glow'), nodes = q('.ag-node');
+      const note = q1('.ag-note'), title = q1('.ag-note__t'), lines = q('.ag-line'), okW = q1('.ag__okW');
+      G.set(srcs, { opacity: 0, y: 0, xPercent: 0, yPercent: -230, rotation: i => [-7, 5, -4][i] });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set(wires, { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .4 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0%)' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { opacity: 0, y: 12, scale: .965 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(srcs, { opacity: 1, yPercent: 0, rotation: 0, duration: .9, stagger: .15 }, .1)
+        .to([wires[0], wires[1], wires[2]], { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, .95)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.2)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.25)
+        .to(srcs[2], { xPercent: -220.7, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to([srcs[0], srcs[1]], { xPercent: 110.35, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to(wires[3], { strokeDashoffset: 0, duration: .3, ease: 'power2.out' }, 2)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.1)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.15)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.15)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .12 }, 2.3)
+        .to(wires[4], { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 2.65)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 2.85)
+        .to(glows[1], { opacity: 0, duration: .4 }, 2.9)
+        .to(glows[2], { opacity: 1, duration: .5 }, 2.9)
+        .to(wires[5], { strokeDashoffset: 0, duration: .3 }, 3.1)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(-14% -14% -30% -14%)', duration: 1 }, 3.2)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 3.35)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 3.5)
+        .to(okW, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, 4.05);
+    }
+  };
+
+  /* Une scène : timeline + bouton « Rejouer » */
+  function makeScene(el, opts = {}) {
+    const s = { el, tl: null, seen: false, pending: null, rb: el.querySelector('[data-replay]') };
+    if (!hasG) return s;
+    try { s.tl = B[opts.name || el.dataset.scene](el, opts); } catch (e) { console.error('[kz] scène : ' + e.message); s.tl = null; return s; }
+    if (opts.speed) s.tl.timeScale(opts.speed);
+    if (RM) { s.tl.progress(1, true); s.seen = true; return s; }
+    el.classList.add('has-tl');
+    s.tl.eventCallback('onComplete', () => { s.seen = true; if (opts.onDone) opts.onDone(); else if (s.rb) s.rb.classList.add('is-on'); });
+    if (s.rb && !opts.ownReplay) s.rb.addEventListener('click', () => { s.rb.classList.remove('is-on'); s.tl.restart(); });
+    return s;
+  }
+  const play = (s, delay = .4) => {
+    if (!s || !s.tl || s.seen) return;
+    if (s.pending) s.pending.kill();
+    s.pending = G.delayedCall(delay, () => { s.pending = null; s.tl.restart(); });
+  };
+
+  /* =========================================================
+     A3 : l'aperçu agents (≈ 2 s), puis c'est au visiteur de valider
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const ok = $('[data-ok]', ag), live = $('[data-ag-live]', ag), rb = $('[data-replay]', ag);
+    ag.dataset.scene = 'agents';
+    const ready = () => { live.textContent = 'La note du lundi est prête. Elle attend votre validation.'; };
+    const s = makeScene(ag, { ownReplay: true, onDone: ready, speed: 2.3 });
+    ag.classList.add('has-tl');
+    if (!s.tl || RM) ready();
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => { rb.classList.add('is-on'); if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true }); }, RM ? 300 : 1900);
+    });
+    rb.addEventListener('click', () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (s.tl) { s.seen = false; s.tl.restart(); }
+      else ready();
+    });
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(s, .25); o.disconnect(); } }, { threshold: .4 });
+    if (s.tl && !RM) o.observe(ag);
+  });
+
+  /* =========================================================
+     A4 : formulaire (envoi simulé)
+     ========================================================= */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) window.addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="../shared/apps.js"></script>
+<script src="../shared/victoire.js"></script>
+<script>
+/* Contournement d'un défaut du module « victoire » (shared/ n'est pas modifié) : en arrivant directement au milieu
+   de l'épinglage (rechargement, outil de revue), deux timelines au défilement règlent l'opacité de la légende
+   « Startup Weekend, Grenoble. » et elle restait affichée sur les temps suivants. La page la masque
+   (visibility, que GSAP ne touche pas) une fois le premier temps passé ; en remontant, elle revient. */
+(() => {
+  const ST = window.ScrollTrigger, sec = document.getElementById('victoire');
+  if (!ST || !sec) return;
+  const pinOf = () => ST.getAll().find(s => s.pin === sec);
+  const go = () => {
+    ST.create({
+      start: () => { const p = pinOf(); return p ? p.start + (p.end - p.start) * .14 : 0; },
+      end: 'max',
+      onToggle: s => sec.classList.toggle('kz-v-cap-off', s.isActive)
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+  else go();
+})();
+</script>
+<script>
+/* =========================================================
+   Le fil, sur l'accueil : le rail, les fils de chapitre (jusque dans les modules), l'arche qui s'éloigne, la lentille
+   ========================================================= */
+(() => {
+  'use strict';
+  const F = window.KzFil, G = window.gsap;
+  if (!F) return;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  /* Un nœud par chapitre ; les 54 heures sont épinglées : leur nœud se pose sur l'espaceur d'épinglage */
+  const chapters = () => $$('main > section, main > .pin-spacer > section')
+    .map(s => s.parentElement.classList.contains('pin-spacer') ? s.parentElement : s);
+  /* Après le remplissage des modules (DOMContentLoaded) : le fil descend aussi dans les apps et les 54 heures */
+  const go = () => {
+    try {
+      $$('#apps, #victoire').forEach(s => {
+        if (s.querySelector(':scope > .fil-drop')) return;
+        const dr = document.createElement('span');
+        dr.className = 'fil-drop';
+        dr.setAttribute('data-fil-drop', '');
+        dr.setAttribute('aria-hidden', 'true');
+        s.appendChild(dr);
+      });
+      F.rail(chapters);
+      F.drops();
+      if (F.hasG && !F.RM) {
+        /* Le hero s'éloigne : l'arche remonte doucement, le texte s'efface */
+        G.matchMedia().add('(min-width: 900px)', () => {
+          const st = { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .6 };
+          G.to('.hero__arch', { yPercent: -8, ease: 'none', scrollTrigger: st });
+          G.to('.hero__copy', { y: -90, opacity: .1, ease: 'none', scrollTrigger: Object.assign({}, st) });
+        });
+      }
+      /* La lentille : sur le portrait, un verre teinté qui le montre dans la lumière Lagon */
+      const arch = $('.hero__arch');
+      F.lens(arch, { clone: $('.arch__in', arch), scale: 1.1, bg: '#16525C', filter: 'grayscale(1) sepia(.55) hue-rotate(138deg) saturate(2.6) brightness(1.12) contrast(1.12)' });
+    } catch (e) { console.error('[kz] le fil : ' + e.message); }
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+  else go();
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

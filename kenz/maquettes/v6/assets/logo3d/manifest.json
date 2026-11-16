@@ -1,0 +1,44 @@
+{
+  "generator": "built-in image_gen",
+  "created": "2026-11-16",
+  "status": "monogram-approved",
+  "sizes": [
+    1024,
+    512,
+    256
+  ],
+  "format": "WebP with alpha",
+  "neon": "Optional CSS overlay; inline neon-filter.svg once",
+  "assets": [
+    {
+      "id": "kz-01-monogramme",
+      "name": "Monogramme",
+      "description": "Une signature compacte et affirmée, proche de ton KZ actuel.",
+      "image": "kz-01-monogramme.webp",
+      "prompt": "kz-01-monogramme.txt"
+    },
+    {
+      "id": "kz-02-ruban",
+      "name": "Ruban",
+      "description": "Un KZ en matière pliée, plus fluide et en mouvement.",
+      "image": "kz-02-ruban.webp",
+      "prompt": "kz-02-ruban.txt"
+    },
+    {
+      "id": "kz-03-arche",
+      "name": "Arche",
+      "description": "Une porte ouverte, en écho à la forme signature de ton site.",
+      "image": "kz-03-arche.webp",
+      "prompt": "kz-03-arche.txt"
+    },
+    {
+      "id": "kz-04-medaillon",
+      "name": "Médaillon",
+      "description": "Un emblème rond pensé pour une photo de profil ou un avatar.",
+      "image": "kz-04-medaillon.webp",
+      "prompt": "kz-04-medaillon.txt"
+    }
+  ],
+  "selected": "kz-01-monogramme",
+  "universeVariants": "univers/index.html"
+}

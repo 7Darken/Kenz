@@ -1,0 +1,17 @@
+Use case: style-transfer. ONE premium floating 3D miniature object for the k15ze hero series, matching the validated HYROX equipment collection in the attached STYLE REFERENCE.
+
+Reference image role: style reference ONLY for the sophisticated collectible-object proportions, tactile matte materials, broad soft highlights, rounded thick edges and quiet studio lighting. Do not reproduce its sports equipment, green colors, background, contact-sheet layout, labels or text.
+
+Create ONE complete isolated object: one elegant small trophy cup with a chunky shallow brushed warm-gold bowl and TWO softly rounded curved side handles, on a short satin graphite stem and small integrated graphite foot. Muted brushed gold is the special warm material for this trophy, not mirror chrome or sparkling yellow. Refined rounded edges, a clean blank cup with no engraving, no emblem and no plaque. Exactly one narrow Lagon-blue inset ring around the short graphite stem near the foot. The foot belongs to the trophy itself; no separate podium
+
+Art direction: same family as the validated graphite robot assistants and passport, and the HYROX kettlebells and sleds. Compact slightly chunky refined proportions, strong readable silhouette, softly beveled edges, satin matte graphite #1A1D1C to #2A2F2D and off-white #F7F7F2. Fine tactile material grain, restrained functional detail. Use any special subject-specific material described above, rendered matte and refined. Exactly ONE coherent Lagon-blue #3FB0C2 accent area, clearly delineated on the physical object, suitable for a subtle animated neon overlay added later in HTML/CSS. Render this blue accent bright and satin, with no baked glow spilling outside the object. No green. No other vivid colors.
+
+Lighting: soft studio light from upper LEFT, broad gentle highlights on the material, restrained cool rim on the right edge, ambient occlusion only inside the object. Same lighting quality as the HYROX series. No dramatic backlight, no hard shadow. No glitter, sparkles or neon halo in the image.
+
+Camera: three-quarter front view, looking down about 25 degrees, showing front and right-hand side, restrained orthographic product perspective. A gentle floating tilt as specified above. Complete object sharply in focus.
+
+Composition: square 1024 x 1024 or larger. Center the complete object within about 70% of the canvas height or longest dimension; transparent margins on all sides, no cropping. Strong silhouette immediately readable at 80 px, premium at 400 px. One compact object only.
+
+Background: GENUINELY TRANSPARENT ALPHA with clean antialiased edges. No colored background, floor, display plinth, detached drop shadow, halo, haze, glow outside the silhouette, painted checkerboard or surrounding scenery. The object's own structural foot or attached strap is allowed, but no decorative base.
+
+No text, letters, numbers, logos, brand marks, insignia, interface elements, app icons, airline livery, flag or watermark anywhere. No people, faces, hands or robots in these remaining object icons. No cartoon faces, cheap plastic toy finish, heavily worn realism, oversharpened textures, computer monitor, code, gears or unrelated accessories.

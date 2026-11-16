@@ -1,0 +1,825 @@
+<!doctype html>
+<!--
+  Kenz — Pro (V5), style Golden hour.
+  Heure bleue. A0 hero sobre → A1 les apps (module partagé shared/apps.*) → A2 les 54 heures
+  (module partagé shared/victoire.*) → A3 pour votre équipe → A4 contact.
+  Les deux modules prennent leur apparence dans les variables --kz-* de la page (bloc « Modules partagés »).
+  Ordinateur (≥ 900 × 600, sans mouvement réduit) : les 54 heures sont épinglées et se jouent au défilement.
+  Mobile et mouvement réduit : rien n'est épinglé, chaque moment se déclenche à l'entrée à l'écran.
+  Transitions (shared/passage.*) et passage secret (shared/cordon.*) : écrits à part, contrat du brief V4 §3.
+  La page fonctionne sans eux.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Pro</title>
+<meta name="description" content="Je construis des apps où l'IA fait le vrai travail.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1220">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   Jetons
+   ========================================================= */
+:root{
+  --bg:#0E1220;
+  --bg-2:#121A2B;
+  --creme:#F4EFE6;
+  --ink:#0E1220;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+  --dusk:157 184 255;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.65,0,.35,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(96px,12vw,176px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,h1,h2,h3,figure{margin:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(55% 45% at 88% 0%, rgba(110,150,214,.10), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(15,93,107,.14), transparent 70%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+main{overflow-x:clip}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:clamp(19px,1.5vw,22px); line-height:1.3; letter-spacing:0; color:var(--faint)}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); border:1px solid rgba(255,255,255,.16)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#171E31,#121827); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(14,18,32,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.2)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link:hover{color:var(--creme)}
+
+/* Rejouer : discret, dans le coin de l'animation */
+.replay{position:absolute; z-index:4; bottom:16px; right:16px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:500; color:rgba(244,239,230,.86); background:rgba(14,18,32,.55); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+
+/* =========================================================
+   Navigation (markup commun : .kz-logo + point-cordon)
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,18,32,.86), rgba(14,18,32,.5)); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-flex; align-items:baseline; margin-right:auto; padding:8px 4px 8px 2px; border-radius:10px; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--creme)}
+/* Le point : un vrai disque de 7 px, sur la ligne de base, comme un point final. Rien d'autre. */
+.kz-dot{position:relative; display:inline-block; flex:none; width:7px; height:7px; margin-left:3px; padding:0; border:0; border-radius:50%; background:var(--creme); vertical-align:baseline; cursor:grab; touch-action:none}
+.kz-dot::before{content:""; position:absolute; inset:-4px; border-radius:50%}
+@media (pointer:coarse){ .kz-dot::before{inset:-14px} }
+.kz-dot:active{cursor:grabbing}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(14,18,32,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--creme); color:var(--ink); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+.progress{position:fixed; top:0; left:0; right:0; z-index:51; height:2px; pointer-events:none; background:linear-gradient(90deg, rgba(244,239,230,.15), rgba(244,239,230,.7)); transform-origin:left; transform:scaleX(0); opacity:0; transition:opacity .6s var(--expo)}
+.progress.is-on{opacity:.6}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .kz-logo{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* =========================================================
+   A0 Hero (heure bleue)
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate; background:#0B0F1B}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__bg{position:absolute; inset:-5% -4%; z-index:0}
+.hero__bgIn{position:absolute; inset:0}
+.hero__land{width:100%; height:100%; object-fit:cover; object-position:46% 50%; filter:sepia(.8) hue-rotate(-168deg) saturate(1.3) brightness(.5) contrast(1.1)}
+.hero__wash{position:absolute; inset:0; background:linear-gradient(180deg, rgba(34,58,108,.42), rgba(10,18,36,.18) 55%, rgba(8,12,24,.5))}
+.hero__shade{position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(180deg, rgba(11,15,27,.8) 0%, rgba(11,15,27,.42) 36%, rgba(11,15,27,0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(14,18,32,.55) 12%, rgba(14,18,32,0) 32%)}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + 92px)}
+.hero__copy{position:relative; z-index:3; padding-left:var(--gl); padding-right:var(--gr)}
+.hero__title{position:relative; margin:0 0 .16em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(92px,26vw,150px); line-height:.82; letter-spacing:-.015em; color:var(--creme)}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.ttl__dot{display:inline-block; width:.1em; height:.1em; margin-left:.035em; border-radius:50%; background:currentColor; vertical-align:baseline}
+.hero__line{margin:0 0 30px; max-width:22ch; font-size:clamp(19px,1.7vw,24px); line-height:1.42; color:rgba(244,239,230,.94); text-wrap:balance; --wd:1.05s}
+.hero__down{display:inline-flex; align-items:center; gap:14px; min-height:48px; padding-right:6px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.hero__downIco{display:grid; place-items:center; width:46px; height:46px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(244,239,230,.26); transition:box-shadow .5s var(--expo), background .5s var(--expo)}
+.hero__downIco svg{width:15px; height:15px; transition:transform .7s var(--expo)}
+.hero__down:hover{color:var(--creme)}
+.hero__down:hover .hero__downIco{background:rgba(244,239,230,.06); box-shadow:inset 0 0 0 1px rgba(244,239,230,.5)}
+.hero__down:hover .hero__downIco svg{transform:translateY(3px)}
+.hero__stage{position:relative; z-index:1; flex:1 1 auto; min-height:46vh; min-height:46svh}
+.hero__glow{position:absolute; left:50%; top:2%; width:min(130%, 920px); aspect-ratio:1; translate:-50% 0; border-radius:50%; background:radial-gradient(closest-side, rgba(118,158,228,.28), rgba(118,158,228,0))}
+.hero__fig{position:absolute; top:0; left:50%; height:calc(100% / .79); aspect-ratio:9 / 16; translate:-50% 0;
+  -webkit-mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+          mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%)}
+.portrait{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 0}
+@media (min-width:861px){
+  .hero__layout{justify-content:flex-end; padding:0 var(--gr) clamp(56px,11svh,128px) var(--gl)}
+  .hero__copy{padding:0; max-width:min(640px, 44%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__stage{position:absolute; right:0; bottom:0; top:9vh; top:9svh; width:58%; min-height:0}
+  .hero__shade{background:linear-gradient(180deg, rgba(11,15,27,.55) 0%, rgba(11,15,27,0) 20%), linear-gradient(90deg, rgba(11,15,27,.7) 0%, rgba(11,15,27,.3) 34%, rgba(11,15,27,0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(14,18,32,.5) 10%, rgba(14,18,32,0) 30%)}
+}
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .hero__bgIn{opacity:0; transform:scale(1.07)}
+.hero-in .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo), transform 2.6s var(--expo)}
+.js .hero__stage{opacity:0; filter:blur(10px); transform:translateY(3%)}
+.hero-in .hero__stage{opacity:1; filter:none; transform:none; transition:opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.hero-in .ttl--main{animation:ttlMain 1.7s var(--expo) .6s both}
+.hero-in .ttl--ghost{animation:ttlGhost 1.5s var(--expo) .42s both}
+.js .hero [data-anim]{opacity:0}
+.hero-in .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad, 0s)}
+.hero__down[data-anim]{--ad:1.85s}
+
+/* =========================================================
+   A3 Pour votre équipe
+   ========================================================= */
+.team{position:relative; padding:calc(var(--sec) * .6) 0 var(--sec); background:radial-gradient(50% 40% at 70% 40%, rgb(var(--dusk) / .07), transparent 70%)}
+.team__grid{display:grid; gap:clamp(40px,5vw,88px); align-items:center}
+.team__copy{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(28px,3vw,40px)}
+.team__q{max-width:19ch; font-size:clamp(32px,4.2vw,66px); line-height:1.05; letter-spacing:-.04em; font-weight:500; text-wrap:balance}
+@media (min-width:960px){ .team__grid{grid-template-columns:6fr 5fr} }
+
+.ag{position:relative; width:min(100%, 440px); margin-inline:auto; aspect-ratio:100 / 126; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -46px rgba(0,0,0,.9)}
+.ag__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgb(var(--dusk) / .15), transparent 70%), linear-gradient(180deg,#151C30,#0E1322); box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%}
+.ag-wires path{fill:none; stroke:rgba(244,239,230,.34); stroke-width:.4; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#1C2439; box-shadow:inset 0 0 0 1px rgba(244,239,230,.13), 0 2cqw 5cqw -2cqw rgba(0,0,0,.6)}
+.ag-src svg{width:4.4cqw; height:4.4cqw; color:var(--muted); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-src span{font-size:max(10px,3.3cqw); line-height:1.2; font-weight:500; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:#A8E6BE}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#0E1322; stroke-width:2.6}
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2.2cqw; border-radius:99px; background:#161E32; box-shadow:inset 0 0 0 1px rgba(244,239,230,.15); font-size:max(11px,3.5cqw); line-height:1; font-weight:500}
+.ag-node > i{flex:none; width:2.4cqw; height:2.4cqw; border-radius:50%; background:rgba(244,239,230,.5)}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1px rgba(170,195,255,.75), 0 0 6cqw rgba(157,184,255,.38); opacity:0; pointer-events:none}
+.ag-node--v{left:12cqw; top:30cqw; width:34cqw; height:10cqw}
+.ag-node--c{left:52cqw; top:30cqw; width:40cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(17px,5.6cqw); background:#1D2640}
+.ag-node--h .ag-glow{opacity:1}
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:36cqw; transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:var(--creme); color:#141A2A; box-shadow:0 4cqw 10cqw -4cqw rgba(0,0,0,.8)}
+.ag-note__t{font-size:max(12px,4.2cqw); line-height:1.3; font-weight:600; letter-spacing:-.02em; margin-bottom:1.4cqw}
+.ag-line{display:flex; align-items:center; gap:3cqw; padding:2.3cqw 0; border-top:1px solid rgba(20,26,42,.1)}
+.ag-line i{flex:1; height:1.6cqw; border-radius:1cqw; background:rgba(20,26,42,.16)}
+.ag-line span{font-size:max(9.5px,2.9cqw); line-height:1.2; font-weight:500; color:#39415A; white-space:nowrap}
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:#A8E6BE; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-size:max(16px,4.8cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; color:var(--creme); opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:106cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:#FFF8F2; font-size:max(18px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 3cqw 8cqw -3cqw rgba(232,50,43,.7); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--creme); outline-offset:4px}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{bottom:5.5%; right:auto; left:50%; translate:-50% 0}
+
+/* =========================================================
+   A4 Contact
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13.5px; font-weight:500; color:var(--muted)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.24); box-shadow:inset 0 0 0 1px rgba(244,239,230,.14); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.42)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.26)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.6), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,180,90,.9)}
+textarea.input{min-height:132px; resize:vertical}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; color:var(--muted); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); transition:background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo)}
+.choice input:hover + span{color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.34)}
+.choice input:checked + span{background:var(--creme); color:var(--ink); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--creme); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1px rgba(242,180,90,.7)}
+.field__err{margin:0; font-size:13px; color:#F2C48A}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:var(--creme); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{margin:0; outline:none; font-size:clamp(28px,3vw,40px); line-height:1.1; letter-spacing:-.03em; font-weight:500}
+.form__ok p{max-width:34ch; color:var(--muted)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+/* =========================================================
+   Pied de page (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:40px var(--gr) calc(36px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--creme)}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal],.js .hero__bgIn,.js .hero__stage,.form__ok,.ag-sent{transform:none !important; filter:none !important}
+  .js .ttl--main{clip-path:none}
+  .hero-in .ttl--main,.hero-in .ttl--ghost,.hero-in .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .ag.is-sent .ag-noteW{transform:none}
+  .btn,.btn__ico,.choice span,.replay svg,.hero__downIco svg{transition-property:opacity,background,color,box-shadow}
+}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+<link rel="stylesheet" href="../shared/apps.css"><link rel="stylesheet" href="../shared/victoire.css">
+<style>
+/* =========================================================
+   Modules partagés (V5) : A1 les apps, A2 les 54 heures.
+   Raccord Golden hour : les jetons de la page, l'heure bleue, la lumière « dusk » sur le mot, le biseau.
+   ========================================================= */
+:root{
+  --kz-bg:#0E1220; --kz-surface:#151B2C; --kz-ink:#F4EFE6; --kz-muted:rgba(244,239,230,.74); --kz-line:rgba(244,239,230,.12);
+  --kz-accent:#9DB8FF;
+  --kz-title:var(--f-title); --kz-text:var(--f-text); --kz-word:var(--f-word);
+  --kz-radius:var(--r-xl);
+  --kz-victoire-nuit:#05070D;
+}
+/* Fond transparent : la lumière d'ambiance (fixe) passe d'un chapitre à l'autre, sans couture */
+.kz-apps,.kz-victoire{background:transparent}
+.kz-apps__titre em{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+/* Le dock, posé comme les contenants « double biseau » de la page */
+.kz-apps__dock{background:rgba(244,239,230,.035); box-shadow:inset 0 0 0 1px rgba(244,239,230,.075), inset 0 1px 0 rgba(255,255,255,.05), 0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+/* Voir le contournement en fin de page : la légende du premier temps ne reste pas affichée */
+.kz-victoire.is-pin.kz-v-cap-off .kv-cap{visibility:hidden}
+</style>
+</head>
+<body>
+<a class="skip" href="#apps">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<i class="progress" aria-hidden="true" data-progress></i>
+
+<!-- ========== Navigation (markup commun du brief V4 §3) ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== A0 Hero ========== -->
+  <section class="hero" id="top" aria-label="Kenz">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bgIn">
+        <img class="hero__land" src="../assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high">
+        <i class="hero__wash"></i>
+      </div>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <h1 class="hero__title"><span class="ttl ttl--main">Kenz<span class="ttl__dot" aria-hidden="true"></span></span><span class="ttl ttl--ghost" aria-hidden="true">Kenz<span class="ttl__dot"></span></span></h1>
+        <p class="hero__line" data-words data-hero-words>Je construis des apps où l’IA fait le <em class="word glow">vrai</em> travail.</p>
+        <a class="hero__down" href="#apps" data-anim><span class="hero__downIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span>Voir ce que je construis</a>
+      </div>
+      <div class="hero__stage">
+        <i class="hero__glow" aria-hidden="true"></i>
+        <div class="hero__fig">
+          <img class="portrait" src="../assets/img/kenz-pro.webp" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== A1 Les apps : choisis une app (module partagé, shared/apps.*) ========== -->
+  <section id="apps" class="kz-apps" data-kz-apps data-theme="dark" aria-label="Mes apps"></section>
+
+  <!-- ========== A2 Les 54 heures (module partagé, shared/victoire.*) ========== -->
+  <section id="victoire" class="kz-victoire" data-kz-victoire data-theme="dark" aria-label="Startup Weekend"></section>
+
+  <!-- ========== A3 Pour votre équipe ========== -->
+  <section class="team" id="equipe" aria-labelledby="equipe-q">
+    <div class="wrap team__grid">
+      <div class="team__copy">
+        <h2 class="team__q" id="equipe-q" data-words>Et si des agents IA travaillaient pour vous, <em class="word glow">sans</em> jamais rien envoyer sans votre accord&nbsp;?</h2>
+        <a class="btn btn--light" href="agents.html" data-passage data-couleur="#1A2440" data-reveal="fade" style="--wd:.6s">Voir comment<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></a>
+      </div>
+      <div class="ag" data-agents>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Aperçu : trois sources tombent, un site concurrent, un appel d’offres et un article. L’agent Veille les trie, l’agent Vérification les contrôle, puis Hermes les assemble en une note du lundi, qui attend votre validation.">
+            <svg class="ag-wires" viewBox="0 0 100 126" preserveAspectRatio="none" aria-hidden="true">
+              <path pathLength="1" d="M18 20C18 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M50 20C50 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M82 20C82 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M46 35H52"/>
+              <path pathLength="1" d="M72 40C72 44.5 50 43.5 50 47"/>
+              <path pathLength="1" d="M50 59V66"/>
+            </svg>
+            <div class="ag-src ag-src--0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-node ag-node--v"><i></i>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c"><i></i>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h">Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW">
+              <div class="ag-note">
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line"><i></i><span>Site concurrent</span></div>
+                <div class="ag-line"><i></i><span>Appel d’offres</span></div>
+                <div class="ag-line"><i></i><span>Article</span></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW"><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== A4 Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">idée</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA"><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  $$('[data-words]').forEach(splitWords);
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal]').forEach(el => { if (!el.closest('.hero')) io.observe(el); });
+
+  /* ---------- A0 : entrée du hero (après un passage ou une porte, sinon au chargement) ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn, { once: true });
+  document.addEventListener('porte:arrivee', heroIn, { once: true });
+  let arriving = d.hasAttribute('data-porte-arrivee');
+  if (!arriving) {
+    try {
+      const p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null');
+      arriving = !!(p && Date.now() - p.t < 6000);
+    } catch (e) { arriving = false; }
+  }
+  if (arriving) setTimeout(heroIn, 2500);
+  else requestAnimationFrame(() => setTimeout(heroIn, 60));
+
+  /* ---------- Nav : fond au défilement ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+
+  /* ---------- Défilement doux (ordinateur) ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!window.Lenis || RM || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    if (hasG) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add(t => lenis.raf(t * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  });
+
+  /* ---------- Repère : un fil de progression, tout en haut ---------- */
+  safe('progress', () => {
+    const bar = $('[data-progress]');
+    if (!hasG || !bar) return;
+    bar.classList.add('is-on');
+    G.to(bar, { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .3 } });
+  });
+
+  /* ---------- Passage vers une autre page (repli : navigation directe) ---------- */
+  const go = (src, url, couleur) => {
+    const P = window.Passage;
+    if (P && typeof P.ouvrir === 'function') {
+      try { P.ouvrir(src, url, { couleur }); return; } catch (e) { console.error('[kz] passage : ' + e.message); }
+    }
+    location.href = url;
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-passage]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const src = (a.dataset.source && document.querySelector(a.dataset.source)) || a;
+    go(src, a.getAttribute('href'), a.dataset.couleur);
+  });
+
+  /* ---------- Ancres internes et logo ---------- */
+  const scrollToY = y => {
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+  };
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l || e.defaultPrevented) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    scrollToY(id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY);
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  });
+  /* Sur l'accueil, « Kenz » remonte en douceur. Le point garde son propre comportement (shared/cordon.js). */
+  safe('logo', () => {
+    const logo = $('.kz-logo');
+    logo.addEventListener('click', e => {
+      if (e.defaultPrevented || e.target.closest('.kz-dot') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      scrollToY(0);
+    });
+  });
+
+  /* =========================================================
+     Scènes. État final = CSS par défaut ; GSAP pose l'état de départ et joue vers l'état final.
+     ========================================================= */
+  const B = {
+    agents(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const srcs = q('.ag-src'), ticks = q('.ag-tick'), wires = q('.ag-wires path'), glows = q('.ag-glow'), nodes = q('.ag-node');
+      const note = q1('.ag-note'), title = q1('.ag-note__t'), lines = q('.ag-line'), okW = q1('.ag__okW');
+      G.set(srcs, { opacity: 0, y: 0, xPercent: 0, yPercent: -230, rotation: i => [-7, 5, -4][i] });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set(wires, { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .4 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0%)' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { opacity: 0, y: 12, scale: .965 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(srcs, { opacity: 1, yPercent: 0, rotation: 0, duration: .9, stagger: .15 }, .1)
+        .to([wires[0], wires[1], wires[2]], { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, .95)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.2)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.25)
+        .to(srcs[2], { xPercent: -220.7, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to([srcs[0], srcs[1]], { xPercent: 110.35, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to(wires[3], { strokeDashoffset: 0, duration: .3, ease: 'power2.out' }, 2)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.1)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.15)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.15)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .12 }, 2.3)
+        .to(wires[4], { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 2.65)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 2.85)
+        .to(glows[1], { opacity: 0, duration: .4 }, 2.9)
+        .to(glows[2], { opacity: 1, duration: .5 }, 2.9)
+        .to(wires[5], { strokeDashoffset: 0, duration: .3 }, 3.1)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(-14% -14% -30% -14%)', duration: 1 }, 3.2)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 3.35)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 3.5)
+        .to(okW, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, 4.05);
+    }
+  };
+
+  /* Une scène : timeline + bouton « Rejouer » */
+  function makeScene(el, opts = {}) {
+    const s = { el, tl: null, seen: false, pending: null, rb: el.querySelector('[data-replay]') };
+    if (!hasG) return s;
+    try { s.tl = B[opts.name || el.dataset.scene](el, opts); } catch (e) { console.error('[kz] scène : ' + e.message); s.tl = null; return s; }
+    if (opts.speed) s.tl.timeScale(opts.speed);
+    if (RM) { s.tl.progress(1, true); s.seen = true; return s; }
+    el.classList.add('has-tl');
+    s.tl.eventCallback('onComplete', () => { s.seen = true; if (opts.onDone) opts.onDone(); else if (s.rb) s.rb.classList.add('is-on'); });
+    if (s.rb && !opts.ownReplay) s.rb.addEventListener('click', () => { s.rb.classList.remove('is-on'); s.tl.restart(); });
+    return s;
+  }
+  const play = (s, delay = .4) => {
+    if (!s || !s.tl || s.seen) return;
+    if (s.pending) s.pending.kill();
+    s.pending = G.delayedCall(delay, () => { s.pending = null; s.tl.restart(); });
+  };
+
+  /* =========================================================
+     A3 : l'aperçu agents (≈ 2 s), puis c'est au visiteur de valider
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const ok = $('[data-ok]', ag), live = $('[data-ag-live]', ag), rb = $('[data-replay]', ag);
+    ag.dataset.scene = 'agents';
+    const ready = () => { live.textContent = 'La note du lundi est prête. Elle attend votre validation.'; };
+    const s = makeScene(ag, { ownReplay: true, onDone: ready, speed: 2.3 });
+    ag.classList.add('has-tl');
+    if (!s.tl || RM) ready();
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => { rb.classList.add('is-on'); if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true }); }, RM ? 300 : 1900);
+    });
+    rb.addEventListener('click', () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (s.tl) { s.seen = false; s.tl.restart(); }
+      else ready();
+    });
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(s, .25); o.disconnect(); } }, { threshold: .4 });
+    if (s.tl && !RM) o.observe(ag);
+  });
+
+  /* =========================================================
+     A4 : formulaire (envoi simulé)
+     ========================================================= */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) window.addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="../shared/apps.js"></script>
+<script src="../shared/victoire.js"></script>
+<script>
+/* Contournement d'un défaut du module « victoire » (shared/ n'est pas modifié) : en arrivant directement au milieu
+   de l'épinglage (rechargement, outil de revue), deux timelines au défilement règlent l'opacité de la légende
+   « Startup Weekend, Grenoble. » et elle restait affichée sur les temps suivants. La page la masque
+   (visibility, que GSAP ne touche pas) une fois le premier temps passé ; en remontant, elle revient. */
+(() => {
+  const ST = window.ScrollTrigger, sec = document.getElementById('victoire');
+  if (!ST || !sec) return;
+  const pinOf = () => ST.getAll().find(s => s.pin === sec);
+  const go = () => {
+    ST.create({
+      start: () => { const p = pinOf(); return p ? p.start + (p.end - p.start) * .14 : 0; },
+      end: 'max',
+      onToggle: s => sec.classList.toggle('kz-v-cap-off', s.isActive)
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+  else go();
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+Use case: style-transfer. Create ONE new premium miniature AI compute module for a personal website hero, matching the attached HYROX object collection exactly in finish, material quality, lighting, chunky proportions and tactile 3D design.
+
+INPUT REFERENCE ROLE: the attached contact sheet is a STYLE REFERENCE ONLY. Match its matte graphite miniature equipment, soft bevels, satin surfaces, off-white details and simple readable silhouettes. Do NOT reproduce the sports equipment, green accent, sheet layout, background, labels or captions.
+
+SUBJECT: a small solid physical AI compute module, floating in a three-quarter view. It is a compact rounded-square graphite processor cartridge with a thick low-profile body, generously rounded corners and a shallow inset on the top face. At its center sits ONE smooth Lagon-blue ceramic core with rounded square corners, fitted into the inset. This central core is completely BLANK. Around it, a few short simple off-white recessed traces connect to exactly TWO short rounded off-white contact tabs on each of the four sides, eight tabs in total. The perimeter tabs are thick sturdy little physical metal contacts, not spindly pins. Strong readable physical microprocessor silhouette. Show the thickness, softly beveled side walls and a simple dark seam around the housing. One unified self-contained object; the central core is attached, no floating detached parts.
+
+DESIGN DIRECTION: premium collectible miniature in the SAME family as the HYROX sleds and kettlebells in the reference. Broad full rounded forms; refined satin graphite metal body #1A1D1C to #2A2F2D with gentle fine grain; restrained off-white #F7F7F2 contacts; ONE accent zone, the solid Lagon-blue #3FB0C2 central core. The physical core is satin ceramic with a soft broad highlight, not a screen or emissive surface. Clean recent material, no scratches, no aged texture. Keep visual detail minimal and purposeful. This is a real three-dimensional miniature component, not a flat app icon or drawn pictogram.
+
+LIGHTING: soft cool studio light from upper LEFT, broad material highlights and a subtle cool rim on the right edge. The same light quality and tactile shading as the reference series. Ambient occlusion only within the object. No neon, no bloom, no light rays, no external halo, no dramatic colored backlight.
+
+CAMERA: three-quarter front view, looking down about 25 degrees, see the top and two sides, restrained orthographic product perspective. Slight natural floating tilt, with the whole object fully in focus.
+
+COMPOSITION: square 1024 x 1024 or larger. One complete object centered, occupying about 70% of the canvas, clear transparent margins on all four sides, nothing cropped. Must read immediately at 80 px and look premium at 400 px.
+
+BACKGROUND: GENUINELY TRANSPARENT ALPHA with clean antialiased edges. No colored background, no ground plane, no pedestal, no cast shadow detached from the object, no decorative platform, no checkerboard printed into the image.
+
+ABSOLUTELY NO TEXT anywhere: no AI lettering, words, letters, numbers, engraving, logo, brand mark, labels, captions, watermark, interface or app icon. No sphere, ball, orb, glass marble, share/network symbol on a ball, transparent crystal shell, brain, robot, face, eyes, person, hand, gear, computer display, sci-fi machinery, cables, gold or bright green. Only the compact graphite module with its blank Lagon core and ivory contacts.

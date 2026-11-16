@@ -1,0 +1,17 @@
+Use case: style-transfer. Redesign ONE miniature hero object to belong to the EXACT SAME art-directed family as the HYROX equipment icons in the attached reference sheet.
+
+INPUT IMAGE ROLE: reference sheet for the object design language, proportions, materials, lighting and finish ONLY. The dark sheet background and its labels are NOT part of the requested output. Do not reproduce any sports equipment. Make the new object specified below.
+
+The user's essential correction: match the HYROX objects themselves. Compact, weighty, slightly chunky, soft bevels, rounded thick edges, broad sculpted highlights, satin graphite surfaces and restrained tactile material grain. The restrained premium 3D miniature finish of the kettlebells, sandbag and medicine ball on the sheet is the target. This must convincingly sit next to those icons as part of one collection.
+
+NEW SUBJECT: a miniature passport booklet, upright and slightly tilted, designed with the SAME chunky rounded padded material language as the HYROX sandbag and boxing gloves in the sheet. A thick satin charcoal-graphite leather cover, very gently tinted deep Lagon #0F5D6B, rounded padded corners and a restrained fine leather grain. A SINGLE simple small off-white globe relief centered on the otherwise completely blank front cover: an unbranded plain circle with just a few meridian and latitude curves, no letters or official crest. The booklet is slightly open, exposing a thick clean ivory page block represented by a handful of broad rounded layers along the right-hand edge. One very small Lagon-blue binding accent at the spine. The whole shape is compact and squat, like a premium collectible object, not a photograph of a real passport. No gold, no scratches, no worn edges, no stamps, no creases, no loose tickets, no straps, no extra objects.
+
+Materials and palette: matte graphite #1A1D1C to #2A2F2D, off-white #F7F7F2, and ONE restrained Lagon-blue #3FB0C2 accent zone, replacing the green accent of the reference icons. No other saturated color. Subtle fine grain, never strong wear or scratches. No polished gold. No elaborate photoreal surface effects.
+
+Lighting: the SAME soft studio light from upper left as the reference, broad gentle material highlights, very restrained rim light along the right edge. No dramatic backlight, no orange outline, no internal glow, no neon, no lens flares. Ambient occlusion ONLY inside the object.
+
+Camera and framing: three-quarter front view, slightly elevated looking down about 25 degrees, showing front and right side. One compact floating object, a restrained slight tilt, no extra accessories. Square 1024 by 1024 or higher. Center the complete object, occupying about 70% of canvas height or maximum dimension, clear transparent margins on every side, no cropping. Strong simple silhouette readable at 80 px. Do not fill the scene with detail.
+
+Background: TRUE TRANSPARENT ALPHA, not black or gray. Completely isolated object, no floor, no pedestal, no scene, no separate cast shadow, no haze, no halo, no background rectangle, no painted checkerboard.
+
+ABSOLUTELY NO TEXT ANYWHERE: no captions, labels, letters, numbers, symbols resembling writing, stamps, official crests, brand logos, watermark. No hands, person, face, robot, brain, gears, computer screen or UI. No antique realism, no magical crystal ball, no wispy luminous filaments, no overly shiny or transparent outer body. No toyish cartoon face.

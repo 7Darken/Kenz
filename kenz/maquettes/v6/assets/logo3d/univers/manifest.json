@@ -1,0 +1,36 @@
+{
+  "generator": "built-in image_gen",
+  "created": "2026-11-16",
+  "approvedBase": "../kz-01-monogramme.webp",
+  "format": "WebP transparent",
+  "sizes": [
+    1024,
+    512,
+    256
+  ],
+  "assets": [
+    {
+      "id": "kz-pro",
+      "name": "Espace Pro",
+      "palette": "Graphite · Ivoire · Lagon",
+      "description": "Le monogramme que tu as validé, dans sa finition originale.",
+      "status": "approved-original"
+    },
+    {
+      "id": "kz-createur",
+      "name": "Espace Créateur",
+      "palette": "Cognac · Ivoire · Lagon",
+      "description": "La même signature, avec une matière plus chaleureuse.",
+      "status": "new-variant"
+    }
+  ],
+  "neon": {
+    "css": "../neon.css",
+    "inlineFilter": "../neon-filter.svg",
+    "intensity": 0.35
+  },
+  "sources": {
+    "pro": "Byte-identical copy of approved monogram",
+    "createur": "Material edit of approved monogram via built-in image_gen"
+  }
+}

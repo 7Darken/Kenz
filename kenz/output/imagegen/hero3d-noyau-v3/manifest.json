@@ -1,0 +1,15 @@
+{
+  "status": "awaiting-user-review",
+  "revision": 3,
+  "generator": "built-in image_gen",
+  "styleReference": "/Users/kenz15/Documents/Dev/Kenz/kenz/maquettes/v6/assets/sport3d/planches/sombre-160.webp",
+  "assets": [
+    {
+      "id": "pro-noyau-ia",
+      "label": "Module IA",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-a6588b54-543c-404f-aa66-6c5663209aab.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    }
+  ]
+}

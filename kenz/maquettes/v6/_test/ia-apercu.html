@@ -1,0 +1,49 @@
+<!doctype html>
+<!--
+  TEST — l'aperçu de la machine (shared/ia.*, mode « apercu »), posé comme dans la section « Pour votre équipe » de pro.html.
+  Porte de test du mode : ?clair ou ?sombre. Page de revue uniquement, à retirer ensuite.
+-->
+<html lang="fr" data-univers="pro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TEST aperçu IA · Kenz — Pro</title>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1220">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="stylesheet" href="../shared/theme.css">
+<script src="../shared/theme.js"></script>
+<style>
+/* Comme pro.html, section A3 */
+.team{padding:calc(var(--sec) * .6) 0 var(--sec)}
+.team__grid{display:grid; gap:clamp(40px,5vw,88px); align-items:center}
+.team__copy{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(28px,3vw,40px)}
+.team__q{max-width:19ch; font-size:clamp(32px,4.2vw,66px); line-height:1.05; letter-spacing:-.04em; font-weight:500; text-wrap:balance}
+@media (min-width:960px){ .team__grid{grid-template-columns:6fr 5fr} }
+</style>
+<link rel="stylesheet" href="../shared/ia.css">
+</head>
+<body>
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="../pro.html">Kenz<span class="kz-dot" aria-hidden="true"></span></a>
+    <button class="kz-mode" type="button" data-kz-mode></button>
+  </div>
+</header>
+<main>
+  <section class="team" id="equipe" aria-labelledby="equipe-q" data-chapitre data-aura="gauche" style="padding-top:140px">
+    <div class="wrap team__grid">
+      <div class="team__copy">
+        <h2 class="team__q" id="equipe-q">Je construis des systèmes qui font le <em class="word glow">travail</em>. Vous gardez la main.</h2>
+      </div>
+      <div class="kz-ia" data-kz-ia="apercu" data-cas="recette" data-lien="../agents.html"></div>
+    </div>
+  </section>
+</main>
+<script src="../shared/ia.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+{
+  "date": "2026-11-15",
+  "assetCount": 18,
+  "exportCount": 36,
+  "totalBytes": 4799384,
+  "checks": [
+    {
+      "id": "hyrox-01-skierg",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-01-skierg.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 157886,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 178,
+            "top": 153,
+            "width": 667,
+            "height": 717,
+            "transparent": 926657,
+            "partial": 119912
+          }
+        },
+        {
+          "file": "256/hyrox-01-skierg.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6934,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 70,
+            "top": 38,
+            "width": 110,
+            "height": 179,
+            "transparent": 57511,
+            "partial": 8025
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-02-sled-push",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-02-sled-push.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 210592,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 153,
+            "top": 153,
+            "width": 717,
+            "height": 717,
+            "transparent": 859979,
+            "partial": 186312
+          }
+        },
+        {
+          "file": "256/hyrox-02-sled-push.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6336,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 45,
+            "top": 38,
+            "width": 172,
+            "height": 180,
+            "transparent": 53433,
+            "partial": 12103
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-03-sled-pull",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-03-sled-pull.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 260064,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 152,
+            "top": 153,
+            "width": 720,
+            "height": 717,
+            "transparent": 841126,
+            "partial": 205941
+          }
+        },
+        {
+          "file": "256/hyrox-03-sled-pull.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 7918,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 47,
+            "top": 57,
+            "width": 165,
+            "height": 151,
+            "transparent": 52261,
+            "partial": 13275
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-04-burpee-broad-jump",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-04-burpee-broad-jump.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 206302,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 155,
+            "top": 153,
+            "width": 713,
+            "height": 717,
+            "transparent": 887180,
+            "partial": 160277
+          }
+        },
+        {
+          "file": "256/hyrox-04-burpee-broad-jump.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5514,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 47,
+            "top": 40,
+            "width": 164,
+            "height": 157,
+            "transparent": 55280,
+            "partial": 10256
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-05-row",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-05-row.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 198442,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 145,
+            "top": 153,
+            "width": 734,
+            "height": 696,
+            "transparent": 890982,
+            "partial": 156118
+          }
+        },
+        {
+          "file": "256/hyrox-05-row.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 7602,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 39,
+            "top": 40,
+            "width": 181,
+            "height": 157,
+            "transparent": 55388,
+            "partial": 10148
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-06-farmers-carry",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-06-farmers-carry.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 237956,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 162,
+            "top": 153,
+            "width": 699,
+            "height": 717,
+            "transparent": 817813,
+            "partial": 229192
+          }
+        },
+        {
+          "file": "256/hyrox-06-farmers-carry.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5664,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 40,
+            "top": 60,
+            "width": 160,
+            "height": 154,
+            "transparent": 50858,
+            "partial": 14678
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-07-sandbag-lunges",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-07-sandbag-lunges.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 440564,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 105,
+            "top": 153,
+            "width": 814,
+            "height": 717,
+            "transparent": 749071,
+            "partial": 298454
+          }
+        },
+        {
+          "file": "256/hyrox-07-sandbag-lunges.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 7610,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 34,
+            "top": 44,
+            "width": 196,
+            "height": 168,
+            "transparent": 46595,
+            "partial": 18941
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-08-wall-balls",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-08-wall-balls.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 270488,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 196,
+            "top": 153,
+            "width": 700,
+            "height": 717,
+            "transparent": 800853,
+            "partial": 246540
+          }
+        },
+        {
+          "file": "256/hyrox-08-wall-balls.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6150,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 55,
+            "top": 48,
+            "width": 160,
+            "height": 167,
+            "transparent": 49833,
+            "partial": 15703
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-run",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-run.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 302500,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 166,
+            "top": 153,
+            "width": 690,
+            "height": 717,
+            "transparent": 826760,
+            "partial": 220819
+          }
+        },
+        {
+          "file": "256/hyrox-run.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 7720,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 41,
+            "top": 53,
+            "width": 170,
+            "height": 162,
+            "transparent": 51484,
+            "partial": 14052
+          }
+        }
+      ]
+    },
+    {
+      "id": "hyrox-finish",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "hyrox-finish.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 154136,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 148,
+            "top": 153,
+            "width": 728,
+            "height": 717,
+            "transparent": 900958,
+            "partial": 146040
+          }
+        },
+        {
+          "file": "256/hyrox-finish.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5426,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 42,
+            "top": 50,
+            "width": 161,
+            "height": 158,
+            "transparent": 56070,
+            "partial": 9466
+          }
+        }
+      ]
+    },
+    {
+      "id": "spartan-mur",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "spartan-mur.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 260798,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 159,
+            "top": 153,
+            "width": 706,
+            "height": 717,
+            "transparent": 809140,
+            "partial": 237999
+          }
+        },
+        {
+          "file": "256/spartan-mur.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5788,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 52,
+            "top": 43,
+            "width": 160,
+            "height": 161,
+            "transparent": 50321,
+            "partial": 15215
+          }
+        }
+      ]
+    },
+    {
+      "id": "spartan-boue",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "spartan-boue.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 239388,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 146,
+            "top": 153,
+            "width": 732,
+            "height": 717,
+            "transparent": 871035,
+            "partial": 176028
+          }
+        },
+        {
+          "file": "256/spartan-boue.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 7420,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 43,
+            "top": 60,
+            "width": 173,
+            "height": 141,
+            "transparent": 54186,
+            "partial": 11350
+          }
+        }
+      ]
+    },
+    {
+      "id": "spartan-portes",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "spartan-portes.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 359078,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 155,
+            "top": 153,
+            "width": 712,
+            "height": 717,
+            "transparent": 788218,
+            "partial": 259468
+          }
+        },
+        {
+          "file": "256/spartan-portes.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6390,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 50,
+            "top": 50,
+            "width": 150,
+            "height": 168,
+            "transparent": 49101,
+            "partial": 16435
+          }
+        }
+      ]
+    },
+    {
+      "id": "spartan-filet",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "spartan-filet.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 266308,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 159,
+            "top": 153,
+            "width": 703,
+            "height": 717,
+            "transparent": 851276,
+            "partial": 192678
+          }
+        },
+        {
+          "file": "256/spartan-filet.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 11832,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 43,
+            "top": 44,
+            "width": 173,
+            "height": 161,
+            "transparent": 52497,
+            "partial": 13039
+          }
+        }
+      ]
+    },
+    {
+      "id": "spartan-saut",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "spartan-saut.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 191186,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 176,
+            "top": 154,
+            "width": 690,
+            "height": 716,
+            "transparent": 869237,
+            "partial": 178108
+          }
+        },
+        {
+          "file": "256/spartan-saut.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5504,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 60,
+            "top": 50,
+            "width": 141,
+            "height": 167,
+            "transparent": 54156,
+            "partial": 11380
+          }
+        }
+      ]
+    },
+    {
+      "id": "boxe-gants",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "boxe-gants.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 285146,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 145,
+            "top": 153,
+            "width": 733,
+            "height": 717,
+            "transparent": 773374,
+            "partial": 274063
+          }
+        },
+        {
+          "file": "256/boxe-gants.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 6076,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 36,
+            "top": 47,
+            "width": 166,
+            "height": 171,
+            "transparent": 48163,
+            "partial": 17373
+          }
+        }
+      ]
+    },
+    {
+      "id": "boxe-sac",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "boxe-sac.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 183684,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 156,
+            "top": 153,
+            "width": 712,
+            "height": 717,
+            "transparent": 899187,
+            "partial": 148366
+          }
+        },
+        {
+          "file": "256/boxe-sac.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 5218,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 92,
+            "top": 38,
+            "width": 69,
+            "height": 180,
+            "transparent": 55950,
+            "partial": 9586
+          }
+        }
+      ]
+    },
+    {
+      "id": "boxe-bandes",
+      "source": {
+        "width": 1254,
+        "height": 1254
+      },
+      "exports": [
+        {
+          "file": "boxe-bandes.webp",
+          "width": 1024,
+          "height": 1024,
+          "bytes": 449418,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 166,
+            "top": 153,
+            "width": 692,
+            "height": 717,
+            "transparent": 762471,
+            "partial": 285149
+          }
+        },
+        {
+          "file": "256/boxe-bandes.webp",
+          "width": 256,
+          "height": 256,
+          "bytes": 10346,
+          "hasAlpha": true,
+          "transparentBorder": true,
+          "visibleBounds": {
+            "left": 58,
+            "top": 45,
+            "width": 157,
+            "height": 168,
+            "transparent": 47450,
+            "partial": 18086
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,554 @@
+/* ==========================================================================
+   Thème commun de la maquette unique (V6) : pro.html, app.html, agents.html, createur.html
+   Brief : maquettes/v6/BRIEF-V6.md. Piloté par shared/theme.js.
+
+   ---------------------------------------------------------------------------
+   BRANCHEMENT (dans cet ordre, dans le <head>, AVANT le <style> de la page)
+     <html lang="fr" data-univers="pro">            (ou "createur" : lumière dorée)
+     <link rel="stylesheet" href="shared/theme.css">
+     <script src="shared/theme.js"></script>         (synchrone : pose le mode avant le 1er rendu)
+   Les styles de la page viennent ensuite et peuvent tout surcharger.
+
+   ---------------------------------------------------------------------------
+   MODE CLAIR / SOMBRE
+     <html data-theme="dark|light">  posé par theme.js (choix mémorisé, sinon prefers-color-scheme).
+     Sombre = Golden hour. Clair = le fond de Studio (papier chaud, grain léger, brume, ombres en couches).
+     Une règle propre à un mode s'écrit :  html[data-theme="light"] .ma-classe{…}
+     Les modules ([data-kz-apps], [data-kz-victoire]) et tout élément [data-theme-suit] reçoivent
+     data-theme="dark|light" à chaque bascule (fait par theme.js).
+
+   ---------------------------------------------------------------------------
+   JETONS (définis une fois en sombre, une fois en clair ; Pro et Créateur)
+     Fond      --bg  --bg-2  --hero-bg
+     Texte     --fg (texte principal)  --fg-rgb (le même en « r g b »)  --muted  --faint
+     Filets    --line  --line-2
+     Matière   --surface --surface-edge (coque)  --core --core-hl (cœur)  --sh-1 --sh-2 (ombres en couches)
+     Lumière   --lum (« r g b » : aura, fil, arches, loupe)  --lum-2 (seconde lumière de l'aura)
+               --word-c (couleur du mot en Instrument Serif)  --glow (son text-shadow)
+     Boutons   --btn-bg --btn-fg --btn-hover --btn-ico-bg --btn-ico-fg (bouton principal)
+               --ghost-bg --ghost-line --ghost-hover --ghost-ico (bouton secondaire)
+     Champs    --field-bg --field-line --field-line-2 --field-focus --placeholder --warn --warn-line
+     Divers    --nav-bg --focus --sel-bg --sel-fg --grain-op --noise --hero-veil
+     Fixes     --creme --encre --red --lagon (n'ont pas de version claire : couleurs de marque)
+     Mouvement --expo --out --io --ios ; --t-mode (durée du fondu de bascule, 400 ms)
+     Mesures   --gutter --gl --gr --maxw --sec --r-xl --r-lg --r-md
+     Polices   --f-title --f-text --f-word --f-ja
+     Modules   --kz-bg --kz-surface --kz-ink --kz-muted --kz-line --kz-accent --kz-title --kz-text
+               --kz-word --kz-radius --kz-victoire-nuit --kz-victoire-or (suivent le mode)
+   Conversion d'une page Golden : var(--creme) en texte -> var(--fg) ; rgba(244,239,230,a) -> rgb(var(--fg-rgb) / a) ;
+   fonds #0E1220/#121A2B -> var(--bg)/var(--bg-2) ; cartes « bezel » -> déjà prêtes ci-dessous.
+
+   ---------------------------------------------------------------------------
+   BRIQUES COMMUNES (déjà en jetons, dans les deux modes ; la page peut les surcharger ou les retirer de son <style>)
+     .wrap .sr .skip .cap .word .glow .glass .bezel/.bezel__core .btn(.btn--light = principal, .btn--ghost, .btn--sm, .btn__ico)
+     .link .replay .slit/.num  [data-words] [data-reveal="card|fade"] (avec html.js)  .nav .nav__in .kz-logo .kz-dot
+     .nav__cta .nav__ctaIco  .field .input .choices/.choice .field__err .foot
+
+   ---------------------------------------------------------------------------
+   AURA (injectée par theme.js, fixe derrière tout) : .kz-aura > .kz-aura__h ×3, et .kz-grain.
+     Sur un chapitre : data-aura="droite|gauche|centre|haut|bas|calme" (ou "x y" en %) : les halos glissent
+     lentement vers cette place quand le chapitre arrive au centre de l'écran. Pas de boucle.
+     <html data-aura="off"> : pas d'aura injectée (la page garde la sienne).
+
+   FIL (injecté par theme.js)
+     Un chapitre = un élément [data-chapitre] (un nœud sur le rail).
+     .kz-fil-rail (≥ 1100 px) : le fil fixe à gauche, .kz-fil-rail__fill, .kz-fil-rail__noeud(.is-lit), .kz-fil-rail__tete
+     .kz-fil-progres (< 1100 px) : simple filet de progression en haut.
+     .kz-fil-trait : le trait qui descend en haut de chaque chapitre (≥ 900 px). Injecté dans chaque [data-chapitre]
+       sauf le premier et ceux marqués data-fil-trait="non". Variable --dp (0 → 1), posée au défilement.
+       .kz-fil-trait--c : centré. Le chapitre doit être position:relative (fait par [data-chapitre]).
+
+   ARCHE (classe utilitaire)
+     .kz-arche  : forme d'arche (haut en demi-cercle). --arche-ratio (largeur / hauteur, défaut .714),
+                  --arche-rb (rayon des coins du bas, défaut 0). Garde l'aspect-ratio.
+     .kz-arche__in : l'intérieur découpé (photo, contenu). .kz-arche--cadre img : photo en cover.
+     .kz-arche--lumiere : intérieur de lumière (halo, arrivée d'une page projet). Couleur : --arche-c (« r g b »,
+                  défaut var(--lum) ; ex. la couleur de l'app).
+     [data-arche-trace] : theme.js dessine le fil de l'arche (.kz-arche__trace > path.kz-arche__fil + .kz-arche__ombre),
+                  tracé à l'entrée à l'écran (classe .is-trace). Enfant facultatif .kz-arche__sol : la ligne de sol.
+
+   LOUPE (souris seulement, jamais au toucher ni en mouvement réduit) : une lentille de verre légèrement teinté, ×1,1.
+     [data-loupe] sur l'élément (photo, capture) : rien d'autre à faire. data-loupe="1.15" change l'échelle,
+     data-loupe-taille="200" la taille en px. En JS : KzTheme.loupe(el, { echelle, taille, source }) -> détache().
+     Couche : .kz-loupe > .kz-loupe__corps > .kz-loupe__disque (.kz-loupe__in, .kz-loupe__teinte) + .kz-loupe__bague.
+
+   BOUTON DE MODE : .kz-mode (soleil / lune en SVG fin), placé dans la nav par theme.js :
+     dans [data-kz-mode] s'il existe, sinon juste avant .nav__cta.
+   ========================================================================== */
+
+/* =========================================================
+   1. Jetons : sombre (Golden hour), univers Pro
+   ========================================================= */
+:root{
+  color-scheme:dark;
+  --creme:#F4EFE6;
+  --encre:#0E1220;
+  --ink:#0E1220;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+
+  --bg:#0E1220;
+  --bg-2:#121A2B;
+  --hero-bg:#0B0F1B;
+  --fg:#F4EFE6;
+  --fg-rgb:244 239 230;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+
+  --surface:rgba(244,239,230,.035);
+  --surface-edge:rgba(244,239,230,.075);
+  --core:linear-gradient(180deg,#171E31,#121827);
+  --core-hl:inset 0 1px 0 rgba(255,255,255,.06);
+  --sh-1:0 1px 1px rgba(0,0,0,.25),0 30px 70px -36px rgba(0,0,0,.7);
+  --sh-2:0 1px 1px rgba(0,0,0,.25),0 50px 90px -46px rgba(0,0,0,.9);
+
+  --lum:118 188 210;
+  --lum-2:15 93 107;
+  --aura-a:1;
+  --word-c:currentColor;
+  --glow:0 0 .5em rgb(var(--lum) / .5),0 0 1.4em rgb(var(--lum) / .22);
+
+  --btn-bg:#F4EFE6;
+  --btn-fg:#0E1220;
+  --btn-hover:rgba(14,18,32,.07);
+  --btn-sh:0 16px 36px -22px rgb(var(--lum) / .55);
+  --btn-ico-bg:#0E1220;
+  --btn-ico-fg:#F4EFE6;
+  --ghost-bg:rgba(244,239,230,.04);
+  --ghost-line:rgba(244,239,230,.2);
+  --ghost-hover:rgba(244,239,230,.07);
+  --ghost-ico:rgba(244,239,230,.1);
+  --cta-bg:rgba(14,18,32,.4);
+
+  --field-bg:rgba(0,0,0,.24);
+  --field-line:rgba(244,239,230,.14);
+  --field-line-2:rgba(244,239,230,.26);
+  --field-focus:rgba(244,239,230,.6);
+  --placeholder:rgba(244,239,230,.42);
+  --warn:#F2C48A;
+  --warn-line:rgba(242,180,90,.9);
+
+  --nav-bg:linear-gradient(180deg,rgba(14,18,32,.86),rgba(14,18,32,.5));
+  --focus:#F4EFE6;
+  --sel-bg:rgba(244,239,230,.88);
+  --sel-fg:#0E1220;
+  --grain-op:.05;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --aura-fond:radial-gradient(55% 45% at 88% 0%,rgba(110,150,214,.08),transparent 70%);
+
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.65,0,.35,1);
+  --ios:cubic-bezier(.2,.8,.2,1);
+  --t-mode:.4s;
+
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter),env(safe-area-inset-left));
+  --gr:max(var(--gutter),env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(96px,12vw,176px);
+  --r-xl:32px;
+  --r-lg:24px;
+  --r-md:16px;
+
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+
+  /* Modules partagés (apps, victoire) */
+  --kz-bg:var(--bg);
+  --kz-surface:#151B2C;
+  --kz-ink:var(--fg);
+  --kz-muted:var(--muted);
+  --kz-line:var(--line);
+  --kz-accent:rgb(var(--lum));
+  --kz-title:var(--f-title);
+  --kz-text:var(--f-text);
+  --kz-word:var(--f-word);
+  --kz-radius:var(--r-xl);
+  --kz-victoire-nuit:#05070D;
+}
+
+/* Univers Créateur, sombre : l'heure dorée */
+:root[data-univers="createur"]{
+  --bg:#16110C;
+  --bg-2:#1D160F;
+  --hero-bg:#120D09;
+  --core:linear-gradient(180deg,#221A12,#18120C);
+  --lum:242 180 90;
+  --lum-2:190 110 48;
+  --btn-fg:#16110C;
+  --btn-hover:rgba(22,17,12,.07);
+  --btn-ico-bg:#16110C;
+  --cta-bg:rgba(22,17,12,.4);
+  --nav-bg:linear-gradient(180deg,rgba(22,17,12,.86),rgba(22,17,12,.5));
+  --sel-fg:#16110C;
+  --aura-fond:radial-gradient(55% 45% at 88% 0%,rgba(242,180,90,.07),transparent 70%);
+  --kz-surface:#21190F;
+  --kz-victoire-nuit:#0A0705;
+}
+
+/* =========================================================
+   2. Jetons : clair (le fond de Studio)
+   ========================================================= */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F5F3EF;
+  --bg-2:#EFECE6;
+  --hero-bg:#E7EBED;
+  --fg:#1A1918;
+  --fg-rgb:26 25 24;
+  --muted:#4B4743;
+  --faint:#69645E;
+  --line:rgba(26,25,24,.12);
+  --line-2:rgba(26,25,24,.07);
+
+  --surface:rgba(255,255,255,.52);
+  --surface-edge:rgba(26,25,24,.05);
+  --core:linear-gradient(180deg,#FFFFFF 0%,#FBFAF8 100%);
+  --core-hl:inset 0 0 0 1px rgba(26,25,24,.05),inset 0 1px 0 rgba(255,255,255,.75);
+  --sh-1:0 0 0 1px rgba(26,25,24,.05),0 1px 1px rgba(26,25,24,.03),0 3px 6px -2px rgba(26,25,24,.04),0 12px 24px -10px rgba(26,25,24,.07),0 32px 64px -24px rgba(26,25,24,.10);
+  --sh-2:0 2px 4px -1px rgba(26,25,24,.05),0 22px 44px -14px rgba(26,25,24,.13),0 60px 120px -34px rgba(26,25,24,.22);
+
+  --lum:15 93 107;
+  --lum-2:150 178 192;
+  --aura-a:.62;
+  --word-c:#0F5D6B;
+  --glow:0 0 .9em rgb(var(--lum) / .14);
+
+  --btn-bg:#1A1918;
+  --btn-fg:#F4EFE6;
+  --btn-hover:rgba(255,255,255,.08);
+  --btn-sh:inset 0 1px 0 rgba(255,255,255,.12),0 10px 24px -10px rgba(26,25,24,.55);
+  --btn-ico-bg:rgba(244,239,230,.14);
+  --btn-ico-fg:#F4EFE6;
+  --ghost-bg:rgba(255,255,255,.66);
+  --ghost-line:rgba(26,25,24,.14);
+  --ghost-hover:#FFFFFF;
+  --ghost-ico:rgba(26,25,24,.06);
+  --cta-bg:rgba(255,255,255,.62);
+
+  --field-bg:#FFFFFF;
+  --field-line:rgba(26,25,24,.14);
+  --field-line-2:rgba(26,25,24,.26);
+  --field-focus:#0F5D6B;
+  --placeholder:#76716B;
+  --warn:#A3352A;
+  --warn-line:rgba(163,53,42,.9);
+
+  --nav-bg:rgba(245,243,239,.74);
+  --focus:#0F5D6B;
+  --sel-bg:rgba(15,93,107,.18);
+  --sel-fg:#1A1918;
+  --grain-op:.04;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .09 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* La brume froide de Studio */
+  --aura-fond:radial-gradient(55% 45% at 88% 2%,rgba(214,226,233,.85),rgba(214,226,233,0) 70%),radial-gradient(42% 40% at 0% 92%,rgba(226,232,234,.7),rgba(226,232,234,0) 70%);
+
+  --kz-surface:#FFFFFF;
+  --kz-accent:#0F5D6B;
+  --kz-victoire-nuit:#141210;
+  --kz-victoire-or:#E9A84C;
+}
+/* Univers Créateur, clair : sable chaud */
+:root[data-theme="light"][data-univers="createur"]{
+  --bg:#F6F2EB;
+  --hero-bg:#EFE6DA;
+  --lum:176 112 40;
+  --lum-2:226 196 160;
+  --word-c:#8A5418;
+  --focus:#8A5418;
+  --field-focus:#8A5418;
+  --sel-bg:rgba(176,112,40,.18);
+  --aura-fond:radial-gradient(55% 45% at 88% 2%,rgba(246,236,221,.95),rgba(246,236,221,0) 70%),radial-gradient(42% 40% at 0% 92%,rgba(233,213,188,.55),rgba(233,213,188,0) 70%);
+  --kz-accent:#8A5418;
+}
+
+/* =========================================================
+   3. Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none; -webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,h1,h2,h3,figure{margin:0}
+::selection{background:var(--sel-bg); color:var(--sel-fg)}
+:focus-visible{outline:2px solid var(--focus); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:95; padding:10px 16px; border-radius:999px; background:var(--btn-bg); color:var(--btn-fg); font-weight:600; font-size:14px; transform:translateY(-200%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+main,.foot{position:relative; z-index:1}
+
+/* =========================================================
+   4. La bascule de mode : un fondu de 400 ms
+   (View Transitions si le navigateur sait faire, sinon un fondu des couleurs)
+   ========================================================= */
+::view-transition-old(root),::view-transition-new(root){animation-duration:var(--t-mode); animation-timing-function:cubic-bezier(.45,0,.55,1)}
+html.kz-bascule,html.kz-bascule *,html.kz-bascule *::before,html.kz-bascule *::after{
+  transition-property:background-color,color,border-color,fill,stroke,box-shadow,text-shadow !important;
+  transition-duration:var(--t-mode) !important; transition-delay:0s !important; transition-timing-function:cubic-bezier(.45,0,.55,1) !important}
+
+/* =========================================================
+   5. Briques communes
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:clamp(19px,1.5vw,22px); line-height:1.3; letter-spacing:0; color:var(--faint)}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0; color:var(--word-c)}
+.glow{text-shadow:var(--glow)}
+/* Verre de la charte : seulement posé sur une image (même rendu dans les deux modes) */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16); color:var(--creme)}
+
+/* Contenant « double biseau » : une coque, un cœur */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:var(--surface); box-shadow:inset 0 0 0 1px var(--surface-edge),var(--sh-1)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 6px); background:var(--core); box-shadow:var(--core-hl)}
+
+/* Boutons : le bouton dans le bouton */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+/* Principal : crème en sombre, encre en clair */
+.btn--light{background:var(--btn-bg); color:var(--btn-fg); box-shadow:var(--btn-sh)}
+.btn--light::before{background:var(--btn-hover)}
+.btn--light .btn__ico{background:var(--btn-ico-bg); color:var(--btn-ico-fg)}
+.btn--ghost{background:var(--ghost-bg); color:var(--fg); box-shadow:inset 0 0 0 1px var(--ghost-line)}
+.btn--ghost::before{background:var(--ghost-hover)}
+.btn--ghost .btn__ico{background:var(--ghost-ico)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link:hover{color:var(--fg)}
+
+/* Rejouer : discret, dans le coin d'une animation */
+.replay{position:absolute; z-index:4; bottom:16px; right:16px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:500;
+  color:rgb(var(--fg-rgb) / .86); background:color-mix(in srgb,var(--bg) 62%,transparent); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .16);
+  opacity:0; visibility:hidden; transition:opacity .24s var(--out),visibility 0s .24s,transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo),visibility 0s}
+html[data-theme="light"] .replay{background:rgba(255,255,255,.86); box-shadow:inset 0 0 0 1px var(--line),0 6px 16px -8px rgba(26,25,24,.32)}
+
+/* Gestes d'apparition (classe .js sur <html> uniquement) */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out),filter .24s var(--out),transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo),filter .9s var(--expo),transform 1.2s var(--expo); transition-delay:calc(var(--wd,0s) + var(--i,0) * 70ms)}
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out),transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo),transform 1.2s var(--expo); transition-delay:calc(var(--wd,0s) + var(--d,0) * 90ms)}
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out),filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo),filter 1s var(--expo); transition-delay:calc(var(--wd,0s) + var(--d,0) * 90ms)}
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+
+/* Navigation (markup commun : .kz-logo + le point du cordon) */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:var(--nav-bg); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+html[data-theme="light"] .nav::before{bottom:-18px; box-shadow:none; -webkit-mask-image:linear-gradient(#000 72%,transparent); mask-image:linear-gradient(#000 72%,transparent)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-flex; align-items:baseline; margin-right:auto; padding:8px 4px 8px 2px; border-radius:10px; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--fg)}
+.kz-logo .kz-dot{background:var(--fg)}
+.kz-logo .kz-dot:focus-visible{outline-color:var(--focus)}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; color:var(--fg);
+  background:var(--cta-bg); box-shadow:inset 0 0 0 1px var(--ghost-line); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:var(--ghost-hover); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--btn-bg); color:var(--btn-fg); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+html[data-theme="light"] .nav__cta{background:var(--btn-bg); color:var(--btn-fg); box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 24px -10px rgba(26,25,24,.55)}
+html[data-theme="light"] .nav__cta::before{background:rgba(255,255,255,.08)}
+html[data-theme="light"] .nav__ctaIco{background:rgba(244,239,230,.14); color:var(--creme)}
+@media (max-width:600px){
+  .nav__in{height:64px; gap:6px}
+  .kz-logo{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* Champs de formulaire */
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13.5px; font-weight:500; color:var(--muted)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:var(--r-md); border:0; outline:none; background:var(--field-bg); box-shadow:inset 0 0 0 1px var(--field-line); font-size:16px; line-height:1.4; color:var(--fg); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:var(--placeholder)}
+.input:hover{box-shadow:inset 0 0 0 1px var(--field-line-2)}
+.input:focus-visible{box-shadow:inset 0 0 0 1.5px var(--field-focus),0 0 0 4px rgb(var(--lum) / .12)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1.5px var(--warn-line)}
+textarea.input{min-height:132px; resize:vertical}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; color:var(--muted); background:var(--ghost-bg); box-shadow:inset 0 0 0 1px var(--field-line);
+  transition:background .4s var(--expo),color .4s var(--expo),box-shadow .4s var(--expo),transform .5s var(--expo)}
+.choice input:hover + span{color:var(--fg); box-shadow:inset 0 0 0 1px var(--field-line-2)}
+.choice input:checked + span{background:var(--btn-bg); color:var(--btn-fg); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--focus); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1px var(--warn-line)}
+.field__err{margin:0; font-size:13px; color:var(--warn)}
+.field__err:empty{display:none}
+
+/* Pied de page (le coin bas gauche reste libre pour l'outil de revue) */
+.foot{padding:40px var(--gr) calc(64px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--fg)}
+
+/* =========================================================
+   6. Le bouton de mode : soleil / lune, dessinés en SVG fin
+   ========================================================= */
+.kz-mode{position:relative; flex:none; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; color:var(--fg); isolation:isolate; -webkit-tap-highlight-color:transparent; transition:transform .5s var(--expo)}
+.kz-mode::before{content:""; position:absolute; inset:2px; z-index:-1; border-radius:50%; background:var(--cta-bg); box-shadow:inset 0 0 0 1px var(--ghost-line);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); transition:background-color .4s var(--expo),box-shadow .4s var(--expo)}
+.kz-mode:hover::before{background-color:var(--ghost-hover); box-shadow:inset 0 0 0 1px var(--field-line-2)}
+html[data-theme="light"] .kz-mode::before{background:rgba(255,255,255,.62); box-shadow:inset 0 0 0 1px var(--line),0 6px 14px -8px rgba(26,25,24,.3)}
+html[data-theme="light"] .kz-mode:hover::before{background-color:#fff}
+.kz-mode:active{transform:scale(.94)}
+.kz-mode:focus-visible{outline-offset:2px}
+.kz-mode svg{width:19px; height:19px; overflow:visible; fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round}
+.kz-mode__soleil,.kz-mode__lune{transform-box:view-box; transform-origin:12px 12px; transition:opacity .45s var(--expo),transform .8s var(--expo)}
+.kz-mode__rayons{transform-box:view-box; transform-origin:12px 12px; transition:transform .9s var(--expo),opacity .45s var(--expo)}
+/* On montre le mode qu'on obtiendra : le soleil en sombre, la lune en clair */
+html[data-theme="dark"] .kz-mode__lune{opacity:0; transform:rotate(-60deg) scale(.55)}
+html[data-theme="light"] .kz-mode__soleil{opacity:0; transform:rotate(80deg) scale(.55)}
+html[data-theme="light"] .kz-mode__rayons{transform:scale(.4); opacity:0}
+.kz-mode:hover .kz-mode__rayons{transform:rotate(22.5deg)}
+
+/* =========================================================
+   7. L'aura : des halos de lumière diffuse, fixes derrière les chapitres
+   ========================================================= */
+.kz-aura{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; background:var(--aura-fond); opacity:0; transition:opacity 1.6s var(--expo)}
+.kz-aura.is-on{opacity:1}
+.kz-aura__h{position:absolute; left:0; top:0; width:var(--s,80vmax); aspect-ratio:1; margin:calc(var(--s,80vmax) / -2) 0 0 calc(var(--s,80vmax) / -2); border-radius:50%;
+  translate:var(--x,50vw) var(--y,50vh); opacity:var(--o,1);
+  background:radial-gradient(closest-side,rgb(var(--c) / calc(var(--a) * var(--aura-a))),rgb(var(--c) / calc(var(--a) * var(--aura-a) * .4)) 48%,rgb(var(--c) / 0));
+  transition:translate 2.8s var(--io),opacity 2.8s var(--io); will-change:translate}
+.kz-aura__h--1{--s:78vmax; --c:var(--lum); --a:.15}
+.kz-aura__h--2{--s:64vmax; --c:var(--lum-2); --a:.2}
+.kz-aura__h--3{--s:46vmax; --c:var(--lum); --a:.08}
+html[data-theme="light"] .kz-aura__h--2{--a:.32}
+.kz-grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:var(--grain-op); background-image:var(--noise); background-size:180px 180px}
+
+/* =========================================================
+   8. Le fil : rail (grand écran), filet de progression (mobile), trait de chapitre
+   ========================================================= */
+[data-chapitre]{position:relative}
+.kz-fil-rail{display:none}
+@media (min-width:1100px){
+  .kz-fil-rail{display:block; position:fixed; z-index:40; left:26px; top:21vh; bottom:27vh; width:1px; pointer-events:none; opacity:0; transition:opacity 1.2s var(--expo);
+    background:linear-gradient(180deg,rgb(var(--fg-rgb) / 0),rgb(var(--fg-rgb) / .12) 10%,rgb(var(--fg-rgb) / .12) 90%,rgb(var(--fg-rgb) / 0))}
+  .kz-fil-rail.is-on{opacity:1}
+}
+.kz-fil-rail__fill{position:absolute; inset:0; transform-origin:50% 0; transform:scaleY(var(--fp,0));
+  background:linear-gradient(180deg,rgb(var(--lum) / 0),rgb(var(--lum) / .85) 14%,rgb(var(--lum))); box-shadow:0 0 10px rgb(var(--lum) / .5)}
+.kz-fil-rail__noeuds{position:absolute; inset:0}
+.kz-fil-rail__noeud{position:absolute; left:-3px; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .36);
+  transition:background-color .6s var(--expo),box-shadow .6s var(--expo)}
+.kz-fil-rail__noeud.is-lit{background:rgb(var(--lum)); box-shadow:0 0 0 3px rgb(var(--lum) / .14),0 0 10px rgb(var(--lum) / .7)}
+.kz-fil-rail__tete{position:absolute; left:-4px; top:-4px; width:9px; height:9px; border-radius:50%; background:#FFF8EC;
+  box-shadow:0 0 0 3px rgb(var(--lum) / .22),0 0 16px 3px rgb(var(--lum) / .75); transform:translateY(calc(var(--fp,0) * var(--rh,0px)))}
+html[data-theme="light"] .kz-fil-rail__tete{background:rgb(var(--lum)); box-shadow:0 0 0 3px #fff,0 0 0 4px rgb(var(--lum) / .25),0 4px 12px rgb(var(--lum) / .35)}
+html[data-theme="light"] .kz-fil-rail__noeud.is-lit{box-shadow:0 0 0 3px rgb(var(--lum) / .12)}
+
+.kz-fil-progres{position:fixed; top:0; left:0; right:0; z-index:51; height:2px; pointer-events:none; transform-origin:0 50%; transform:scaleX(var(--fp,0));
+  background:linear-gradient(90deg,rgb(var(--lum) / .2),rgb(var(--lum))); box-shadow:0 0 8px rgb(var(--lum) / .5); opacity:.85}
+@media (min-width:1100px){ .kz-fil-progres{display:none} }
+
+.kz-fil-trait{display:none}
+@media (min-width:900px){
+  .kz-fil-trait{display:block; position:absolute; z-index:12; top:0; left:var(--gl); width:7px; height:calc(var(--sec) * .55); margin-left:-3px; pointer-events:none; --dp:0}
+  .kz-fil-trait::before{content:""; position:absolute; left:3px; top:0; bottom:3px; width:1px; transform-origin:50% 0; transform:scaleY(var(--dp));
+    background:linear-gradient(180deg,rgb(var(--lum) / 0),rgb(var(--lum) / .9)); box-shadow:0 0 8px rgb(var(--lum) / .45)}
+  .kz-fil-trait::after{content:""; position:absolute; left:0; bottom:0; width:7px; height:7px; border-radius:50%; background:rgb(var(--lum));
+    box-shadow:0 0 0 3px rgb(var(--lum) / .14),0 0 12px 2px rgb(var(--lum) / .55); opacity:clamp(0,calc(var(--dp) * 6 - 5),1); transform:scale(clamp(.3,calc(var(--dp) * 4 - 3),1))}
+  .kz-fil-trait--c{left:50%}
+}
+
+/* =========================================================
+   9. L'arche : la forme signature des cadres (porte ovale)
+   ========================================================= */
+.kz-arche{--arche-ratio:.714; --arche-rb:0px; --arche-c:var(--lum); position:relative; aspect-ratio:var(--arche-ratio); isolation:isolate;
+  border-radius:50% 50% var(--arche-rb) var(--arche-rb) / calc(var(--arche-ratio) * 50%) calc(var(--arche-ratio) * 50%) var(--arche-rb) var(--arche-rb)}
+.kz-arche__in{position:absolute; inset:0; overflow:hidden; border-radius:inherit; isolation:isolate}
+.kz-arche--cadre .kz-arche__in img{position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover}
+/* Arche de lumière : un intérieur lumineux qui s'éteint vers le sol */
+.kz-arche--lumiere::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(76% 40% at 50% 22%,rgb(var(--arche-c) / .3),rgb(var(--arche-c) / .08) 60%,rgb(var(--arche-c) / 0)),
+             linear-gradient(180deg,rgb(var(--arche-c) / .08),rgb(var(--arche-c) / 0) 70%)}
+html[data-theme="light"] .kz-arche--lumiere::before{
+  background:radial-gradient(80% 42% at 50% 24%,rgba(255,255,255,.9),rgba(255,255,255,.4) 62%,rgba(255,255,255,0)),
+             linear-gradient(180deg,rgb(var(--arche-c) / .08),rgb(var(--arche-c) / 0) 80%)}
+.kz-arche__trace{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none}
+.kz-arche__trace path{fill:none; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.kz-arche__fil{stroke:rgb(var(--arche-c)); stroke-width:1.5; filter:drop-shadow(0 0 4px rgb(var(--arche-c) / .7))}
+.kz-arche__ombre{stroke:rgb(var(--fg-rgb) / .16); stroke-width:1.1}
+html[data-theme="light"] .kz-arche__fil{stroke-width:1.3; filter:drop-shadow(0 0 3px rgb(var(--arche-c) / .3))}
+.kz-arche__sol{position:absolute; left:-30%; right:-30%; bottom:0; height:1px; pointer-events:none;
+  background:linear-gradient(90deg,rgb(var(--arche-c) / 0),rgb(var(--arche-c) / .7) 32%,rgb(var(--arche-c) / .7) 68%,rgb(var(--arche-c) / 0)); box-shadow:0 0 10px rgb(var(--arche-c) / .4)}
+html.kz-t [data-arche-trace]:not(.is-trace) .kz-arche__trace path{stroke-dashoffset:1}
+html.kz-t [data-arche-trace]:not(.is-trace) .kz-arche__sol{transform:scaleX(0)}
+[data-arche-trace].is-trace .kz-arche__fil{stroke-dashoffset:0; transition:stroke-dashoffset 2.4s var(--io) .1s}
+[data-arche-trace].is-trace .kz-arche__ombre{stroke-dashoffset:0; transition:stroke-dashoffset 2.8s var(--io) .5s}
+[data-arche-trace].is-trace .kz-arche__sol{transform:none; transition:transform 2s var(--expo)}
+
+/* =========================================================
+   10. La loupe : une lentille de verre légèrement teinté, ×1,1 (souris seulement)
+   ========================================================= */
+.kz-loupe{position:fixed; inset:0; z-index:46; pointer-events:none; visibility:hidden; transition:visibility 0s .5s}
+.kz-loupe.is-on{visibility:visible; transition:none}
+.kz-loupe__corps{position:absolute; left:0; top:0; width:var(--lt,168px); height:var(--lt,168px); will-change:transform}
+.kz-loupe__disque{position:absolute; inset:0; overflow:hidden; border-radius:50%; clip-path:circle(0% at 50% 50%); transition:clip-path .28s var(--out)}
+.kz-loupe.is-on .kz-loupe__disque{clip-path:circle(50% at 50% 50%); transition:clip-path .7s var(--expo)}
+.kz-loupe__in{position:absolute; inset:0}
+.kz-loupe__clone{position:absolute !important; left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; margin:0 !important;
+  transform-origin:50% 50% !important; translate:none !important; rotate:none !important; scale:none !important; opacity:1 !important; visibility:visible !important}
+/* Le verre : une teinte de la lumière, un reflet, un bord plus dense */
+.kz-loupe__teinte{position:absolute; inset:0; border-radius:50%;
+  background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.2),rgba(255,255,255,0) 42%),
+             radial-gradient(circle at 50% 50%,rgb(var(--lum) / 0) 58%,rgb(var(--lum) / .2) 100%),
+             rgb(var(--lum) / .07)}
+.kz-loupe__bague{position:absolute; inset:0; border-radius:50%; opacity:0; transform:scale(.7);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.62),inset 0 1px 0 1px rgba(255,255,255,.18),0 0 0 1px rgb(var(--lum) / .45),0 0 26px rgb(var(--lum) / .3),0 24px 50px -22px rgba(0,0,0,.75);
+  transition:opacity .28s var(--out),transform .28s var(--out)}
+html[data-theme="light"] .kz-loupe__bague{box-shadow:inset 0 0 0 1px rgba(255,255,255,.9),0 0 0 1px rgba(26,25,24,.1),0 0 0 4px rgba(255,255,255,.35),0 22px 44px -20px rgba(26,25,24,.45)}
+.kz-loupe.is-on .kz-loupe__bague{opacity:1; transform:none; transition:opacity .6s var(--expo),transform .9s var(--expo)}
+html.kz-loupe-curseur{cursor:none}
+
+/* =========================================================
+   11. Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal]{transform:none !important; filter:none !important}
+  .btn,.btn__ico,.choice span,.replay svg{transition-property:opacity,background-color,color,box-shadow}
+  .kz-aura__h{transition-duration:.01s}
+  .kz-fil-trait{--dp:1 !important}
+  html.kz-t [data-arche-trace]:not(.is-trace) .kz-arche__trace path{stroke-dashoffset:0}
+  html.kz-t [data-arche-trace]:not(.is-trace) .kz-arche__sol{transform:none}
+  .kz-loupe{display:none}
+  .kz-mode__soleil,.kz-mode__lune,.kz-mode__rayons{transition-property:opacity}
+}

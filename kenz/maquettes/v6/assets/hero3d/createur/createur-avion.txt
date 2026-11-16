@@ -1,0 +1,11 @@
+Use case: stylized-concept. Create ONE genuinely transparent PNG icon of a miniature passenger jet, as a premium tactile graphite collectible matching the attached HYROX objects.
+
+Reference image: match ONLY the matte material finish, softly rounded substantial proportions, studio light and three-quarter camera angle of the HYROX collection. Do not copy its backdrop, text or equipment.
+
+Subject: a compact elegant passenger airplane in a slight climbing pose, nose to the upper right, seen from three-quarter front above. Satin GRAPHITE fuselage and wings (#1A1D1C to #2A2F2D), two compact dark engines beneath the wings, a narrow off-white belly and off-white engine inlet rims. Small dark cockpit windows and a few simple off-white passenger window insets. One solid Lagon-blue (#3FB0C2) vertical tail fin. Clear recognizable airliner silhouette. The plane has a complete tail, two wings and two engines, all fully visible. No airline branding or registration.
+
+Premium 3D miniature, substantial rounded shapes, soft bevels, refined proportions, matte anodized metal and satin rubber finish, broad soft highlights, minimal detail. Same tactile physical quality as the HYROX sleds. Soft studio light upper left and a restrained material rim on the right. All surfaces are non-emissive.
+
+Square 1024 x 1024 or larger. Complete plane centered within 70% of the canvas, generous empty transparent margin. Isolated alpha cutout with clean antialiased boundaries. Every pixel outside the airplane silhouette is fully transparent. No floor, backdrop, shadow, glow, aura, mist, motion trail or scenery.
+
+No text, letters, numbers, logos, decals, flags, people, faces, eyes, hands, robot or display stand. The result contains ONLY the graphite-and-ivory aircraft with one blue tail fin.

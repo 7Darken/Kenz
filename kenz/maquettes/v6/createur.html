@@ -1,0 +1,1171 @@
+<!doctype html>
+<!--
+  Kenz — Créateur (V6, maquette unique), DA « Terre » (BRIEF-V6-TERRE.md) : le côté Pro, c'est l'espace ;
+  le côté Créateur, c'est la Terre. Sombre : la Terre de nuit. Clair : la Terre de jour. Teintes : océan (Lagon), or doux, crème.
+  C0 hero (la composition du hero Pro, sur le tour de la Terre ; au défilement, le dézoom) · C1 le voyage (le trajet épinglé sur le globe,
+  d'escale en escale, un pays par escale, jusqu'à « Entrer dans mes voyages » → voyage.html) · C2 le sport (univers k15ze, un écran :
+  les cartes HYROX et Spartan côte à côte, module partagé shared/courses.*, « Entrer dans le sport » → sport.html) · C3 me suivre (deux univers posés sur le fond, les réseaux en icônes).
+  Pied : le ciel en arche, le cordon, « Marques & collaborations » (voyage.html#marques). BRIEF-V6-CREATEUR.md.
+  La Terre : un seul globe WebGL pour toute la page, dans un calque fixe (shared/terre.js + terre.css, three.js r128).
+  Sans WebGL ou en mouvement réduit : une image fixe ronde, le même halo ; le voyage devient une simple liste.
+  La base commune (jetons clair / sombre, bouton soleil / lune, aura, fil, arche, loupe) : shared/theme.css + theme.js.
+  Chaque chapitre porte data-chapitre (un nœud sur le rail du fil) et data-aura (la place de la lumière).
+  Repère : la barre « stories » en fil doré, un nœud entre chaque chapitre, + le nom du chapitre en cours.
+  Le voyage est épinglé partout (sauf mouvement réduit : une liste). Le sport n'est pas épinglé : deux cartes, un écran.
+  Vu une fois (sessionStorage « kz-terre-vu ») : dès la dernière escale atteinte, le trajet devient un écran statique
+  (globe et tous ses arcs, liste des escales cliquable) et le dézoom du hero ne se rejoue plus : le hero revient en fondu.
+  Passages entre les pages : shared/passage.js et shared/cordon.js. Arrivée par le passage secret (#porte) : on vient de
+  l'espace, l'éclat d'atmosphère se dissipe et la Terre finit la descente. Retour vers Pro : le décollage (cordon.js).
+  Sans JS ni CDN : tout est visible (classe .js + garde-fou).
+-->
+<html lang="fr" data-univers="createur">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&(document.documentElement.setAttribute('data-porte-arrivee','1'),document.documentElement.classList.add('is-plongee'))</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Créateur</title>
+<meta name="description" content="Kenz voyage en Asie et s’entraîne entre deux voyages : deux univers, le voyage et le sport, à suivre.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1117">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('is-loaded'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="preload" as="image" href="assets/img/horizon-createur.jpg">
+<link rel="stylesheet" href="shared/theme.css">
+<script src="shared/theme.js"></script>
+<link rel="stylesheet" href="shared/terre.css">
+<link rel="stylesheet" href="shared/courses.css">
+<link rel="stylesheet" href="shared/profondeur.css">
+<style>
+/* =========================================================
+   La DA Terre : les jetons du côté Créateur (ils surchargent ceux de shared/theme.css)
+   Sombre : la Terre de nuit (un océan noir, la lueur Lagon, l'or doux des villes).
+   Clair : la Terre de jour (la crème, le Lagon, un or doux).
+   ========================================================= */
+:root:not([data-theme="light"])[data-univers="createur"]{
+  --bg:#0A1117;
+  --bg-2:#0E1820;
+  --hero-bg:#05090D;
+  --core:linear-gradient(180deg,#111D25,#0C151C);
+  --lum:63 176 194;
+  --lum-2:206 160 92;
+  --btn-fg:#0A1117;
+  --btn-hover:rgba(10,17,23,.07);
+  --btn-ico-bg:#0A1117;
+  --cta-bg:rgba(10,17,23,.42);
+  --nav-bg:linear-gradient(180deg,rgba(7,12,17,.86),rgba(7,12,17,.5));
+  --sel-fg:#0A1117;
+  --aura-fond:radial-gradient(55% 45% at 88% 0%,rgba(63,176,194,.07),transparent 70%);
+  --kz-surface:#111C24;
+  --kz-victoire-nuit:#05090C;
+}
+:root[data-theme="light"][data-univers="createur"]{
+  --bg:#F6F2EB;
+  --bg-2:#EFEAE1;
+  --hero-bg:#EEF0EC;
+  --lum:15 93 107;
+  --lum-2:224 186 122;
+  --word-c:#0F5D6B;
+  --focus:#0F5D6B;
+  --field-focus:#0F5D6B;
+  --sel-bg:rgba(15,93,107,.16);
+  --aura-fond:radial-gradient(55% 45% at 88% 2%,rgba(220,234,236,.9),rgba(220,234,236,0) 70%),radial-gradient(42% 40% at 0% 92%,rgba(236,220,190,.55),rgba(236,220,190,0) 70%);
+  --kz-accent:#0F5D6B;
+}
+
+/* =========================================================
+   Jetons propres à la page (le reste vient de shared/theme.css)
+   ========================================================= */
+:root{
+  --cordon-lumiere:#9DB8FF;
+  --hand:cubic-bezier(.62,.04,.32,1);
+  --nav-h:84px;
+  --hero-glow:rgba(226,166,92,.2);
+  /* Le paysage de Kuala Lumpur (le fond du hero, comme sur Pro) : l'heure dorée */
+  --land-f:saturate(1.04) brightness(.86) contrast(1.03);
+  --land-wash:radial-gradient(70% 60% at 62% 14%,rgba(255,176,96,.28),rgba(255,176,96,0) 70%);
+  --hero-shade:linear-gradient(180deg,rgba(15,11,8,.8) 0%,rgba(15,11,8,.45) 38%,rgba(15,11,8,0) 60%),linear-gradient(0deg,var(--bg) 0%,rgba(10,17,23,.7) 16%,rgba(10,17,23,0) 40%);
+  --hero-shade-d:linear-gradient(180deg,rgba(15,11,8,.55) 0%,rgba(15,11,8,0) 20%),linear-gradient(90deg,rgba(15,11,8,.68) 0%,rgba(15,11,8,.3) 34%,rgba(15,11,8,0) 56%),linear-gradient(0deg,var(--bg) 0%,rgba(10,17,23,.7) 16%,rgba(10,17,23,0) 40%);
+  /* Les photos */
+  --media-bg:#071015;
+  --media-sh:0 0 0 1px rgba(244,239,230,.09),0 26px 50px -28px rgba(0,0,0,.85);
+  --arche-glow:0 0 44px -10px rgb(var(--lum) / .5),0 30px 60px -30px rgba(0,0,0,.8);
+}
+:root[data-theme="light"]{
+  --hero-glow:rgba(255,251,244,.8);
+  /* Le même paysage, au matin : il s'éclaircit et fond dans la crème */
+  --land-f:saturate(.74) sepia(.2) brightness(1.1) contrast(.86);
+  --land-wash:radial-gradient(60% 52% at 72% 6%,rgba(255,232,196,.6),rgba(255,232,196,0) 70%),linear-gradient(180deg,rgba(246,238,226,.55) 0%,rgba(246,240,232,.26) 46%,rgba(246,242,235,.55) 86%);
+  --hero-shade:linear-gradient(180deg,rgba(246,242,235,.92) 0%,rgba(246,242,235,.6) 36%,rgba(246,242,235,0) 58%),linear-gradient(0deg,var(--bg) 0%,rgba(246,242,235,.72) 16%,rgba(246,242,235,0) 40%);
+  --hero-shade-d:linear-gradient(180deg,rgba(246,242,235,.62) 0%,rgba(246,242,235,0) 20%),linear-gradient(90deg,rgba(246,242,235,.9) 0%,rgba(246,242,235,.56) 34%,rgba(246,242,235,0) 58%),linear-gradient(0deg,var(--bg) 0%,rgba(246,242,235,.72) 16%,rgba(246,242,235,0) 40%);
+  --media-bg:#E2E8E6;
+  --media-sh:0 0 0 1px rgba(26,25,24,.06),0 2px 4px -1px rgba(26,25,24,.05),0 22px 44px -22px rgba(26,25,24,.32);
+  --arche-glow:0 0 40px -12px rgb(var(--lum) / .35),0 24px 50px -24px rgba(26,25,24,.35);
+}
+
+/* =========================================================
+   Typo et briques propres à la page
+   ========================================================= */
+.ch{position:relative; padding-block:var(--sec)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(54px,8.4vw,128px); line-height:.9; letter-spacing:-.01em}
+.statement{margin:0; max-width:18ch; font-size:clamp(34px,5vw,72px); line-height:1.06; letter-spacing:-.03em; font-weight:500; text-wrap:balance}
+.lead{margin:0; max-width:26ch; font-size:clamp(20px,1.8vw,26px); line-height:1.4; letter-spacing:-.012em; color:rgb(var(--fg-rgb) / .92); text-wrap:balance}
+.btn.is-busy{opacity:.75}
+.round{display:grid; place-items:center; width:48px; height:48px; border-radius:50%; color:var(--fg); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .2); transition:transform .5s var(--expo)}
+.round svg{width:16px; height:16px}
+.round:hover{transform:scale(1.05)}
+.round:active{transform:scale(.96)}
+html[data-theme="light"] .round{background:rgba(255,255,255,.7); box-shadow:inset 0 0 0 1px var(--line),0 6px 14px -8px rgba(26,25,24,.3)}
+/* Le titre en balayage doux avec flou */
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path 1.4s var(--expo),filter 1.2s var(--expo)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none}
+/* La barre « stories » fait office de filet de progression : pas de second filet en haut */
+.kz-fil-progres{display:none}
+
+/* =========================================================
+   Navigation : barre « stories » en fil doré + nom du chapitre + bouton de mode
+   ========================================================= */
+.story{position:relative; display:flex; gap:4px; padding:6px var(--gr) 0 var(--gl); pointer-events:auto}
+.story a{position:relative; flex:1 1 0; height:18px; border-radius:4px}
+.story a::before,.story a i{content:""; position:absolute; left:0; right:0; top:8px; height:2px; border-radius:2px}
+.story a::before{background:rgb(var(--fg-rgb) / .18); transition:background-color .4s var(--expo)}
+.story a i{background:rgb(var(--lum)); transform:scaleX(0); transform-origin:left; box-shadow:0 0 8px rgb(var(--lum) / .7)}
+.story a:hover::before{background:rgb(var(--fg-rgb) / .34)}
+.story a:focus-visible{outline-offset:1px}
+/* Un nœud entre deux chapitres, qui s'allume quand le chapitre est lu */
+.story a::after{content:""; position:absolute; right:-5px; top:6px; z-index:1; width:6px; height:6px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .4); transition:background-color .6s var(--expo),box-shadow .6s var(--expo)}
+.story a:last-child::after{display:none}
+.story a.is-done::after{background:rgb(var(--lum)); box-shadow:0 0 0 2px rgb(var(--lum) / .18),0 0 8px rgb(var(--lum) / .8)}
+html[data-theme="light"] .story a i{box-shadow:0 0 6px rgb(var(--lum) / .35)}
+html[data-theme="light"] .story a.is-done::after{box-shadow:0 0 0 2px rgb(var(--lum) / .16)}
+.nav__in{height:58px}
+.nav__ch{display:flex; align-items:center; margin:0; height:30px; overflow:hidden; font-family:var(--f-word); font-style:italic; font-size:19px; line-height:1.3; color:rgb(var(--fg-rgb) / .86)}
+.nav__chT{display:block; white-space:nowrap}
+.nav__chT.in{animation:chIn .8s var(--expo) both}
+@keyframes chIn{from{transform:translateY(110%); filter:blur(4px); opacity:0} to{transform:none; filter:none; opacity:1}}
+@media (max-width:600px){ .nav__in{height:54px} .nav__ch{font-size:17px} }
+.js .nav{opacity:0}
+.is-loaded .nav{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+
+/* =========================================================
+   C0 Hero : la même composition que le hero Pro (pro.html : .hero__*), mêmes tailles, mêmes gestes.
+   Seul le fond change : à la place du paysage, le tour de la Terre (le calque fixe de shared/terre.*),
+   sa courbure en bas de l'écran ; le portrait et l'arche se tiennent au-dessus de l'horizon.
+   Au défilement, la caméra recule et révèle la planète entière, qui file vers la première escale.
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + var(--nav-h) + 8px)}
+.hero__copy{position:relative; z-index:3; padding-left:var(--gl); padding-right:var(--gr)}
+.hero__title{position:relative; margin:0 0 .16em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(92px,26vw,150px); line-height:.82; letter-spacing:-.015em; color:var(--fg)}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.ttl__dot{display:inline-block; width:.1em; height:.1em; margin-left:.035em; border-radius:50%; background:currentColor; vertical-align:baseline}
+.hero__line{margin:0 0 30px; max-width:22ch; font-size:clamp(19px,1.7vw,24px); line-height:1.42; color:rgb(var(--fg-rgb) / .94); text-wrap:balance; --wd:1.05s}
+.is-porte .hero__line{--wd:.15s}
+.hero__down{display:inline-flex; align-items:center; gap:14px; min-height:48px; padding-right:6px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.hero__downIco{display:grid; place-items:center; width:46px; height:46px; border-radius:50%; box-shadow:inset 0 0 0 1px rgb(var(--lum) / .45),0 0 18px -6px rgb(var(--lum) / .5); transition:box-shadow .5s var(--expo),background-color .5s var(--expo)}
+.hero__downIco svg{width:15px; height:15px; transition:transform .7s var(--expo)}
+.hero__down:hover{color:var(--fg)}
+.hero__down:hover .hero__downIco{background-color:rgb(var(--lum) / .1); box-shadow:inset 0 0 0 1px rgb(var(--lum) / .8),0 0 24px -4px rgb(var(--lum) / .6)}
+.hero__down:hover .hero__downIco svg{transform:translateY(3px)}
+html[data-theme="light"] .hero__downIco{background-color:rgba(255,255,255,.7); box-shadow:inset 0 0 0 1px var(--line),0 6px 14px -8px rgba(26,25,24,.3)}
+html[data-theme="light"] .hero__down:hover .hero__downIco{background-color:#fff}
+.hero__stage{position:relative; z-index:1; flex:1 1 auto; min-height:46vh; min-height:46svh}
+/* Le fond du hero, comme sur Pro : le paysage de Kuala Lumpur. Il vit dans le calque fixe de la Terre (div.terre),
+   sous le globe : du fond vers l'avant, le paysage, la Terre qui se lève à l'horizon, l'arche, puis le portrait.
+   Son bas fond vers l'encre (ou la crème) : la bille s'y lève comme une planète, sans bloc. */
+.terre .hero__bg{position:absolute; inset:-4%; will-change:transform,opacity}
+.terre .hero__bgIn{position:absolute; inset:0}
+.terre .hero__land{width:100%; height:100%; max-width:none; object-fit:cover; object-position:46% 50%; filter:var(--land-f)}
+.terre .hero__wash{position:absolute; inset:0; background:var(--land-wash)}
+.terre .hero__shade{position:absolute; inset:0; background:var(--hero-shade)}
+@media (min-width:861px){ .terre .hero__shade{background:var(--hero-shade-d)} }
+.js .terre .hero__bgIn{opacity:0; transform:scale(1.07)}
+.is-loaded .terre .hero__bgIn,.is-porte .terre .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo),transform 2.6s var(--expo)}
+.hero__glow{position:absolute; left:50%; top:2%; width:min(130%,920px); aspect-ratio:1; translate:-50% 0; border-radius:50%; background:radial-gradient(closest-side,var(--hero-glow),transparent)}
+/* L'arche : un halo de lumière derrière le portrait, dessinée par le fil (shared/theme : .kz-arche) */
+.hero__arche{position:absolute; z-index:0; left:50%; top:calc(100% / .79 * .045); bottom:0; translate:-50% 0; --arche-ratio:.47; --arche-ecart:16px; --arche-c:96 214 142;
+  -webkit-mask-image:linear-gradient(180deg,#000 46%,transparent 88%); mask-image:linear-gradient(180deg,#000 46%,transparent 88%)}
+.hero__fig{position:absolute; z-index:1; top:0; left:50%; height:calc(100% / .79); aspect-ratio:9 / 16; translate:-50% 0;
+  -webkit-mask-image:radial-gradient(ellipse 60% 48% at 50% 32%,#000 70%,transparent 100%);
+          mask-image:radial-gradient(ellipse 60% 48% at 50% 32%,#000 70%,transparent 100%)}
+.portrait{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 0}
+@media (min-width:861px){
+  .hero__layout{justify-content:flex-end; padding:0 var(--gr) clamp(56px,11svh,128px) var(--gl)}
+  .hero__copy{padding:0; max-width:min(640px,44%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__stage{position:absolute; right:0; bottom:0; top:9vh; top:9svh; width:58%; min-height:0}
+}
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+/* Entrée : celle du hero Pro (le portrait à .3 s, le titre à .6 s, le bouton à 1,85 s) */
+.js .hero__stage{opacity:0; filter:blur(10px); transform:translateY(3%)}
+.is-loaded .hero__stage,.is-porte .hero__stage{opacity:1; filter:none; transform:none; transition:opacity 1.4s var(--expo) .3s,filter 1.4s var(--expo) .3s,transform 1.8s var(--expo) .3s}
+.is-plongee .hero__stage{transition-delay:.9s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.is-loaded .ttl--main{animation:ttlMain 1.7s var(--expo) var(--td,.6s) both}
+.is-loaded .ttl--ghost{animation:ttlGhost 1.5s var(--expo) calc(var(--td,.6s) - .18s) both}
+.is-porte .hero__title{--td:.25s}
+.js .hero [data-anim]{opacity:0}
+.is-loaded .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad,0s)}
+.hero__down[data-anim]{--ad:1.85s}
+.is-porte .hero__down[data-anim]{--ad:.8s}
+/* Le hero se dessine à son arrivée : le fil de l'arche part un peu après le portrait */
+.hero__arche.is-trace .kz-arche__fil{transition-delay:.45s}
+.hero__arche.is-trace .kz-arche__ombre{transition-delay:.9s}
+
+/* =========================================================
+   C1 Le voyage : le trajet sur le globe. Épinglé, la Terre tourne d'escale en escale (l'ordre réel des séries),
+   un arc de vol se trace entre deux escales ; l'escale montre son nom, sa période, sa série, sa vraie image.
+   Sans épinglage (mouvement réduit, sans JS) : une liste, et le globe en image fixe.
+   ========================================================= */
+.voyage__stage{position:relative; padding-block:var(--sec)}
+.voyage__head{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin:0 auto; padding:0 var(--gr) 0 var(--gl)}
+.voyage__head .h2{font-size:clamp(54px,7vw,112px)}
+.voyage__sub{margin:14px 0 0; font-family:var(--f-word); font-style:italic; font-size:clamp(19px,1.5vw,22px); line-height:1.3; color:var(--muted)}
+.voyage__repli{display:block; width:min(74vw,440px); height:auto; margin:clamp(28px,5vw,56px) auto 0}
+html[data-theme="light"] .voyage__repli--nuit,html:not([data-theme="light"]) .voyage__repli--jour{display:none}
+.escales{display:grid; gap:clamp(56px,8vw,96px); max-width:calc(var(--maxw) + 2 * var(--gutter)); margin:clamp(40px,6vw,72px) auto 0; padding:0 var(--gr) 0 var(--gl)}
+.escale{position:relative; display:flex; flex-direction:column; align-items:flex-start; max-width:560px}
+.escale__n{margin:0 0 10px; font-family:var(--f-word); font-style:italic; font-size:18px; line-height:1; color:var(--faint); font-variant-numeric:tabular-nums}
+.escale__n span{margin-left:.2em; opacity:.7}
+.escale__nom{margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,5.6vw,92px); line-height:.94; letter-spacing:-.01em; text-wrap:balance}
+.escale__local{margin:8px 0 0; font-family:var(--f-ja); font-size:clamp(17px,1.4vw,21px); line-height:1.2; letter-spacing:.08em; color:var(--muted)}
+.escale__quand{margin:14px 0 0; font-family:var(--f-word); font-style:italic; font-size:clamp(20px,1.7vw,25px); line-height:1.2; color:rgb(var(--fg-rgb) / .94)}
+.escale__serie{margin:8px 0 0; max-width:36ch; font-size:15.5px; line-height:1.45; color:var(--muted); text-wrap:pretty}
+.escale__serie b{font-weight:500; color:var(--fg)}
+.escale__media{position:relative; display:block; width:100%; margin-top:20px; aspect-ratio:16 / 9; overflow:hidden; border-radius:20px; background:var(--media-bg); box-shadow:var(--media-sh)}
+.escale__media img{width:100%; height:100%; object-fit:cover; transition:transform 1.4s var(--expo)}
+.escale__media:hover img{transform:scale(1.04)}
+.escale__media:focus-visible{outline-offset:3px}
+.escale__media span{position:absolute; left:14px; bottom:12px; display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 14px; border-radius:999px; font-size:13.5px; font-weight:500}
+.escale__media span svg{width:12px; height:12px}
+/* La prochaine escale : en pointillé, en préparation */
+.escale--futur .escale__nom{color:transparent; -webkit-text-stroke:1.2px rgb(var(--fg-rgb) / .9)}
+.escale__prochaine{margin:12px 0 0; font-family:var(--f-word); font-style:italic; font-size:clamp(24px,2.2vw,32px); line-height:1.1; color:var(--word-c); text-shadow:var(--glow)}
+.voyage__route{display:none}
+
+/* Épinglé : la scène tient l'écran, le globe (calque fixe) se pose à gauche (ordinateur) ou en haut (mobile) */
+.voyage.is-pin{padding:0}
+.voyage.is-pin > .kz-fil-trait{display:none}
+.voyage.is-pin .voyage__stage{position:sticky; top:0; height:100vh; height:100svh; padding:0; overflow:hidden; overflow:clip}
+.voyage.is-pin .voyage__head{position:absolute; left:0; right:0; top:calc(env(safe-area-inset-top) + var(--nav-h) + 4px)}
+.voyage.is-pin .voyage__head .h2{font-size:clamp(40px,11vw,58px)}
+.voyage.is-pin .voyage__sub{margin-top:8px; font-size:17px}
+.voyage.is-pin .voyage__repli{display:none}
+.voyage.is-pin .voyage__head,.voyage.is-pin .escales,.voyage.is-pin .voyage__route{opacity:var(--va,1); translate:0 calc((1 - var(--va,1)) * 14px)}
+.voyage.is-pin .escales{position:absolute; left:0; right:0; bottom:calc(18px + env(safe-area-inset-bottom)); margin:0; gap:0}
+@media (max-width:899px){ .voyage.is-pin .escales{bottom:calc(66px + env(safe-area-inset-bottom))} }
+.voyage.is-pin .escale{grid-area:1 / 1; align-self:end; opacity:0; transform:translate3d(0,28px,0); filter:blur(8px); pointer-events:none;
+  transition:opacity .3s var(--out),transform .45s var(--out),filter .35s var(--out)}
+.voyage.is-pin .escale.is-avant{transform:translate3d(0,-28px,0)}
+.voyage.is-pin .escale.is-on{opacity:1; transform:none; filter:none; pointer-events:auto; transition:opacity .8s var(--expo) .1s,transform 1.1s var(--expo) .1s,filter .8s var(--expo) .1s}
+@media (max-width:899px){
+  .voyage.is-pin .escale__nom{font-size:clamp(38px,11vw,52px)}
+  .voyage.is-pin .escale__n{margin-bottom:6px; font-size:16px}
+  .voyage.is-pin .escale__local{margin-top:4px; font-size:15px}
+  .voyage.is-pin .escale__quand{margin-top:8px; font-size:19px}
+  .voyage.is-pin .escale__serie{margin-top:4px; font-size:14px}
+  .voyage.is-pin .escale__media{margin-top:12px; aspect-ratio:auto; height:min(21svh,calc((100vw - 2 * var(--gutter)) * .5625))}
+  .voyage.is-pin .escale__media span{display:none}
+}
+@media (min-width:900px){
+  .voyage.is-pin .voyage__head .h2{font-size:clamp(54px,5.4vw,88px)}
+  .voyage.is-pin .voyage__sub{font-size:20px}
+  .voyage.is-pin .escales{left:auto; top:0; bottom:0; right:max(var(--gr),calc((100vw - var(--maxw)) / 2)); width:min(38vw,520px); padding:0; align-content:center}
+  .voyage.is-pin .escale{align-self:center}
+  .voyage.is-pin .voyage__route{position:absolute; right:max(var(--gr),calc((100vw - var(--maxw)) / 2)); bottom:calc(40px + env(safe-area-inset-bottom)); width:min(38vw,520px);
+    display:flex; justify-content:space-between; align-items:center; margin:0; padding:0; list-style:none; --rp:0}
+  .voyage__route::before,.voyage__route::after{content:""; position:absolute; left:3px; right:3px; top:50%; height:1px; margin-top:-.5px}
+  .voyage__route::before{background:rgb(var(--fg-rgb) / .18)}
+  .voyage__route::after{right:auto; width:calc((100% - 6px) * var(--rp)); background:rgb(var(--lum)); box-shadow:0 0 8px rgb(var(--lum) / .6)}
+  .voyage__route li{position:relative; z-index:1; width:7px; height:7px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .4); transition:background-color .5s var(--expo),box-shadow .5s var(--expo),transform .6s var(--expo)}
+  .voyage__route li.is-fait{background:rgb(var(--lum)); box-shadow:none}
+  .voyage__route li.is-on{transform:scale(1.5); background:rgb(var(--lum)); box-shadow:0 0 0 3px rgb(var(--lum) / .2),0 0 10px rgb(var(--lum) / .8)}
+  .voyage__route li:last-child{background:transparent; box-shadow:none; outline:1px dashed rgb(var(--fg-rgb) / .55); outline-offset:1px}
+  .voyage__route li:last-child.is-on{outline-color:rgb(var(--lum))}
+}
+
+/* La porte du voyage, au bout du trajet (dernière escale) */
+.escale__porte{margin-top:22px}
+.voyage:not(.is-pin) .escale__porte{margin-top:28px}
+
+/* Vu une fois (.is-vu, drapeau sessionStorage « kz-terre-vu ») : dès que la dernière escale a été atteinte, le trajet
+   n'est plus épinglé ni piloté au défilement. La section devient un écran statique, mis en page comme l'écran épinglé
+   (rien ne bouge au moment de la bascule) : le globe avec tous ses arcs, la liste compacte des escales (cliquable :
+   le globe tourne vers le pays) et « Entrer dans mes voyages ». */
+.voyage.is-pin.is-vu .voyage__stage{position:relative}
+.voyage.is-vu .escales,.voyage.is-vu .voyage__route{opacity:0 !important; visibility:hidden; pointer-events:none; transition:opacity .3s var(--out),visibility 0s linear .3s}
+.voyage__liste{display:none}
+.voyage.is-vu .voyage__liste{position:absolute; z-index:2; display:flex; flex-direction:column; align-items:flex-start; animation:vuIn .8s var(--expo) .28s both}
+@keyframes vuIn{from{opacity:0; transform:translate3d(0,14px,0); filter:blur(6px)} to{opacity:1; transform:none; filter:none}}
+.vliste{display:grid; gap:2px; width:100%; margin:0; padding:0; list-style:none}
+.vliste__b{display:flex; align-items:baseline; justify-content:space-between; gap:16px; width:100%; min-height:42px; margin:0; padding:6px 12px; border:0; border-radius:12px;
+  font:inherit; text-align:left; color:var(--fg); background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:background-color .35s var(--expo),box-shadow .35s var(--expo)}
+.vliste__nom{font-family:var(--f-title); font-weight:600; font-size:clamp(20px,1.7vw,26px); line-height:1.1}
+.vliste__quand{font-family:var(--f-word); font-style:italic; font-size:16px; line-height:1.2; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap}
+.vliste__b:hover{background:var(--ghost-bg)}
+.vliste__b:focus-visible{outline:2px solid var(--focus); outline-offset:1px}
+.vliste__b[aria-pressed="true"]{background:var(--ghost-bg); box-shadow:inset 0 0 0 1px var(--ghost-line)}
+.vliste__b[aria-pressed="true"] .vliste__nom{color:var(--word-c); text-shadow:var(--glow)}
+.vliste .is-futur .vliste__nom{color:transparent; -webkit-text-stroke:1px rgb(var(--fg-rgb) / .9); text-shadow:none}
+.voyage__liste .btn{margin-top:20px}
+@media (min-width:900px){
+  .voyage.is-vu .voyage__liste{right:max(var(--gr),calc((100vw - var(--maxw)) / 2)); top:calc(var(--nav-h) + 8px); bottom:calc(24px + env(safe-area-inset-bottom)); width:min(38vw,460px); justify-content:center}
+}
+@media (max-width:899px){
+  .voyage.is-vu .voyage__liste{left:var(--gl); right:var(--gr); bottom:calc(18px + env(safe-area-inset-bottom))}
+  .vliste{grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:6px; gap:0 6px}
+  .vliste__b{flex-direction:column; align-items:flex-start; justify-content:center; gap:1px; min-height:44px; padding:4px 10px}
+  .vliste__nom{font-size:17px}
+  .vliste__quand{font-size:13px}
+  .voyage__liste .btn{margin-top:12px}
+}
+
+/* =========================================================
+   C2 Le sport : l'univers k15ze, en un écran. Le vert (#3DDC84 ; #1E7A46 sur clair) annonce qu'on change d'univers ;
+   un seul mot en vert, avec une lueur douce. Les courses : deux cartes côte à côte (HYROX, Spartan Race), données et rendu
+   dans le module partagé shared/courses.* (variante « landing », sans épinglage), puis « Entrer dans le sport ».
+   ========================================================= */
+.sport{--k-vert:61 220 132; --k-fond:#0D0F0E; --k-texte:247 247 242;
+  position:relative; padding-block:clamp(72px,10vh,120px); color:rgb(var(--k-texte)); background:var(--bg); isolation:isolate}
+html[data-theme="light"] .sport{--k-vert:30 122 70; --k-fond:#F1F2EC; --k-texte:21 26 22}
+html[data-theme="light"] .hero__arche{--arche-c:30 122 70}
+.sport::before{content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(55% 40% at 14% 38%,rgb(var(--k-vert) / .1),rgb(var(--k-vert) / 0) 70%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 30%,#000 70%,transparent 100%);
+          mask-image:linear-gradient(180deg,transparent 0,#000 30%,#000 70%,transparent 100%)}
+/* le fond k15ze arrive en fondu depuis la couleur de la page : aucune frontière visible, et toujours opaque (la Terre fixe reste cachée derrière) */
+.sport::after{content:""; position:absolute; left:0; right:0; top:-22vh; bottom:0; z-index:-2; pointer-events:none;
+  background:linear-gradient(180deg,transparent 0,var(--bg) 22vh,var(--k-fond) 38%,var(--k-fond) 78%,var(--bg) 100%)}
+.sport__in{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "cartes" "porte"; row-gap:clamp(28px,4vh,44px)}
+.sport__head{grid-area:head}
+.sport__univers{margin:0 0 12px; font-family:var(--f-word); font-style:italic; font-size:19px; color:rgb(var(--k-texte) / .7)}
+.sport__titre{max-width:15ch; font-size:clamp(32px,4vw,58px); color:rgb(var(--k-texte))}
+.sport__mot{color:rgb(var(--k-vert)); text-shadow:0 0 .55em rgb(var(--k-vert) / .55),0 0 1.4em rgb(var(--k-vert) / .25)}
+html[data-theme="light"] .sport__mot{text-shadow:0 0 .8em rgb(var(--k-vert) / .18)}
+.sport__cartes{grid-area:cartes}
+.sport__porte{grid-area:porte; justify-self:start}
+.sport .btn--light{background:rgb(var(--k-vert)); color:var(--k-fond); box-shadow:0 14px 34px -18px rgb(var(--k-vert) / .8)}
+.sport .btn--light .btn__ico{background:var(--k-fond); color:rgb(var(--k-vert))}
+html[data-theme="light"] .sport .btn--light{color:#F7F7F2}
+html[data-theme="light"] .sport .btn--light .btn__ico{background:rgba(255,255,255,.16); color:#F7F7F2}
+@media (min-width:900px){
+  /* le titre à gauche, la porte à droite, les deux cartes dessous : la section tient en un écran */
+  .sport__in{grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"head porte" "cartes cartes"; align-items:end}
+  .sport__porte{justify-self:end; margin-bottom:.35em}
+}
+@media (min-width:900px) and (min-height:700px){
+  .sport{min-height:100vh; min-height:100svh; display:flex; flex-direction:column; justify-content:center}
+  .sport > .wrap{width:100%}
+}
+
+/* =========================================================
+   C3 Me suivre : deux univers, deux compositions posées sur le fond (pas de cartes : comme les courses, shared/courses.*).
+   Une composition = l'arche (l'ambiance de l'univers), le nom en grand, l'accroche, les réseaux en icônes, « Entrer dans… ».
+   Ordinateur : côte à côte, en miroir et en rythmes décalés (le sport plus bas) ; entre les deux, une lumière diffuse.
+   Mobile : l'une sous l'autre. Toute la composition mène à sa page (lien étendu) ; les icônes restent cliquables, par-dessus.
+   Au survol (ou au focus) : le voyage, la Terre de verre se lève dans l'arche ; le sport, l'arche s'allume en vert.
+   ========================================================= */
+.univers__head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px 40px; margin-bottom:clamp(40px,5vw,72px)}
+.univers__liste{position:relative; display:grid; grid-template-columns:minmax(0,1fr); row-gap:clamp(72px,14vw,112px)}
+/* la séparation : une lumière diffuse (Lagon vers vert), jamais un trait */
+.univers__liste::before{content:""; position:absolute; z-index:-1; pointer-events:none; left:50%; top:46%; width:min(90vw,520px); height:clamp(120px,22vw,200px); translate:-50% -50%;
+  background:radial-gradient(50% 50% at 50% 50%,rgb(var(--lum) / .10),rgb(var(--lum) / 0) 72%); filter:blur(8px)}
+@media (min-width:1000px){
+  .univers__liste{grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(56px,7vw,120px); align-items:start}
+  .univers__liste::before{top:8%; bottom:0; height:auto; width:clamp(140px,14vw,220px); translate:-50% 0;
+    background:radial-gradient(50% 46% at 50% 46%,rgb(var(--lum) / .12),rgba(61,220,132,.05) 55%,rgba(61,220,132,0) 78%)}
+  .porte--sport{margin-top:clamp(64px,12vh,140px)}
+}
+.porte{--u:var(--lum); --u2:var(--lum-2); --ic:rgb(var(--u2)); --ring:rgb(var(--u));
+  position:relative; display:grid; grid-template-columns:minmax(0,var(--arche-w)) minmax(0,1fr); grid-template-areas:"vue tete" "corps corps";
+  column-gap:clamp(18px,2.4vw,36px); align-items:end; --arche-w:clamp(120px,34vw,180px)}
+html[data-theme="light"] .porte--voyage{--ic:rgb(var(--u)); --ring:rgb(var(--u2))}
+.porte--sport{--u:61 220 132; --u2:61 220 132}
+html[data-theme="light"] .porte--sport{--u:30 122 70; --u2:30 122 70}
+@media (min-width:1000px){
+  .porte{--arche-w:clamp(180px,18vw,280px); grid-template-areas:"vue tete" "vue corps"; grid-template-rows:auto auto; align-content:end}
+  /* le sport en miroir : l'arche à droite, le texte vers la lumière du milieu */
+  .porte--sport{grid-template-columns:minmax(0,1fr) minmax(0,var(--arche-w)); grid-template-areas:"tete vue" "corps vue"}
+  .porte__corps{align-self:end}
+}
+.porte__vue{grid-area:vue; position:relative; width:100%; --arche-ratio:.72; align-self:end; box-shadow:0 30px 60px -34px rgba(0,0,0,.8); transition:box-shadow .9s var(--expo)}
+html[data-theme="light"] .porte__vue{box-shadow:0 26px 50px -30px rgba(26,25,24,.45)}
+.porte__vue .kz-arche__in{background:#0A1117}
+.porte__fond{position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; transition:transform 1.6s var(--expo),filter 1s var(--expo)}
+.porte__tete{grid-area:tete; min-width:0}
+.porte__corps{grid-area:corps; min-width:0; margin-top:clamp(16px,2vw,22px)}
+.porte__qui{margin:0; font-family:var(--f-word); font-style:italic; font-size:clamp(18px,1.5vw,21px); color:rgb(var(--u))}
+.porte__titre{margin:4px 0 0; font-family:var(--f-title); font-weight:600; font-size:clamp(40px,11vw,46px); line-height:.9; letter-spacing:-.01em; white-space:nowrap}
+@media (min-width:1000px){ .porte__titre{font-size:clamp(44px,4.4vw,76px)} }
+.porte__ligne{margin:0; max-width:34ch; font-size:clamp(15.5px,1.15vw,17px); line-height:1.5; color:rgb(var(--fg-rgb) / .9); text-wrap:pretty}
+.porte__chiffre{margin:10px 0 0; font-size:13px; line-height:1.4; color:var(--muted)}
+
+/* Les réseaux : une rangée d'icônes rondes (logos officiels, Simple Icons, CC0), le nom du compte en infobulle */
+.reseaux{display:flex; flex-wrap:wrap; gap:10px; margin:18px 0 0; padding:0; list-style:none}
+.reseau{position:relative; z-index:2; display:grid; place-items:center; width:46px; height:46px; border-radius:50%; color:var(--fg);
+  background:rgb(var(--fg-rgb) / .045); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .2);
+  transition:color .35s var(--expo),background-color .35s var(--expo),box-shadow .45s var(--expo),transform .5s var(--expo)}
+.reseau svg{width:20px; height:20px; fill:currentColor}
+.reseau:hover,.reseau:focus-visible{color:var(--ic); background:rgb(var(--u) / .12); box-shadow:inset 0 0 0 1.5px var(--ring),0 0 24px -4px rgb(var(--u) / .7); transform:translateY(-2px)}
+.reseau:focus-visible{outline:2px solid var(--ring); outline-offset:3px}
+.reseau__bulle{position:absolute; z-index:3; left:50%; bottom:calc(100% + 12px); padding:7px 11px; border-radius:9px; white-space:nowrap; pointer-events:none;
+  font:600 12.5px/1 var(--f-ui,Inter,system-ui,sans-serif); letter-spacing:.005em; color:var(--bg); background:var(--fg); box-shadow:0 10px 24px -10px rgba(0,0,0,.5);
+  opacity:0; translate:-50% 6px; transition:opacity .25s var(--out),translate .35s var(--out)}
+.reseau__bulle::after{content:""; position:absolute; left:50%; top:100%; width:8px; height:8px; margin:-4px 0 0 -4px; background:inherit; rotate:45deg; border-radius:0 0 2px 0}
+.reseau:hover .reseau__bulle,.reseau:focus-visible .reseau__bulle{opacity:1; translate:-50% 0; transition:opacity .3s var(--expo),translate .45s var(--expo)}
+
+/* « Entrer dans… » : le lien de toute la composition */
+.porte__entrer{display:inline-flex; align-items:center; gap:12px; min-height:48px; margin-top:16px; font-size:15.5px; font-weight:600; color:var(--fg);
+  background-image:linear-gradient(currentColor,currentColor); background-size:0 1px; background-position:0 calc(100% - 10px); background-repeat:no-repeat; transition:background-size .7s var(--expo)}
+.porte__entrer i{display:grid; place-items:center; width:40px; height:40px; border-radius:50%; font-style:normal; color:rgb(var(--u)); box-shadow:inset 0 0 0 1.5px rgb(var(--u));
+  transition:transform .7s var(--expo),background-color .4s var(--expo),color .4s var(--expo)}
+.porte__entrer i svg{width:15px; height:15px}
+.porte__entrer::after{content:""; position:absolute; inset:-12px; z-index:1}
+.porte__entrer:focus-visible{outline:2px solid rgb(var(--u)); outline-offset:4px; border-radius:6px}
+.porte:hover .porte__entrer,.porte:focus-within .porte__entrer{background-size:calc(100% - 52px) 1px}
+.porte:hover .porte__entrer i,.porte:focus-within .porte__entrer i{transform:translateX(4px); background-color:rgb(var(--u)); color:var(--bg)}
+
+/* Le voyage : une vraie miniature, et la Terre de verre qui se lève en bas de l'arche */
+.porte--voyage .porte__fond{filter:brightness(.62) saturate(1.05)}
+.porte__globe{position:absolute; left:50%; bottom:0; width:150%; height:auto; max-width:none; translate:-50% 60%; filter:drop-shadow(0 -6px 22px rgba(120,190,255,.25)); transition:translate 1.4s var(--expo),rotate 1.8s var(--expo),filter 1s var(--expo)}
+html[data-theme="light"] .porte__globe--nuit,html:not([data-theme="light"]) .porte__globe--jour{display:none}
+.porte--voyage:hover .porte__fond,.porte--voyage:focus-within .porte__fond{transform:scale(1.06); filter:brightness(.82) saturate(1.15)}
+.porte--voyage:hover .porte__globe,.porte--voyage:focus-within .porte__globe{translate:-50% 46%; rotate:18deg; filter:drop-shadow(0 0 22px rgba(255,186,90,.55))}
+.porte--voyage:hover .porte__vue,.porte--voyage:focus-within .porte__vue{box-shadow:0 0 0 1px rgba(255,214,150,.6),0 0 42px -8px rgba(255,180,80,.6),0 30px 60px -34px rgba(0,0,0,.8)}
+
+/* Le sport : l'identité k15ze dans l'arche (sombre, une photo HYROX, « 8 km »), le vert pour les accents */
+.porte--sport .porte__fond{object-position:50% 22%; filter:grayscale(.9) brightness(.6) contrast(1.1)}
+.porte--sport .kz-arche__in::after{content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(13,15,14,.88),rgba(13,15,14,0) 46%),radial-gradient(80% 60% at 50% 100%,rgba(61,220,132,.24),rgba(61,220,132,0) 70%)}
+.porte__km{position:absolute; z-index:1; left:0; right:0; bottom:7%; text-align:center; font-family:"Anton",var(--f-title); font-size:clamp(30px,3.2vw,48px); line-height:1; color:#F7F7F2;
+  opacity:.85; transform:translateY(8px); transition:transform 1s var(--expo),opacity .8s var(--expo),text-shadow .8s var(--expo)}
+.porte__km b{font-weight:400; color:#3DDC84}
+.porte--sport:hover .porte__fond,.porte--sport:focus-within .porte__fond{transform:scale(1.05); filter:grayscale(0) brightness(.85) contrast(1.05)}
+.porte--sport:hover .porte__km,.porte--sport:focus-within .porte__km{opacity:1; transform:none; text-shadow:0 0 22px rgba(61,220,132,.6)}
+.porte--sport:hover .porte__vue,.porte--sport:focus-within .porte__vue{box-shadow:0 0 0 1.5px #3DDC84,0 0 42px -6px rgba(61,220,132,.6),0 30px 60px -34px rgba(0,0,0,.8)}
+@media (hover:none){ .porte__km{opacity:1; transform:none} }
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-sweep],.js .slit .num,.js .hero__stage,.js .ttl--main,.porte__fond,.porte__globe,.porte{transform:none !important; filter:none !important; clip-path:none !important}
+  .is-loaded .ttl--main,.is-loaded .ttl--ghost,.is-loaded .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .nav__chT.in{animation-name:kzFade}
+  .escale__media img,.porte__fond,.porte__globe{transition:none !important}
+}
+</style>
+<link rel="stylesheet" href="shared/passage.css"><link rel="stylesheet" href="shared/cordon.css"><link rel="stylesheet" href="shared/etoiles.css">
+<link rel="stylesheet" href="shared/footer.css">
+</head>
+<body>
+<a class="skip" href="#voyage">Aller au contenu</a>
+
+<!-- ========== Navigation : barre « stories », le logo et son cordon, le chapitre en cours, le bouton soleil / lune ========== -->
+<header class="nav">
+  <nav class="story" aria-label="Chapitres">
+    <a href="#top"><i></i><span class="sr">Kenz</span></a>
+    <a href="#voyage"><i></i><span class="sr">Le voyage</span></a>
+    <a href="#sport"><i></i><span class="sr">Le sport</span></a>
+    <a href="#suivre"><i></i><span class="sr">Me suivre</span></a>
+  </nav>
+  <div class="nav__in">
+    <a class="kz-logo" href="#top">Kenz<button class="kz-dot" type="button" data-cordon data-vers="pro.html" data-symbole="lune" aria-label="Kenz"></button></a>
+    <p class="nav__ch" aria-hidden="true"><span class="nav__chT" data-ch-label>Kenz</span></p>
+    <button class="kz-mode" type="button" data-kz-mode></button>
+  </div>
+</header>
+
+<!-- La Terre : un seul globe pour la page (shared/terre.js), fixe derrière les chapitres -->
+<div class="terre" data-terre aria-hidden="true">
+  <div class="hero__bg"><div class="hero__bgIn"><img class="hero__land" src="assets/img/horizon-createur.jpg" alt="" width="1672" height="941" fetchpriority="high"><i class="hero__wash"></i></div><i class="hero__shade"></i></div>
+</div>
+
+<main>
+  <!-- ========== C0 Hero : l'orbite ========== -->
+  <section class="hero" id="top" data-label="Kenz" aria-labelledby="t-hero" data-chapitre data-aura="droite">
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <h1 class="hero__title" id="t-hero"><span class="ttl ttl--main">Kenz<span class="ttl__dot" aria-hidden="true"></span></span><span class="ttl ttl--ghost" aria-hidden="true">Kenz<span class="ttl__dot"></span></span></h1>
+        <p class="hero__line" data-words>Je voyage en Asie, je m’entraîne entre deux voyages, et je te raconte tout, <em class="word glow">vraiment</em>.</p>
+        <a class="hero__down" href="#voyage" data-anim><span class="hero__downIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span>Partir avec moi</a>
+      </div>
+      <div class="hero__stage">
+        <!-- La profondeur : polaroïds, chaussure k15ze, puis les objets 3D à leur livraison, sur trois plans (shared/profondeur.*) -->
+        <div class="kz-prof" data-kz-prof="createur" aria-hidden="true"></div>
+        <i class="hero__glow" aria-hidden="true"></i>
+        <div class="hero__arche kz-arche kz-arche--lumiere" aria-hidden="true"></div>
+        <div class="hero__fig">
+          <img class="portrait" src="assets/img/kenz-moi.webp" alt="Kenz en t-shirt vert anis, le regard tourné vers l’horizon" width="1080" height="1920" fetchpriority="high">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C1 Le voyage : le trajet sur le globe, d'escale en escale ========== -->
+  <section class="ch voyage" id="voyage" data-label="Le voyage" aria-labelledby="t-voyage" data-chapitre data-aura="bas">
+    <div class="voyage__stage">
+      <header class="voyage__head">
+        <h2 class="h2" id="t-voyage" data-sweep>Le voyage</h2>
+        <p class="voyage__sub" data-reveal="fade">9 pays filmés, dans l’ordre des séries.</p>
+        <img class="voyage__repli voyage__repli--nuit" src="assets/terre/globe-nuit.webp" alt="" width="1024" height="1024" loading="lazy" decoding="async">
+        <img class="voyage__repli voyage__repli--jour" src="assets/terre/globe-jour.webp" alt="" width="1024" height="1024" loading="lazy" decoding="async">
+      </header>
+      <ol class="escales" role="list" aria-label="Les escales, un pays après l’autre">
+      <li class="escale" data-escale data-id="japon" data-lat="35.68" data-lon="139.69">
+        <p class="escale__n" aria-hidden="true">01<span>/ 10</span></p>
+        <h3 class="escale__nom">Japon</h3>
+        <p class="escale__local" lang="ja">日本</p>
+        <p class="escale__quand">05/2024 → 06/2026</p>
+        <p class="escale__serie">Débuts au Japon, puis <b>Branche-toi Japon</b>, saisons 1 et 2.</p>
+        <a class="escale__media" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Japon : voir mes vidéos sur YouTube"><img src="assets/img/video-japon.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" data-loupe><span class="glass" aria-hidden="true">YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </li>
+      <li class="escale" data-escale data-id="coree" data-lat="35.18" data-lon="129.08">
+        <p class="escale__n" aria-hidden="true">02<span>/ 10</span></p>
+        <h3 class="escale__nom">Corée du Sud</h3>
+        <p class="escale__local" lang="ko">한국</p>
+        <p class="escale__quand">12/2024 → 03/2025</p>
+        <p class="escale__serie"><b>Dans le bon en Corée</b>.</p>
+        <a class="escale__media" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Corée du Sud : voir mes vidéos sur YouTube"><img src="assets/img/video-coree.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" data-loupe><span class="glass" aria-hidden="true">YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </li>
+      <li class="escale" data-escale data-id="malaisie" data-lat="3.14" data-lon="101.69">
+        <p class="escale__n" aria-hidden="true">03<span>/ 10</span></p>
+        <h3 class="escale__nom">Malaisie</h3>
+        <p class="escale__quand">05 → 06/2025</p>
+        <p class="escale__serie"><b>En Bien en Malaisie</b>. Ma vidéo la plus vue&nbsp;: le budget.</p>
+        <a class="escale__media" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Malaisie : voir mes vidéos sur YouTube"><img src="assets/img/video-malaisie.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" data-loupe><span class="glass" aria-hidden="true">YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </li>
+      <li class="escale" data-escale data-id="chine" data-lat="39.9" data-lon="116.4">
+        <p class="escale__n" aria-hidden="true">04<span>/ 10</span></p>
+        <h3 class="escale__nom">Chine</h3>
+        <p class="escale__local" lang="zh">中国</p>
+        <p class="escale__quand">07/2025 → 02/2026</p>
+        <p class="escale__serie"><b>Branche-toi Chine</b>, saisons 1 et 2 (Shenzhen, Guangzhou). La saison 2 est ma meilleure série.</p>
+        <a class="escale__media" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Chine : voir mes vidéos sur YouTube"><img src="assets/img/video-chine.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" data-loupe><span class="glass" aria-hidden="true">YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </li>
+      <li class="escale" data-escale data-id="hong-kong" data-lat="22.32" data-lon="114.17">
+        <p class="escale__n" aria-hidden="true">05<span>/ 10</span></p>
+        <h3 class="escale__nom">Hong Kong</h3>
+        <p class="escale__local" lang="zh">香港</p>
+        <p class="escale__quand">08/2025</p>
+        <p class="escale__serie">Un hors-série.</p>
+      </li>
+      <li class="escale" data-escale data-id="islande" data-lat="64.15" data-lon="-21.94">
+        <p class="escale__n" aria-hidden="true">06<span>/ 10</span></p>
+        <h3 class="escale__nom">Islande</h3>
+        <p class="escale__quand">26/08/2025</p>
+        <p class="escale__serie">Un vlog.</p>
+        <a class="escale__media" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Islande : voir mes vidéos sur YouTube"><img src="assets/img/video-islande.jpg" alt="" width="960" height="540" loading="lazy" decoding="async" data-loupe><span class="glass" aria-hidden="true">YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </li>
+      <li class="escale" data-escale data-id="emirats" data-lat="24.45" data-lon="54.38">
+        <p class="escale__n" aria-hidden="true">07<span>/ 10</span></p>
+        <h3 class="escale__nom">Émirats</h3>
+        <p class="escale__quand">12/2025</p>
+        <p class="escale__serie">Abu Dhabi, une mini-série.</p>
+      </li>
+      <li class="escale" data-escale data-id="taiwan" data-lat="25.03" data-lon="121.57">
+        <p class="escale__n" aria-hidden="true">08<span>/ 10</span></p>
+        <h3 class="escale__nom">Taïwan</h3>
+        <p class="escale__quand">08/2026</p>
+      </li>
+      <li class="escale" data-escale data-id="suisse" data-lat="46.8" data-lon="8.23">
+        <p class="escale__n" aria-hidden="true">09<span>/ 10</span></p>
+        <h3 class="escale__nom">Suisse</h3>
+        <p class="escale__quand">09/2026</p>
+        <p class="escale__serie">Un hors-série.</p>
+      </li>
+      <li class="escale escale--futur" data-escale data-futur data-id="maurice" data-lat="-20.16" data-lon="57.5">
+        <p class="escale__n" aria-hidden="true">10<span>/ 10</span></p>
+        <h3 class="escale__nom">Île Maurice</h3>
+        <p class="escale__prochaine">Prochaine escale</p>
+        <p class="escale__serie"><b>Branche-toi Île Maurice</b>, en préparation.</p>
+        <a class="btn btn--light escale__porte" href="voyage.html" data-passage data-couleur="#0F5D6B">Entrer dans mes voyages<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></a>
+      </li>
+      </ol>
+      <ol class="voyage__route" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ol>
+    </div>
+  </section>
+
+  <!-- ========== C2 Le sport : l'univers k15ze, en un écran. Les deux courses côte à côte (shared/courses.*, variante landing),
+       puis « Entrer dans le sport » → sport.html (Passage) ========== -->
+  <section class="ch sport" id="sport" data-label="Le sport" aria-labelledby="t-sport" data-chapitre data-aura="gauche" data-fil-trait="non">
+    <div class="wrap sport__in">
+      <header class="sport__head">
+        <p class="sport__univers" data-reveal="fade">k15ze · sport, nutrition, lifestyle</p>
+        <h2 class="statement sport__titre" id="t-sport" data-words>Entre deux voyages, je m’<em class="word sport__mot">entraîne</em>.</h2>
+      </header>
+      <div class="sport__cartes" data-kz-courses data-ids="hyrox,spartan" data-variante="landing"></div>
+      <a class="btn btn--light sport__porte" href="sport.html" data-passage data-couleur="#0D0F0E">Entrer dans le sport<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></a>
+    </div>
+  </section>
+
+  <!-- ========== C3 Me suivre : deux univers, deux compositions posées sur le fond (sans cartes), les réseaux en icônes ========== -->
+  <section class="ch univers" id="suivre" data-label="Me suivre" aria-labelledby="t-univers" data-chapitre data-aura="calme">
+    <svg class="si-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><!-- Logos officiels : Simple Icons 13.21.0 (CC0), en ligne --><symbol id="si-youtube" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></symbol><symbol id="si-tiktok" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></symbol><symbol id="si-instagram" viewBox="0 0 24 24"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></symbol></svg>
+    <div class="wrap">
+      <header class="univers__head">
+        <h2 class="h2" id="t-univers" data-sweep>Me suivre</h2>
+        <p class="lead" data-words>Deux univers. Choisis le <em class="word glow">tien</em>.</p>
+      </header>
+      <div class="univers__liste">
+        <article class="porte porte--voyage" data-reveal="card">
+          <div class="porte__vue kz-arche" aria-hidden="true">
+            <div class="kz-arche__in">
+              <img class="porte__fond" src="assets/img/video-japon.jpg" alt="" width="960" height="540" loading="lazy" decoding="async">
+              <img class="porte__globe porte__globe--nuit" src="assets/terre/globe-nuit.webp" alt="" width="1024" height="1024" loading="lazy" decoding="async">
+              <img class="porte__globe porte__globe--jour" src="assets/terre/globe-jour.webp" alt="" width="1024" height="1024" loading="lazy" decoding="async">
+            </div>
+          </div>
+          <div class="porte__tete">
+            <p class="porte__qui">Kenz en Asie</p>
+            <h3 class="porte__titre">Le voyage</h3>
+          </div>
+          <div class="porte__corps">
+            <p class="porte__ligne">L’Asie, et ce que ça coûte vraiment.</p>
+            <ul class="reseaux" role="list" aria-label="Mes comptes voyage">
+              <li><a class="reseau" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="YouTube : Kenz in Asia"><svg aria-hidden="true" focusable="false"><use href="#si-youtube"/></svg><span class="reseau__bulle" aria-hidden="true">Kenz in Asia</span></a></li>
+              <li><a class="reseau" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener" aria-label="TikTok : En Bien en Asie"><svg aria-hidden="true" focusable="false"><use href="#si-tiktok"/></svg><span class="reseau__bulle" aria-hidden="true">En Bien en Asie</span></a></li>
+              <li><a class="reseau" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener" aria-label="Instagram : @kenzvoyage_enbien"><svg aria-hidden="true" focusable="false"><use href="#si-instagram"/></svg><span class="reseau__bulle" aria-hidden="true">@kenzvoyage_enbien</span></a></li>
+            </ul>
+            <p class="porte__chiffre">≈&#8239;28&#8239;000 personnes me suivent sur TikTok.</p>
+            <a class="porte__entrer" href="voyage.html" data-passage data-couleur="#0F5D6B" data-source=".porte--voyage"><span>Entrer dans mes voyages</span><i aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></i></a>
+          </div>
+        </article>
+        <article class="porte porte--sport" data-reveal="card" style="--d:1">
+          <div class="porte__vue kz-arche" aria-hidden="true">
+            <div class="kz-arche__in">
+              <img class="porte__fond" src="assets/img/hyrox-1.jpg" alt="" width="733" height="1100" loading="lazy" decoding="async">
+              <span class="porte__km"><b>8</b>km</span>
+            </div>
+          </div>
+          <div class="porte__tete">
+            <p class="porte__qui">k15ze</p>
+            <h3 class="porte__titre">Le sport</h3>
+          </div>
+          <div class="porte__corps">
+            <p class="porte__ligne">En sèche, je mange plaisir et copieux&nbsp;: des recettes simples, aux doses exactes.</p>
+            <ul class="reseaux" role="list" aria-label="Mes comptes sport">
+              <li><a class="reseau" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener" aria-label="YouTube : k15ze"><svg aria-hidden="true" focusable="false"><use href="#si-youtube"/></svg><span class="reseau__bulle" aria-hidden="true">k15ze</span></a></li>
+            </ul>
+            <p class="porte__chiffre">Ni coach, ni expert. Je partage ce qui marche pour moi.</p>
+            <a class="porte__entrer" href="sport.html" data-passage data-couleur="#0D0F0E" data-source=".porte--sport"><span>Entrer dans le sport</span><i aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></i></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer data-kz-footer="createur"></footer>
+<script src="shared/footer.js"></script>
+
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)');
+  const DESK = matchMedia('(min-width: 900px)');
+  const hasIO = 'IntersectionObserver' in window;
+  const T = window.KzTheme || null;
+  const clamp01 = v => (v < 0 ? 0 : v > 1 ? 1 : v);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+  const onMQ = (m, fn) => { if (m.addEventListener) m.addEventListener('change', fn); else if (m.addListener) m.addListener(fn); };
+
+  /* ---------- 1. Mot par mot ---------- */
+  function splitWords(el) {
+    let i = 0;
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/([ \t\r\n]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\r\n]+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+          const s = document.createElement('span');
+          s.className = 'w'; s.style.setProperty('--i', i++); s.textContent = p;
+          frag.appendChild(s);
+        });
+        n.parentNode.replaceChild(frag, n);
+      } else if (n.nodeType === 1) {
+        n.classList.add('w'); n.style.setProperty('--i', i++);
+      }
+    });
+  }
+  $$('[data-words]').forEach(splitWords);
+
+  /* ---------- 2. Apparitions à l'entrée (une seule fois) ---------- */
+  const io = hasIO ? new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const t = e.target;
+      if (t.__sweep) t.__sweep.forEach(s => s.classList.add('is-in'));
+      if (t.matches('[data-reveal],[data-words],[data-play]')) t.classList.add('is-in');
+      io.unobserve(t);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: .12 }) : null;
+  $$('[data-reveal],[data-words],[data-play]').forEach(el => {
+    if (el.closest('.hero')) return;
+    if (io) io.observe(el); else el.classList.add('is-in');
+  });
+  /* Un titre en balayage est rogné à zéro (clip-path) : Chrome le croit invisible, on observe donc son parent. */
+  $$('[data-sweep]').forEach(el => {
+    if (el.closest('.hero')) return;
+    if (!io) { el.classList.add('is-in'); return; }
+    const host = el.parentElement;
+    host.__sweep = (host.__sweep || []).concat(el);
+    io.observe(host);
+  });
+
+  /* ---------- 3. Entrée du hero (attend les battants si on arrive par la porte, ou le voile du passage) ---------- */
+  let heroPlayed = false;
+  function playHero() {
+    if (heroPlayed) return;
+    heroPlayed = true;
+    d.classList.add('is-loaded');
+    $$('.hero [data-words]').forEach(el => el.classList.add('is-in'));
+    /* L'arche de lumière : le fil la dessine pendant que le portrait arrive */
+    const arche = $('.hero__arche');
+    if (arche) { if (T) T.arche(arche); else arche.classList.add('is-trace'); }
+  }
+  let viaPassage = false;
+  try { const kp = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); viaPassage = !!(kp && Date.now() - kp.t < 6000); } catch (e) {}
+  if (d.hasAttribute('data-porte-arrivee') || location.hash.indexOf('porte') > -1 || viaPassage) {
+    d.classList.add('is-porte');
+    document.addEventListener('porte:arrivee', playHero, { once: true });
+    document.addEventListener('passage:arrivee', playHero, { once: true });
+    setTimeout(playHero, 2500);
+  } else {
+    const go = () => requestAnimationFrame(() => requestAnimationFrame(playHero));
+    const t = setTimeout(go, 700);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { clearTimeout(t); go(); });
+  }
+
+  /* ---------- 4. Défilement doux (ordinateur) et ancres internes ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!window.Lenis || RM.matches || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+  });
+  const scrollToY = (y, now) => {
+    if (lenis) lenis.scrollTo(y, now ? { immediate: true, force: true } : { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM.matches || now ? 'auto' : 'smooth' });
+  };
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l || l.classList.contains('skip') || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const id = l.getAttribute('href').slice(1), t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    if (id === 'sport' || id === 'suivre') entrerVu(false);
+    scrollToY(id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY);
+  });
+
+  /* ---------- 4 bis. Les portes vers voyage.html et sport.html : le passage (même contrat que pro.html) ---------- */
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-passage]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const url = a.getAttribute('href'), P = window.Passage;
+    if (!P || typeof P.ouvrir !== 'function') return;
+    e.preventDefault();
+    const src = (a.dataset.source && $(a.dataset.source)) || a;
+    const clair = d.getAttribute('data-theme') === 'light';
+    try { P.ouvrir(src, url, { couleur: (clair && a.dataset.couleurClair) || a.dataset.couleur }); }
+    catch (err) { console.error('[kz] passage : ' + err.message); location.href = url; }
+  });
+
+  /* ---------- 5. Le défilement : repère « stories », nom du chapitre, hero, la Terre et le voyage, le sport ---------- */
+  const nav = $('.nav');
+  const chapters = $$('main > section[data-label]');
+  const segs = $$('.story a');
+  const fills = segs.map(a => a.querySelector('i'));
+  const label = $('[data-ch-label]');
+  const hero = $('#top'), heroCopy = $('.hero__copy'), heroBg = $('.terre .hero__bg');
+  const voyage = $('#voyage'), vStage = $('.voyage__stage', voyage), vHead = $('.voyage__head', voyage), vList = $('.escales', voyage), vRoute = $('.voyage__route', voyage);
+  let vaPrec = -1;
+  /* « Le voyage » et la première escale n'apparaissent qu'une fois le globe posé à sa place (jamais sur la planète) */
+  const apparition = v => { if (Math.abs(v - vaPrec) < .001) return; vaPrec = v; vStage.style.setProperty('--va', v.toFixed(3)); };
+  const ESC = $$('[data-escale]', voyage).map(li => ({ el: li, id: li.getAttribute('data-id'), lat: +li.getAttribute('data-lat'), lon: +li.getAttribute('data-lon'), futur: li.hasAttribute('data-futur') }));
+  const NE = ESC.length, routeDots = vRoute ? $$('li', vRoute) : [];
+  const PLONGEE = d.classList.contains('is-plongee');
+  /* Vu une fois : une fois la dernière escale atteinte (ou si l'on arrive plus bas : ancre, retour, rechargement),
+     le trajet n'est plus épinglé ni piloté au défilement, et le dézoom du hero ne se rejoue pas à l'envers.
+     Deux compositions fixes pour le globe, « hero » et « voyage », reliées par un fondu court (≈ 0,4 s). */
+  const CLE_VU = 'kz-terre-vu';
+  let vu = false;
+  try { vu = sessionStorage.getItem(CLE_VU) === '1'; } catch (e) {}
+  const ANCRE_BAS = /^#(voyage|sport|suivre)$/.test(location.hash);
+  if (ANCRE_BAS) { vu = true; try { sessionStorage.setItem(CLE_VU, '1'); } catch (e) {} }   /* arrivé plus bas : les états finaux, pour toute la session */
+  const enVu = () => vu && !RM.matches;
+  let etat = 'hero', etatAff = 'hero', aRefaire = false, fd = 1, fdRaf = 0, fdT = 0, choix = NE - 1, pDernier = 1;
+  /* La liste compacte des escales (pays, période) et la porte du voyage, pour l'écran statique */
+  const txt = el => (el ? el.textContent.trim() : '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const vListe = document.createElement('div');
+  vListe.className = 'voyage__liste';
+  vListe.innerHTML = '<ol class="vliste" role="list" aria-label="Les escales : choisis un pays, le globe tourne vers lui">' + ESC.map((e, i) =>
+    '<li' + (e.futur ? ' class="is-futur"' : '') + '><button type="button" class="vliste__b" data-i="' + i + '" aria-pressed="false">' +
+    '<span class="vliste__nom">' + txt($('.escale__nom', e.el)) + '</span><span class="vliste__quand">' + (e.futur ? 'Prochaine escale' : txt($('.escale__quand', e.el))) + '</span></button></li>').join('') + '</ol>';
+  { const pv0 = $('.escale__porte', voyage); if (pv0) vListe.appendChild(pv0.cloneNode(true)); }
+  vStage.appendChild(vListe);
+  const vBoutons = $$('.vliste__b', vListe);
+  let vh = innerHeight, vw = d.clientWidth, maxY = 1;
+  const tops = [], hs = [];
+  let current = -1, ticking = false;
+  let globe = null, arcs = [], voyPin = false, voyTop = 0, voyLen = 1, voyPas = 1, escOn = -1, depart = null, vMob = null;
+  const DERIVE = 1.2;
+  const lerp = (a, b, k) => a + (b - a) * k;
+  const lisse = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+  const n180 = v => ((v + 180) % 360 + 360) % 360 - 180;
+  const versLL = (a, b, k) => ({ lat: lerp(a.lat, b.lat, k), lon: a.lon + n180(b.lon - a.lon) * k });
+
+  /* Les places du globe à l'écran (px) : le tour de la Terre dans le hero (sa courbure en bas de l'écran),
+     puis, au défilement, la caméra recule jusqu'à la planète entière du voyage */
+  const heroStage = $('.hero__stage'), heroFig = $('.hero__fig'), heroArche = $('.hero__arche');
+  function poseHero() {
+    if (globe && globe.mode === 'repli') {   /* l'image fixe : la Terre se lève sous le portrait */
+      const r = vw >= 900 ? Math.min(vw * .36, vh * .72) : vw * .62;
+      return { x: vw >= 900 ? vw * .71 : vw * .5, y: vh * .82 + r, r };
+    }
+    if (vw >= 900) { const r = Math.max(vw * 1.02, vh * 1.6); return { x: vw * .62, y: vh * .8 + r, r }; }
+    const r = Math.max(vw * 1.7, vh * .72), sc = heroStage;
+    const limbe = sc ? Math.min(vh * .88, Math.max(vh * .62, sc.offsetTop + sc.offsetHeight * .74)) : vh * .8;
+    return { x: vw * .5, y: limbe + r, r };
+  }
+  function poseVoyage() {
+    if (vw >= 900) { const r = Math.min(vh * .31, vw * .22); return { x: Math.max(vw * .31, r + 72), y: vh * .57, r }; }
+    if (vMob) return { x: vw * .5, y: vMob.y, r: vMob.r };
+    return { x: vw * .5, y: vh * .38, r: Math.min(vw * .4, vh * .18) };
+  }
+  function voyMesurer() {
+    voyPin = voyage.classList.contains('is-pin') && !enVu();
+    if (voyPin) {
+      voyPas = vh * (vw >= 900 ? .62 : .56);
+      const h = Math.round(vh + (NE - 1) * voyPas + vh * .5) + 'px';
+      if (voyage.style.height !== h) voyage.style.height = h;
+    } else if (voyage.style.height) voyage.style.height = '';
+    const bas = enVu() ? vListe : vList;
+    if ((voyPin || enVu()) && vw < 900 && vHead && bas) {
+      const hb = vHead.offsetTop + vHead.offsetHeight, pt = bas.offsetTop;
+      vMob = { y: (hb + pt) / 2 + 4, r: Math.max(56, Math.min(vw * .4, (pt - hb) / 2 - 16)) };
+    } else vMob = null;
+  }
+  /* L'escale à l'écran : le panneau, le point qui s'allume, la petite route de points */
+  function escale(a) {
+    if (a === escOn) return;
+    escOn = a;
+    ESC.forEach((e, i) => { e.el.classList.toggle('is-on', i === a); e.el.classList.toggle('is-avant', i < a); });
+    routeDots.forEach((li, i) => { li.classList.toggle('is-on', i === a); li.classList.toggle('is-fait', i < a); });
+    if (vRoute) vRoute.style.setProperty('--rp', (a / Math.max(1, NE - 1)).toFixed(4));
+    if (globe) globe.allumer(ESC[a] ? ESC[a].id : null);
+  }
+  function voyFrame(y) {
+    if (!globe) return;
+    if (enVu()) { vuFrame(y); return; }
+    const ph = poseHero();
+    if (!voyPin) {   /* mouvement réduit : le globe reste dans le hero, puis s'efface */
+      globe.cadrer(ph);
+      globe.opacite(1 - clamp01((y - vh * .3) / (vh * .55)));
+      return;
+    }
+    const pv = poseVoyage();
+    const t = clamp01(y / Math.max(1, voyTop));
+    apparition(t < 1 ? 0 : lisse(0, .14, (y - voyTop) / Math.max(1, voyPas)));
+    if (t <= 0) {
+      if (depart) { depart = null; globe.deriver(DERIVE); globe.orienter(-22, 116); }   /* retour au hero : l'Asie revient au bord de la Terre */
+      globe.cadrer(ph); globe.opacite(1);
+      arcs.forEach(a => a.tracer(0).vif(false));
+      escale(0);
+      return;
+    }
+    if (!depart) { depart = globe.vue(); globe.deriver(0); }
+    const fin = voyTop + (NE - 1) * voyPas;
+    let pose, o, a = 0;
+    if (t < 1) {   /* l'orbite s'éloigne : on recule jusqu'à voir la Terre entière, tournée vers la première escale */
+      const k = lisse(0, 1, t);
+      pose = { x: lerp(ph.x, pv.x, k), y: lerp(ph.y, pv.y, k), r: lerp(ph.r, pv.r, k) };
+      o = versLL(depart, { lat: ESC[0].lat - 6, lon: ESC[0].lon }, k);
+      arcs.forEach(x => x.tracer(0).vif(false));
+    } else {
+      const p = clamp01((y - voyTop) / Math.max(1, fin - voyTop)), f = p * (NE - 1);
+      const i = Math.min(NE - 2, Math.floor(f)), fr = f - i, mv = lisse(.26, .86, fr);
+      o = versLL({ lat: ESC[i].lat - 6, lon: ESC[i].lon }, { lat: ESC[i + 1].lat - 6, lon: ESC[i + 1].lon }, mv);
+      /* pendant le vol, la caméra prend un peu de hauteur */
+      pose = { x: pv.x, y: pv.y, r: pv.r * (1 - .1 * Math.sin(Math.PI * mv)) };
+      arcs.forEach((x, k) => {
+        if (k < i) x.tracer(1).vif(false);
+        else if (k === i) x.tracer(lisse(.2, .88, fr)).vif(true);
+        else x.tracer(0).vif(false);
+      });
+      a = fr >= .6 ? i + 1 : i;
+      /* la dernière escale est atteinte : le trajet est vu, il ne se rejouera plus */
+      if (a >= NE - 1) { pDernier = lisse(.2, .88, fr); escale(a); entrerVu(true); return; }
+    }
+    /* Après le voyage, le globe part avec la page et s'efface */
+    const apres = y - (voyTop + voyLen);
+    if (apres > 0) pose.y -= apres;
+    globe.opacite(1 - clamp01(apres / (vh * .6)));
+    globe.orienter(o.lat, o.lon);
+    globe.cadrer(pose);
+    escale(a);
+  }
+
+  /* ---------- Vu une fois : les deux compositions, le fondu, la bascule ---------- */
+  const zone = y => (y < Math.max(1, hero.offsetHeight - vh * .5) ? 'hero' : 'voyage');
+  /* Le globe suit la page sans retard (cadrer « suivre ») ; « saut » : posé d'un coup, sous le fondu */
+  function poserVu(y, saut) {
+    if (!globe) return;
+    const o = saut ? { saut: true } : { suivre: true };
+    if (etatAff === 'hero') { const ph = poseHero(); globe.cadrer({ x: ph.x, y: ph.y - y, r: ph.r }, o); }
+    else { const pv = poseVoyage(); globe.cadrer({ x: pv.x, y: pv.y + voyTop - y, r: pv.r }, o); }
+  }
+  /* L'état initial du hero (l'Asie au bord de la Terre, sans arcs), ou l'état final du voyage (tous les arcs) */
+  /* Le hero ne montre que le paysage, l'horizon et Kenz : les arcs et les escales sont masqués d'un coup */
+  function masquerTrajet() {
+    if (!globe) return;
+    arcs.forEach(a => a.tracer(0, true).vif(false, true));
+    if (globe.escales) globe.escales(false);
+  }
+  function appliquerEtat(e) {
+    if (!globe) return;
+    if (e === 'hero') {
+      depart = null; globe.deriver(DERIVE); globe.viser(-22, 116, { duree: 0 });
+      masquerTrajet(); globe.allumer(ESC[0].id);
+    } else {
+      const s = ESC[choix];
+      globe.deriver(0); globe.viser(s.lat - 6, s.lon, { duree: 0 });
+      if (globe.escales) globe.escales(true);
+      arcs.forEach(a => a.tracer(1, true).vif(false, true)); globe.allumer(s.id);
+    }
+    poserVu(scrollY, true);
+  }
+  function opacitesVu() {
+    if (globe) globe.opacite(fd);
+    if (heroStage && heroStage.style.transitionProperty !== 'filter, transform') heroStage.style.transitionProperty = 'filter, transform';
+    /* le paysage est dans le calque de la Terre (déjà en fondu avec elle) ; le portrait suit le même fondu */
+    const b = etatAff === 'hero' ? '1' : '0', h = (etatAff === 'hero' ? fd : 0).toFixed(3);
+    if (heroBg && heroBg.style.opacity !== b) heroBg.style.opacity = b;
+    if (heroStage && heroStage.style.opacity !== h) heroStage.style.opacity = h;
+  }
+  /* Le fondu : l'ancienne composition s'efface (0,14 s), la nouvelle est posée, elle apparaît (0,3 s) */
+  function pasFondu(t) {
+    fdRaf = 0;
+    const dt = Math.min(64, Math.max(0, t - fdT)); fdT = t;
+    if (etatAff !== etat || aRefaire) {
+      fd -= dt / 140;
+      if (fd <= 0) { fd = 0; aRefaire = false; etatAff = etat; appliquerEtat(etatAff); }
+    } else fd = Math.min(1, fd + dt / 300);
+    opacitesVu();
+    if (etatAff !== etat || aRefaire || fd < 1) fdRaf = requestAnimationFrame(pasFondu);
+  }
+  function lancerFondu() { if (!fdRaf) { fdT = performance.now(); fdRaf = requestAnimationFrame(pasFondu); } }
+  function vuFrame(y) {
+    const z = zone(y);
+    if (z !== etat) {
+      etat = z;
+      if (z === 'hero') masquerTrajet();   /* dès le début du retour, avant le fondu */
+      lancerFondu();
+    }
+    poserVu(y, false);
+  }
+  /* Un pays de la liste : le globe tourne vers lui (0,6 s) */
+  function choisir(i, duree) {
+    choix = i;
+    vBoutons.forEach((b, k) => b.setAttribute('aria-pressed', k === i ? 'true' : 'false'));
+    if (!globe || etatAff !== 'voyage') return;
+    const e = ESC[i];
+    globe.viser(e.lat - 6, e.lon, { duree: duree == null ? .6 : duree });
+    globe.allumer(e.id);
+  }
+  vListe.addEventListener('click', ev => { const b = ev.target.closest('.vliste__b'); if (b) choisir(+b.getAttribute('data-i')); });
+  /* La bascule : l'épinglage et le scrub sont retirés ; la position de défilement est compensée de la hauteur
+     retirée, pour que rien ne saute (la scène épinglée et l'écran statique ont la même mise en page).
+     fin = vrai : on vient d'atteindre la dernière escale (le globe finit sa rotation, le dernier arc son tracé). */
+  function entrerVu(fin) {
+    if (vu || RM.matches) return;
+    vu = true;
+    try { sessionStorage.setItem(CLE_VU, '1'); } catch (e) {}
+    const y = scrollY, h0 = voyage.offsetHeight, top0 = voyTop, fin0 = voyTop + voyLen;
+    voyage.classList.add('is-vu');
+    measure();
+    const retire = h0 - voyage.offsetHeight;
+    let y2 = y;
+    if (y >= fin0) y2 = y - retire; else if (y > top0) y2 = top0;
+    if (Math.abs(y2 - y) > .5) scrollToY(y2, true);
+    measure();
+    vaPrec = -1; apparition(1);
+    choix = NE - 1;
+    vBoutons.forEach((b, k) => b.setAttribute('aria-pressed', k === choix ? 'true' : 'false'));
+    etat = zone(y2);
+    if (fin && globe && etat === 'voyage') {
+      etatAff = 'voyage'; fd = 1;
+      const s = ESC[choix], der = arcs[arcs.length - 1];
+      globe.deriver(0); globe.viser(s.lat - 6, s.lon, { duree: .5 }); globe.allumer(s.id);
+      arcs.forEach(a => { if (a !== der) a.tracer(1).vif(false); });
+      if (der) {
+        let t0 = 0;
+        const st = t => {
+          t0 = t0 || t;
+          const k = Math.min(1, (t - t0) / 450);
+          if (etatAff !== 'voyage') return;
+          der.tracer(pDernier + (1 - pDernier) * k).vif(k < 1);
+          if (k < 1) requestAnimationFrame(st);
+        };
+        requestAnimationFrame(st);
+      }
+      poserVu(y2, false);
+    } else if (globe) {
+      /* un saut (ancre) : la composition en cours s'efface, la bonne est posée, en fondu */
+      etatAff = etat; aRefaire = true; lancerFondu();
+    } else { etatAff = etat; fd = 1; }
+    opacitesVu();
+    current = -1; ticking = false; onScroll();
+  }
+
+  function measure() {
+    vh = innerHeight; vw = d.clientWidth;
+    voyMesurer();
+    maxY = Math.max(1, d.scrollHeight - vh);
+    const y = scrollY;
+    chapters.forEach((c, i) => { const r = c.getBoundingClientRect(); tops[i] = r.top + y; hs[i] = Math.max(1, r.height); });
+    { const r = voyage.getBoundingClientRect(); voyTop = r.top + y; voyLen = Math.max(1, r.height - vh); }
+  }
+
+  function swapLabel(text) {
+    if (!label || label.textContent === text) return;
+    label.classList.remove('in');
+    void label.offsetWidth;
+    label.textContent = text;
+    label.classList.add('in');
+  }
+  function frame() {
+    ticking = false;
+    const y = scrollY;
+    /* Le repère « stories » : un segment par chapitre, un nœud qui s'allume quand le chapitre est lu */
+    const ref = y + vh * .35 * Math.min(1, y / (vh * .5));
+    const end = y >= maxY - 4;
+    let act = 0;
+    for (let i = 0; i < chapters.length; i++) {
+      const f = end ? 1 : clamp01((ref - tops[i]) / hs[i]);
+      if (fills[i]) fills[i].style.transform = 'scaleX(' + f.toFixed(4) + ')';
+      if (segs[i]) segs[i].classList.toggle('is-done', f >= .999);
+      if (tops[i] <= ref + 1) act = i;
+    }
+    if (end) act = chapters.length - 1;
+    if (act !== current) {
+      current = act;
+      segs.forEach((a, j) => { if (j === act) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
+      swapLabel(chapters[act].getAttribute('data-label'));
+    }
+    nav.classList.toggle('is-scrolled', y > 24);
+    /* Le hero s'éloigne : le texte monte et s'efface (ordinateur) */
+    if (!RM.matches && y < vh * 1.3 && heroCopy && DESK.matches) {
+      const p = clamp01(y / Math.max(1, hero.offsetHeight));
+      heroCopy.style.transform = 'translate3d(0,' + (-p * 80).toFixed(1) + 'px,0)';
+      heroCopy.style.opacity = (1 - p * .88).toFixed(3);
+      [heroFig, heroArche].forEach(el => { if (el) el.style.transform = 'translate3d(0,' + (-p * 4).toFixed(2) + '%,0)'; });
+    }
+    /* Le paysage glisse (parallaxe, comme sur Pro) et s'efface pendant le dézoom : la bille seule se pose pour le voyage */
+    if (heroBg) {   /* toujours mis à jour : après un saut (ancre, rechargement en milieu de page), le paysage ne reste pas derrière le voyage */
+      const pb = clamp01(y / Math.max(1, hero.offsetHeight)), op = (1 - clamp01(pb / .5)).toFixed(3);
+      if (!enVu() && heroBg.style.opacity !== op) heroBg.style.opacity = op;
+      if (y < vh * 1.4) heroBg.style.transform = RM.matches ? '' : 'translate3d(0,' + (-y * .22).toFixed(1) + 'px,0)';
+    }
+    /* Pendant le dézoom, le portrait et son arche montent avec le texte et s'effacent vite, sans traîner */
+    if (!RM.matches && heroStage && !enVu()) { const so = (1 - clamp01((y / Math.max(1, hero.offsetHeight) - .03) / .22)).toFixed(3); if (heroStage.style.opacity !== so) heroStage.style.opacity = so; }
+    /* La Terre et le voyage (arrivé d'un saut au-delà du trajet : il est vu) */
+    if (!vu && voyPin && y > voyTop + voyLen) { entrerVu(false); return; }
+    voyFrame(y);
+  }
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+
+  function setup() {
+    /* Le voyage : épinglé partout, sauf en mouvement réduit (une liste) */
+    voyage.classList.toggle('is-pin', !RM.matches);
+    voyage.classList.toggle('is-vu', enVu());
+    escOn = -1; escale(0);
+    if (RM.matches) ESC.forEach(e => e.el.classList.remove('is-on', 'is-avant'));
+    if (enVu()) {
+      measure();
+      vaPrec = -1; apparition(1);
+      vBoutons.forEach((b, k) => b.setAttribute('aria-pressed', k === choix ? 'true' : 'false'));
+      etat = etatAff = zone(scrollY); fd = 1; aRefaire = false;
+      appliquerEtat(etatAff); opacitesVu();
+    }
+    if (heroCopy && (!DESK.matches || RM.matches)) { heroCopy.style.transform = ''; heroCopy.style.opacity = ''; [heroFig, heroArche].forEach(el => { if (el) el.style.transform = ''; }); }
+    measure(); frame();
+    if (T) T.rafraichir();
+  }
+
+  let rz;
+  const later = () => { clearTimeout(rz); rz = setTimeout(() => { measure(); frame(); }, 120); };
+  onMQ(RM, setup); onMQ(DESK, setup);
+  setup();
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', later);
+  addEventListener('load', () => { measure(); frame(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); frame(); });
+  if (window.ResizeObserver) new ResizeObserver(later).observe($('main'));
+  if (ANCRE_BAS && !RM.matches) {
+    const cible = document.getElementById(location.hash.slice(1));
+    const aller = () => { if (cible) { measure(); scrollToY(cible.getBoundingClientRect().top + scrollY, true); frame(); } };
+    aller();
+    addEventListener('load', aller, { once: true });
+  }
+
+  /* Au clavier, dans le voyage épinglé : l'escale qui reçoit le focus vient à l'écran */
+  voyage.addEventListener('focusin', e => {
+    if (!voyPin) return;
+    const li = e.target.closest('[data-escale]');
+    const i = ESC.findIndex(x => x.el === li);
+    if (i > -1 && i !== escOn) scrollToY(voyTop + Math.max(0, i - .25) * voyPas, true);
+  });
+
+  /* ---------- 6. La Terre : un seul globe (shared/terre.js, chargé après ce script), les escales et leurs arcs ---------- */
+  function terre() {
+    safe('terre', () => {
+      if (!window.Terre) return;
+      globe = window.Terre.creer($('[data-terre]'), {
+        points: ESC.map(e => ({ id: e.id, lat: e.lat, lon: e.lon, futur: e.futur })),
+        lat: -22, lon: 116, derive: RM.matches ? 0 : DERIVE,
+        arrivee: PLONGEE ? 'plongee' : null,
+        observer: [hero, voyage]
+      });
+      if (!globe) return;
+      arcs = ESC.slice(1).map((e, k) => globe.arc('vol-' + k, ESC[k], e, { pointille: e.futur }));
+      escOn = -1;
+      measure();
+      if (enVu()) { etat = etatAff = zone(scrollY); fd = 1; appliquerEtat(etatAff); opacitesVu(); }
+      frame();
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', terre, { once: true });
+  else terre();
+
+  /* ---------- Tout s'est bien chargé : on désarme le garde-fou ---------- */
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="shared/terre.js" defer></script>
+<script src="shared/courses.js" defer></script>
+<script src="shared/profondeur.js" defer></script>
+<script src="shared/passage.js" defer></script><script src="shared/cordon.js" defer></script><script src="shared/etoiles.js" defer></script>
+<script src="shared/revue.js" defer></script>
+</body>
+</html>

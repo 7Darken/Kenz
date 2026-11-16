@@ -1,0 +1,272 @@
+{
+  "status": "delivered",
+  "pilotApproved": true,
+  "revision": 5,
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "id": "createur-passeport",
+      "exports": [
+        {
+          "file": "createur/createur-passeport.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 687452
+        },
+        {
+          "file": "createur/createur-passeport.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 360454
+        },
+        {
+          "file": "createur/512/createur-passeport.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 172486
+        },
+        {
+          "file": "createur/512/createur-passeport.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 25630
+        }
+      ]
+    },
+    {
+      "id": "pro-noyau-ia",
+      "exports": [
+        {
+          "file": "pro/pro-noyau-ia.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 572253
+        },
+        {
+          "file": "pro/pro-noyau-ia.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 284920
+        },
+        {
+          "file": "pro/512/pro-noyau-ia.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 155765
+        },
+        {
+          "file": "pro/512/pro-noyau-ia.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 28958
+        }
+      ]
+    },
+    {
+      "id": "pro-telephone",
+      "exports": [
+        {
+          "file": "pro/pro-telephone.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 438832
+        },
+        {
+          "file": "pro/pro-telephone.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 197736
+        },
+        {
+          "file": "pro/512/pro-telephone.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 113237
+        },
+        {
+          "file": "pro/512/pro-telephone.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 17226
+        }
+      ]
+    },
+    {
+      "id": "pro-trophee",
+      "exports": [
+        {
+          "file": "pro/pro-trophee.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 613253
+        },
+        {
+          "file": "pro/pro-trophee.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 289040
+        },
+        {
+          "file": "pro/512/pro-trophee.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 164054
+        },
+        {
+          "file": "pro/512/pro-trophee.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 25492
+        }
+      ]
+    },
+    {
+      "id": "pro-satellite",
+      "exports": [
+        {
+          "file": "pro/pro-satellite.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 295297
+        },
+        {
+          "file": "pro/pro-satellite.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 157600
+        },
+        {
+          "file": "pro/512/pro-satellite.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 77886
+        },
+        {
+          "file": "pro/512/pro-satellite.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 16720
+        }
+      ]
+    },
+    {
+      "id": "createur-avion",
+      "exports": [
+        {
+          "file": "createur/createur-avion.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 279657
+        },
+        {
+          "file": "createur/createur-avion.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 144668
+        },
+        {
+          "file": "createur/512/createur-avion.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 77943
+        },
+        {
+          "file": "createur/512/createur-avion.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 17562
+        }
+      ]
+    },
+    {
+      "id": "createur-appareil",
+      "exports": [
+        {
+          "file": "createur/createur-appareil.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 590106
+        },
+        {
+          "file": "createur/createur-appareil.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 305312
+        },
+        {
+          "file": "createur/512/createur-appareil.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 153687
+        },
+        {
+          "file": "createur/512/createur-appareil.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 23576
+        }
+      ]
+    },
+    {
+      "id": "createur-etiquette",
+      "exports": [
+        {
+          "file": "createur/createur-etiquette.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 627835
+        },
+        {
+          "file": "createur/createur-etiquette.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 334294
+        },
+        {
+          "file": "createur/512/createur-etiquette.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 153104
+        },
+        {
+          "file": "createur/512/createur-etiquette.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 27098
+        }
+      ]
+    }
+  ]
+}

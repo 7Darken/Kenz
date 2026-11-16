@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maquettes — Kenz.</title>
+<meta name="description" content="Galerie des cinq maquettes du site de Kenz (REC / PROD, Carnet, Lignes, Épisode, Matière), avec leurs notes après vérification et le verdict du jury.">
+<meta name="robots" content="noindex, nofollow">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=Instrument+Serif:ital@0;1&display=swap">
+<style>
+/* ============================================================
+   Galerie des maquettes — même règles que les maquettes :
+   CSS et JS dans le fichier, aucune requête hors Google Fonts.
+   Tokens du socle (brief 05, § 9.1) ; thème clair et sombre.
+   ============================================================ */
+:root{
+  --fond:#F3F1EC; --surface:#FBFAF7; --surface-2:#ECE9E2;
+  --encre:#15171A; --texte-2:#5A5E65; --filet:#E0DCD3; --trait:#878278;
+  --accent:#2D52C4; --sur-accent:#FBFAF7; --focus:#2D52C4;
+  --ombre:0 1px 2px rgba(21,23,26,.04),0 18px 40px -22px rgba(21,23,26,.22);
+  --ombre-haute:0 2px 4px rgba(21,23,26,.05),0 28px 56px -26px rgba(21,23,26,.30);
+  --puce:rgba(251,250,247,.94);
+  --ease-arrivee:cubic-bezier(.16,1,.3,1);
+  --ease-sortie:cubic-bezier(.32,0,.67,0);
+  --ease-recadre:cubic-bezier(.65,0,.35,1);
+  --f-sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-serif:"Instrument Serif",ui-serif,Georgia,serif;
+  --gout:clamp(16px,4vw,40px);
+  --max:1240px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --fond:#111214; --surface:#191B1E; --surface-2:#202327;
+    --encre:#F1EFEA; --texte-2:#A4A8AF; --filet:#2A2D31; --trait:#7C818A;
+    --accent:#9DB2FF; --sur-accent:#111214; --focus:#9DB2FF;
+    --ombre:0 1px 2px rgba(0,0,0,.3),0 18px 40px -22px rgba(0,0,0,.6);
+    --ombre-haute:0 2px 4px rgba(0,0,0,.35),0 28px 56px -24px rgba(0,0,0,.7);
+    --puce:rgba(17,18,20,.9);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --fond:#111214; --surface:#191B1E; --surface-2:#202327;
+  --encre:#F1EFEA; --texte-2:#A4A8AF; --filet:#2A2D31; --trait:#7C818A;
+  --accent:#9DB2FF; --sur-accent:#111214; --focus:#9DB2FF;
+  --ombre:0 1px 2px rgba(0,0,0,.3),0 18px 40px -22px rgba(0,0,0,.6);
+  --ombre-haute:0 2px 4px rgba(0,0,0,.35),0 28px 56px -24px rgba(0,0,0,.7);
+  --puce:rgba(17,18,20,.9);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;background:var(--fond);color:var(--encre);
+  font:400 16px/1.55 var(--f-sans);font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit}
+h1,h2,h3,h4,p,ol,ul,dl,dd,figure{margin:0}
+ol,ul{padding:0;list-style:none}
+em{font-family:var(--f-serif);font-style:italic;font-weight:400;letter-spacing:0}
+code{font:500 .9em/1 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--surface-2);padding:.15em .4em;border-radius:6px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.evitement{position:absolute;left:12px;top:12px;z-index:20;padding:12px 16px;border-radius:10px;background:var(--encre);color:var(--surface);font-weight:600;text-decoration:none;transform:translateY(-160%);transition:transform .2s var(--ease-arrivee)}
+.evitement:focus{transform:none}
+.wrap{width:100%;max-width:var(--max);margin:0 auto;padding-left:var(--gout);padding-right:var(--gout)}
+.tnum{font-feature-settings:"tnum","zero"}
+
+/* ---------- En-tête ---------- */
+.tete{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;padding-bottom:20px}
+.marque{display:inline-flex;align-items:baseline;gap:2px;text-decoration:none;font-weight:700;font-size:22px;letter-spacing:-.03em;min-height:44px;align-items:center}
+.marque .point{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-left:2px;transform:translateY(5px)}
+.tete nav ul{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tete nav a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border-radius:999px;text-decoration:none;color:var(--texte-2);font-weight:500;font-size:15px;position:relative}
+.tete nav a::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:1.5px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .24s var(--ease-arrivee)}
+.tete nav a:hover,.tete nav a:focus-visible{color:var(--encre)}
+.tete nav a:hover::after,.tete nav a:focus-visible::after{transform:scaleX(1)}
+
+/* ---------- Intro ---------- */
+.intro{padding-top:clamp(28px,6vw,72px);padding-bottom:clamp(28px,4vw,48px)}
+.surtitre{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--texte-2)}
+.intro h1{
+  margin-top:14px;font-size:clamp(40px,7.4vw,88px);line-height:.98;letter-spacing:-.035em;font-weight:620;
+  font-variation-settings:"opsz" 32;max-width:13ch;text-wrap:balance;
+}
+.intro h1 em{font-size:1.06em}
+.chapo{margin-top:22px;max-width:62ch;font-size:clamp(17px,1.9vw,20px);line-height:1.5;color:var(--texte-2);text-wrap:pretty}
+.chapo strong{color:var(--encre);font-weight:600}
+.faits{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:24px}
+.faits li{display:inline-flex;align-items:center;gap:8px;min-height:36px;max-width:100%;padding:6px 14px;line-height:1.35;border:1px solid var(--filet);border-radius:999px;background:var(--surface);font-size:14px;color:var(--texte-2)}
+.faits li b{color:var(--encre);font-weight:600}
+.faits .pastille{width:8px;height:8px;border-radius:50%;border:1.5px solid currentColor}
+.faits .pastille--pleine{background:currentColor;border-color:currentColor}
+.faits .pastille--pointille{border-style:dotted;border-width:2px}
+
+/* balayage doux des titres (socle, § 9.1) */
+.balaye{padding:0 .12em .16em 0;margin-right:-.12em;margin-bottom:-.16em}
+.js .balaye{clip-path:inset(0 100% 0 0);filter:blur(6px);transition:clip-path .6s var(--ease-arrivee),filter .6s var(--ease-arrivee)}
+.js .balaye.vu{clip-path:inset(0 0 0 0);filter:none}
+.js .balaye.fini{clip-path:none}
+
+/* ---------- Verdict ---------- */
+.verdict{padding-bottom:clamp(32px,5vw,56px)}
+.verdict-carte{
+  position:relative;display:grid;gap:28px;grid-template-columns:1fr;
+  padding:clamp(22px,4vw,44px);border-radius:24px;background:var(--surface);border:1px solid var(--filet);box-shadow:var(--ombre);overflow:hidden;
+}
+.verdict-carte::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+@media (min-width:960px){.verdict-carte{grid-template-columns:1.05fr .95fr;align-items:start}}
+.verdict h2{margin-top:12px;font-size:clamp(28px,3.6vw,44px);line-height:1.05;letter-spacing:-.03em;font-weight:620;font-variation-settings:"opsz" 32;text-wrap:balance}
+.verdict p.txt{margin-top:16px;color:var(--texte-2);max-width:56ch;text-wrap:pretty}
+.verdict p.txt b{color:var(--encre);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:22px}
+.greffes-titre{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--texte-2)}
+.greffes{margin-top:12px;display:grid;gap:8px}
+.greffes a{
+  display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;min-height:48px;padding:8px 14px 8px 8px;
+  border:1px solid var(--filet);border-radius:14px;background:var(--fond);text-decoration:none;
+  transition:border-color .2s,background-color .2s,transform .24s var(--ease-arrivee);
+}
+.greffes a:hover,.greffes a:focus-visible{border-color:var(--trait);transform:translateX(3px)}
+.greffes .g{display:inline-grid;place-items:center;height:30px;border-radius:9px;background:var(--surface-2);font-weight:650;font-size:13px}
+.greffes .nom{font-weight:550;font-size:15px;line-height:1.3}
+.greffes .src{font-size:13px;color:var(--texte-2);white-space:nowrap}
+.greffes .src .fl{display:inline-block;transition:transform .2s var(--ease-arrivee)}
+.greffes a:hover .src .fl,.greffes a:focus-visible .src .fl{transform:translateX(-3px)}
+
+/* ---------- Boutons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 18px 0 16px;border-radius:999px;
+  border:1px solid var(--trait);background:transparent;color:var(--encre);
+  font:600 15px/1 var(--f-sans);text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:background-color .2s,border-color .2s,color .2s;
+}
+.btn:hover{border-color:var(--encre)}
+.btn--plein{background:var(--encre);border-color:var(--encre);color:var(--surface)}
+.btn--plein:hover{background:var(--encre)}
+/* le point s'étire en bouton (geste de REC / PROD, greffe G4) */
+.btn .pt{display:inline-block;width:22px;height:8px;border-radius:4px;background:currentColor;margin-right:-6px;
+  clip-path:inset(0 14px 0 0 round 4px);transition:clip-path .28s var(--ease-arrivee)}
+.btn:hover .pt,.btn:focus-visible .pt{clip-path:inset(0 0 0 0 round 4px)}
+.btn .fl{display:inline-block;transition:transform .2s var(--ease-arrivee)}
+.btn:hover .fl,.btn:focus-visible .fl{transform:translateX(4px)}
+.lien{display:inline-flex;align-items:center;min-height:44px;color:var(--texte-2);font-size:15px;font-weight:500;text-decoration:underline;text-decoration-color:var(--filet);text-underline-offset:4px;text-decoration-thickness:1.5px;transition:color .2s,text-decoration-color .2s}
+.lien:hover,.lien:focus-visible{color:var(--encre);text-decoration-color:currentColor}
+
+/* ---------- Galerie : barre d'outils ---------- */
+.galerie{padding-bottom:clamp(40px,6vw,80px)}
+.galerie-tete{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px 24px;padding-bottom:22px;border-bottom:1px solid var(--filet)}
+.galerie-tete h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.025em;font-weight:620;line-height:1.1}
+.outils{display:flex;flex-wrap:wrap;gap:12px 20px}
+.groupe{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.groupe>span{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--texte-2)}
+.seg{display:inline-flex;padding:3px;border-radius:999px;background:var(--surface-2);border:1px solid var(--filet)}
+.seg button{
+  position:relative;min-height:38px;min-width:44px;padding:0 13px;border:0;border-radius:999px;background:transparent;color:var(--texte-2);
+  font:550 14px/1 var(--f-sans);cursor:pointer;transition:color .2s,background-color .2s,box-shadow .2s;
+}
+.seg button::after{content:"";position:absolute;inset:-3px 0}
+.seg button:hover{color:var(--encre)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--encre);box-shadow:0 1px 2px rgba(21,23,26,.08),0 0 0 1px var(--filet)}
+
+/* ---------- Cartes ---------- */
+.liste{display:grid;gap:22px;margin-top:26px}
+.carte{
+  --pad:clamp(16px,2.6vw,28px);
+  position:relative;display:grid;gap:22px;grid-template-columns:1fr;
+  padding:var(--pad);border-radius:22px;background:var(--surface);border:1px solid var(--filet);box-shadow:var(--ombre);
+  transition:box-shadow .3s var(--ease-arrivee),border-color .3s;
+  scroll-margin-top:24px;
+}
+.carte.actif{box-shadow:var(--ombre-haute)}
+.carte[data-reco]{border-color:color-mix(in srgb,var(--accent) 45%,var(--filet))}
+@media (min-width:760px){
+  .carte{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .carte .vfig{grid-column:1/2}
+  .carte .corps{grid-column:2/3}
+  .carte .notes{grid-column:1/3}
+}
+@media (min-width:1120px){
+  .carte{grid-template-columns:minmax(0,1.05fr) minmax(0,1.15fr) minmax(0,.8fr);align-items:start}
+  .carte .vfig{grid-column:auto}
+  .carte .corps{grid-column:auto}
+  .carte .notes{grid-column:auto;border-top:0;padding-top:0;border-left:1px solid var(--filet);padding-left:clamp(16px,2vw,26px);align-self:stretch}
+}
+
+/* Apparition : token « carte » du socle (+34 px, 0,965 → 1, 550 ms) */
+.js .carte{opacity:0;transform:translateY(34px) scale(.965)}
+.js .carte.vu{opacity:1;transform:none;transition:opacity .55s var(--ease-arrivee),transform .55s var(--ease-arrivee),box-shadow .3s var(--ease-arrivee),border-color .3s;transition-delay:calc(var(--i,0) * 60ms),calc(var(--i,0) * 60ms),0s,0s}
+
+/* Vignette (schéma, pas une capture) */
+.vfig{display:grid;gap:10px;align-content:start}
+.vignette{
+  position:relative;display:block;width:100%;aspect-ratio:16/10;padding:0;margin:0;border:1px solid var(--filet);border-radius:16px;overflow:hidden;
+  background:var(--surface-2);cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.vignette svg{display:block;width:100%;height:100%}
+.vignette:focus-visible{outline-offset:4px;border-radius:16px}
+.v-pro,.v-crea{transition:opacity .32s var(--ease-arrivee);transition-delay:var(--d,0ms)}
+.vignette[data-vue="pro"] .v-crea{opacity:0}
+.vignette[data-vue="createur"] .v-pro{opacity:0}
+.cote-puce{
+  position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;border-radius:999px;
+  background:var(--puce);color:var(--encre);font-size:13px;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08);pointer-events:none;
+}
+.cote-puce .pt{width:8px;height:8px;border-radius:50%;background:currentColor;transition:transform .24s var(--ease-arrivee)}
+.cote-puce .l{display:inline-grid}
+.cote-puce .l>span{grid-area:1/1;transition:opacity .2s,transform .24s var(--ease-arrivee)}
+.vignette[data-vue="pro"] .cote-puce .l-crea,.vignette[data-vue="createur"] .cote-puce .l-pro{opacity:0;transform:translateY(6px)}
+.vignette[data-vue="createur"] .cote-puce .pt{transform:scale(1.25)}
+.legende{font-size:13px;color:var(--texte-2);line-height:1.4}
+
+/* Corps */
+.corps{min-width:0}
+.titre-l{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.num{font-size:15px;font-weight:600;color:var(--texte-2);font-feature-settings:"tnum","zero"}
+.carte h3{font-size:clamp(28px,3.2vw,40px);line-height:1;letter-spacing:-.03em;font-weight:640;font-variation-settings:"opsz" 32}
+.badge{display:inline-flex;align-items:center;gap:8px;margin-top:12px;min-height:30px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--filet);color:var(--texte-2)}
+.badge--reco{background:var(--accent);border-color:var(--accent);color:var(--sur-accent)}
+.badge .pt{width:7px;height:7px;border-radius:50%;background:currentColor}
+.concept{margin-top:14px;font-size:17px;line-height:1.5;text-wrap:pretty}
+.concept em{font-size:1.1em}
+.pm{display:grid;gap:6px;margin-top:14px}
+.pm li{display:grid;grid-template-columns:22px 1fr;gap:6px;font-size:15px;line-height:1.45;color:var(--texte-2)}
+.pm li b{color:var(--encre);font-weight:600}
+.pm .s{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--trait);font-size:13px;font-weight:700;color:var(--encre);line-height:1;margin-top:1px}
+.bloc{margin-top:18px}
+.bloc h4{font-size:12.5px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--texte-2)}
+.signs{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.signs li{display:inline-flex;align-items:center;min-height:30px;padding:0 11px;border-radius:999px;background:var(--fond);border:1px solid var(--filet);font-size:13.5px;line-height:1.2}
+.signs li .w{font-weight:650;margin-right:6px;color:var(--texte-2);font-feature-settings:"tnum"}
+.palette{display:grid;gap:8px;margin-top:9px}
+.palette .rang{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:start}
+.palette .rang>span{font-size:13px;font-weight:600;color:var(--texte-2);padding-top:3px}
+.palette ul{display:flex;flex-wrap:wrap;gap:6px 12px}
+.palette li{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--texte-2);font-feature-settings:"tnum","zero"}
+.palette .sw{width:18px;height:18px;border-radius:6px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);transition:transform .2s var(--ease-arrivee)}
+.palette li:hover .sw{transform:translateY(-2px) scale(1.12)}
+.typo{margin-top:14px;font-size:14px;color:var(--texte-2)}
+.typo b{color:var(--encre);font-weight:600}
+
+/* Notes */
+.notes{min-width:0;display:grid;gap:16px;align-content:start;border-top:1px solid var(--filet);padding-top:20px}
+.moy{display:flex;align-items:baseline;gap:10px}
+.moy-v{display:inline-block;overflow:hidden;line-height:1;padding-bottom:.06em}
+.moy-v>span{display:inline-block;font-size:clamp(44px,5vw,60px);font-weight:620;letter-spacing:-.04em;font-variation-settings:"opsz" 32;font-feature-settings:"tnum","zero"}
+.js .carte:not(.vu) .moy-v>span{transform:translateY(100%);opacity:0}
+.js .carte.vu .moy-v>span{transition:transform .32s var(--ease-arrivee) .25s,opacity .2s .25s}
+.moy-l{font-size:14px;color:var(--texte-2);line-height:1.3}
+.barres{display:grid;gap:9px}
+.barres>div{display:grid;grid-template-columns:96px 1fr 34px;align-items:center;gap:10px}
+.barres dt{font-size:14px;color:var(--texte-2)}
+.barres dd{display:contents}
+.barre{display:block;height:6px;border-radius:3px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--filet);overflow:hidden}
+.barre i{display:block;height:100%;border-radius:3px;background:var(--encre);clip-path:inset(0 calc(100% - var(--p) * 100%) 0 0)}
+.carte[data-reco] .barre i{background:var(--accent)}
+.js .carte:not(.vu) .barre i{clip-path:inset(0 100% 0 0)}
+.js .carte.vu .barre i{transition:clip-path .6s var(--ease-arrivee);transition-delay:calc(220ms + var(--k,0) * 50ms)}
+.barres .val{font-size:14px;font-weight:600;text-align:right;font-feature-settings:"tnum","zero"}
+.echelle{font-size:12.5px;color:var(--texte-2)}
+.jury{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--texte-2)}
+.jury b{color:var(--encre);font-weight:650;font-feature-settings:"tnum"}
+.notes .actions{margin-top:2px}
+
+/* ---------- Gestes des vignettes (au survol ou au focus de la carte) ---------- */
+.vignette svg *{transform-box:fill-box}
+/* 01 — le point s'étire, les équerres se posent */
+.v1-pill{stroke-dasharray:.001 2;transition:stroke-dasharray .28s var(--ease-arrivee)}
+.v1-pill-t{opacity:0;transition:opacity .16s}
+.carte.actif .v1-pill{stroke-dasharray:1 0}
+.carte.actif .v1-pill-t{opacity:1;transition-delay:.08s}
+.v1-eq{opacity:0;transition:transform .22s var(--ease-arrivee),opacity .22s}
+.v1-eq.a{transform:translate(-6px,-6px)} .v1-eq.b{transform:translate(6px,-6px)}
+.v1-eq.c{transform:translate(-6px,6px)} .v1-eq.d{transform:translate(6px,6px)}
+.carte.actif .v1-eq{opacity:1;transform:none}
+/* 02 — les tracés */
+.v2-trace{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .24s var(--ease-sortie)}
+.carte.actif .v2-trace{stroke-dashoffset:0;transition:stroke-dashoffset .52s var(--ease-arrivee)}
+.carte.actif .v2-trace.t2{transition-delay:.18s}
+.v2-pointe{opacity:0;transition:opacity .12s}
+.carte.actif .v2-pointe{opacity:1;transition-delay:.42s}
+/* 03 — la rame s'arrête à « Validation humaine » */
+.v3-rame{transition:transform .24s var(--ease-sortie)}
+.carte.actif .v3-rame{transform:translateX(231px);transition:transform .9s cubic-bezier(.45,0,.2,1)}
+.v3-anneau{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .2s}
+.carte.actif .v3-anneau{stroke-dashoffset:0;transition:stroke-dashoffset 1.2s var(--ease-arrivee) .9s}
+.v3-tampon{opacity:0;transform:scale(1.04) rotate(-4deg);transform-origin:center;transition:opacity .16s,transform .16s}
+.carte.actif .v3-tampon{opacity:1;transform:rotate(-4deg);transition-delay:.12s}
+/* 04 — crédits et bande d'épisodes */
+.v4-lis{transform:scaleY(0);transform-origin:center;transition:transform .2s var(--ease-arrivee)}
+.carte.actif .v4-lis{transform:scaleY(1)}
+.carte.actif .v4-lis.b{transition-delay:.08s}
+.v4-bande{transition:transform .42s var(--ease-arrivee)}
+.carte.actif .v4-bande{transform:translateX(-78px)}
+.v4-n1,.v4-n2{transition:transform .2s var(--ease-arrivee),opacity .16s}
+.v4-n2{opacity:0;transform:translateY(9px)}
+.carte.actif .v4-n1{opacity:0;transform:translateY(-9px)}
+.carte.actif .v4-n2{opacity:1;transform:none;transition-delay:.12s}
+.v4-tampon{opacity:.0;transform:scale(1.04) rotate(-4deg);transform-origin:center;transition:opacity .16s,transform .16s}
+.carte.actif .v4-tampon{opacity:1;transform:rotate(-4deg);transition-delay:.2s}
+/* 05 — la vue éclatée, l'objet en main */
+.v5-p2,.v5-p3{transition:transform .48s var(--ease-arrivee)}
+.carte.actif .v5-p2{transform:translateY(-11px);transition-delay:.06s}
+.carte.actif .v5-p3{transform:translateY(-22px);transition-delay:.12s}
+.v5-l{opacity:0;transition:opacity .2s}
+.carte.actif .v5-l{opacity:1;transition-delay:.32s}
+.v5-objet{transition:transform .32s var(--ease-arrivee)}
+.v5-ombre{transform-origin:center;transition:transform .32s var(--ease-arrivee),opacity .32s}
+.carte.actif .v5-objet{transform:translateY(-8px)}
+.carte.actif .v5-ombre{transform:scaleX(1.2);opacity:.55}
+
+/* ---------- Comparatif ---------- */
+.comparatif{padding-bottom:clamp(48px,7vw,96px)}
+.comparatif h2{font-size:clamp(24px,3vw,34px);letter-spacing:-.025em;font-weight:620;line-height:1.1}
+.comparatif .txt{margin-top:10px;color:var(--texte-2);max-width:70ch}
+.defile{margin-top:22px;overflow-x:auto;border:1px solid var(--filet);border-radius:18px;background:var(--surface);-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:760px;border-collapse:collapse;font-size:15px}
+caption{text-align:left;padding:16px 18px 0;font-size:13px;color:var(--texte-2)}
+th,td{padding:13px 18px;text-align:left;border-bottom:1px solid var(--filet);white-space:nowrap}
+thead th{font-size:12.5px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--texte-2)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-feature-settings:"tnum","zero"}
+th.n{text-align:right}
+tbody th{font-weight:600}
+tbody th a{text-decoration:none}
+tbody th a:hover{text-decoration:underline;text-underline-offset:3px}
+tr.reco th,tr.reco td{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+td.role{white-space:normal;min-width:240px;color:var(--texte-2)}
+tbody tr{transition:background-color .2s}
+tbody tr:hover{background:var(--fond)}
+
+/* ---------- Pied ---------- */
+.pied{border-top:1px solid var(--filet);padding-top:26px;padding-bottom:calc(32px + env(safe-area-inset-bottom));display:grid;gap:10px;font-size:14px;color:var(--texte-2)}
+.pied p{max-width:80ch}
+
+/* ---------- Petits écrans ---------- */
+@media (max-width:520px){
+  .tete{flex-wrap:wrap}
+  .greffes a{grid-template-columns:38px 1fr;row-gap:2px}
+  .greffes .src{grid-column:2;white-space:normal}
+  .barres>div{grid-template-columns:84px 1fr 30px}
+  .palette .rang{grid-template-columns:1fr}
+  .outils{width:100%}
+}
+
+/* ---------- Mouvement réduit ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.12s!important;transition-delay:0s!important;animation:none!important}
+  .js .carte,.js .carte.vu{opacity:1;transform:none}
+  .js .carte:not(.vu) .barre i{clip-path:inset(0 calc(100% - var(--p) * 100%) 0 0)}
+  .js .carte:not(.vu) .moy-v>span{transform:none;opacity:1}
+  .js .balaye{clip-path:none;filter:none}
+}
+
+/* ---------- Impression ---------- */
+@media print{
+  .js .carte,.js .carte.vu{opacity:1;transform:none;box-shadow:none;break-inside:avoid}
+  .js .carte:not(.vu) .barre i{clip-path:inset(0 calc(100% - var(--p) * 100%) 0 0)}
+  .js .carte:not(.vu) .moy-v>span{transform:none;opacity:1}
+  .js .balaye{clip-path:none;filter:none}
+  .outils,.evitement{display:none}
+}
+</style>
+</head>
+<body>
+<a class="evitement" href="#contenu">Aller au contenu</a>
+
+<header class="tete wrap">
+  <a class="marque" href="./index.html" aria-label="Kenz, galerie des maquettes">Kenz<span class="point" aria-hidden="true"></span></a>
+  <nav aria-label="Documents">
+    <ul>
+      <li><a href="./_brief/05-brief-final.md">Le brief</a></li>
+      <li><a href="./_brief/06-verdict.md">Le verdict</a></li>
+      <li><a href="#comparatif">Le comparatif</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main id="contenu" tabindex="-1">
+
+  <section class="intro wrap" aria-labelledby="t-intro">
+    <p class="surtitre">Maquettes du site · 11/11/2026</p>
+    <h1 id="t-intro" class="balaye">Cinq maquettes, un <em>verdict</em>.</h1>
+    <p class="chapo">Cinq directions pour séparer vraiment les deux casquettes&#8239;: le <strong>Pro</strong> (AI engineer, développeur fullstack, solopreneur, et la mise en place d'agents IA chez un client) et le <strong>Créateur</strong> (Kenz en Asie, k15ze). Même socle, mêmes données, les 38 routes du sitemap dans chacune. Seules changent la composition, la matière et les gestes.</p>
+    <ul class="faits" aria-label="Repères">
+      <li><span class="pastille pastille--pleine" aria-hidden="true"></span><b>38</b> routes par maquette</li>
+      <li><span class="pastille pastille--pleine" aria-hidden="true"></span><b>5</b> vérifications, notes après corrections</li>
+      <li><span class="pastille" aria-hidden="true"></span>Données de <code>_shared/content.js</code>, relevé simulé du 11/11/2026</li>
+      <li><span class="pastille pastille--pointille" aria-hidden="true"></span>Rien vu dans un navigateur&#8239;: à ouvrir sur un vrai téléphone</li>
+    </ul>
+  </section>
+
+  <section class="verdict wrap" aria-labelledby="t-verdict">
+    <div class="verdict-carte">
+      <div>
+        <p class="surtitre">Recommandation du jury</p>
+        <h2 id="t-verdict">Partir de <em>Lignes</em>, et greffer le meilleur des quatre autres.</h2>
+        <p class="txt">La ligne <b>P2 «&#8239;Agents IA&#8239;»</b> et son arrêt obligatoire <b>«&#8239;Validation humaine&#8239;»</b> montrent à un futur client, d'un coup d'œil, ce qui peut s'installer chez lui&#8239;: les rôles, Hermes qui coordonne, et l'endroit où il garde la main. Les quatre lignes sont les quatre offres, le tableau des départs rend le live visible, et il n'y a aucun asset à produire.</p>
+        <p class="txt">Note pondérée du jury&#8239;: <b>72 / 80</b>, devant Épisode (65), REC / PROD (64), Carnet (63) et Matière (56).</p>
+        <div class="actions">
+          <a class="btn btn--plein" href="./_brief/06-verdict.md"><span class="pt" aria-hidden="true"></span>Lire le verdict</a>
+          <a class="btn" href="./03-lignes.html">Ouvrir Lignes <span class="fl" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <div>
+        <p class="greffes-titre" id="t-greffes">Les sept greffes</p>
+        <ol class="greffes" aria-labelledby="t-greffes">
+          <li><a href="#m04"><span class="g">G1</span><span class="nom">Crédits honnêtes, en terminus de ligne</span><span class="src"><span class="fl" aria-hidden="true">←</span> 04 Épisode</span></a></li>
+          <li><a href="#m02"><span class="g">G2</span><span class="nom">Fiche «&#8239;Où on en est&#8239;» et tampons du livrable</span><span class="src"><span class="fl" aria-hidden="true">←</span> 02 Carnet</span></a></li>
+          <li><a href="#m01"><span class="g">G3</span><span class="nom">Cadres 9:16 et cadre REC côté créateur</span><span class="src"><span class="fl" aria-hidden="true">←</span> 01 REC / PROD</span></a></li>
+          <li><a href="#m01"><span class="g">G4</span><span class="nom">Le point qui s'étire en bouton</span><span class="src"><span class="fl" aria-hidden="true">←</span> 01 REC / PROD</span></a></li>
+          <li><a href="#m04"><span class="g">G5</span><span class="nom">Bande d'épisodes native sur /asie</span><span class="src"><span class="fl" aria-hidden="true">←</span> 04 Épisode</span></a></li>
+          <li><a href="#m05"><span class="g">G6</span><span class="nom">Vue éclatée d'une équipe d'agents</span><span class="src"><span class="fl" aria-hidden="true">←</span> 05 Matière</span></a></li>
+          <li><a href="#m03"><span class="g">G7</span><span class="nom">Les six cas clients dès le premier écran</span><span class="src"><span class="fl" aria-hidden="true">←</span> 01, 04, 05</span></a></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="galerie wrap" aria-labelledby="t-galerie">
+    <div class="galerie-tete">
+      <h2 id="t-galerie">Les cinq directions</h2>
+      <div class="outils">
+        <div class="groupe" role="group" aria-labelledby="l-tri">
+          <span id="l-tri">Trier</span>
+          <div class="seg">
+            <button type="button" data-tri="n" aria-pressed="true">Numéro</button>
+            <button type="button" data-tri="jury" aria-pressed="false">Jury</button>
+            <button type="button" data-tri="moy" aria-pressed="false">Moyenne</button>
+            <button type="button" data-tri="produit" aria-pressed="false">Produit</button>
+          </div>
+        </div>
+        <div class="groupe" role="group" aria-labelledby="l-cote">
+          <span id="l-cote">Schémas</span>
+          <div class="seg">
+            <button type="button" data-cote-global="pro" aria-pressed="true">Pro</button>
+            <button type="button" data-cote-global="createur" aria-pressed="false">Créateur</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="sr-only" id="annonce" aria-live="polite"></p>
+
+    <div class="liste" id="liste">
+
+      <!-- ===================== 01 REC / PROD ===================== -->
+      <article class="carte" id="m01" data-n="1" data-moy="8.1" data-produit="8.5" data-jury="64" data-nom="REC / PROD" style="--i:0" aria-labelledby="h01">
+        <figure class="vfig">
+          <button class="vignette" type="button" data-vue="pro" aria-pressed="false" aria-label="Schéma de REC / PROD côté créateur">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="g1c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2b22"/><stop offset=".6" stop-color="#1f1a17"/><stop offset="1" stop-color="#141211"/></linearGradient>
+              </defs>
+              <g class="v-pro">
+                <rect width="320" height="200" fill="#F5F3EE"/>
+                <circle cx="26" cy="22" r="4" fill="#1F8A5B"/>
+                <text x="36" y="25.5" font-family="Inter,system-ui,sans-serif" font-size="9.5" font-weight="600" fill="#17704A">PROD · Oshii 2.0.2 · 04/11</text>
+                <rect x="20" y="38" width="206" height="116" rx="7" fill="#FBFAF7" stroke="#E3DFD7"/>
+                <rect x="36" y="56" width="126" height="10" rx="2" fill="#16181C"/>
+                <rect x="36" y="71" width="92" height="10" rx="2" fill="#16181C"/>
+                <rect x="36" y="92" width="150" height="3" rx="1.5" fill="#5D6168" opacity=".55"/>
+                <rect x="36" y="100" width="132" height="3" rx="1.5" fill="#5D6168" opacity=".55"/>
+                <line class="v1-pill" x1="44" y1="130" x2="122" y2="130" stroke="#17704A" stroke-width="16" stroke-linecap="round" pathLength="1"/>
+                <text class="v1-pill-t" x="50" y="133" font-family="Inter,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#FBFAF7">Demander un devis</text>
+                <rect x="240" y="38" width="62" height="110" rx="7" fill="none" stroke="#C9C4BA" stroke-dasharray="3 4"/>
+                <text x="240" y="168" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#5D6168">16:9 · posé</text>
+              </g>
+              <g class="v-crea">
+                <rect width="320" height="200" fill="#0E0D0C"/>
+                <text x="18" y="62" font-family="Instrument Serif,Georgia,serif" font-size="17" fill="#F4EFE6">Chongqing</text>
+                <text x="18" y="78" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#A8A196">le plan · 31/10</text>
+                <rect x="18" y="92" width="64" height="2" fill="#2C2A27"/>
+                <rect x="113" y="16" width="94" height="168" rx="9" fill="url(#g1c)"/>
+                <circle cx="126" cy="30" r="4" fill="#FF5A1F"/>
+                <text x="134" y="33.5" font-family="Inter,system-ui,sans-serif" font-size="9" font-weight="600" fill="#F4EFE6">REC</text>
+                <rect x="123" y="142" width="74" height="8" rx="2" fill="#F4EFE6"/>
+                <rect x="123" y="154" width="52" height="8" rx="2" fill="#F4EFE6"/>
+                <g fill="none" stroke="#F4EFE6" stroke-width="2" stroke-linecap="round">
+                  <path class="v1-eq a" d="M105 24 V8 H121"/>
+                  <path class="v1-eq b" d="M199 8 H215 V24"/>
+                  <path class="v1-eq c" d="M105 176 V192 H121"/>
+                  <path class="v1-eq d" d="M215 176 V192 H199"/>
+                </g>
+                <text x="226" y="62" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#A8A196">ce que ça m'a coûté</text>
+                <text x="226" y="94" font-family="Instrument Serif,Georgia,serif" font-style="italic" font-size="24" fill="#F4EFE6">10 €</text>
+                <text x="272" y="92" font-family="Inter,system-ui,sans-serif" font-size="10" fill="#A8A196">200 €</text>
+                <line x1="270" y1="89" x2="301" y2="86" stroke="#E8322B" stroke-width="2" stroke-linecap="round"/>
+                <text x="226" y="124" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#A8A196">9:16 · énergique</text>
+              </g>
+            </svg>
+            <span class="cote-puce" aria-hidden="true"><span class="pt"></span><span class="l"><span class="l-pro">Côté pro</span><span class="l-crea">Côté créateur</span></span></span>
+          </button>
+          <figcaption class="legende">Schéma de la direction, pas une capture. Un clic ou un toucher le fait changer de côté.</figcaption>
+        </figure>
+        <div class="corps">
+          <div class="titre-l"><span class="num">01</span><h3 id="h01">REC / PROD</h3></div>
+          <p class="badge"><span class="pt" aria-hidden="true"></span>Greffes G3 et G4 retenues</p>
+          <p class="concept">Le point de «&#8239;Kenz.&#8239;» devient un voyant&#8239;: PROD côté pro, REC côté créateur. Chaque côté prend le format de sortie réel de Kenz, le 16:9 posé et le 9:16 <em>énergique</em>.</p>
+          <ul class="pm">
+            <li><span class="s" aria-hidden="true">+</span><span><span class="sr-only">Force : </span><b>La séparation la plus lisible en vignette floue</b>&#8239;: format, lumière, navigation et ton changent ensemble.</span></li>
+            <li><span class="s" aria-hidden="true">−</span><span><span class="sr-only">Faiblesse : </span>Dépend d'extraits verticaux pas encore exportés&#8239;; l'iris attend sa validation (DA-1).</span></li>
+          </ul>
+          <div class="bloc">
+            <h4>Gestes signature</h4>
+            <ol class="signs">
+              <li><span class="w">W1</span>L'iris du point</li>
+              <li><span class="w">W16</span>Le timecode</li>
+              <li>Le point s'étire en bouton</li>
+              <li>La capture monte</li>
+              <li><span class="w">W7</span>La timeline à pistes</li>
+              <li>Le cadre REC</li>
+            </ol>
+          </div>
+          <div class="bloc">
+            <h4>Palette</h4>
+            <div class="palette">
+              <div class="rang"><span>Pro</span><ul>
+                <li><span class="sw" style="--c:#F5F3EE" aria-hidden="true"></span>#F5F3EE<span class="sr-only">, fond</span></li>
+                <li><span class="sw" style="--c:#16181C" aria-hidden="true"></span>#16181C<span class="sr-only">, encre</span></li>
+                <li><span class="sw" style="--c:#1F8A5B" aria-hidden="true"></span>#1F8A5B<span class="sr-only">, voyant PROD</span></li>
+                <li><span class="sw" style="--c:#2E3A4A" aria-hidden="true"></span>#2E3A4A<span class="sr-only">, agents et Hermes</span></li>
+              </ul></div>
+              <div class="rang"><span>Créateur</span><ul>
+                <li><span class="sw" style="--c:#0E0D0C" aria-hidden="true"></span>#0E0D0C<span class="sr-only">, nuit</span></li>
+                <li><span class="sw" style="--c:#F4EFE6" aria-hidden="true"></span>#F4EFE6<span class="sr-only">, crème</span></li>
+                <li><span class="sw" style="--c:#FF5A1F" aria-hidden="true"></span>#FF5A1F<span class="sr-only">, point REC</span></li>
+                <li><span class="sw" style="--c:#E8322B" aria-hidden="true"></span>#E8322B<span class="sr-only">, rouge, un seul élément</span></li>
+              </ul></div>
+            </div>
+          </div>
+          <p class="typo"><b>Typo</b> · socle Inter et Instrument Serif, plus IBM Plex Mono pour le timecode</p>
+        </div>
+        <div class="notes">
+          <h4 class="sr-only">Notes après vérification</h4>
+          <p class="moy"><span class="moy-v"><span>8,1</span></span><span class="moy-l">moyenne sur 10<br>après vérification</span></p>
+          <dl class="barres">
+            <div style="--p:.625;--k:0"><dt>Produit</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.5;--k:1"><dt>UX</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.5;--k:2"><dt>UI</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.5;--k:3"><dt>Motion</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.5;--k:4"><dt>Accessibilité</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+          </dl>
+          <p class="echelle" aria-hidden="true">Barres de 6 à 10, pour voir les écarts.</p>
+          <p class="jury"><span>Jury pondéré <b>64</b> / 80</span><span>Audiences <b>53</b> / 65</span></p>
+          <div class="actions">
+            <a class="btn btn--plein" href="./01-rec-prod.html"><span class="pt" aria-hidden="true"></span>Ouvrir<span class="sr-only"> la maquette 01, REC / PROD</span></a>
+            <a class="lien" href="./_brief/verif-01-rec-prod.md">Rapport de vérification<span class="sr-only"> de REC / PROD</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===================== 02 Carnet ===================== -->
+      <article class="carte" id="m02" data-n="2" data-moy="8.5" data-produit="8.5" data-jury="63" data-nom="Carnet" style="--i:1" aria-labelledby="h02">
+        <figure class="vfig">
+          <button class="vignette" type="button" data-vue="pro" aria-pressed="false" aria-label="Schéma de Carnet côté créateur">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <defs>
+                <pattern id="q2" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#E6DFD2" stroke-width="1"/></pattern>
+                <radialGradient id="i2" cx=".66" cy=".42" r=".85"><stop offset="0" stop-color="#5b3d2e"/><stop offset=".55" stop-color="#2a1d17"/><stop offset="1" stop-color="#111013"/></radialGradient>
+              </defs>
+              <g class="v-pro">
+                <rect width="320" height="200" fill="#F2EDE3"/>
+                <rect width="320" height="200" fill="url(#q2)"/>
+                <text x="14" y="32" font-family="Inter,system-ui,sans-serif" font-size="8.5" fill="#5C5853">état au</text>
+                <text x="14" y="44" font-family="Inter,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#5C5853">11/11/2026</text>
+                <rect x="14" y="92" width="44" height="3" fill="#5C5853" opacity=".55"/>
+                <rect x="14" y="99" width="34" height="3" fill="#5C5853" opacity=".55"/>
+                <rect x="74" y="14" width="176" height="174" rx="2" fill="#FAF7F1" stroke="#D9D2C5"/>
+                <rect x="88" y="30" width="108" height="10" fill="#111013"/>
+                <path class="v2-trace" pathLength="1" d="M88 49 C 118 53 154 45 198 50" fill="none" stroke="#2B4C9B" stroke-width="2.2" stroke-linecap="round"/>
+                <g fill="#111013">
+                  <rect x="88" y="66" width="148" height="1" fill="#D9D2C5"/>
+                  <circle cx="93" cy="77" r="3" fill="#2F6B4F"/><rect x="102" y="75" width="58" height="4"/><text x="206" y="80" font-family="Inter,system-ui,sans-serif" font-size="8.5" fill="#5C5853">2.0.2</text>
+                  <rect x="88" y="88" width="148" height="1" fill="#D9D2C5"/>
+                  <circle cx="93" cy="99" r="3" fill="#2F6B4F"/><rect x="102" y="97" width="44" height="4"/><text x="206" y="102" font-family="Inter,system-ui,sans-serif" font-size="8.5" fill="#5C5853">2.0.1</text>
+                  <rect x="88" y="110" width="148" height="1" fill="#D9D2C5"/>
+                  <circle cx="93" cy="121" r="3" fill="#2F6B4F"/><rect x="102" y="119" width="52" height="4"/><text x="206" y="124" font-family="Inter,system-ui,sans-serif" font-size="8.5" fill="#5C5853">1.1.1</text>
+                  <rect x="88" y="132" width="148" height="1" fill="#D9D2C5"/>
+                  <circle cx="93" cy="143" r="3" fill="#2F6B4F"/><rect x="102" y="141" width="38" height="4"/><text x="206" y="146" font-family="Inter,system-ui,sans-serif" font-size="8.5" fill="#5C5853">1.2.1</text>
+                </g>
+                <path class="v2-trace t2" pathLength="1" d="M58 96 C 70 96 74 99 86 99" fill="none" stroke="#2B4C9B" stroke-width="1.6" stroke-linecap="round"/>
+                <path class="v2-pointe" d="M81 95.5 L87 99 L81 102.5" fill="none" stroke="#2B4C9B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <rect x="262" y="30" width="44" height="3" fill="#5C5853" opacity=".55"/>
+                <rect x="262" y="37" width="32" height="3" fill="#5C5853" opacity=".55"/>
+              </g>
+              <g class="v-crea">
+                <rect width="320" height="200" fill="url(#i2)"/>
+                <circle cx="216" cy="74" r="21" fill="#1c1411"/>
+                <path d="M176 200 C 180 126 252 126 256 200 Z" fill="#1c1411"/>
+                <text x="18" y="40" font-family="Instrument Serif,Georgia,serif" font-size="24" fill="#F4EFE6">Chongqing</text>
+                <rect x="18" y="54" width="62" height="20" fill="#F2C14E"/>
+                <text x="25" y="68" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="700" fill="#111013">≈ 10 €</text>
+                <rect x="18" y="146" width="128" height="12" rx="2" fill="#F4EFE6"/>
+                <rect x="18" y="164" width="86" height="12" rx="2" fill="#F4EFE6"/>
+                <path class="v2-trace" pathLength="1" d="M150 148 C 168 134 176 114 186 98" fill="none" stroke="#E8322B" stroke-width="3" stroke-linecap="round"/>
+                <path class="v2-pointe" d="M180 101 L187 96 L189 104" fill="none" stroke="#E8322B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+            </svg>
+            <span class="cote-puce" aria-hidden="true"><span class="pt"></span><span class="l"><span class="l-pro">Côté pro</span><span class="l-crea">Côté créateur</span></span></span>
+          </button>
+          <figcaption class="legende">Schéma de la direction, pas une capture. Un clic ou un toucher le fait changer de côté.</figcaption>
+        </figure>
+        <div class="corps">
+          <div class="titre-l"><span class="num">02</span><h3 id="h02">Carnet</h3></div>
+          <p class="badge"><span class="pt" aria-hidden="true"></span>Greffe G2 retenue</p>
+          <p class="concept">Côté pro, un carnet d'atelier&#8239;: feuilles datées, sources en marge, registre des apps. Côté créateur, l'image plein cadre, <em>annotée</em> comme dans les montages de Kenz.</p>
+          <ul class="pm">
+            <li><span class="s" aria-hidden="true">+</span><span><span class="sr-only">Force : </span><b>Le meilleur livrable client</b>&#8239;: décisions datées, états des livrables, tampons de validation.</span></li>
+            <li><span class="s" aria-hidden="true">−</span><span><span class="sr-only">Faiblesse : </span>Le créateur attend des images plein cadre propres&#8239;; risque d'effet «&#8239;modèle Notion&#8239;» côté pro.</span></li>
+          </ul>
+          <div class="bloc">
+            <h4>Gestes signature</h4>
+            <ol class="signs">
+              <li>Le quadrillage se retire</li>
+              <li><span class="w">W15</span>La fiche «&#8239;Où on en est&#8239;»</li>
+              <li><span class="w">W14</span>Le renvoi de marge</li>
+              <li>La transmission qui se remplit</li>
+              <li>L'annotation qui se trace</li>
+              <li><span class="w">W4</span>Le vrai prix</li>
+            </ol>
+          </div>
+          <div class="bloc">
+            <h4>Palette</h4>
+            <div class="palette">
+              <div class="rang"><span>Pro</span><ul>
+                <li><span class="sw" style="--c:#F2EDE3" aria-hidden="true"></span>#F2EDE3<span class="sr-only">, papier</span></li>
+                <li><span class="sw" style="--c:#111013" aria-hidden="true"></span>#111013<span class="sr-only">, encre</span></li>
+                <li><span class="sw" style="--c:#2B4C9B" aria-hidden="true"></span>#2B4C9B<span class="sr-only">, stylo bleu</span></li>
+                <li><span class="sw" style="--c:#2F6B4F" aria-hidden="true"></span>#2F6B4F<span class="sr-only">, vert prod</span></li>
+              </ul></div>
+              <div class="rang"><span>Créateur</span><ul>
+                <li><span class="sw" style="--c:#111013" aria-hidden="true"></span>#111013<span class="sr-only">, cadre image</span></li>
+                <li><span class="sw" style="--c:#F4EFE6" aria-hidden="true"></span>#F4EFE6<span class="sr-only">, crème</span></li>
+                <li><span class="sw" style="--c:#E8322B" aria-hidden="true"></span>#E8322B<span class="sr-only">, rouge, un seul</span></li>
+                <li><span class="sw" style="--c:#F2C14E" aria-hidden="true"></span>#F2C14E<span class="sr-only">, moutarde</span></li>
+              </ul></div>
+            </div>
+          </div>
+          <p class="typo"><b>Typo</b> · socle, plus IBM Plex Mono pour les dates et les statuts</p>
+        </div>
+        <div class="notes">
+          <h4 class="sr-only">Notes après vérification</h4>
+          <p class="moy"><span class="moy-v"><span>8,5</span></span><span class="moy-l">moyenne sur 10<br>après vérification</span></p>
+          <dl class="barres">
+            <div style="--p:.625;--k:0"><dt>Produit</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:1"><dt>UX</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:2"><dt>UI</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:3"><dt>Motion</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:4"><dt>Accessibilité</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+          </dl>
+          <p class="echelle" aria-hidden="true">Barres de 6 à 10, pour voir les écarts.</p>
+          <p class="jury"><span>Jury pondéré <b>63</b> / 80</span><span>Audiences <b>51</b> / 65</span></p>
+          <div class="actions">
+            <a class="btn btn--plein" href="./02-carnet.html"><span class="pt" aria-hidden="true"></span>Ouvrir<span class="sr-only"> la maquette 02, Carnet</span></a>
+            <a class="lien" href="./_brief/verif-02-carnet.md">Rapport de vérification<span class="sr-only"> de Carnet</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===================== 03 Lignes ===================== -->
+      <article class="carte" id="m03" data-n="3" data-moy="8.6" data-produit="9" data-jury="72" data-nom="Lignes" data-reco style="--i:2" aria-labelledby="h03">
+        <figure class="vfig">
+          <button class="vignette" type="button" data-vue="pro" aria-pressed="false" aria-label="Schéma de Lignes côté créateur">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <g class="v-pro">
+                <rect width="320" height="200" fill="#F7F7F4"/>
+                <path d="M30 42 H294" stroke="#2D52C4" stroke-width="5" stroke-linecap="round" fill="none"/>
+                <circle cx="230" cy="42" r="5" fill="#F7F7F4" stroke="#0F1012" stroke-width="2"/>
+                <text x="206" y="30" font-family="Inter,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#0F1012">Oshii 2.0.2 · 04/11</text>
+                <path d="M30 92 H246 M30 99 H246" stroke="#3E4A5C" stroke-width="2" fill="none"/>
+                <path d="M272 92 H294 M272 99 H294" stroke="#3E4A5C" stroke-width="2" stroke-dasharray="3 3" fill="none"/>
+                <g fill="#F7F7F4" stroke="#0F1012" stroke-width="2">
+                  <circle cx="74" cy="95.5" r="5.5"/><circle cx="118" cy="95.5" r="5.5"/><circle cx="162" cy="95.5" r="5.5"/><circle cx="206" cy="95.5" r="5.5"/>
+                </g>
+                <circle cx="259" cy="95.5" r="10" fill="#F7F7F4" stroke="#0F1012" stroke-width="3"/>
+                <circle class="v3-anneau" pathLength="1" cx="259" cy="95.5" r="15.5" fill="none" stroke="#0F1012" stroke-width="1.5"/>
+                <text x="208" y="72" font-family="Inter,system-ui,sans-serif" font-size="8.5" font-weight="700" fill="#0F1012">Validation humaine</text>
+                <circle class="v3-rame" cx="28" cy="95.5" r="5" fill="#3E4A5C"/>
+                <path d="M30 146 H148 L176 118 H294" stroke="#4D7A59" stroke-width="5" stroke-dasharray="12 6" fill="none"/>
+                <path d="M30 182 H202 L230 154 H294" stroke="#7A3E6A" stroke-width="5" stroke-linecap="round" stroke-dasharray=".1 9" fill="none"/>
+                <g font-family="Inter,system-ui,sans-serif" font-size="8" font-weight="700" fill="#F7F7F4">
+                  <rect x="4" y="35" width="20" height="14" rx="7" fill="#2D52C4"/><text x="8" y="45">P1</text>
+                  <rect x="4" y="88.5" width="20" height="14" rx="7" fill="#3E4A5C"/><text x="8" y="98.5">P2</text>
+                  <rect x="4" y="139" width="20" height="14" rx="7" fill="#4D7A59"/><text x="8" y="149">P3</text>
+                  <rect x="4" y="175" width="20" height="14" rx="7" fill="#7A3E6A"/><text x="8" y="185">P4</text>
+                </g>
+              </g>
+              <g class="v-crea">
+                <rect width="320" height="200" fill="#F4EFE6"/>
+                <path d="M304 10 C 282 56 306 88 276 120 C 252 146 268 172 236 198" fill="none" stroke="#1A1918" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 5"/>
+                <path d="M222 44 C 184 66 152 92 132 120 C 168 138 202 136 238 138" fill="none" stroke="#E8322B" stroke-width="2.5" stroke-linecap="round"/>
+                <g fill="#1A1918">
+                  <circle cx="222" cy="44" r="4.5"/><circle cx="132" cy="120" r="4.5"/><circle cx="238" cy="138" r="4.5"/>
+                </g>
+                <g font-family="Instrument Serif,Georgia,serif" font-size="17" fill="#1A1918">
+                  <text x="170" y="34">Pékin</text><text x="44" y="116">Chongqing</text><text x="246" y="160">Shanghai</text>
+                </g>
+                <g class="v3-tampon">
+                  <rect x="36" y="146" width="98" height="26" rx="2" fill="none" stroke="#1A1918" stroke-width="2"/>
+                  <text x="46" y="163.5" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="800" letter-spacing=".04em" fill="#1A1918">JE CONSEILLE</text>
+                </g>
+                <text x="18" y="28" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#6B655C">À la une : la Chine</text>
+              </g>
+            </svg>
+            <span class="cote-puce" aria-hidden="true"><span class="pt"></span><span class="l"><span class="l-pro">Côté pro</span><span class="l-crea">Côté créateur</span></span></span>
+          </button>
+          <figcaption class="legende">Schéma de la direction, pas une capture. Un clic ou un toucher le fait changer de côté.</figcaption>
+        </figure>
+        <div class="corps">
+          <div class="titre-l"><span class="num">03</span><h3 id="h03">Lignes</h3></div>
+          <p class="badge badge--reco"><span class="pt" aria-hidden="true"></span>Direction recommandée</p>
+          <p class="concept">Côté pro, un plan de lignes en signalétique suisse, où chaque page est une station et la ligne des agents s'arrête à la validation humaine. Côté créateur, une carte de l'Asie aux <em>tampons</em>.</p>
+          <ul class="pm">
+            <li><span class="s" aria-hidden="true">+</span><span><span class="sr-only">Force : </span><b>Les agents lisibles d'un coup d'œil</b>, l'offre en quatre lignes, le live en tableau des départs, aucun asset à produire.</span></li>
+            <li><span class="s" aria-hidden="true">−</span><span><span class="sr-only">Faiblesse : </span>Un créateur calme pour un public TikTok&#8239;: corrigé par les greffes G3 et G5.</span></li>
+          </ul>
+          <div class="bloc">
+            <h4>Gestes signature</h4>
+            <ol class="signs">
+              <li>L'aiguillage</li>
+              <li>Survol d'une ligne</li>
+              <li>La rame</li>
+              <li><span class="w">W6</span>L'arrêt obligatoire</li>
+              <li>Le tableau des départs</li>
+              <li>Le tampon de ville</li>
+            </ol>
+          </div>
+          <div class="bloc">
+            <h4>Palette</h4>
+            <div class="palette">
+              <div class="rang"><span>Pro</span><ul>
+                <li><span class="sw" style="--c:#F7F7F4" aria-hidden="true"></span>#F7F7F4<span class="sr-only">, fond</span></li>
+                <li><span class="sw" style="--c:#0F1012" aria-hidden="true"></span>#0F1012<span class="sr-only">, encre</span></li>
+                <li><span class="sw" style="--c:#2D52C4" aria-hidden="true"></span>#2D52C4<span class="sr-only">, P1 Apps</span></li>
+                <li><span class="sw" style="--c:#3E4A5C" aria-hidden="true"></span>#3E4A5C<span class="sr-only">, P2 Agents</span></li>
+                <li><span class="sw" style="--c:#4D7A59" aria-hidden="true"></span>#4D7A59<span class="sr-only">, P3 Services</span></li>
+                <li><span class="sw" style="--c:#7A3E6A" aria-hidden="true"></span>#7A3E6A<span class="sr-only">, P4 Vidéo</span></li>
+              </ul></div>
+              <div class="rang"><span>Créateur</span><ul>
+                <li><span class="sw" style="--c:#F4EFE6" aria-hidden="true"></span>#F4EFE6<span class="sr-only">, crème</span></li>
+                <li><span class="sw" style="--c:#1A1918" aria-hidden="true"></span>#1A1918<span class="sr-only">, encre</span></li>
+                <li><span class="sw" style="--c:#E8322B" aria-hidden="true"></span>#E8322B<span class="sr-only">, saison Chine</span></li>
+                <li><span class="sw" style="--c:#0F5D6B" aria-hidden="true"></span>#0F5D6B<span class="sr-only">, saison Maurice</span></li>
+              </ul></div>
+            </div>
+          </div>
+          <p class="typo"><b>Typo</b> · socle, plus Archivo semi-condensé pour les noms de stations</p>
+        </div>
+        <div class="notes">
+          <h4 class="sr-only">Notes après vérification</h4>
+          <p class="moy"><span class="moy-v"><span>8,6</span></span><span class="moy-l">moyenne sur 10<br>après vérification</span></p>
+          <dl class="barres">
+            <div style="--p:.75;--k:0"><dt>Produit</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">9</span></dd></div>
+            <div style="--p:.625;--k:1"><dt>UX</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:2"><dt>UI</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:3"><dt>Motion</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:4"><dt>Accessibilité</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+          </dl>
+          <p class="echelle" aria-hidden="true">Barres de 6 à 10, pour voir les écarts.</p>
+          <p class="jury"><span>Jury pondéré <b>72</b> / 80</span><span>Audiences <b>54</b> / 65</span></p>
+          <div class="actions">
+            <a class="btn btn--plein" href="./03-lignes.html"><span class="pt" aria-hidden="true"></span>Ouvrir<span class="sr-only"> la maquette 03, Lignes</span></a>
+            <a class="lien" href="./_brief/verif-03-lignes.md">Rapport de vérification<span class="sr-only"> de Lignes</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===================== 04 Épisode ===================== -->
+      <article class="carte" id="m04" data-n="4" data-moy="8.4" data-produit="8.5" data-jury="65" data-nom="Épisode" style="--i:3" aria-labelledby="h04">
+        <figure class="vfig">
+          <button class="vignette" type="button" data-vue="pro" aria-pressed="false" aria-label="Schéma d'Épisode côté créateur">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <defs><clipPath id="b4"><rect x="6" y="130" width="308" height="64"/></clipPath></defs>
+              <g class="v-pro">
+                <rect width="320" height="200" fill="#0B0B0C"/>
+                <circle cx="26" cy="22" r="4" fill="#F0705A"/>
+                <text x="36" y="25.5" font-family="Inter,system-ui,sans-serif" font-size="9.5" font-weight="600" fill="#F4EFE6">Oshii · fiche technique</text>
+                <rect x="20" y="40" width="280" height="117" fill="#161514" stroke="#2A2826"/>
+                <line x1="160" y1="52" x2="160" y2="146" stroke="#2A2826"/>
+                <g fill="#9C978F">
+                  <rect x="100" y="59" width="50" height="4"/><rect x="110" y="77" width="40" height="4"/><rect x="90" y="95" width="60" height="4"/><rect x="114" y="113" width="36" height="4"/><rect x="94" y="131" width="56" height="4"/>
+                </g>
+                <g fill="#F4EFE6">
+                  <rect x="170" y="58" width="70" height="6"/><rect x="170" y="76" width="46" height="6"/><rect x="170" y="94" width="92" height="6"/><rect x="170" y="112" width="60" height="6"/><rect x="170" y="130" width="80" height="6"/>
+                </g>
+                <rect class="v4-lis" x="164" y="74" width="3" height="10" fill="#F0705A"/>
+                <rect class="v4-lis b" x="164" y="110" width="3" height="10" fill="#F0705A"/>
+                <text x="20" y="178" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#9C978F">Mise en production : Kenz · 30/10/2026</text>
+              </g>
+              <g class="v-crea">
+                <rect width="320" height="200" fill="#0E0D0C"/>
+                <rect x="6" y="6" width="190" height="118" fill="#F2EDE3"/>
+                <text x="18" y="36" font-family="Inter,system-ui,sans-serif" font-size="17" font-weight="800" letter-spacing="-.5" fill="#0E0D0C">BRANCHE-TOI</text>
+                <rect x="18" y="46" width="124" height="8" fill="#0E0D0C"/>
+                <rect x="18" y="60" width="92" height="8" fill="#0E0D0C"/>
+                <rect x="202" y="6" width="112" height="56" fill="#FFE600"/>
+                <text x="214" y="42" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="#0E0D0C">第3話</text>
+                <rect x="202" y="68" width="112" height="56" fill="#F2EDE3"/>
+                <g class="v4-tampon">
+                  <rect x="214" y="83" width="88" height="26" rx="2" fill="none" stroke="#E8322B" stroke-width="2.5"/>
+                  <text x="222" y="100.5" font-family="Inter,system-ui,sans-serif" font-size="10" font-weight="800" letter-spacing=".04em" fill="#E8322B">JE CONSEILLE</text>
+                </g>
+                <g clip-path="url(#b4)">
+                  <g class="v4-bande" font-family="Inter,system-ui,sans-serif" font-size="9" font-weight="600" fill="#0E0D0C">
+                    <rect x="6" y="130" width="72" height="64" fill="#E4DCCD"/><text x="14" y="186">ép. 1</text>
+                    <rect x="84" y="130" width="72" height="64" fill="#F2EDE3"/><text x="92" y="186">ép. 2</text>
+                    <rect x="162" y="130" width="72" height="64" fill="#E4DCCD"/><text x="170" y="186">ép. 3</text>
+                    <rect x="240" y="130" width="72" height="64" fill="#F2EDE3"/><text x="248" y="186">ép. 4</text>
+                    <rect x="318" y="130" width="72" height="64" fill="#E4DCCD"/><text x="326" y="186">ép. 5</text>
+                  </g>
+                </g>
+                <rect x="262" y="134" width="48" height="18" rx="9" fill="#0E0D0C"/>
+                <g font-family="Inter,system-ui,sans-serif" font-size="9" font-weight="700" fill="#F2EDE3">
+                  <text class="v4-n1" x="270" y="146.5">ép. 3</text>
+                  <text class="v4-n2" x="270" y="146.5">ép. 4</text>
+                </g>
+              </g>
+            </svg>
+            <span class="cote-puce" aria-hidden="true"><span class="pt"></span><span class="l"><span class="l-pro">Côté pro</span><span class="l-crea">Côté créateur</span></span></span>
+          </button>
+          <figcaption class="legende">Schéma de la direction, pas une capture. Un clic ou un toucher le fait changer de côté.</figcaption>
+        </figure>
+        <div class="corps">
+          <div class="titre-l"><span class="num">04</span><h3 id="h04">Épisode</h3></div>
+          <p class="badge"><span class="pt" aria-hidden="true"></span>Greffes G1 et G5 retenues</p>
+          <p class="concept">Côté créateur, la planche de manga de Branche-toi&#8239;: saisons, 第N話, tampons, bande d'épisodes. Côté pro, la fiche technique d'un film et ses crédits <em>honnêtes</em>.</p>
+          <ul class="pm">
+            <li><span class="s" aria-hidden="true">+</span><span><span class="sr-only">Force : </span><b>Le créateur le plus proche des vidéos</b>, et les crédits&#8239;: la meilleure preuve de l'humain dans la boucle.</span></li>
+            <li><span class="s" aria-hidden="true">−</span><span><span class="sr-only">Faiblesse : </span>Poids (GSAP, plans jusqu'à 427 Ko)&#8239;; un Pro sombre, contraire à «&#8239;Pro toujours clair&#8239;».</span></li>
+          </ul>
+          <div class="bloc">
+            <h4>Gestes signature</h4>
+            <ol class="signs">
+              <li>Arrêt sur image ↔ déclencheur</li>
+              <li><span class="w">W12</span>La rafale corrigée</li>
+              <li><span class="w">W13</span>WANTED</li>
+              <li>La bande d'épisodes</li>
+              <li>Les crédits honnêtes</li>
+              <li>La feuille de service</li>
+            </ol>
+          </div>
+          <div class="bloc">
+            <h4>Palette</h4>
+            <div class="palette">
+              <div class="rang"><span>Pro</span><ul>
+                <li><span class="sw" style="--c:#0B0B0C" aria-hidden="true"></span>#0B0B0C<span class="sr-only">, noir film</span></li>
+                <li><span class="sw" style="--c:#F4EFE6" aria-hidden="true"></span>#F4EFE6<span class="sr-only">, crème</span></li>
+                <li><span class="sw" style="--c:#9C978F" aria-hidden="true"></span>#9C978F<span class="sr-only">, gris</span></li>
+                <li><span class="sw" style="--c:#F0705A" aria-hidden="true"></span>#F0705A<span class="sr-only">, corail, point PROD</span></li>
+              </ul></div>
+              <div class="rang"><span>Créateur</span><ul>
+                <li><span class="sw" style="--c:#F2EDE3" aria-hidden="true"></span>#F2EDE3<span class="sr-only">, papier manga</span></li>
+                <li><span class="sw" style="--c:#0E0D0C" aria-hidden="true"></span>#0E0D0C<span class="sr-only">, encre des gouttières</span></li>
+                <li><span class="sw" style="--c:#FFE600" aria-hidden="true"></span>#FFE600<span class="sr-only">, jaune accroche</span></li>
+                <li><span class="sw" style="--c:#E8322B" aria-hidden="true"></span>#E8322B<span class="sr-only">, rouge, un seul</span></li>
+              </ul></div>
+            </div>
+          </div>
+          <p class="typo"><b>Typo</b> · socle, plus Bebas Neue (tampons) et Dela Gothic One (第N話, 12 glyphes)</p>
+        </div>
+        <div class="notes">
+          <h4 class="sr-only">Notes après vérification</h4>
+          <p class="moy"><span class="moy-v"><span>8,4</span></span><span class="moy-l">moyenne sur 10<br>après vérification</span></p>
+          <dl class="barres">
+            <div style="--p:.625;--k:0"><dt>Produit</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.5;--k:1"><dt>UX</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.625;--k:2"><dt>UI</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:3"><dt>Motion</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:4"><dt>Accessibilité</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+          </dl>
+          <p class="echelle" aria-hidden="true">Barres de 6 à 10, pour voir les écarts.</p>
+          <p class="jury"><span>Jury pondéré <b>65</b> / 80</span><span>Audiences <b>55</b> / 65</span></p>
+          <div class="actions">
+            <a class="btn btn--plein" href="./04-episode.html"><span class="pt" aria-hidden="true"></span>Ouvrir<span class="sr-only"> la maquette 04, Épisode</span></a>
+            <a class="lien" href="./_brief/verif-04-episode.md">Rapport de vérification<span class="sr-only"> d'Épisode</span></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- ===================== 05 Matière ===================== -->
+      <article class="carte" id="m05" data-n="5" data-moy="8.3" data-produit="8.5" data-jury="56" data-nom="Matière" style="--i:4" aria-labelledby="h05">
+        <figure class="vfig">
+          <button class="vignette" type="button" data-vue="pro" aria-pressed="false" aria-label="Schéma de Matière côté créateur">
+            <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+              <g class="v-pro">
+                <rect width="320" height="200" fill="#ECEFEC"/>
+                <text x="20" y="30" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#555B57">L'étagère, dans l'ordre de sortie</text>
+                <line x1="18" y1="152" x2="302" y2="152" stroke="#D7DDD8" stroke-width="2"/>
+                <ellipse cx="70" cy="154" rx="30" ry="5" fill="rgba(27,29,28,.12)"/>
+                <ellipse cx="160" cy="154" rx="34" ry="5" fill="rgba(27,29,28,.12)"/>
+                <ellipse cx="250" cy="154" rx="30" ry="5" fill="rgba(27,29,28,.12)"/>
+                <rect x="44" y="96" width="52" height="54" rx="14" fill="#F7F8F6" stroke="#D7DDD8"/>
+                <rect x="58" y="111" width="24" height="24" rx="7" fill="#5E7D6A"/>
+                <rect x="128" y="130" width="64" height="12" rx="5" fill="#F7F8F6" stroke="#C9D0CA"/>
+                <rect class="v5-p2" x="128" y="118" width="64" height="12" rx="5" fill="#F7F8F6" stroke="#C9D0CA"/>
+                <rect class="v5-p3" x="128" y="106" width="64" height="12" rx="5" fill="#F7F8F6" stroke="#C9D0CA"/>
+                <g font-family="Inter,system-ui,sans-serif" font-size="8.5" font-weight="600" fill="#48654F">
+                  <text class="v5-l" x="198" y="88">App</text>
+                  <text class="v5-l" x="198" y="110">API</text>
+                  <text class="v5-l" x="198" y="140">Données</text>
+                </g>
+                <rect x="224" y="96" width="52" height="54" rx="14" fill="#F7F8F6" stroke="#D7DDD8"/>
+                <rect x="238" y="111" width="24" height="24" rx="7" fill="#1B1D1C"/>
+                <text x="20" y="180" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#555B57">Sous le capot : App · API · Données · IA · Infra</text>
+              </g>
+              <g class="v-crea">
+                <rect width="320" height="200" fill="#16203A"/>
+                <line x1="18" y1="152" x2="302" y2="152" stroke="#2E3D63" stroke-width="2"/>
+                <ellipse cx="70" cy="155" rx="32" ry="5" fill="rgba(0,0,0,.35)"/>
+                <ellipse class="v5-ombre" cx="160" cy="155" rx="28" ry="5" fill="rgba(0,0,0,.35)"/>
+                <ellipse cx="250" cy="155" rx="30" ry="5" fill="rgba(0,0,0,.35)"/>
+                <rect x="40" y="100" width="60" height="50" rx="22" fill="#F0705A"/>
+                <circle class="v5-objet" cx="160" cy="124" r="26" fill="#F6B48F"/>
+                <rect x="222" y="108" width="56" height="42" rx="12" fill="#C9A45C"/>
+                <g font-family="Inter,system-ui,sans-serif" font-size="9.5" fill="#F4EFE6">
+                  <text x="46" y="176">avion ≈ 100 €</text><text x="140" y="176">lit 25 €</text>
+                </g>
+                <text x="226" y="178" font-family="Instrument Serif,Georgia,serif" font-style="italic" font-size="19" fill="#F4EFE6">10 €</text>
+                <text x="260" y="176" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#A9B2C6">200 €</text>
+                <line x1="258" y1="173" x2="290" y2="170" stroke="#E8322B" stroke-width="2" stroke-linecap="round"/>
+                <text x="20" y="30" font-family="Inter,system-ui,sans-serif" font-size="9" fill="#A9B2C6">Les objets-preuves, sur bleu nuit</text>
+              </g>
+            </svg>
+            <span class="cote-puce" aria-hidden="true"><span class="pt"></span><span class="l"><span class="l-pro">Côté pro</span><span class="l-crea">Côté créateur</span></span></span>
+          </button>
+          <figcaption class="legende">Schéma de la direction, pas une capture. Un clic ou un toucher le fait changer de côté.</figcaption>
+        </figure>
+        <div class="corps">
+          <div class="titre-l"><span class="num">05</span><h3 id="h05">Matière</h3></div>
+          <p class="badge"><span class="pt" aria-hidden="true"></span>Greffe G6 retenue</p>
+          <p class="concept">Une table de studio&#8239;: côté pro, des apps posées comme des objets en lumière du jour&#8239;; côté créateur, des objets-preuves qui portent chacun un prix vécu, sur bleu <em>nuit</em>.</p>
+          <ul class="pm">
+            <li><span class="s" aria-hidden="true">+</span><span><span class="sr-only">Force : </span><b>La vue éclatée la plus parlante</b>, qui éclate aussi une équipe d'agents&#8239;: Vous, Hermes, rôles, mémoire, garde-fous.</span></li>
+            <li><span class="s" aria-hidden="true">−</span><span><span class="sr-only">Faiblesse : </span>Objets en CSS provisoires tant que les objets en pâte (DA-4) n'existent pas.</span></li>
+          </ul>
+          <div class="bloc">
+            <h4>Gestes signature</h4>
+            <ol class="signs">
+              <li>La lumière change</li>
+              <li><span class="w">W10</span>La vue éclatée</li>
+              <li>L'objet en main</li>
+              <li>L'étagère de progression</li>
+              <li><span class="w">W11</span>Les objets-preuves</li>
+              <li>Le bloc de verre</li>
+            </ol>
+          </div>
+          <div class="bloc">
+            <h4>Palette</h4>
+            <div class="palette">
+              <div class="rang"><span>Pro</span><ul>
+                <li><span class="sw" style="--c:#ECEFEC" aria-hidden="true"></span>#ECEFEC<span class="sr-only">, studio jour</span></li>
+                <li><span class="sw" style="--c:#1B1D1C" aria-hidden="true"></span>#1B1D1C<span class="sr-only">, encre</span></li>
+                <li><span class="sw" style="--c:#5E7D6A" aria-hidden="true"></span>#5E7D6A<span class="sr-only">, sauge matière</span></li>
+                <li><span class="sw" style="--c:#48654F" aria-hidden="true"></span>#48654F<span class="sr-only">, sauge texte</span></li>
+              </ul></div>
+              <div class="rang"><span>Créateur</span><ul>
+                <li><span class="sw" style="--c:#16203A" aria-hidden="true"></span>#16203A<span class="sr-only">, bleu nuit</span></li>
+                <li><span class="sw" style="--c:#F4EFE6" aria-hidden="true"></span>#F4EFE6<span class="sr-only">, crème</span></li>
+                <li><span class="sw" style="--c:#F0705A" aria-hidden="true"></span>#F0705A<span class="sr-only">, corail</span></li>
+                <li><span class="sw" style="--c:#F6B48F" aria-hidden="true"></span>#F6B48F<span class="sr-only">, pêche</span></li>
+              </ul></div>
+            </div>
+          </div>
+          <p class="typo"><b>Typo</b> · socle seul&#8239;: la matière est l'accent</p>
+        </div>
+        <div class="notes">
+          <h4 class="sr-only">Notes après vérification</h4>
+          <p class="moy"><span class="moy-v"><span>8,3</span></span><span class="moy-l">moyenne sur 10<br>après vérification</span></p>
+          <dl class="barres">
+            <div style="--p:.625;--k:0"><dt>Produit</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.5;--k:1"><dt>UX</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.5;--k:2"><dt>UI</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8</span></dd></div>
+            <div style="--p:.625;--k:3"><dt>Motion</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+            <div style="--p:.625;--k:4"><dt>Accessibilité</dt><dd><span class="barre" aria-hidden="true"><i></i></span><span class="val">8,5</span></dd></div>
+          </dl>
+          <p class="echelle" aria-hidden="true">Barres de 6 à 10, pour voir les écarts.</p>
+          <p class="jury"><span>Jury pondéré <b>56</b> / 80</span><span>Audiences <b>46</b> / 65</span></p>
+          <div class="actions">
+            <a class="btn btn--plein" href="./05-matiere.html"><span class="pt" aria-hidden="true"></span>Ouvrir<span class="sr-only"> la maquette 05, Matière</span></a>
+            <a class="lien" href="./_brief/verif-05-matiere.md">Rapport de vérification<span class="sr-only"> de Matière</span></a>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="comparatif wrap" id="comparatif" aria-labelledby="t-comp">
+    <h2 id="t-comp">Le comparatif</h2>
+    <p class="txt">Notes des cinq rapports de vérification (sur 10), puis l'appréciation du jury&#8239;: par audience (sur 65) et par critère (sur 80), pondérée selon la demande de Kenz, avec la mise en place d'agents IA chez un client au premier rang. Le détail est dans le verdict.</p>
+    <div class="defile" role="region" aria-labelledby="t-comp" tabindex="0">
+      <table>
+        <caption>Notes après vérification et appréciation du jury, 11/11/2026</caption>
+        <thead>
+          <tr>
+            <th scope="col">Maquette</th>
+            <th scope="col" class="n">Produit</th>
+            <th scope="col" class="n">UX</th>
+            <th scope="col" class="n">UI</th>
+            <th scope="col" class="n">Motion</th>
+            <th scope="col" class="n">A11y</th>
+            <th scope="col" class="n">Moyenne</th>
+            <th scope="col" class="n">Audiences</th>
+            <th scope="col" class="n">Critères</th>
+            <th scope="col">Dans la recommandation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><a href="#m01">01 REC / PROD</a></th><td class="n">8,5</td><td class="n">8</td><td class="n">8</td><td class="n">8</td><td class="n">8</td><td class="n">8,1</td><td class="n">53</td><td class="n">64</td><td class="role">Cadres 9:16, cadre REC, le point qui s'étire (G3, G4)</td></tr>
+          <tr><th scope="row"><a href="#m02">02 Carnet</a></th><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">51</td><td class="n">63</td><td class="role">Fiche «&#8239;Où on en est&#8239;» et tampons du livrable (G2)</td></tr>
+          <tr class="reco"><th scope="row"><a href="#m03">03 Lignes</a></th><td class="n">9</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,6</td><td class="n">54</td><td class="n"><b>72</b></td><td class="role"><b>Direction principale</b>&#8239;; les six cas dès le premier écran (G7)</td></tr>
+          <tr><th scope="row"><a href="#m04">04 Épisode</a></th><td class="n">8,5</td><td class="n">8</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,4</td><td class="n"><b>55</b></td><td class="n">65</td><td class="role">Crédits honnêtes, bande d'épisodes (G1, G5)</td></tr>
+          <tr><th scope="row"><a href="#m05">05 Matière</a></th><td class="n">8,5</td><td class="n">8</td><td class="n">8</td><td class="n">8,5</td><td class="n">8,5</td><td class="n">8,3</td><td class="n">46</td><td class="n">56</td><td class="role">Vue éclatée d'une équipe, en coupe de station (G6)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="pied wrap">
+    <p>Les maquettes ne font aucune requête réseau, sauf les polices (et GSAP pour Épisode, sur deux pages). Les données viennent de <code>_shared/content.js</code>&#8239;; les valeurs live sont simulées au 11/11/2026.</p>
+    <p>Rien n'a été vu dans un navigateur&#8239;: ouvrez chaque maquette sur un vrai téléphone, puis avec le bouton «&#8239;Aperçu 390 px&#8239;» de son panneau de simulation.</p>
+    <p>Galerie et verdict — Claude, jury final, 11/11/2026.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var d = document, root = d.documentElement;
+  var mqReduit = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  function reduit() { return mqReduit.matches; }
+  function $$(s, c) { return Array.prototype.slice.call((c || d).querySelectorAll(s)); }
+
+  var liste = d.getElementById('liste');
+  var cartes = $$('.carte', liste);
+  var annonce = d.getElementById('annonce');
+  function dire(t) { annonce.textContent = ''; window.setTimeout(function () { annonce.textContent = t; }, 40); }
+
+  /* ---------- Apparitions (une fois) ---------- */
+  var aReveler = cartes.concat($$('.balaye'));
+  function toutReveler() { aReveler.forEach(function (el) { el.classList.add('vu'); }); }
+  if ('IntersectionObserver' in window && !reduit()) {
+    var io = new IntersectionObserver(function (entrees) {
+      entrees.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('vu'); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.08 });
+    aReveler.forEach(function (el) { io.observe(el); });
+  } else {
+    toutReveler();
+  }
+  window.addEventListener('beforeprint', toutReveler);
+  $$('.balaye').forEach(function (el) { el.addEventListener('transitionend', function (e) { if (e.propertyName === 'clip-path' && el.classList.contains('vu')) el.classList.add('fini'); }); });
+
+  /* ---------- Gestes des vignettes : survol ou focus de la carte ---------- */
+  var survolFin = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : { matches: true };
+  cartes.forEach(function (c) {
+    function on() { if (!reduit()) c.classList.add('actif'); }
+    function off() { c.classList.remove('actif'); }
+    c.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' || survolFin.matches) on(); });
+    c.addEventListener('pointerleave', off);
+    c.addEventListener('focusin', on);
+    c.addEventListener('focusout', function (e) { if (!c.contains(e.relatedTarget)) off(); });
+  });
+
+  /* ---------- Côté montré dans les schémas ---------- */
+  var vignettes = $$('.vignette');
+  function nomDe(v) { return v.closest('.carte').getAttribute('data-nom'); }
+  function poserCote(v, cote, delai) {
+    v.setAttribute('data-vue', cote);
+    v.setAttribute('aria-pressed', cote === 'createur' ? 'true' : 'false');
+    v.style.setProperty('--d', (delai || 0) + 'ms');
+  }
+  vignettes.forEach(function (v) {
+    v.addEventListener('click', function () {
+      var cote = v.getAttribute('data-vue') === 'pro' ? 'createur' : 'pro';
+      poserCote(v, cote, 0);
+      majGlobal();
+      dire('Schéma de ' + nomDe(v) + ' : côté ' + (cote === 'pro' ? 'pro' : 'créateur') + '.');
+    });
+  });
+  var boutonsCote = $$('[data-cote-global]');
+  function majGlobal() {
+    var tousCrea = vignettes.every(function (v) { return v.getAttribute('data-vue') === 'createur'; });
+    var tousPro = vignettes.every(function (v) { return v.getAttribute('data-vue') === 'pro'; });
+    boutonsCote.forEach(function (b) {
+      var c = b.getAttribute('data-cote-global');
+      b.setAttribute('aria-pressed', (c === 'pro' && tousPro) || (c === 'createur' && tousCrea) ? 'true' : 'false');
+    });
+  }
+  boutonsCote.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var cote = b.getAttribute('data-cote-global');
+      var ordre = $$('.vignette', liste);
+      ordre.forEach(function (v, i) { poserCote(v, cote, reduit() ? 0 : i * 40); });
+      majGlobal();
+      dire('Tous les schémas montrent le côté ' + (cote === 'pro' ? 'pro' : 'créateur') + '.');
+    });
+  });
+
+  /* ---------- Tri, avec transition FLIP ---------- */
+  var libelles = { n: 'par numéro', jury: 'par note du jury, de la plus haute à la plus basse', moy: 'par moyenne après vérification, de la plus haute à la plus basse', produit: 'par note produit, de la plus haute à la plus basse' };
+  var boutonsTri = $$('[data-tri]');
+  function trier(cle) {
+    var avant = new Map();
+    cartes.forEach(function (c) { avant.set(c, c.getBoundingClientRect()); });
+    var ordre = cartes.slice().sort(function (a, b) {
+      var na = +a.getAttribute('data-n'), nb = +b.getAttribute('data-n');
+      if (cle === 'n') return na - nb;
+      var va = parseFloat(a.getAttribute('data-' + cle)), vb = parseFloat(b.getAttribute('data-' + cle));
+      return (vb - va) || (na - nb);
+    });
+    ordre.forEach(function (c) { liste.appendChild(c); });
+    if (!reduit() && typeof Element.prototype.animate === 'function') {
+      ordre.forEach(function (c, i) {
+        var a = avant.get(c), b = c.getBoundingClientRect();
+        var dx = a.left - b.left, dy = a.top - b.top;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+        c.animate(
+          [{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'translate(0,0)' }],
+          { duration: 480, easing: 'cubic-bezier(.16,1,.3,1)', delay: Math.min(i * 30, 120), fill: 'backwards' }
+        );
+      });
+    }
+    boutonsTri.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-tri') === cle ? 'true' : 'false'); });
+    var premiere = ordre[0].getAttribute('data-nom');
+    dire('Maquettes triées ' + libelles[cle] + '. En tête : ' + premiere + '.');
+  }
+  boutonsTri.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (b.getAttribute('aria-pressed') === 'true') return;
+      trier(b.getAttribute('data-tri'));
+    });
+  });
+
+  /* ---------- Ancres vers une carte : focus sur son titre ---------- */
+  $$('a[href^="#m0"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var id = a.getAttribute('href').slice(1), cible = d.getElementById(id);
+      if (!cible) return;
+      cible.classList.add('vu');
+      window.setTimeout(function () {
+        var h = cible.querySelector('h3');
+        if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+      }, reduit() ? 0 : 420);
+    });
+  });
+  if (!reduit()) root.style.scrollBehavior = 'smooth';
+})();
+</script>
+</body>
+</html>

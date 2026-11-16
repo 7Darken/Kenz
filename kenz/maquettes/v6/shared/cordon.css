@@ -1,0 +1,546 @@
+/* ==========================================================================
+   Le cordon : le passage secret entre les deux univers (Pro <-> Créateur)
+   Rempli par shared/cordon.js. Contrat : BRIEF-V4.md, section 3.
+
+   Au repos : un point de 7 px, rien d'autre. Seul le curseur passe en « grab ».
+   Matière et lumière : celles du sceau de la V3 (pierre, bronze patiné, soleil / lune).
+   Lumière : --cordon-lumiere sur la page (sinon doré vers Créateur, bleu vers Pro).
+   ========================================================================== */
+
+/* ---------- Le point de « Kenz· » ---------- */
+.kz-logo {
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  white-space: nowrap;
+}
+.kz-dot {
+  position: relative;
+  display: inline-block;
+  box-sizing: content-box;
+  width: 7px;
+  height: 7px;
+  margin: 0 0 0 .07em;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--creme, #F4EFE6);
+  color: inherit;
+  font: inherit;
+  line-height: 0;
+  vertical-align: baseline;
+  cursor: grab;
+  touch-action: none;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: box-shadow 1.4s cubic-bezier(.16, 1, .3, 1);
+}
+/* Zone de prise un peu plus large que le point, invisible (souris : à peine ; doigt : 44 px) */
+.kz-dot::before {
+  content: "";
+  position: absolute;
+  inset: -5px -6px -6px -4px;
+  border-radius: 50%;
+  touch-action: none;
+}
+@media (pointer: coarse) {
+  .kz-dot::before { inset: -18px -16px -19px -9px; }
+}
+.kz-dot:focus { outline: none; }
+.kz-dot:focus-visible {
+  outline: 2px solid var(--creme, #F4EFE6);
+  outline-offset: 4px;
+}
+/* Sans data-cordon (pages Pro : le passage est dans la constellation des apps) : un simple point du logo */
+.kz-dot:not([data-cordon]) { cursor: inherit; touch-action: auto; pointer-events: none; }
+.kz-dot:not([data-cordon])::before { content: none; }
+.kz-dot.is-tire { opacity: 0; }
+/* Juste après le geste : le point garde une seconde la lumière du mécanisme */
+.kz-dot.is-enclenche {
+  box-shadow: 0 0 0 1px rgb(var(--cd-l-rgb, 242 180 90) / .55), 0 0 14px 3px rgb(var(--cd-l-rgb, 242 180 90) / .55);
+  transition: none;
+}
+
+html.cd-tire,
+html.cd-tire * {
+  cursor: grabbing !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+html.cd-gronde { overflow-x: clip; }
+
+/* ---------- Le fil : œillet, chaîne à billes, point ---------- */
+.cd-fil {
+  --cd-l-rgb: 242 180 90;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 2147483590;
+  pointer-events: none;
+}
+.cd-fil__oeillet {
+  position: absolute;
+  left: -5.5px;
+  top: -5.5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, #050403 0 38%, #1b1612 52%, #6c4f30 66%, #c8a26b 78%, #4a341e 92%);
+  box-shadow: 0 1px 0 rgb(255 240 220 / .12), 0 2px 6px rgb(0 0 0 / .55);
+  transition: box-shadow .5s cubic-bezier(.16, 1, .3, 1);
+}
+.cd-fil__svg {
+  position: absolute;
+  left: -60px;
+  top: -20px;
+  width: 120px;
+  height: 300px;
+  overflow: visible;
+  transition: filter .5s cubic-bezier(.16, 1, .3, 1);
+}
+.cd-fil__chaine,
+.cd-fil__lueur {
+  fill: none;
+  stroke-linecap: round;
+}
+.cd-fil__chaine {
+  stroke: rgb(244 239 230 / .78);
+  stroke-width: 2.1;
+  stroke-dasharray: 0 4.2;
+  transition: stroke .5s cubic-bezier(.16, 1, .3, 1);
+}
+.cd-fil__lueur {
+  stroke: rgb(var(--cd-l-rgb));
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity .5s cubic-bezier(.16, 1, .3, 1);
+}
+.cd-fil__point {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: #F4EFE6;
+  will-change: transform;
+  box-shadow: 0 3px 8px rgb(0 0 0 / .45);
+  transition: box-shadow .5s cubic-bezier(.16, 1, .3, 1);
+}
+/* Le cran : la chaîne s'éclaire d'un coup */
+.cd-fil.is-cran .cd-fil__chaine { stroke: rgb(var(--cd-l-rgb)); transition-duration: .05s; }
+.cd-fil.is-cran .cd-fil__lueur { opacity: .55; transition-duration: .05s; }
+.cd-fil.is-cran .cd-fil__svg {
+  filter: drop-shadow(0 0 1.5px rgb(var(--cd-l-rgb) / .95)) drop-shadow(0 0 6px rgb(var(--cd-l-rgb) / .6));
+  transition-duration: .05s;
+}
+.cd-fil.is-cran .cd-fil__point {
+  box-shadow: 0 0 0 1px rgb(var(--cd-l-rgb) / .6), 0 0 14px 3px rgb(var(--cd-l-rgb) / .7);
+  transition-duration: .05s;
+}
+.cd-fil.is-cran .cd-fil__oeillet {
+  box-shadow: 0 0 0 1px rgb(var(--cd-l-rgb) / .7), 0 0 12px 2px rgb(var(--cd-l-rgb) / .55);
+  transition-duration: .05s;
+}
+
+/* ---------- La porte : deux battants de pierre et le médaillon ---------- */
+.cd-porte {
+  --cd-l-rgb: 242 180 90;
+  --cd-d: min(86vw, 440px, 64vh);
+  --cd-ease: cubic-bezier(.16, 1, .3, 1);
+  --cd-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .96 0 0 0 0 .9 0 0 0 1.5 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  position: fixed;
+  inset: 0;
+  z-index: 2147483601;
+  overflow: hidden;
+  color: var(--creme, #F4EFE6);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cd-porte * { box-sizing: border-box; }
+.cd-porte__ombre {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(90% 80% at 50% 50%, rgb(8 7 6 / .55), rgb(4 3 3 / .9));
+}
+.cd-porte__lum {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(46% 64% at 50% 50%, rgb(var(--cd-l-rgb) / .5), rgb(var(--cd-l-rgb) / .14) 56%, transparent 82%);
+}
+.cd-battant {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  overflow: hidden;
+  will-change: transform;
+  transition: box-shadow .5s var(--cd-ease);
+}
+.cd-battant--g { left: 0; box-shadow: 28px 0 60px -14px rgb(0 0 0 / .7); }
+.cd-battant--d { left: 50%; box-shadow: -28px 0 60px -14px rgb(0 0 0 / .7); }
+.cd-porte.is-joint .cd-battant { box-shadow: none; }
+.cd-battant__in {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  background:
+    linear-gradient(90deg, transparent 36%, rgb(var(--cd-l-rgb) / .1) 49.7%, rgb(var(--cd-l-rgb) / .1) 50.3%, transparent 64%),
+    radial-gradient(72% 82% at 50% 50%, #221f1b 0%, #181613 52%, #0d0c0a 100%);
+}
+.cd-battant--d .cd-battant__in { left: -100%; }
+.cd-battant__in::before {
+  content: "";
+  position: absolute;
+  inset: clamp(10px, 2.2vw, 28px);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgb(255 240 220 / .07), inset 0 0 0 2px rgb(0 0 0 / .4), inset 0 0 90px rgb(0 0 0 / .45);
+  pointer-events: none;
+}
+/* L'arête de chaque battant : bronze au repos, lumière quand le symbole s'allume */
+.cd-battant::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, #6c4f30 22%, #c8a26b 50%, #6c4f30 78%, transparent);
+  opacity: .55;
+}
+.cd-battant--g::after { right: 0; }
+.cd-battant--d::after { left: 0; }
+.cd-porte.is-allume .cd-battant::after {
+  background: linear-gradient(180deg, transparent, rgb(var(--cd-l-rgb) / .8) 25%, rgb(255 246 230 / .9) 50%, rgb(var(--cd-l-rgb) / .8) 75%, transparent);
+  box-shadow: 0 0 18px 2px rgb(var(--cd-l-rgb) / .45);
+  opacity: 1;
+}
+.cd-grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--cd-grain);
+  background-size: 180px 180px;
+  opacity: .42;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.cd-battant__in .cd-grain { opacity: .3; }
+.cd-orn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--cd-d) * 1.7);
+  height: calc(var(--cd-d) * 1.7);
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
+.cd-orn path { fill: none; stroke-width: .5; }
+.cd-orn-o path { stroke: rgb(0 0 0 / .65); stroke-width: .9; }
+.cd-orn-c path { stroke: rgb(240 228 206 / .11); }
+
+.cd-medaillon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cd-d);
+  height: var(--cd-d);
+  margin: calc(var(--cd-d) / -2) 0 0 calc(var(--cd-d) / -2);
+  border-radius: 50%;
+}
+.cd-ombre {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / .04),
+    0 0 0 1px rgb(0 0 0 / .55),
+    0 16px 30px -12px rgb(0 0 0 / .7),
+    0 46px 90px -30px rgb(0 0 0 / .75),
+    0 0 70px -12px rgb(var(--cd-l-rgb) / .12);
+}
+.cd-art { position: absolute; inset: 0; border-radius: 50%; }
+.cd-socle {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 34% 24%, rgb(255 236 210 / .085), transparent 52%),
+    radial-gradient(closest-side, #26231f 0%, #1e1b18 46%, #171513 78%, #100f0d 93.5%);
+}
+/* Bague de bronze patiné */
+.cd-socle::before,
+.cd-socle::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  -webkit-mask: radial-gradient(closest-side, transparent 93.7%, #000 94.1%);
+  mask: radial-gradient(closest-side, transparent 93.7%, #000 94.1%);
+}
+.cd-socle::before {
+  background: conic-gradient(from 196deg, #2c2115, #6c4f30 7%, #b28a55 13%, #6a4c2d 21%, #3a2a1a 31%, #86663f 43%, #c8a26b 49%, #7a5a36 56%, #3b2b1b 67%, #5a4228 79%, #a07b4b 88%, #2c2115);
+}
+.cd-socle::after {
+  background:
+    radial-gradient(16% 13% at 20% 30%, rgb(84 128 110 / .5), transparent 70%),
+    radial-gradient(12% 10% at 78% 76%, rgb(84 128 110 / .42), transparent 70%),
+    radial-gradient(9% 7% at 62% 9%, rgb(84 128 110 / .32), transparent 70%),
+    linear-gradient(180deg, rgb(255 236 200 / .16), transparent 30%, transparent 70%, rgb(0 0 0 / .45));
+}
+.cd-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.cd-bague { position: absolute; inset: 0; border-radius: 50%; }
+
+/* Gravures : les fragments du symbole, incrustations de bronze dans la pierre */
+.cd-fs { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.cd-go .cd-fs { stroke: rgb(0 0 0 / .72); stroke-width: 2.7; }
+.cd-go .cd-ff { fill: rgb(0 0 0 / .6); }
+.cd-gv .cd-fs { stroke: #c29a62; stroke-opacity: .78; stroke-width: 1.6; }
+.cd-gv .cd-ff { fill: #b48d58; fill-opacity: .82; }
+.cd-gl .cd-fs { stroke: rgb(var(--cd-l-rgb)); stroke-width: 1.7; }
+.cd-gl .cd-ff { fill: rgb(var(--cd-l-rgb)); }
+.cd-o-t { fill: none; stroke: rgb(240 228 206 / .17); stroke-width: .8; }
+.cd-o-n { fill: none; stroke: rgb(0 0 0 / .78); stroke-width: 2.2; }
+.cd-o-c { fill: none; stroke: #d6b07a; stroke-opacity: .85; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.cd-o-d { fill: rgb(240 228 206 / .22); }
+
+/* Lumières : rainures, course de lumière, symbole (éteintes, puis .is-allume) */
+.cd-l-rn, .cd-b-lit, .cd-l-cr, .cd-l-symbole {
+  filter: drop-shadow(0 0 1.4px rgb(var(--cd-l-rgb) / .95)) drop-shadow(0 0 7px rgb(var(--cd-l-rgb) / .55));
+}
+.cd-rn { fill: none; stroke: rgb(var(--cd-l-rgb)); stroke-width: 1.6; opacity: 0; transition: opacity .55s var(--cd-ease); }
+.cd-rn[data-i="1"] { transition-delay: .11s; }
+.cd-rn[data-i="2"] { transition-delay: .22s; }
+.cd-rn[data-i="3"] { transition-delay: .5s; }
+.cd-point { fill: rgb(var(--cd-l-rgb)); opacity: .6; }
+.cd-b-lit { opacity: 0; transition: opacity .7s var(--cd-ease) .15s; }
+.cd-cr {
+  fill: none;
+  stroke: rgb(255 246 230);
+  stroke-width: 1.9;
+  stroke-linecap: butt;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset .62s cubic-bezier(.45, 0, .55, 1) .14s;
+}
+.cd-cr[data-k="c"] { transition-duration: .5s; transition-delay: .1s; }
+.cd-cr[data-k="1"] { transition-duration: .54s; transition-delay: .24s; }
+.cd-cr[data-k="2"] { transition-duration: .46s; transition-delay: .34s; }
+.cd-cr[data-k="3"] { transition-duration: .38s; transition-delay: .44s; }
+.cd-l-sym {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  filter: blur(4px) brightness(2.2);
+  pointer-events: none;
+  transition: opacity .8s var(--cd-ease) .32s, filter .8s var(--cd-ease) .32s;
+}
+.cd-l-symbole .cd-fs { stroke-width: 2; }
+.cd-cliquet {
+  position: absolute;
+  left: 50%;
+  top: .2%;
+  width: 4.6%;
+  height: 4.4%;
+  margin-left: -2.3%;
+  background: linear-gradient(180deg, #e2bd84, #9a7243 55%, #4a341e);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  pointer-events: none;
+}
+.cd-reflet {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 240 220 / .05),
+    inset 0 -28px 54px -12px rgb(0 0 0 / .55),
+    inset 0 18px 40px -18px rgb(255 236 210 / .07);
+}
+.cd-arete {
+  position: absolute;
+  left: 50%;
+  top: 2%;
+  bottom: 2%;
+  width: 3px;
+  margin-left: -1.5px;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgb(var(--cd-l-rgb)) 18%, rgb(255 248 236) 50%, rgb(var(--cd-l-rgb)) 82%, transparent);
+  box-shadow: 0 0 14px 2px rgb(var(--cd-l-rgb) / .55);
+  transition: opacity .5s var(--cd-ease) .2s;
+}
+.cd-porte.is-allume .cd-rn { opacity: 1; }
+.cd-porte.is-allume .cd-cr { stroke-dashoffset: 0; }
+.cd-porte.is-allume .cd-b-lit { opacity: .4; }
+.cd-porte.is-allume .cd-l-sym { opacity: 1; filter: blur(0) brightness(1); }
+.cd-porte.is-allume .cd-arete { opacity: .95; }
+.cd-porte.is-instant,
+.cd-porte.is-instant * { transition: none !important; }
+
+/* Fente de lumière, halo, poussière */
+.cd-porte__fente {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  opacity: 0;
+  background: linear-gradient(180deg, rgb(255 250 240 / .2), rgb(255 250 240 / .95) 30%, #fff 50%, rgb(255 250 240 / .95) 70%, rgb(255 250 240 / .2));
+  box-shadow: 0 0 12px 3px rgb(var(--cd-l-rgb) / .9), 0 0 60px 16px rgb(var(--cd-l-rgb) / .4);
+}
+.cd-porte__halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--cd-d) * 1.9);
+  height: calc(var(--cd-d) * 1.9);
+  margin: calc(var(--cd-d) * -.95) 0 0 calc(var(--cd-d) * -.95);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgb(var(--cd-l-rgb) / .3), rgb(var(--cd-l-rgb) / .1) 44%, rgb(var(--cd-l-rgb) / .03) 66%, transparent 80%);
+}
+.cd-poussiere {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- Arrivée par #porte : la porte fermée dès le premier rendu ----------
+   La page pose data-porte-arrivee dans le <head> ; cordon.js remplace ce voile par la vraie porte.
+   Garde-fou : sans script, le voile s'efface seul. */
+html[data-porte-arrivee]::after {
+  --cd-pre: 244 239 230;
+  --cd-d: min(86vw, 440px, 64vh);
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483600;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent calc(50% - 1px), rgb(255 250 240 / .85) calc(50% - 1px), rgb(255 250 240 / .85) calc(50% + 1px), transparent calc(50% + 1px)),
+    radial-gradient(circle calc(var(--cd-d) * .95) at 50% 50%, rgb(var(--cd-pre) / .2), rgb(var(--cd-pre) / .05) 60%, transparent 80%),
+    radial-gradient(circle calc(var(--cd-d) / 2) at 50% 50%, #26231f 0%, #1e1b18 46%, #171513 78%, #100f0d 93%, #6c4f30 94.2%, #b28a55 96.6%, #4a3520 99.4%, transparent 100%),
+    linear-gradient(90deg, transparent 36%, rgb(var(--cd-pre) / .1) 49.7%, rgb(var(--cd-pre) / .1) 50.3%, transparent 64%),
+    radial-gradient(72% 82% at 50% 50%, #221f1b 0%, #181613 52%, #0d0c0a 100%);
+  animation: cd-secours .6s ease-out 3.6s forwards;
+}
+/* Côté Pro (le point mène au soleil), on arrive par la lune ; côté Créateur, par le soleil. */
+html[data-porte-arrivee]:has([data-cordon][data-symbole="soleil"])::after { --cd-pre: 157 184 255; }
+html[data-porte-arrivee]:has([data-cordon][data-symbole="lune"])::after { --cd-pre: 242 180 90; }
+html[data-porte-arrivee][data-univers="pro"]::after { --cd-pre: 157 184 255; }   /* Pro sans cordon : on arrive par la lune */
+@keyframes cd-secours { to { opacity: 0; visibility: hidden; } }
+
+/* ==========================================================================
+   DA Terre (BRIEF-V6-TERRE.md) : vers Créateur, la plongée vers la Terre ; vers Pro, le décollage vers les étoiles.
+   Rempli par cordon.js (plonger, decoller, arriver). Mêmes calques au départ et à l'arrivée :
+     .cd-eclat  l'éclat d'atmosphère (Lagon et bleu ciel ; plus clair en mode clair)
+     .cd-ciel   l'espace et ses étoiles (motif en dégradés : identique sur les deux pages, sans script)
+     .cd-astre  la Terre (image ronde, halo compris), posée par transform
+   ========================================================================== */
+:root {
+  --cd-eclat:
+    radial-gradient(70% 60% at 50% 58%, #F4FCFF 0%, #BAE6F0 26%, #4EA6C0 58%, #164A60 100%);
+  --cd-espace: radial-gradient(120% 90% at 50% 112%, #0B1D27 0%, #070D14 48%, #04060A 100%);
+  --cd-ciel:
+    radial-gradient(1.8px 1.8px at 23px 41px, #FFFBF2 55%, transparent 100%) 0 0 / 173px 173px,
+    radial-gradient(1.4px 1.4px at 97px 113px, rgba(255, 246, 230, .95) 55%, transparent 100%) 0 0 / 229px 229px,
+    radial-gradient(2.2px 2.2px at 151px 63px, #DCE8FF 50%, transparent 100%) 0 0 / 311px 311px,
+    radial-gradient(1.3px 1.3px at 41px 207px, rgba(255, 255, 255, .85) 55%, transparent 100%) 0 0 / 263px 263px,
+    radial-gradient(2.6px 2.6px at 263px 281px, #FFE6C2 45%, transparent 100%) 0 0 / 397px 397px,
+    radial-gradient(1.3px 1.3px at 301px 23px, rgba(255, 255, 255, .8) 55%, transparent 100%) 0 0 / 353px 353px,
+    radial-gradient(1.6px 1.6px at 189px 377px, rgba(230, 238, 255, .95) 55%, transparent 100%) 0 0 / 449px 449px,
+    radial-gradient(1.2px 1.2px at 71px 19px, rgba(255, 255, 255, .75) 55%, transparent 100%) 0 0 / 97px 131px,
+    radial-gradient(1px 1px at 12px 88px, rgba(255, 250, 240, .6) 55%, transparent 100%) 0 0 / 61px 107px,
+    radial-gradient(120% 90% at 50% 112%, #0B1D27 0%, #070D14 48%, #04060A 100%);
+}
+html[data-theme="light"] {
+  --cd-eclat:
+    radial-gradient(70% 60% at 50% 58%, #FFFFFF 0%, rgba(240, 249, 251, 1) 34%, rgba(196, 228, 236, 1) 70%, rgba(150, 200, 214, 1) 100%);
+}
+.cd-plongee,
+.cd-envol,
+.cd-arrivee {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483601;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+.cd-envol { background: var(--cd-espace); opacity: 0; }
+.cd-arrivee--ciel { background: var(--cd-espace); }
+.cd-eclat {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--cd-eclat);
+  opacity: 0;
+}
+.cd-arrivee .cd-eclat { opacity: 1; }
+.cd-ciel {
+  position: absolute;
+  inset: -12%;
+  display: block;
+  background: var(--cd-ciel);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+.cd-astre {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 400px;
+  height: 400px;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.cd-astre__globe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* Le point de lumière d'où naît la planète (--cd-flash : 1 → 0) */
+.cd-astre__lueur {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #FFFFFF 0%, rgba(214, 244, 250, .85) 22%, rgba(120, 200, 222, .35) 52%, rgba(120, 200, 222, 0) 100%);
+  opacity: var(--cd-flash, 0);
+  transform: scale(calc(1 + var(--cd-flash, 0) * 1.6));
+  mix-blend-mode: screen;
+}
+.cd-astre:has(.cd-astre__lueur) .cd-astre__globe { filter: brightness(calc(1 + var(--cd-flash, 0) * 1.4)); }
+
+/* L'arrivée par #porte, dès le premier rendu (avant le script) : l'éclat côté Créateur, le ciel côté Pro */
+html[data-porte-arrivee][data-univers="createur"]::after { background: var(--cd-eclat); }
+html[data-porte-arrivee][data-univers="pro"]::after { background: var(--cd-ciel); }
+
+/* ---------- Mouvement réduit : des fondus ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cd-battant { will-change: auto; }
+  .cd-fil__svg, .cd-fil__chaine, .cd-fil__point { transition: none; }
+}

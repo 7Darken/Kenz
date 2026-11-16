@@ -1,0 +1,1824 @@
+<!doctype html>
+<html lang="fr" class="no-js" data-side="pro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Le fil</title>
+<!--
+  Proposition 4 « Le fil » : deux univers séparés par l'URL, et un passage secret.
+  1. Deux entrées : #pro (ou sans hash) et #createur. Chaque entrée n'affiche que son univers :
+     son hero (portrait, phrase), sa barre (ses sections, son bouton d'action), son pied de page.
+  2. « La loupe » : après ~400 ms de survol du portrait du hero, le curseur devient une lentille douce
+     (150 px, liseré crème, léger grossissement) qui montre l'autre soi, aligné, sur l'autre fond
+     (Lagon ↔ lumière dorée de Kuala Lumpur), avec la légende « l'autre moi ». Sur mobile : appui long (~500 ms),
+     relâcher dans la lentille. En bas de page, une seconde porte : « Il existe une autre version de moi. ».
+  3. Le passage : au clic, la lentille s'ouvre depuis le pointeur jusqu'à couvrir l'écran (clip-path circle,
+     1,1 s expo.out, bord lumineux flou) pendant que l'ancienne page recule (scale 0,98, flou, 240 ms) ;
+     puis le titre du nouveau hero arrive mot par mot. ScrollTrigger et épinglages de l'univers quitté sont
+     détruits puis recréés. pushState + popstate : le retour arrière refait le passage. Mouvement réduit : fondu 300 ms.
+  4. Pro : apps en défilement horizontal épinglé, schéma des agents construit au scroll, Startup Weekend balayé.
+     Créateur : dernière vidéo ouverte par un masque, chiffres qui montent d'une fente, destinations en parallaxe.
+  Mobile (< 768 px) et mouvement réduit : ni épinglage ni scroll horizontal. Sans JS : tout le contenu est visible.
+-->
+<meta name="description" content="Kenz : des apps où l’IA fait le vrai travail, des agents IA installés dans votre équipe, et l’Asie racontée en vidéo.">
+<meta name="theme-color" content="#1A1918">
+<script>
+(function(){var d=document.documentElement;d.classList.remove('no-js');d.classList.add('js');var h=(location.hash||'').slice(1);d.setAttribute('data-side',(h==='createur'||h.indexOf('cr-')===0)?'createur':'pro');})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="preload" as="image" href="assets/img/kenz-pro.webp">
+<link rel="preload" as="image" href="assets/img/kenz-moi.webp">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function(){if(window.gsap&&window.ScrollTrigger){document.documentElement.classList.add('motion');}})();
+</script>
+<style>
+/* ---------- Jetons ---------- */
+:root{
+  --ink:#1A1918; --ink-2:#201E1D; --ink-3:#272523; --ink-4:#302D2B;
+  --cream:#F4EFE6; --cream-80:rgba(244,239,230,.82); --cream-60:rgba(244,239,230,.64); --cream-40:rgba(244,239,230,.4);
+  --line:rgba(244,239,230,.1); --line-2:rgba(244,239,230,.16);
+  --red:#E8322B; --lagon:#0F5D6B; --lagon-2:#5E9EA8; --lagon-3:#14707F; --gold:#E2B26A; --gold-2:#C98E45; --sand:#F3C9A0;
+  --accent:var(--lagon-2);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --g:clamp(16px,4vw,56px);
+  --gl:max(var(--g),env(safe-area-inset-left));
+  --gr:max(var(--g),env(safe-area-inset-right));
+  --sec:clamp(80px,12vh,150px);
+  --hh:max(100vh,560px);
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  color-scheme:dark;
+}
+@supports (height:100svh){:root{--hh:max(100svh,560px)}}
+html[data-side="createur"]{--accent:var(--gold)}
+
+/* ---------- Base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ink);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html:not(.js){scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html:not(.js){scroll-behavior:auto}}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--f-text);font-optical-sizing:auto;font-size:17px;line-height:1.55;font-weight:400;overflow-x:clip;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+::selection{background:var(--accent);color:var(--ink)}
+:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+[hidden]{display:none!important}
+em{font-family:var(--f-word);font-style:italic;font-weight:400;letter-spacing:0}
+.glow{text-shadow:0 0 26px rgba(226,178,106,.55)}
+.nw{white-space:nowrap}
+.w{display:inline-block}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:fixed;left:16px;top:-80px;z-index:120;padding:12px 18px;border-radius:999px;background:var(--cream);color:var(--ink);font-weight:600;text-decoration:none}
+.skip:focus{top:16px}
+main{position:relative;z-index:1}
+.wrap{width:100%;max-width:1320px;margin-inline:auto;padding-inline:var(--gl) var(--gr)}
+.sec{padding-block:var(--sec)}
+
+/* Ambiance fixe : halo Lagon (Pro) ou doré (Créateur), grain */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb{position:absolute;inset:-10%;opacity:0;transition:opacity 1.6s var(--ease)}
+.amb-pro{background:radial-gradient(46% 38% at 12% 0%,rgba(15,93,107,.3),transparent 72%),radial-gradient(40% 36% at 100% 70%,rgba(15,93,107,.14),transparent 72%)}
+.amb-cr{background:radial-gradient(46% 38% at 88% 0%,rgba(226,178,106,.18),transparent 72%),radial-gradient(42% 38% at 0% 72%,rgba(201,142,69,.1),transparent 72%)}
+html[data-side="pro"] .amb-pro,html[data-side="createur"] .amb-cr{opacity:1}
+.grain{position:fixed;inset:0;z-index:96;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E")}
+.page-thread{display:none}
+@media (min-width:1100px){
+  .motion .page-thread{display:block;position:fixed;z-index:40;left:22px;top:22vh;bottom:22vh;width:1px;background:rgba(244,239,230,.08);pointer-events:none}
+  .page-thread i{display:block;height:100%;background:var(--accent);transform-origin:50% 0;transform:scaleY(0);transition:background-color 1.2s var(--ease)}
+}
+
+/* ---------- Typo commune ---------- */
+.t-title{margin:0;font-family:var(--f-title);font-weight:600;font-size:clamp(48px,7.4vw,116px);line-height:.95;letter-spacing:-.015em}
+.t-sub{margin:0;font-family:var(--f-title);font-weight:600;font-size:clamp(34px,4vw,58px);line-height:1;letter-spacing:-.01em}
+.lead{margin:20px 0 0;max-width:34em;font-size:clamp(17px,1.5vw,21px);line-height:1.5;color:var(--cream-60)}
+.lead em{color:var(--cream)}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;margin:0 0 20px;padding:7px 13px;border-radius:999px;border:1px solid var(--line-2);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-80)}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* ---------- Boutons ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:14px;height:54px;padding:0 6px 0 24px;border:0;border-radius:999px;background:var(--cream);color:var(--ink);font-size:15px;font-weight:600;letter-spacing:-.005em;text-decoration:none;cursor:pointer;white-space:nowrap;transition:transform .5s var(--ease),background-color .5s var(--ease),box-shadow .5s var(--ease);-webkit-tap-highlight-color:transparent}
+.btn:hover{background:#FBF7F0;box-shadow:0 14px 30px -16px rgba(244,239,230,.35)}
+.btn:active{transform:scale(.98)}
+.btn .ico{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(26,25,24,.08);transition:transform .6s var(--ease),background-color .6s var(--ease)}
+.btn:hover .ico{transform:translate(2px,-1px) scale(1.05)}
+.btn--sm{height:46px;padding-left:20px;font-size:14px}
+.btn--sm .ico{width:36px;height:36px}
+.btn--ghost{background:rgba(244,239,230,.06);color:var(--cream);box-shadow:inset 0 0 0 1px rgba(244,239,230,.14)}
+.btn--ghost:hover{background:rgba(244,239,230,.12);box-shadow:inset 0 0 0 1px rgba(244,239,230,.24)}
+.btn--ghost .ico{background:rgba(244,239,230,.1)}
+.btn--red{height:58px;background:var(--red);color:var(--cream);font-size:19px;font-weight:700}
+.btn--red:hover{background:#EE3D36;box-shadow:0 16px 34px -18px rgba(232,50,43,.7)}
+.btn--red .ico{background:rgba(26,25,24,.16)}
+.link-arrow{display:inline-flex;align-items:center;gap:12px;font-size:15px;font-weight:600;text-decoration:none;color:var(--cream)}
+.link-arrow .ico{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(244,239,230,.07);box-shadow:inset 0 0 0 1px rgba(244,239,230,.12);transition:transform .6s var(--ease),background-color .6s var(--ease)}
+.link-arrow:hover .ico{transform:translateX(3px);background:rgba(244,239,230,.14)}
+.link-u{position:relative;font-size:14px;font-weight:500;text-decoration:none;color:var(--cream-80);padding-bottom:3px}
+.link-u::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;transform:scaleX(.35);transform-origin:0 50%;transition:transform .7s var(--ease)}
+.link-u:hover{color:var(--cream)}
+.link-u:hover::after,.link-u:focus-visible::after{transform:scaleX(1)}
+
+/* ---------- Containers premium (double bezel) ---------- */
+.shell{position:relative;padding:6px;border-radius:34px;background:rgba(244,239,230,.035);border:1px solid rgba(244,239,230,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 50px 90px -50px rgba(0,0,0,.85),0 20px 40px -24px rgba(0,0,0,.5)}
+.core{position:relative;border-radius:28px;background:var(--ink-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+
+/* ---------- Barre (propre à chaque univers) ---------- */
+.nav{position:fixed;z-index:60;top:max(12px,env(safe-area-inset-top));left:0;right:0;margin-inline:auto;width:min(1200px,calc(100% - 24px));height:60px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;padding:0 7px 0 22px;border-radius:999px;background:rgba(26,25,24,.58);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border:1px solid rgba(244,239,230,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 40px -22px rgba(0,0,0,.7)}
+.brand{justify-self:start;font-family:var(--f-title);font-weight:600;font-size:26px;line-height:1;letter-spacing:-.01em;text-decoration:none;color:var(--cream);padding:6px 4px;border-radius:10px}
+.nav-links{justify-self:center}
+.nl{display:none;margin:0;padding:0;list-style:none;gap:2px}
+.nl--pro{display:flex}
+.js[data-side="createur"] .nl--pro{display:none}
+.js[data-side="createur"] .nl--cr{display:flex}
+.nl a{position:relative;display:block;padding:9px 14px;border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;color:var(--cream-60);transition:color .5s var(--ease),background-color .5s var(--ease)}
+.nl a:hover{color:var(--cream);background:rgba(244,239,230,.06)}
+.nl a.is-active{color:var(--cream)}
+.nl a::after{content:"";position:absolute;left:50%;bottom:2px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .6s var(--ease)}
+.nl a.is-active::after{transform:scale(1)}
+.nav-cta{justify-self:end;display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 5px 0 18px;border-radius:999px;font-size:14px;font-weight:600;text-decoration:none;color:var(--ink);background:var(--cream);transition:background-color .5s var(--ease),transform .5s var(--ease)}
+.nav-cta:hover{background:#FBF7F0}
+.nav-cta:active{transform:scale(.98)}
+.nav-cta .ico{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(26,25,24,.08);transition:transform .6s var(--ease)}
+.nav-cta:hover .ico{transform:translateX(2px)}
+.nav-cta--cr{display:none}
+.js[data-side="createur"] .nav-cta--pro{display:none}
+.js[data-side="createur"] .nav-cta--cr{display:inline-flex}
+@media (max-width:959px){.nav-links{display:none}}
+@media (max-width:600px){
+  .nav{height:54px;padding-left:16px}
+  .brand{font-size:22px}
+  .nav-cta{height:42px;padding-left:14px;font-size:13px}
+  .nav-cta .ico{width:32px;height:32px}
+}
+
+/* ---------- Hero (un par univers) ---------- */
+.hero{position:relative;z-index:1;height:var(--hh);overflow:hidden;isolation:isolate}
+.scene{position:absolute;inset:0;overflow:hidden;--ph:min(calc(var(--hh) * .88),880px);--pw:calc(var(--ph) * 9 / 13);--pr:max(var(--gr),calc((100vw - 1320px) / 2 + 56px))}
+.backdrop{position:absolute;inset:0}
+.backdrop--pro{background:radial-gradient(40% 56% at calc(100% - var(--pr) - var(--pw) / 2) 56%,rgba(20,112,127,.66),rgba(15,93,107,.24) 50%,transparent 76%),radial-gradient(90% 60% at 80% 110%,rgba(15,93,107,.3),transparent 70%),linear-gradient(180deg,#1B2224 0%,var(--ink) 100%)}
+.backdrop--cr{background:var(--ink)}
+.backdrop--cr img{width:100%;height:100%;object-fit:cover;object-position:62% 40%}
+.backdrop--cr::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(26,25,24,.92) 0%,rgba(26,25,24,.72) 34%,rgba(26,25,24,.16) 62%,rgba(26,25,24,.22) 100%),linear-gradient(180deg,rgba(26,25,24,.4) 0%,rgba(26,25,24,0) 24%,rgba(26,25,24,0) 74%,var(--ink) 100%)}
+.portrait{position:absolute;z-index:1;bottom:0;right:var(--pr);width:var(--pw);height:var(--ph);cursor:default;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:pan-y}
+.portrait::before{content:"";position:absolute;left:50%;top:33%;width:84%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);border:1px solid var(--ring)}
+.portrait--pro{--ring:rgba(94,158,168,.34)}
+.portrait--cr{--ring:rgba(226,178,106,.42)}
+.portrait img{position:relative;width:100%;height:100%;object-fit:cover;object-position:50% 0%;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,#000 76%,transparent 100%);mask-image:linear-gradient(180deg,#000 76%,transparent 100%)}
+.pz{position:absolute;left:30%;top:13%;width:40%;height:34%;pointer-events:none}
+.hero.is-lens .portrait{cursor:none}
+.hero-text{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding-top:64px;pointer-events:none}
+.hero-text>*{pointer-events:auto;max-width:min(44vw,620px)}
+.hero-title{margin:0;font-size:clamp(40px,4.8vw,76px);font-weight:500;line-height:1.04;letter-spacing:-.035em;text-wrap:balance}
+.hero-title em{font-size:1.1em;letter-spacing:-.01em}
+.hero-title:focus{outline:none}
+.hero-sub{margin:24px 0 0;font-size:clamp(15px,1.2vw,17px);color:var(--cream-60)}
+.hero-cta{margin-top:34px}
+@media (max-width:899px),(max-aspect-ratio:1/1){
+  .scene{--ph:min(calc(var(--hh) * .56),calc((100vw - 32px) * 13 / 9));--pw:calc(var(--ph) * 9 / 13)}
+  .portrait{right:auto;left:calc(50% - var(--pw) / 2)}
+  .backdrop--pro{background:radial-gradient(70% 42% at 50% 74%,rgba(20,112,127,.62),rgba(15,93,107,.2) 55%,transparent 80%),linear-gradient(180deg,#1B2224 0%,var(--ink) 100%)}
+  .backdrop--cr img{object-position:58% 50%}
+  .backdrop--cr::after{background:linear-gradient(180deg,rgba(26,25,24,.92) 0%,rgba(26,25,24,.62) 32%,rgba(26,25,24,.08) 54%,rgba(26,25,24,.18) 84%,var(--ink) 100%)}
+  .hero-text{justify-content:flex-start;align-items:center;text-align:center;padding-top:clamp(92px,13vh,128px)}
+  .hero-text>*{max-width:34rem}
+  .hero-title{font-size:clamp(32px,8.6vw,54px)}
+  .hero-sub{margin-top:16px}
+  .hero-cta{display:none}
+}
+@media (max-width:899px) and (min-height:760px),(max-aspect-ratio:1/1) and (min-height:760px){
+  .hero-cta{display:inline-flex;margin-top:22px;height:48px}
+  .hero-cta .ico{width:38px;height:38px}
+}
+
+/* ---------- La loupe ---------- */
+.loupe{position:absolute;left:0;top:0;z-index:4;width:150px;height:150px;pointer-events:none;visibility:hidden;will-change:transform}
+.loupe-disc{position:absolute;inset:0;overflow:hidden;background:var(--ink);clip-path:circle(0px at 50% 50%)}
+.loupe-in{position:absolute;left:0;top:0;transform-origin:0 0}
+.loupe-ring{position:absolute;inset:0;border-radius:50%;opacity:0;box-shadow:inset 0 0 0 1px rgba(244,239,230,.8),0 0 0 1px rgba(26,25,24,.28),0 26px 50px -18px rgba(0,0,0,.7);background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.16),transparent 40%)}
+.loupe-cap{position:absolute;top:50%;left:calc(100% + 20px);transform:translateY(-50%);padding:7px 13px 8px;border-radius:999px;white-space:nowrap;font-family:var(--f-word);font-style:italic;font-size:19px;line-height:1;color:var(--cream);background:rgba(28,27,26,.42);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);opacity:0}
+.loupe.cap-left .loupe-cap{left:auto;right:calc(100% + 20px)}
+@media (hover:none),(pointer:coarse){.loupe{width:136px;height:136px}}
+
+/* ---------- Le passage ---------- */
+.passage{position:fixed;inset:0;z-index:92;visibility:hidden;overflow:hidden;pointer-events:none;background:var(--ink)}
+.passage-in{position:absolute;left:0;top:0}
+.passage-ring{position:fixed;z-index:93;left:0;top:0;width:150px;height:150px;border-radius:50%;visibility:hidden;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(244,239,230,.75),0 0 36px 8px rgba(244,239,230,.12),inset 0 0 36px 8px rgba(244,239,230,.12);filter:blur(1px)}
+
+/* ---------- Univers ---------- */
+.js[data-side="pro"] #createur,.js[data-side="createur"] #pro{display:none}
+.side{position:relative}
+.intro{text-align:center}
+.statement{margin:0 auto;max-width:20em;font-size:clamp(30px,4.4vw,66px);font-weight:500;line-height:1.08;letter-spacing:-.035em;text-wrap:balance}
+.statement em{font-size:1.1em}
+.intro-sub{margin:26px auto 0;max-width:36em;font-size:clamp(16px,1.4vw,19px);color:var(--cream-60)}
+
+/* ---------- Pro : apps ---------- */
+.apps{position:relative;padding-block:calc(var(--sec) / 2) calc(var(--sec) / 2)}
+.apps-track{position:relative;display:grid;gap:clamp(16px,2.4vw,28px);max-width:1320px;margin-inline:auto;padding-inline:var(--gl) var(--gr)}
+.apps-intro{padding-bottom:4px}
+.apps-hint{display:none}
+.app-panel{--tint:rgba(94,158,168,.2)}
+.app-panel .core{display:grid;gap:clamp(24px,4vw,48px);padding:clamp(22px,4vw,52px);background:radial-gradient(110% 90% at 88% 40%,var(--tint),transparent 62%),var(--ink-2)}
+.app-text{display:flex;flex-direction:column;align-items:flex-start;gap:14px;max-width:30em}
+.app-icon{width:68px;height:68px;border-radius:22%;box-shadow:0 0 0 1px rgba(244,239,230,.12),0 14px 30px -12px rgba(0,0,0,.7)}
+.app-name{margin:6px 0 0;font-family:var(--f-title);font-weight:600;font-size:clamp(46px,5.4vw,88px);line-height:.95;letter-spacing:-.01em}
+.app-line{margin:0;font-size:clamp(17px,1.4vw,20px);line-height:1.5;color:var(--cream-80)}
+.app-line em{color:var(--cream)}
+.app-quote{margin:0;font-family:var(--f-word);font-style:italic;font-size:clamp(19px,1.6vw,23px);line-height:1.35;color:var(--cream)}
+.app-meta{margin:0;font-size:13px;color:var(--cream-60)}
+.app-links{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-top:8px}
+.app-visual{display:flex;justify-content:center;align-items:flex-start;gap:clamp(12px,2vw,20px)}
+.shot{flex:none;margin:0;padding:5px;border-radius:30px;background:rgba(244,239,230,.05);border:1px solid rgba(244,239,230,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 40px 80px -40px rgba(0,0,0,.85),0 16px 34px -18px rgba(0,0,0,.55)}
+.shot img{width:100%;height:100%;object-fit:cover;border-radius:25px}
+.shot--tall{width:min(46%,260px);aspect-ratio:462/1000}
+.app-visual--solo .shot--tall{width:min(62%,300px)}
+.app-visual--duo .shot--tall:nth-child(2){margin-top:44px}
+.shot--wide{width:100%;aspect-ratio:1000/703;border-radius:24px}
+.shot--wide img{border-radius:19px}
+@media (min-width:1024px){.app-panel .core{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:center}}
+.apps-progress{display:none}
+/* Mode horizontal épinglé (ajouté par le JS sur ordinateur) */
+.apps.is-h{height:100vh;height:100svh;padding:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.is-h .apps-track{--ph:min(66vh,680px);display:flex;align-items:center;gap:clamp(24px,3vw,48px);width:max-content;max-width:none;margin:0;padding:clamp(40px,6vh,64px) 10vw 0 var(--gl);will-change:transform}
+.is-h .apps-intro{flex:none;width:min(480px,36vw);padding:0}
+.is-h .apps-hint{display:inline-flex;align-items:center;gap:14px;margin-top:34px;font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-60)}
+.is-h .apps-hint i{display:block;width:56px;height:1px;background:linear-gradient(90deg,var(--cream-60),transparent)}
+.is-h .app-panel{flex:none;width:min(1120px,84vw);height:var(--ph)}
+.is-h .app-panel .core{height:100%;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);grid-template-rows:minmax(0,1fr);align-items:center}
+.is-h .app-visual{height:100%;min-height:0;container-type:size;align-items:center}
+.is-h .shot--tall{width:auto;height:min(100cqh,calc(100cqw / .462 - 12px))}
+.is-h .app-visual--duo{gap:18px}
+.is-h .app-visual--duo .shot--tall{height:min(92cqh,calc((100cqw - 18px) / 2 / .462));margin-top:0}
+.is-h .app-visual--duo .shot--tall:first-child{align-self:flex-start}
+.is-h .app-visual--duo .shot--tall:nth-child(2){align-self:flex-end}
+.is-h .shot--wide{width:min(100cqw,calc(100cqh * 1.42));height:auto}
+.is-h .apps-progress{display:block;position:absolute;left:max(var(--gl),170px);right:var(--gr);bottom:clamp(22px,4vh,40px)}
+@media (max-width:1023px){
+  .is-h .app-panel .core{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);align-items:stretch}
+  .is-h .app-text{gap:10px;max-width:none}
+  .is-h .app-icon{width:50px;height:50px}
+  .is-h .app-name{font-size:44px}
+  .is-h .app-line{font-size:16px}
+}
+.apps-names{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px}
+.apps-names button{appearance:none;background:none;border:0;padding:4px 2px;border-radius:6px;font-size:13px;font-weight:500;color:var(--cream-60);cursor:pointer;transition:color .5s var(--ease)}
+.apps-names button.is-on,.apps-names button:hover{color:var(--cream)}
+.apps-bar{position:relative;height:1px;background:rgba(244,239,230,.14);overflow:hidden}
+.apps-bar i{position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:0 50%}
+
+/* ---------- Pro : agents IA ---------- */
+.agents{position:relative}
+.agents-stage{display:grid;gap:clamp(44px,6vw,88px);align-items:center;padding-block:var(--sec) calc(var(--sec) / 2)}
+@media (min-width:1024px){.agents-stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (min-width:1024px) and (min-height:640px){.motion .agents-stage{min-height:100vh;padding-block:100px 48px}}
+.agents-for{margin:10px 0 0;font-size:clamp(20px,2vw,28px);font-weight:500;letter-spacing:-.02em}
+.agents-promise{margin:20px 0 0;max-width:34em;font-size:clamp(16px,1.25vw,18px);line-height:1.6;color:var(--cream-60)}
+.agents-promise em{color:var(--cream)}
+.agents-steps{list-style:none;margin:28px 0 0;padding:0}
+.agent-step{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-top:1px solid var(--line);font-size:16px;line-height:1.45}
+.agent-step:last-child{border-bottom:1px solid var(--line)}
+.step-dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--lagon-2);transform:translateY(-2px)}
+.dia{display:flex;flex-direction:column;align-items:center;width:100%;max-width:580px;margin-inline:auto}
+.dia-node{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:min(240px,100%);padding:14px 26px;border-radius:22px;background:var(--ink-3);border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 24px 44px -26px rgba(0,0,0,.85);text-align:center}
+.dia-node strong{position:relative;z-index:1;font-size:17px;font-weight:600}
+.dia-node small{position:relative;z-index:1;font-size:13px;color:var(--cream-60)}
+.dia-ok small{color:var(--cream-80)}
+.dia-hermes strong{font-family:var(--f-title);font-size:30px;line-height:1}
+.dia-ring{position:absolute;inset:-6px;border-radius:28px;border:1px solid rgba(94,158,168,.55);box-shadow:0 0 30px -4px rgba(15,93,107,.7);pointer-events:none}
+.ln{display:block;flex:none;background:rgba(94,158,168,.8)}
+.ln-v{width:1px;height:34px;transform-origin:50% 0}
+.ln-s{height:20px}
+.dia-branch{width:100%}
+.ln-h{width:75%;height:1px;margin-inline:auto;transform-origin:50% 50%}
+.dia-roles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.dia-col{display:flex;flex-direction:column;align-items:center}
+.dia-role{padding:10px 16px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;background:rgba(15,93,107,.26);border:1px solid rgba(94,158,168,.4)}
+.dia-mem{min-width:min(340px,100%)}
+.dia-ok{overflow:hidden;border-color:rgba(94,158,168,.6)}
+.ok-fill{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,var(--lagon-3),var(--lagon))}
+@media (max-width:767px){
+  .dia-roles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%}
+  .dia-branch .ln-h,.dia-col .ln-s{display:none}
+  .dia-role{width:100%;text-align:center}
+  .ln-v{height:24px}
+}
+.agents-more{padding-bottom:var(--sec)}
+.uses{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:0 clamp(24px,3vw,48px);margin:32px 0 0;padding:0;list-style:none}
+.uses li{padding:20px 0;border-top:1px solid var(--line);font-size:17px;line-height:1.45}
+.uses em{color:var(--cream)}
+.proof-k{margin:clamp(48px,6vw,80px) 0 20px;font-size:15px;color:var(--cream-60)}
+.proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0;padding:0;list-style:none}
+.proof li{padding-top:20px;border-top:1px solid var(--line)}
+.proof-n{font-family:var(--f-title);font-weight:600;font-size:clamp(46px,7vw,104px);line-height:1}
+.proof-l{display:block;margin-top:10px;font-size:14px;color:var(--cream-60)}
+.slit{display:block;overflow:hidden;padding-bottom:.06em}
+.slit>span{display:block}
+
+/* ---------- Pro : offres ---------- */
+.offers-grid{display:grid;gap:16px;margin-top:clamp(36px,5vw,64px)}
+@media (min-width:768px){.offers-grid{grid-template-columns:1fr 1fr}}
+.offer{transition:translate .8s var(--ease),border-color .8s var(--ease)}
+.offer:hover,.offer:focus-within{translate:0 -4px;border-color:rgba(244,239,230,.16)}
+.offer .core{display:flex;flex-direction:column;gap:14px;height:100%;padding:clamp(26px,3vw,40px);background:radial-gradient(80% 70% at 100% 0%,rgba(15,93,107,.24),transparent 62%),var(--ink-2)}
+.offer-line{display:block;width:44px;height:1px;background:var(--lagon-2);transform-origin:0 50%;transition:transform .8s var(--ease)}
+.offer:hover .offer-line,.offer:focus-within .offer-line{transform:scaleX(2.4)}
+.offer h3{margin:12px 0 0;font-size:clamp(21px,1.8vw,26px);font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.offer p{margin:0;font-size:16px;line-height:1.55;color:var(--cream-60)}
+.offer .link-arrow{margin-top:auto;padding-top:14px}
+
+/* ---------- Pro : Startup Weekend ---------- */
+.sw-head{margin-bottom:clamp(28px,4vw,48px)}
+.sw-head p:last-child{margin:16px 0 0;font-size:clamp(17px,1.5vw,21px);color:var(--cream-60);max-width:30em}
+.sw-photo{position:relative;margin:0;aspect-ratio:21/9;border-radius:32px;overflow:hidden;background:var(--ink-3);box-shadow:0 60px 120px -60px rgba(0,0,0,.9)}
+.sw-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 22%}
+@media (max-width:767px){
+  .sw-photo{aspect-ratio:16/9;border-radius:22px}
+  .sw-photo img{width:118%;max-width:none;height:auto;object-fit:fill}
+}
+.sw-row{display:grid;gap:20px;align-items:end;margin-top:20px}
+@media (min-width:768px){.sw-row{grid-template-columns:minmax(0,1fr) minmax(0,340px)}}
+.sw-cap{margin:0;max-width:30em;font-size:15px;color:var(--cream-60)}
+.sw-small{margin:0;aspect-ratio:4/3;border-radius:22px;overflow:hidden;background:var(--ink-3)}
+.sw-small img{width:100%;height:100%;object-fit:cover;object-position:30% 40%}
+
+/* ---------- Formulaires ---------- */
+.contact-grid{display:grid;gap:clamp(36px,5vw,88px);align-items:start}
+@media (min-width:1024px){.contact-grid{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}}
+.contact-links{display:flex;flex-wrap:wrap;gap:10px;margin:32px 0 0;padding:0;list-style:none}
+.form-box .core{padding:clamp(22px,3.4vw,44px)}
+.form{display:grid;gap:18px}
+.field{display:grid;gap:8px}
+.field label{font-size:13px;font-weight:500;color:var(--cream-80)}
+.field input,.field select,.field textarea{width:100%;padding:14px 16px;border-radius:16px;border:1px solid rgba(244,239,230,.14);background:rgba(244,239,230,.04);font-size:16px;line-height:1.4;color:var(--cream);appearance:none;-webkit-appearance:none;transition:border-color .4s var(--ease),background-color .4s var(--ease)}
+.field textarea{min-height:140px;resize:vertical}
+.field select{padding-right:44px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='%23F4EFE6' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.field option{background:var(--ink);color:var(--cream)}
+.field input::placeholder,.field textarea::placeholder{color:rgba(244,239,230,.42)}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:rgba(244,239,230,.24)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);background-color:rgba(244,239,230,.07)}
+.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{outline:2px solid var(--cream);outline-offset:2px}
+.field-err{display:none;margin:0;font-size:13px;color:var(--sand)}
+.field.is-error input,.field.is-error select,.field.is-error textarea{border-color:var(--sand)}
+.field.is-error .field-err{display:block}
+.form-row{display:grid;gap:18px}
+@media (min-width:640px){.form-row{grid-template-columns:1fr 1fr}}
+.form-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:6px}
+.form-note{margin:0;font-size:13px;color:var(--cream-60)}
+.form-done{display:grid;justify-items:start;gap:14px;padding-block:12px;outline:none}
+.done-check{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:rgba(244,239,230,.07);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--accent)}
+.form-done h3{margin:6px 0 0;font-family:var(--f-title);font-weight:600;font-size:clamp(34px,3.6vw,48px);line-height:1}
+.form-done p{margin:0;color:var(--cream-60)}
+.form-done button{margin-top:8px}
+
+/* ---------- Créateur ---------- */
+.latest{padding-bottom:calc(var(--sec) / 2)}
+.latest-fig{position:relative;display:block;aspect-ratio:16/9;border-radius:28px;overflow:hidden;background:var(--ink-3);box-shadow:0 60px 120px -60px rgba(0,0,0,.95)}
+.latest-fig img{width:100%;height:100%;object-fit:cover;transform-origin:50% 50%}
+.play{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:rgba(28,27,26,.42);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);border:1px solid rgba(255,255,255,.16);color:var(--cream);transition:transform .7s var(--ease),background-color .7s var(--ease)}
+.latest-fig:hover .play,.latest-fig:focus-visible .play{transform:scale(1.07);background:rgba(28,27,26,.56)}
+.latest-meta{display:grid;gap:18px;margin-top:28px}
+@media (min-width:1024px){.latest-meta{grid-template-columns:minmax(0,1fr) auto;align-items:end}}
+.latest-meta .eyebrow{margin-bottom:14px}
+.latest-title{margin:0;max-width:20em;font-size:clamp(26px,3vw,44px);font-weight:600;line-height:1.1;letter-spacing:-.03em}
+.also{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.also-k{margin:clamp(40px,5vw,64px) 0 14px;font-size:15px;color:var(--cream-60)}
+.also a{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:18px;padding:20px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--cream)}
+.also a::after{content:"";position:absolute;left:0;bottom:-1px;width:100%;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;transition:transform .9s var(--ease)}
+.also a:hover::after,.also a:focus-visible::after{transform:scaleX(1)}
+.also .t{font-size:clamp(16px,1.4vw,19px);font-weight:500}
+.also .v{font-size:14px;color:var(--cream-60);white-space:nowrap}
+.also .ico{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:rgba(244,239,230,.07);transition:transform .6s var(--ease)}
+.also a:hover .ico{transform:translate(2px,-1px)}
+@media (max-width:640px){.also a{grid-template-columns:minmax(0,1fr) auto;gap:6px 14px}.also .v{grid-column:1;grid-row:2}.also .ico{grid-column:2;grid-row:1 / 3}}
+.stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 20px;margin:0;padding:0;list-style:none}
+.stat{padding-top:20px;border-top:1px solid var(--line)}
+.stat-n{font-family:var(--f-title);font-weight:600;font-size:clamp(32px,5.6vw,92px);line-height:1;letter-spacing:-.01em;white-space:nowrap}
+.stat-n small{margin-right:.18em;font-family:var(--f-text);font-size:.42em;font-weight:500;vertical-align:.55em;color:var(--cream-60)}
+.stat-l{display:block;margin-top:12px;font-size:14px;line-height:1.4;color:var(--cream-60)}
+@media (max-width:699px){.stat:last-child{grid-column:1 / -1}}
+@media (min-width:700px){
+  .stats-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .stat{grid-column:span 2}
+  .stat:nth-child(4),.stat:nth-child(5){grid-column:span 3}
+}
+.dest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px);align-items:start;margin-top:clamp(36px,5vw,64px)}
+.dest-col{display:grid;gap:clamp(14px,2vw,28px)}
+.dest-col:nth-child(2){margin-top:clamp(40px,9vw,140px)}
+.dest-col:nth-child(3){margin-top:clamp(20px,4vw,60px)}
+.tile{position:relative;display:block;margin:0;text-decoration:none;color:var(--cream);border-radius:22px}
+.tile-media{position:relative;display:block;aspect-ratio:16/9;border-radius:22px;overflow:hidden;background:var(--ink-3);box-shadow:0 40px 80px -48px rgba(0,0,0,.95)}
+.tile-media img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+a.tile:hover .tile-media img,a.tile:focus-visible .tile-media img{transform:scale(1.04)}
+.tile--tall .tile-media{aspect-ratio:4/5}
+.tile--sq .tile-media{aspect-ratio:1/1}
+.tile-cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px 4px 0}
+.tile-name{font-family:var(--f-title);font-weight:600;font-size:clamp(22px,2vw,30px);line-height:1}
+.tile-meta{font-size:13px;color:var(--cream-60);text-align:right}
+@media (max-width:767px){
+  .dest-grid{grid-template-columns:1fr 1fr}
+  .dest-col{display:contents}
+  .tile{grid-column:1 / -1;order:3}
+  .tile--photo{grid-column:auto;order:1}
+  .tile--tall .tile-media,.tile--sq .tile-media{aspect-ratio:4/5}
+  .tile--photo .tile-cap{display:none}
+}
+.guides-grid{display:grid;gap:16px;margin-top:clamp(36px,5vw,64px)}
+@media (min-width:900px){.guides-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+.guide{display:block;text-decoration:none;color:var(--cream);transition:translate .8s var(--ease),border-color .8s var(--ease)}
+a.guide:hover,a.guide:focus-visible{translate:0 -4px;border-color:rgba(226,178,106,.3)}
+.guide .core{display:flex;flex-direction:column;gap:16px;height:100%;min-height:clamp(240px,28vw,360px);padding:clamp(26px,3.4vw,44px);background:radial-gradient(90% 80% at 100% 0%,rgba(226,178,106,.24),transparent 62%),var(--ink-2)}
+.guide-tag{align-self:flex-start;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-80);box-shadow:inset 0 0 0 1px var(--line-2)}
+.guide h3{margin:auto 0 0;font-family:var(--f-title);font-weight:600;font-size:clamp(40px,4.6vw,72px);line-height:.95}
+.guide p{margin:0;color:var(--cream-60)}
+.guide--soon .core{background:var(--ink-2)}
+.guide--soon h3{font-family:var(--f-text);font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.k15-grid{display:grid;gap:clamp(36px,5vw,80px);align-items:center}
+@media (min-width:900px){.k15-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)}}
+.k15-main{margin:0;aspect-ratio:4/5;border-radius:32px;overflow:hidden;background:var(--ink-3);box-shadow:0 60px 120px -60px rgba(0,0,0,.95)}
+.k15-main img{width:100%;height:100%;object-fit:cover;object-position:50% 0%}
+.k15-text>p{margin:18px 0 0;font-size:clamp(17px,1.5vw,21px);color:var(--cream-60);max-width:28em}
+.k15-text>p em{color:var(--cream)}
+.k15-races{margin:28px 0 30px;padding:0;list-style:none;border-top:1px solid var(--line)}
+.k15-races li{display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:17px;font-weight:500}
+.k15-races span{font-size:15px;font-weight:400;color:var(--cream-60)}
+.k15-duo{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,.8fr);gap:14px;align-items:end;margin-top:36px}
+.k15-duo figure{margin:0;border-radius:22px;overflow:hidden;background:var(--ink-3)}
+.k15-wide{aspect-ratio:2/1}
+.k15-wide img{width:100%;height:100%;object-fit:cover;object-position:50% 0%}
+.k15-small{aspect-ratio:3/4}
+.k15-small img{width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.bio-wrap{max-width:600px;text-align:center}
+.bio-avatar{width:96px;height:96px;margin:0 auto 24px;border-radius:50%;object-fit:cover;object-position:50% 28%;box-shadow:0 0 0 1px rgba(244,239,230,.16),0 0 0 7px rgba(244,239,230,.04)}
+.bio-sub{margin:14px 0 0;color:var(--cream-60)}
+.bio-links{display:grid;gap:10px;margin:32px 0 0;padding:0;list-style:none;text-align:left}
+.bio-link{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;padding:11px 8px 11px 24px;border-radius:999px;background:rgba(244,239,230,.04);box-shadow:inset 0 0 0 1px rgba(244,239,230,.1);text-decoration:none;color:var(--cream);overflow:hidden;isolation:isolate;transition:box-shadow .6s var(--ease)}
+.bio-link::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(226,178,106,.18),rgba(226,178,106,.05));transform:scaleX(0);transform-origin:0 50%;transition:transform .8s var(--ease)}
+.bio-link:hover::before,.bio-link:focus-visible::before{transform:scaleX(1)}
+.bio-link:hover{box-shadow:inset 0 0 0 1px rgba(226,178,106,.3)}
+.bio-t{display:block;font-size:16px;font-weight:600}
+.bio-m{display:block;font-size:13px;color:var(--cream-60)}
+.bio-link .ico{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(244,239,230,.08);transition:transform .6s var(--ease)}
+.bio-link:hover .ico{transform:translate(2px,-1px) scale(1.05)}
+
+/* ---------- Pied de page (un par univers) ---------- */
+.foot{position:relative;z-index:1;padding:clamp(72px,10vw,120px) 0 calc(88px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.foot-mark{margin:0;font-family:var(--f-title);font-weight:600;font-size:clamp(84px,16vw,240px);line-height:.85;letter-spacing:-.02em}
+.foot-tag{margin:20px 0 0;font-size:clamp(18px,1.6vw,22px);color:var(--cream-60)}
+.foot-tag em{color:var(--cream)}
+.foot-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:36px;margin-top:56px}
+.foot h2{margin:0 0 16px;font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--cream-60)}
+.foot ul{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.foot a{text-decoration:none;color:var(--cream);transition:color .5s var(--ease)}
+.foot ul a:hover,.foot ul a:focus-visible{color:var(--accent)}
+.now li{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.now li::before{content:"";flex:none;width:6px;height:6px;margin-top:8px;border-radius:50%;background:var(--accent)}
+.now li span{flex:1}
+.now time{color:var(--cream-60);white-space:nowrap}
+.foot-legal{margin:28px 0 0;font-size:13px;color:var(--cream-60);text-align:right}
+/* La seconde porte, tout en bas */
+.other{position:relative;display:flex;align-items:center;justify-content:space-between;gap:28px;margin-top:64px;padding:30px 4px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-decoration:none;color:var(--cream);-webkit-tap-highlight-color:transparent}
+.other::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;transition:transform 1s var(--ease)}
+.other:hover::after,.other:focus-visible::after{transform:scaleX(1)}
+.other-t{font-size:clamp(22px,2.8vw,40px);font-weight:500;letter-spacing:-.03em;line-height:1.15}
+.other-t em{font-size:1.1em}
+.other-lens{position:relative;flex:none;width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 34% 28%,rgba(244,239,230,.12),transparent 58%),rgba(244,239,230,.03);box-shadow:inset 0 0 0 1px rgba(244,239,230,.55),0 22px 44px -22px rgba(0,0,0,.8);transition:transform .9s var(--ease)}
+.other-alt{position:absolute;inset:0;border-radius:50%;clip-path:circle(0% at 50% 50%);transition:clip-path .9s var(--ease)}
+.other-alt--cr{background:url("assets/img/kenz-moi.webp") 52% 13% / 175% auto no-repeat,url("assets/img/paysage-kuala-lumpur.jpg") 60% 45% / cover no-repeat}
+.other-alt--pro{background:url("assets/img/kenz-pro.webp") 50% 13% / 175% auto no-repeat,radial-gradient(circle at 50% 40%,var(--lagon-3),var(--lagon) 70%)}
+.other-lens::after{content:"";position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(244,239,230,.75);background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.16),transparent 40%);pointer-events:none}
+.other-cap{position:absolute;right:calc(100% + 18px);top:50%;transform:translateY(-50%);white-space:nowrap;font-family:var(--f-word);font-style:italic;font-size:17px;color:var(--cream);opacity:0;filter:blur(6px);transition:opacity .6s var(--ease),filter .6s var(--ease)}
+.other:hover .other-alt,.other:focus-visible .other-alt{clip-path:circle(50% at 50% 50%)}
+.other:hover .other-lens,.other:focus-visible .other-lens{transform:scale(1.06)}
+.other:hover .other-cap,.other:focus-visible .other-cap{opacity:1;filter:blur(0px)}
+@media (hover:none){.other-alt{clip-path:circle(50% at 50% 50%)}.other-cap{opacity:1;filter:none;right:auto;left:50%;top:calc(100% + 8px);transform:translateX(-50%)}}
+@media (max-width:600px){.other{padding-block:24px 40px}.other-lens{width:78px;height:78px}}
+
+/* ---------- États initiaux des entrées (seulement si GSAP est chargé) ---------- */
+.motion [data-rv],.motion [data-rv-h],.motion [data-rv-ag],.motion [data-rv-video]{opacity:0}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"><i class="amb amb-pro"></i><i class="amb amb-cr"></i></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="page-thread" aria-hidden="true"><i></i></div>
+
+<header class="nav">
+  <a class="brand" href="#contenu" data-go-top>Kenz</a>
+  <nav class="nav-links" aria-label="Sections">
+    <ul class="nl nl--pro">
+      <li><a href="#apps" data-go>Apps</a></li>
+      <li><a href="#agents" data-go>Agents IA</a></li>
+      <li><a href="#offres" data-go>Offres</a></li>
+      <li><a href="#startup-weekend" data-go>Startup Weekend</a></li>
+    </ul>
+    <ul class="nl nl--cr">
+      <li><a href="#cr-video" data-go>Vidéos</a></li>
+      <li><a href="#cr-destinations" data-go>Destinations</a></li>
+      <li><a href="#cr-guides" data-go>Guides</a></li>
+      <li><a href="#cr-k15ze" data-go>k15ze</a></li>
+    </ul>
+  </nav>
+  <a class="nav-cta nav-cta--pro" href="#contact" data-go>Me contacter<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+  <a class="nav-cta nav-cta--cr" href="#cr-marques" data-go>Travaillons ensemble<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+</header>
+<p class="sr-only" aria-live="polite" id="live"></p>
+
+<main id="contenu">
+
+  <!-- ===================== UNIVERS PRO ===================== -->
+  <div class="side side--pro" id="pro">
+    <section class="hero" aria-labelledby="pro-title">
+      <div class="scene">
+        <div class="backdrop backdrop--pro" aria-hidden="true"></div>
+        <div class="portrait portrait--pro">
+          <img src="assets/img/kenz-pro.webp" width="1080" height="1920" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" draggable="false" fetchpriority="high">
+          <span class="pz" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="hero-text wrap">
+        <p class="eyebrow" data-hero-in>Apps et agents IA</p>
+        <h1 class="hero-title" id="pro-title" tabindex="-1">Le jour, je construis <span class="nw">des <em>apps</em>.</span></h1>
+        <p class="hero-sub" data-hero-in>AI engineer&nbsp;· Développeur fullstack&nbsp;· Solopreneur</p>
+        <a class="btn hero-cta" href="#apps" data-go data-hero-in>Voir les apps<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 9l4 4 4-4"/></svg></span></a>
+      </div>
+      <div class="loupe" aria-hidden="true">
+        <div class="loupe-disc"><div class="loupe-in"></div></div>
+        <span class="loupe-ring"></span>
+        <span class="loupe-cap">l’autre moi</span>
+      </div>
+    </section>
+
+    <section class="intro sec wrap" aria-label="En une phrase">
+      <p class="statement" data-rv="words">Je construis des apps où l’IA fait le <em>vrai</em> travail. Et j’installe des agents IA dans votre équipe.</p>
+    </section>
+
+    <section class="apps" id="apps" aria-labelledby="apps-title">
+      <div class="apps-track">
+        <div class="apps-intro">
+          <h2 class="t-title" id="apps-title" data-rv="wipe">Six apps</h2>
+          <p class="lead" data-rv="fade">Conçues, codées et lancées en solo, <span class="nw">de l’idée au <em>store</em>.</span></p>
+          <p class="apps-hint" aria-hidden="true">Faites défiler <i></i></p>
+        </div>
+
+        <article class="app-panel shell" style="--tint:rgba(232,150,190,.2)" aria-labelledby="app-oshii">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/oshii-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-oshii" data-rv-h="fade">Oshii</h3>
+              <p class="app-line" data-rv-h="fade">Une vidéo TikTok, Instagram ou YouTube Shorts devient une recette pesée, prête à <em>cuisiner</em>.</p>
+              <p class="app-meta" data-rv-h="fade">iOS et Android · v2.0.2 · mise à jour <time datetime="2026-11-04" data-rel>le 04/11/2026</time></p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="btn btn--sm btn--ghost" href="https://play.google.com/store/apps/details?id=com.x7kenz.Oshii" target="_blank" rel="noopener">Google Play<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="link-u" href="https://oshii.fr" target="_blank" rel="noopener">Le site</a>
+              </div>
+            </div>
+            <div class="app-visual app-visual--duo">
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/oshii-ecran-1.jpg" width="462" height="1000" alt="Capture App Store d’Oshii : « Transforme tes recettes »" loading="lazy"></figure>
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/oshii-ecran-2.jpg" width="462" height="1000" alt="Deuxième capture App Store d’Oshii" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+
+        <article class="app-panel shell" style="--tint:rgba(124,92,230,.26)" aria-labelledby="app-sago">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/sago-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-sago" data-rv-h="fade">Sago</h3>
+              <p class="app-line" data-rv-h="fade">Apprendre le japonais par l’image.</p>
+              <p class="app-quote" data-rv-h="fade">« Là, tu ne comprends rien. 15 minutes plus tard&nbsp;: maintenant, tu comprends. »</p>
+              <p class="app-meta" data-rv-h="fade">180 épisodes en saison 1 · iOS et iPad · v2.0.1</p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/fr/app/sago-apprendre-le-japonais/id6759610780" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="link-u" href="https://sago-landing.vercel.app" target="_blank" rel="noopener">Le site</a>
+              </div>
+            </div>
+            <div class="app-visual app-visual--duo">
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/sago-ecran-1.jpg" width="460" height="1000" alt="Capture App Store de Sago : une scène d’anime sous-titrée en japonais" loading="lazy"></figure>
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/sago-ecran-2.jpg" width="460" height="1000" alt="Capture App Store de Sago : « à travers des histoires anime »" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+
+        <article class="app-panel shell" style="--tint:rgba(64,140,96,.26)" aria-labelledby="app-wado">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/wado-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-wado" data-rv-h="fade">Wado</h3>
+              <p class="app-line" data-rv-h="fade">Muscu et calories, un seul plan&nbsp;: une photo du plat devient des <em>macros</em>.</p>
+              <p class="app-meta" data-rv-h="fade">iOS · v1.1.1 · mise à jour <time datetime="2026-11-04" data-rel>le 04/11/2026</time></p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/us/app/wado-calories-ia-muscu/id6813179120" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="link-u" href="https://wado-lilac.vercel.app" target="_blank" rel="noopener">Le site</a>
+              </div>
+            </div>
+            <div class="app-visual">
+              <figure class="shot shot--wide" data-rv-h="rise"><img src="assets/apps/wado-ecran-1.jpg" width="1000" height="703" alt="Capture App Store de Wado sur iPad : « Muscu et calories, un seul plan »" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+
+        <article class="app-panel shell" style="--tint:rgba(160,130,230,.24)" aria-labelledby="app-croc">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/croc-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-croc" data-rv-h="fade">Croc</h3>
+              <p class="app-line" data-rv-h="fade">Arrêter de se ronger les ongles&nbsp;: un petit pacte chaque jour, sans <em>jugement</em>.</p>
+              <p class="app-meta" data-rv-h="fade">iOS · v1.2.1</p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/app/croc-stop-ongles-rong%C3%A9s/id6801541157" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="link-u" href="https://croc-snowy.vercel.app" target="_blank" rel="noopener">Le site</a>
+              </div>
+            </div>
+            <div class="app-visual">
+              <figure class="shot shot--wide" data-rv-h="rise"><img src="assets/apps/croc-ecran-1.jpg" width="1000" height="687" alt="Capture App Store de Croc sur iPad : « Arrête de te ronger les ongles »" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+
+        <article class="app-panel shell" style="--tint:rgba(70,80,200,.26)" aria-labelledby="app-miru">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/miru-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-miru" data-rv-h="fade">Miru</h3>
+              <p class="app-line" data-rv-h="fade">Des jeux de soirée entre amis&nbsp;: un thème inventé devient un jeu généré en <em>direct</em>.</p>
+              <p class="app-meta" data-rv-h="fade">9 jeux en V2 · iOS et web · v2.0</p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/us/app/miru-jeux-entre-amis/id6761622088" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+                <a class="link-u" href="https://v0-miru-website.vercel.app" target="_blank" rel="noopener">Le site</a>
+              </div>
+            </div>
+            <div class="app-visual app-visual--solo">
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/miru-ecran-1.jpg" width="462" height="1000" alt="Capture App Store de Miru : le salon d’une partie, chacun avec son téléphone" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+
+        <article class="app-panel shell" style="--tint:rgba(150,86,44,.3)" aria-labelledby="app-zenko">
+          <div class="core">
+            <div class="app-text">
+              <img class="app-icon" data-rv-h="rise" src="assets/apps/zenko-icone.jpg" width="320" height="320" alt="" loading="lazy">
+              <h3 class="app-name" id="app-zenko" data-rv-h="fade">Zenko</h3>
+              <p class="app-line" data-rv-h="fade">Des programmes quotidiens, selon ses envies et son <em>budget</em>.</p>
+              <p class="app-meta" data-rv-h="fade">iOS · v1.0</p>
+              <div class="app-links" data-rv-h="fade">
+                <a class="btn btn--sm" href="https://apps.apple.com/ch/app/zenko/id6753706200" target="_blank" rel="noopener">App Store<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a>
+              </div>
+            </div>
+            <div class="app-visual app-visual--solo">
+              <figure class="shot shot--tall" data-rv-h="rise"><img src="assets/apps/zenko-ecran-1.jpg" width="462" height="1000" alt="Capture de Zenko : mes dernières journées et mes voyages" loading="lazy"></figure>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="apps-progress">
+        <div class="apps-names">
+          <button type="button" aria-label="Aller à Oshii">Oshii</button>
+          <button type="button" aria-label="Aller à Sago">Sago</button>
+          <button type="button" aria-label="Aller à Wado">Wado</button>
+          <button type="button" aria-label="Aller à Croc">Croc</button>
+          <button type="button" aria-label="Aller à Miru">Miru</button>
+          <button type="button" aria-label="Aller à Zenko">Zenko</button>
+        </div>
+        <div class="apps-bar" aria-hidden="true"><i></i></div>
+      </div>
+    </section>
+
+    <section class="agents" id="agents" aria-labelledby="agents-title">
+      <div class="agents-stage wrap">
+        <div class="agents-text">
+          <h2 class="t-title" id="agents-title" data-rv-ag="wipe">Agents IA</h2>
+          <p class="agents-for" data-rv-ag="fade">pour votre équipe</p>
+          <p class="agents-promise" data-rv-ag="fade">Je mets en place des équipes d’agents IA qui travaillent comme une vraie équipe&nbsp;: chacun son rôle, une mémoire commune, et rien ne part sans votre <em>validation</em>.</p>
+          <ul class="agents-steps">
+            <li class="agent-step" data-rv-ag="fade" data-step><i class="step-dot" aria-hidden="true"></i>Un coordinateur, Hermes, sait où en est chaque dossier.</li>
+            <li class="agent-step" data-rv-ag="fade" data-step><i class="step-dot" aria-hidden="true"></i>Chaque agent a son rôle, bien séparé des autres.</li>
+            <li class="agent-step" data-rv-ag="fade" data-step><i class="step-dot" aria-hidden="true"></i>Une mémoire commune&nbsp;: tout est noté et sourcé.</li>
+            <li class="agent-step" data-rv-ag="fade" data-step><i class="step-dot" aria-hidden="true"></i>Vous validez avant que quoi que ce soit parte.</li>
+          </ul>
+        </div>
+        <div class="dia" data-rv-ag="rise">
+          <div class="dia-node dia-hermes" data-dia="hermes"><span class="dia-ring" data-dia="ring" aria-hidden="true"></span><strong>Hermes</strong><small>coordonne</small></div>
+          <i class="ln ln-v" data-dia="l1" aria-hidden="true"></i>
+          <div class="dia-branch">
+            <i class="ln ln-h" data-dia="h1" aria-hidden="true"></i>
+            <div class="dia-roles">
+              <div class="dia-col"><i class="ln ln-v ln-s" data-dia="d" aria-hidden="true"></i><div class="dia-role" data-dia="role">Veille</div><i class="ln ln-v ln-s" data-dia="u" aria-hidden="true"></i></div>
+              <div class="dia-col"><i class="ln ln-v ln-s" data-dia="d" aria-hidden="true"></i><div class="dia-role" data-dia="role">Support</div><i class="ln ln-v ln-s" data-dia="u" aria-hidden="true"></i></div>
+              <div class="dia-col"><i class="ln ln-v ln-s" data-dia="d" aria-hidden="true"></i><div class="dia-role" data-dia="role">Contenu</div><i class="ln ln-v ln-s" data-dia="u" aria-hidden="true"></i></div>
+              <div class="dia-col"><i class="ln ln-v ln-s" data-dia="d" aria-hidden="true"></i><div class="dia-role" data-dia="role">Suivi</div><i class="ln ln-v ln-s" data-dia="u" aria-hidden="true"></i></div>
+            </div>
+            <i class="ln ln-h" data-dia="h2" aria-hidden="true"></i>
+          </div>
+          <i class="ln ln-v" data-dia="l2" aria-hidden="true"></i>
+          <div class="dia-node dia-mem" data-dia="mem"><strong>Mémoire commune</strong><small>tout est noté et sourcé</small></div>
+          <i class="ln ln-v" data-dia="l3" aria-hidden="true"></i>
+          <div class="dia-node dia-ok" data-dia="ok"><span class="ok-fill" data-dia="okfill" aria-hidden="true"></span><strong>Vous validez</strong><small>rien ne part sans vous</small></div>
+        </div>
+      </div>
+
+      <div class="wrap agents-more">
+        <h3 class="t-sub" data-rv="wipe">Concrètement</h3>
+        <ul class="uses">
+          <li data-rv="fade">Veille et recherches <em>sourcées</em></li>
+          <li data-rv="fade" data-delay=".06">Réponses clients et support</li>
+          <li data-rv="fade" data-delay=".12">Production de contenu et de vidéos</li>
+          <li data-rv="fade">Back-office et suivi</li>
+          <li data-rv="fade" data-delay=".06">Des agents qui codent, avec relecture</li>
+          <li data-rv="fade" data-delay=".12">Une mémoire d’équipe&nbsp;: plus rien ne se perd</li>
+        </ul>
+        <p class="proof-k" data-rv="fade">Ce qui le prouve</p>
+        <ul class="proof">
+          <li data-rv="slit"><span class="proof-n slit"><span>6</span></span><span class="proof-l" data-in>apps livrées</span></li>
+          <li data-rv="slit" data-delay=".08"><span class="proof-n slit"><span>180</span></span><span class="proof-l" data-in>épisodes en une saison</span></li>
+          <li data-rv="slit" data-delay=".16"><span class="proof-n slit"><span>60+</span></span><span class="proof-l" data-in>vidéos produites</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="offers sec" id="offres" aria-labelledby="offers-title">
+      <div class="wrap">
+        <h2 class="t-title" id="offers-title" data-rv="wipe">Pour vous</h2>
+        <p class="lead" data-rv="fade">Ce que je peux faire pour votre <em>équipe</em>.</p>
+        <div class="offers-grid">
+          <article class="offer shell" data-rv="rise"><div class="core">
+            <span class="offer-line" aria-hidden="true" data-in></span>
+            <h3 data-in>Agents IA pour votre équipe</h3>
+            <p data-in>Chacun son rôle, une mémoire commune, et rien ne part sans votre validation.</p>
+            <a class="link-arrow" href="#contact" data-go data-need="agents" data-in>En parler<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+          </div></article>
+          <article class="offer shell" data-rv="rise" data-delay=".08"><div class="core">
+            <span class="offer-line" aria-hidden="true" data-in></span>
+            <h3 data-in>Intégrer l’IA dans votre produit</h3>
+            <p data-in>L’IA qui fait le vrai travail, comme la vidéo qui devient une recette dans Oshii.</p>
+            <a class="link-arrow" href="#contact" data-go data-need="produit" data-in>En parler<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+          </div></article>
+          <article class="offer shell" data-rv="rise"><div class="core">
+            <span class="offer-line" aria-hidden="true" data-in></span>
+            <h3 data-in>Votre app, de l’idée au store</h3>
+            <p data-in>Conception, code et lancement&nbsp;: le chemin de mes six apps, pour la vôtre.</p>
+            <a class="link-arrow" href="#contact" data-go data-need="app" data-in>En parler<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+          </div></article>
+          <article class="offer shell" data-rv="rise" data-delay=".08"><div class="core">
+            <span class="offer-line" aria-hidden="true" data-in></span>
+            <h3 data-in>Contenu vidéo automatisé pour votre marque</h3>
+            <p data-in>Des vidéos produites avec des agents, validées par vous avant publication.</p>
+            <a class="link-arrow" href="#contact" data-go data-need="video" data-in>En parler<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+          </div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sw sec" id="startup-weekend" aria-labelledby="sw-title">
+      <div class="wrap">
+        <div class="sw-head">
+          <p class="eyebrow" data-rv="fade">Startup Weekend</p>
+          <h2 class="t-title" id="sw-title" data-rv="wipe">Première place</h2>
+          <p data-rv="fade">54 h pour concevoir, prototyper et pitcher en <em>équipe</em>.</p>
+        </div>
+        <figure class="sw-photo" data-rv="img-wipe"><img src="assets/img/startup-weekend-2.jpg" width="1200" height="800" alt="Kenz, bras levés, au moment où la première place est annoncée au Startup Weekend" loading="lazy"></figure>
+        <div class="sw-row">
+          <p class="sw-cap" data-rv="fade">Le moment de l’annonce, puis la remise du prix avec l’équipe.</p>
+          <figure class="sw-small" data-rv="rise"><img src="assets/img/startup-weekend-1.jpg" width="1200" height="900" alt="Kenz et l’équipe lauréate du Startup Weekend, avec le chèque du prix" loading="lazy"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact sec" id="contact" aria-labelledby="contact-title">
+      <div class="wrap contact-grid">
+        <div>
+          <h2 class="t-title" id="contact-title" data-rv="wipe">Parlons-en</h2>
+          <p class="lead" data-rv="fade">Une équipe à épauler, une app à lancer, de l’IA dans votre produit&nbsp;: dites-moi tout, je vous <em>réponds</em>.</p>
+          <ul class="contact-links" data-rv="fade">
+            <li><a class="btn btn--sm btn--ghost" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+            <li><a class="btn btn--sm btn--ghost" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          </ul>
+        </div>
+        <div class="form-box shell" data-rv="rise">
+          <div class="core">
+            <form class="form" data-demo novalidate aria-label="Formulaire de contact professionnel">
+              <div class="form-row">
+                <div class="field">
+                  <label for="f-name">Nom</label>
+                  <input id="f-name" name="nom" type="text" autocomplete="name" required aria-describedby="f-name-err" placeholder="Votre nom">
+                  <p class="field-err" id="f-name-err">Votre nom, pour savoir à qui répondre.</p>
+                </div>
+                <div class="field">
+                  <label for="f-need">Besoin</label>
+                  <select id="f-need" name="besoin" required aria-describedby="f-need-err">
+                    <option value="">Choisir</option>
+                    <option value="agents">Agents IA pour mon équipe</option>
+                    <option value="produit">L’IA dans mon produit</option>
+                    <option value="app">Mon app, de l’idée au store</option>
+                    <option value="video">Contenu vidéo pour ma marque</option>
+                    <option value="autre">Autre chose</option>
+                  </select>
+                  <p class="field-err" id="f-need-err">Choisissez ce qui s’en rapproche le plus.</p>
+                </div>
+              </div>
+              <div class="field">
+                <label for="f-msg">Message</label>
+                <textarea id="f-msg" name="message" required data-min="10" aria-describedby="f-msg-err" placeholder="Quelques lignes sur votre projet"></textarea>
+                <p class="field-err" id="f-msg-err">Quelques mots de plus (10 caractères minimum).</p>
+              </div>
+              <div class="form-foot">
+                <button class="btn btn--red" type="submit">Envoyer<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></button>
+                <p class="form-note">Pas d’adresse affichée&nbsp;: tout passe par ici.</p>
+              </div>
+            </form>
+            <div class="form-done" hidden tabindex="-1" role="status">
+              <span class="done-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <h3 data-in>Merci</h3>
+              <p data-in>Votre message est bien noté. Je reviens vers vous.</p>
+              <button class="btn btn--sm btn--ghost" type="button" data-again data-in>Écrire un autre message<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p class="foot-mark" data-rv="wipe">Kenz</p>
+        <p class="foot-tag" data-rv="fade">Des apps où l’IA fait le vrai <em>travail</em>.</p>
+        <div class="foot-cols" data-rv="fade">
+          <div>
+            <h2>En ce moment</h2>
+            <ul class="now">
+              <li><span>Oshii mis à jour</span><time datetime="2026-11-04" data-rel>le 04/11/2026</time></li>
+              <li><span>Wado mis à jour</span><time datetime="2026-11-04" data-rel>le 04/11/2026</time></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Liens</h2>
+            <ul>
+              <li><a href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn</a></li>
+              <li><a href="https://oshii.fr" target="_blank" rel="noopener">Oshii</a></li>
+            </ul>
+          </div>
+        </div>
+        <a class="other" href="#createur" data-passage="createur" data-rv="fade">
+          <span class="other-t">Il existe une <em>autre</em> version de moi.</span>
+          <span class="other-lens" aria-hidden="true"><span class="other-alt other-alt--cr"></span><span class="other-cap">l’autre moi</span></span>
+        </a>
+        <p class="foot-legal">© 2026 Kenz</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ===================== UNIVERS CRÉATEUR ===================== -->
+  <div class="side side--cr" id="createur">
+    <section class="hero" aria-labelledby="cr-title">
+      <div class="scene">
+        <div class="backdrop backdrop--cr" aria-hidden="true"><img src="assets/img/paysage-kuala-lumpur.jpg" width="1600" height="900" alt="" draggable="false"></div>
+        <div class="portrait portrait--cr">
+          <img src="assets/img/kenz-moi.webp" width="1080" height="1920" alt="Kenz en t-shirt vert anis, regard au loin" draggable="false">
+          <span class="pz" aria-hidden="true"></span>
+        </div>
+      </div>
+      <div class="hero-text wrap">
+        <p class="eyebrow" data-hero-in>Kenz in Asia</p>
+        <h1 class="hero-title" id="cr-title" tabindex="-1">Le reste du temps, <span class="nw">je filme</span> <span class="nw">l’<em class="glow">Asie</em>.</span></h1>
+        <p class="hero-sub" data-hero-in>Budget, astuces, avant de partir&nbsp;: le pratique d’abord.</p>
+        <a class="btn hero-cta" href="#cr-video" data-go data-hero-in>Voir la dernière vidéo<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M4 9l4 4 4-4"/></svg></span></a>
+      </div>
+      <div class="loupe" aria-hidden="true">
+        <div class="loupe-disc"><div class="loupe-in"></div></div>
+        <span class="loupe-ring"></span>
+        <span class="loupe-cap">l’autre moi</span>
+      </div>
+    </section>
+
+    <section class="intro sec wrap" aria-label="En une phrase">
+      <p class="statement" data-rv="words">Je voyage en Asie et je raconte ce que ça coûte <span class="nw"><em class="glow">vraiment</em>.</span></p>
+      <p class="intro-sub" data-rv="fade">La Chine en tête, parmi neuf pays filmés.</p>
+    </section>
+
+    <section class="latest" id="cr-video" aria-labelledby="latest-title">
+      <div class="wrap">
+        <a class="latest-fig" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener" data-rv-video aria-label="Regarder la dernière vidéo sur YouTube : Premier voyage en Chine, itinéraire de 14 jours">
+          <img src="assets/img/video-chine-14-jours.jpg" width="960" height="540" alt="Miniature « 14 jours » : Kenz sur la Grande Muraille de Chine" loading="lazy">
+          <span class="play" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M8.5 5.8v12.4L18.6 12z" fill="currentColor"/></svg></span>
+        </a>
+        <div class="latest-meta">
+          <div>
+            <p class="eyebrow" data-rv="fade">Dernière vidéo · <time datetime="2026-10-31" data-rel>le 31/10/2026</time></p>
+            <h2 class="latest-title" id="latest-title" data-rv="fade">Premier voyage en Chine&nbsp;: itinéraire de 14 jours</h2>
+          </div>
+          <div data-rv="fade"><a class="btn" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener">Regarder sur YouTube<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></div>
+        </div>
+        <p class="also-k" data-rv="fade">À voir aussi</p>
+        <ul class="also">
+          <li data-rv="fade"><a href="https://www.youtube.com/watch?v=Fp3SsWY28WE" target="_blank" rel="noopener"><span class="t">Tout savoir pour ton voyage en Malaisie</span><span class="v">24 671 vues · la plus vue sur YouTube</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="fade" data-delay=".06"><a href="https://www.youtube.com/watch?v=rR6V6H3hFKA" target="_blank" rel="noopener"><span class="t">15 choses à savoir avant de voyager en Chine</span><span class="v">8 275 vues</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="fade" data-delay=".12"><a href="https://www.youtube.com/shorts/LRxxde_vebE" target="_blank" rel="noopener"><span class="t">Réparer son iPhone en Chine (Short)</span><span class="v">93 760 vues</span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="stats sec" id="cr-chiffres" aria-labelledby="stats-title">
+      <div class="wrap">
+        <h2 class="sr-only" id="stats-title">En chiffres</h2>
+        <ul class="stats-grid">
+          <li class="stat" data-rv="slit"><span class="stat-n slit"><span><small>≈</small>28&nbsp;000</span></span><span class="stat-l" data-in>abonnés TikTok</span></li>
+          <li class="stat" data-rv="slit" data-delay=".08"><span class="stat-n slit"><span>7,83&nbsp;M</span></span><span class="stat-l" data-in>vues sur TikTok</span></li>
+          <li class="stat" data-rv="slit" data-delay=".16"><span class="stat-n slit"><span>725&nbsp;600</span></span><span class="stat-l" data-in>vues pour mon record, la Malaisie petit budget</span></li>
+          <li class="stat" data-rv="slit"><span class="stat-n slit"><span>1&nbsp;530</span></span><span class="stat-l" data-in>abonnés YouTube</span></li>
+          <li class="stat" data-rv="slit" data-delay=".08"><span class="stat-n slit"><span>9</span></span><span class="stat-l" data-in>pays filmés</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="dest sec" id="cr-destinations" aria-labelledby="dest-title">
+      <div class="wrap">
+        <h2 class="t-title" id="dest-title" data-rv="wipe">Destinations</h2>
+        <p class="lead" data-rv="fade">Neuf pays filmés. Quelques-uns, en <em>images</em>.</p>
+        <div class="dest-grid">
+          <div class="dest-col" data-speed="4">
+            <figure class="tile tile--photo tile--tall" data-rv="rise"><span class="tile-media"><img src="assets/img/paysage-kuala-lumpur.jpg" width="1600" height="900" alt="Les tours de Kuala Lumpur au-dessus des rizières en terrasses, au coucher du soleil" loading="lazy" style="object-position:55% 50%"></span><figcaption class="tile-cap"><span class="tile-name">Kuala Lumpur</span><span class="tile-meta">au coucher du soleil</span></figcaption></figure>
+            <a class="tile" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" data-rv="rise"><span class="tile-media"><img src="assets/img/video-coree.jpg" width="960" height="540" alt="Miniature de la vidéo sur la Corée" loading="lazy"></span><span class="tile-cap"><span class="tile-name">Corée</span><span class="tile-meta">sur YouTube</span></span></a>
+          </div>
+          <div class="dest-col" data-speed="14">
+            <a class="tile" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" data-rv="rise"><span class="tile-media"><img src="assets/img/video-chine.jpg" width="960" height="540" alt="Miniature de la vidéo sur la Chine" loading="lazy"></span><span class="tile-cap"><span class="tile-name">Chine</span><span class="tile-meta">sur YouTube</span></span></a>
+            <figure class="tile tile--photo tile--sq" data-rv="rise"><span class="tile-media"><img src="assets/img/kenz-carre.jpg" width="900" height="855" alt="Kenz en t-shirt vert devant les tours de Kuala Lumpur" loading="lazy" style="object-position:50% 30%"></span><figcaption class="tile-cap"><span class="tile-name">Sur place</span><span class="tile-meta">Malaisie</span></figcaption></figure>
+            <a class="tile" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" data-rv="rise"><span class="tile-media"><img src="assets/img/video-islande.jpg" width="960" height="540" alt="Miniature de la vidéo sur l’Islande" loading="lazy"></span><span class="tile-cap"><span class="tile-name">Islande</span><span class="tile-meta">sur YouTube</span></span></a>
+          </div>
+          <div class="dest-col" data-speed="8">
+            <a class="tile" href="https://www.youtube.com/watch?v=Fp3SsWY28WE" target="_blank" rel="noopener" data-rv="rise"><span class="tile-media"><img src="assets/img/video-malaisie.jpg" width="960" height="540" alt="Miniature de la vidéo sur la Malaisie" loading="lazy"></span><span class="tile-cap"><span class="tile-name">Malaisie</span><span class="tile-meta">la plus vue sur YouTube</span></span></a>
+            <a class="tile" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" data-rv="rise"><span class="tile-media"><img src="assets/img/video-japon.jpg" width="960" height="540" alt="Miniature illustrée de la vidéo sur le Japon" loading="lazy"></span><span class="tile-cap"><span class="tile-name">Japon</span><span class="tile-meta">sur YouTube</span></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="guides sec" id="cr-guides" aria-labelledby="guides-title">
+      <div class="wrap">
+        <h2 class="t-title" id="guides-title" data-rv="wipe">Pour les abonnés</h2>
+        <div class="guides-grid">
+          <a class="guide shell" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener" data-rv="rise"><div class="core">
+            <span class="guide-tag" data-in>En ligne</span>
+            <h3 data-in>Chine, 14 jours</h3>
+            <p data-in>L’itinéraire complet de ma dernière vidéo, à garder pour ton voyage.</p>
+            <span class="link-arrow" data-in>Ouvrir l’itinéraire<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></span>
+          </div></a>
+          <div class="guide guide--soon shell" data-rv="rise" data-delay=".08"><div class="core">
+            <span class="guide-tag" data-in>Bientôt</span>
+            <h3 data-in>D’autres guides arrivent</h3>
+            <p data-in>Même principe&nbsp;: du pratique, ce que ça coûte, avant de partir.</p>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="k15 sec" id="cr-k15ze" aria-labelledby="k15-title">
+      <div class="wrap k15-grid">
+        <figure class="k15-main" data-rv="img-wipe"><img src="assets/img/hyrox-2.jpg" width="733" height="1100" alt="Kenz pousse le traîneau pendant la course HYROX" loading="lazy"></figure>
+        <div class="k15-text">
+          <h2 class="t-title" id="k15-title" data-rv="wipe">k15ze</h2>
+          <p data-rv="fade">L’autre chaîne&nbsp;: le sport, la nutrition et mes <em>courses</em>.</p>
+          <ul class="k15-races" data-rv="fade">
+            <li>HYROX <span>mai 2025</span></li>
+            <li>Spartan Race <span>course à obstacles</span></li>
+          </ul>
+          <div data-rv="fade"><a class="btn btn--ghost" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">k15ze sur YouTube<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></div>
+          <div class="k15-duo">
+            <figure class="k15-wide" data-rv="rise"><img src="assets/img/hyrox-4.jpg" width="1100" height="733" alt="Kenz et un ami franchissent la ligne d’arrivée HYROX en riant" loading="lazy"></figure>
+            <figure class="k15-small" data-rv="rise" data-delay=".08"><img src="assets/img/spartan-1.jpg" width="511" height="768" alt="Kenz porte une boule de pierre pendant la Spartan Race" loading="lazy"></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bio sec" id="cr-liens" aria-labelledby="bio-title">
+      <div class="wrap bio-wrap">
+        <img class="bio-avatar" src="assets/img/kenz-carre.jpg" width="900" height="855" alt="Kenz devant les tours de Kuala Lumpur" loading="lazy" data-rv="fade">
+        <h2 class="t-title" id="bio-title" data-rv="wipe">Lien en bio</h2>
+        <p class="bio-sub" data-rv="fade">Tout est là, au même endroit.</p>
+        <ul class="bio-links">
+          <li data-rv="rise"><a class="bio-link" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener"><span><span class="bio-t">YouTube · Kenz in Asia</span><span class="bio-m">1 530 abonnés</span></span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="rise" data-delay=".06"><a class="bio-link" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener"><span><span class="bio-t">TikTok · En Bien en Asie</span><span class="bio-m">≈ 28 000 abonnés</span></span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="rise" data-delay=".12"><a class="bio-link" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener"><span><span class="bio-t">Instagram</span><span class="bio-m">kenzvoyage_enbien</span></span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="rise" data-delay=".18"><a class="bio-link" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener"><span><span class="bio-t">L’itinéraire Chine, 14 jours</span><span class="bio-m">le guide en ligne</span></span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+          <li data-rv="rise" data-delay=".24"><a class="bio-link" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener"><span><span class="bio-t">k15ze</span><span class="bio-m">le sport, sur YouTube</span></span><span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg></span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="brands sec" id="cr-marques" aria-labelledby="brands-title">
+      <div class="wrap contact-grid">
+        <div>
+          <h2 class="t-title" id="brands-title" data-rv="wipe">Travaillons ensemble</h2>
+          <p class="lead" data-rv="fade">Une marque, une destination, une idée à <em>raconter</em>&nbsp;? Proposez-la ici, on en parle.</p>
+        </div>
+        <div class="form-box shell" data-rv="rise">
+          <div class="core">
+            <form class="form" data-demo novalidate aria-label="Formulaire pour les marques">
+              <div class="form-row">
+                <div class="field">
+                  <label for="b-name">Marque</label>
+                  <input id="b-name" name="marque" type="text" autocomplete="organization" required aria-describedby="b-name-err" placeholder="Nom de la marque">
+                  <p class="field-err" id="b-name-err">Le nom de la marque, s’il vous plaît.</p>
+                </div>
+                <div class="field">
+                  <label for="b-budget">Budget</label>
+                  <select id="b-budget" name="budget">
+                    <option value="">À définir ensemble</option>
+                    <option value="1">Moins de 1 000 €</option>
+                    <option value="2">De 1 000 à 5 000 €</option>
+                    <option value="3">Plus de 5 000 €</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="b-idea">Idée</label>
+                <textarea id="b-idea" name="idee" required data-min="10" aria-describedby="b-idea-err" placeholder="Le format, la destination, le message"></textarea>
+                <p class="field-err" id="b-idea-err">Quelques mots de plus (10 caractères minimum).</p>
+              </div>
+              <div class="form-foot">
+                <button class="btn btn--red" type="submit">Proposer<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></button>
+                <p class="form-note">Pas d’adresse affichée&nbsp;: tout passe par ici.</p>
+              </div>
+            </form>
+            <div class="form-done" hidden tabindex="-1" role="status">
+              <span class="done-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+              <h3 data-in>Merci</h3>
+              <p data-in>Votre idée est bien notée. Je reviens vers vous.</p>
+              <button class="btn btn--sm btn--ghost" type="button" data-again data-in>Proposer une autre idée<span class="ico" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="wrap">
+        <p class="foot-mark" data-rv="wipe">Kenz</p>
+        <p class="foot-tag" data-rv="fade">Kenz in Asia · En Bien en <em>Asie</em></p>
+        <div class="foot-cols" data-rv="fade">
+          <div>
+            <h2>En ce moment</h2>
+            <ul class="now">
+              <li><span>Dernière vidéo</span><time datetime="2026-10-31" data-rel>le 31/10/2026</time></li>
+              <li><span>Short publié</span><time datetime="2026-11-07" data-rel>le 07/11/2026</time></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Réseaux</h2>
+            <ul>
+              <li><a href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">YouTube · Kenz in Asia</a></li>
+              <li><a href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">TikTok · En Bien en Asie</a></li>
+              <li><a href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">Instagram</a></li>
+              <li><a href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">k15ze</a></li>
+            </ul>
+          </div>
+        </div>
+        <a class="other" href="#pro" data-passage="pro" data-rv="fade">
+          <span class="other-t">Il existe une <em>autre</em> version de moi.</span>
+          <span class="other-lens" aria-hidden="true"><span class="other-alt other-alt--pro"></span><span class="other-cap">l’autre moi</span></span>
+        </a>
+        <p class="foot-legal">© 2026 Kenz</p>
+      </div>
+    </footer>
+  </div>
+</main>
+
+<div class="passage" aria-hidden="true"><div class="passage-in"></div></div>
+<span class="passage-ring" aria-hidden="true"></span>
+
+<script>
+(function () {
+  'use strict';
+
+  var root = document.documentElement;
+  function $(s, c) { return (c || document).querySelector(s); }
+  function $$(s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); }
+
+  var SIDES = ['pro', 'createur'];
+  var NAMES = { pro: 'Pro', createur: 'Créateur' };
+  var G = window.gsap;
+  var ST = window.ScrollTrigger;
+  var reduceMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var hoverMQ = window.matchMedia('(hover: hover) and (pointer: fine)');
+  var motion = !!(G && ST) && root.classList.contains('motion');
+  var lenis = null;
+  var sideMM = null;
+  var busy = false;
+  var lenses = [];
+  var coolUntil = 0;
+  var current =root.getAttribute('data-side') === 'createur' ? 'createur' : 'pro';
+
+  var NOPREF = '(prefers-reduced-motion: no-preference)';
+  var DESK = '(min-width: 768px) and (min-height: 560px) and ' + NOPREF;
+  var MOB = '(max-width: 767px) and ' + NOPREF + ', (max-height: 559px) and ' + NOPREF;
+  var RM = '(prefers-reduced-motion: reduce)';
+  var AG = '(min-width: 1024px) and (min-height: 640px) and ' + NOPREF;
+
+  function otherOf(s) { return s === 'pro' ? 'createur' : 'pro'; }
+  function sideFromHash(h) {
+    h = (h || '').replace(/^#/, '');
+    if (h === 'createur' || h.indexOf('cr-') === 0) return 'createur';
+    if (h === 'pro' || h === '') return 'pro';
+    var el = document.getElementById(h);
+    var s = el && el.closest ? el.closest('.side') : null;
+    return s ? s.id : null;
+  }
+
+  /* ---------- Dates relatives douces ---------- */
+  function rel(iso) {
+    var p = (iso || '').split('-');
+    if (p.length !== 3) return null;
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    var n = new Date();
+    var t = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    var days = Math.round((t - d) / 864e5);
+    if (isNaN(days) || days < 0) return null;
+    if (days === 0) return 'aujourd’hui';
+    if (days === 1) return 'hier';
+    if (days < 30) return 'il y a ' + days + ' jours';
+    var m = Math.round(days / 30.44);
+    if (m < 12) return m <= 1 ? 'il y a un mois' : 'il y a ' + m + ' mois';
+    var y = Math.floor(days / 365);
+    return y <= 1 ? 'il y a un an' : 'il y a ' + y + ' ans';
+  }
+  try {
+    $$('time[data-rel]').forEach(function (el) {
+      var r = rel(el.getAttribute('datetime'));
+      if (r) { el.title = el.textContent.replace(/^le\s+/, ''); el.textContent = r; }
+    });
+  } catch (errDates) { /* les dates absolues restent affichées */ }
+
+  /* ---------- Découpe en mots (geste « mot par mot ») ---------- */
+  function splitWords(el) {
+    Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+          var s = document.createElement('span');
+          s.className = 'w';
+          s.textContent = part;
+          frag.appendChild(s);
+        });
+        n.parentNode.replaceChild(frag, n);
+      } else if (n.nodeType === 1 && n.tagName !== 'BR') {
+        n.classList.add('w');
+      }
+    });
+  }
+  try { $$('.hero-title, [data-rv="words"]').forEach(splitWords); } catch (errSplit) { fail(errSplit); }
+
+  /* ---------- Défilement ---------- */
+  function scrollToY(y, opts) {
+    opts = opts || {};
+    y = Math.max(0, Math.round(y));
+    if (lenis) {
+      lenis.scrollTo(y, { immediate: !!opts.immediate, duration: opts.duration || 1.4, force: true });
+    } else {
+      window.scrollTo({ top: y, behavior: (opts.immediate || reduceMQ.matches) ? 'auto' : 'smooth' });
+    }
+  }
+  function scrollToEl(el, opts) {
+    if (el) scrollToY(el.getBoundingClientRect().top + window.pageYOffset, opts);
+  }
+  function announce(side) {
+    var live = document.getElementById('live');
+    if (live) live.textContent = 'Univers ' + NAMES[side] + ' affiché.';
+  }
+
+  /* ---------- Formulaires simulés ---------- */
+  function isValid(el) {
+    var min = parseInt(el.getAttribute('data-min') || '1', 10);
+    return (el.value || '').trim().length >= min;
+  }
+  function animOK() { return motion && !reduceMQ.matches; }
+  function showDone(form, done) {
+    if (!animOK()) {
+      form.hidden = true;
+      done.hidden = false;
+      done.focus({ preventScroll: true });
+      if (motion) ST.refresh();
+      return;
+    }
+    G.to(form, {
+      opacity: 0, filter: 'blur(6px)', duration: 0.24, ease: 'power2.in',
+      onComplete: function () {
+        form.hidden = true;
+        G.set(form, { clearProps: 'opacity,filter' });
+        done.hidden = false;
+        done.focus({ preventScroll: true });
+        var tl = G.timeline();
+        tl.fromTo(done, { opacity: 0, y: 34, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'expo.out' })
+          .fromTo($('.done-check svg', done), { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.9, ease: 'expo.out' }, 0.2)
+          .fromTo($$('[data-in]', done), { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.9, ease: 'expo.out', stagger: 0.08 }, 0.3);
+        ST.refresh();
+      }
+    });
+  }
+  function clearErr(e) {
+    var f = e.target.closest('.field');
+    if (f && f.classList.contains('is-error') && isValid(e.target)) {
+      f.classList.remove('is-error');
+      e.target.removeAttribute('aria-invalid');
+    }
+  }
+  $$('form[data-demo]').forEach(function (form) {
+    var box = form.closest('.form-box');
+    var done = box ? $('.form-done', box) : null;
+    form.addEventListener('input', clearErr);
+    form.addEventListener('change', clearErr);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var first = null;
+      $$('[required]', form).forEach(function (el) {
+        var ok = isValid(el);
+        var f = el.closest('.field');
+        if (f) f.classList.toggle('is-error', !ok);
+        if (ok) { el.removeAttribute('aria-invalid'); }
+        else { el.setAttribute('aria-invalid', 'true'); if (!first) first = el; }
+      });
+      if (first) { first.focus(); return; }
+      if (done) showDone(form, done);
+    });
+    var again = done ? $('[data-again]', done) : null;
+    if (again) {
+      again.addEventListener('click', function () {
+        form.reset();
+        done.hidden = true;
+        if (motion) G.set(done, { clearProps: 'all' });
+        form.hidden = false;
+        var f1 = $('input, select, textarea', form);
+        if (f1) f1.focus({ preventScroll: true });
+        if (motion) ST.refresh();
+      });
+    }
+  });
+
+  /* ---------- Gestes d'entrée ---------- */
+  function trig(el) { return { trigger: el, start: 'top 88%', once: true }; }
+  function reveal(el, type) {
+    type = type || el.getAttribute('data-rv') || 'fade';
+    var d = parseFloat(el.getAttribute('data-delay') || '0') || 0;
+    var kids = $$('[data-in]', el);
+    if (type === 'words') {
+      G.set(el, { opacity: 1 });
+      G.fromTo($$('.w', el), { opacity: 0, filter: 'blur(10px)', scale: 1.1 },
+        { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.2, ease: 'expo.out', stagger: 0.07, delay: d, scrollTrigger: trig(el) });
+    } else if (type === 'wipe') {
+      G.fromTo(el, { opacity: 1, clipPath: 'inset(-30% 100% -30% 0%)', filter: 'blur(10px)' },
+        { clipPath: 'inset(-30% -6% -30% 0%)', filter: 'blur(0px)', duration: 1.5, ease: 'expo.out', delay: d, scrollTrigger: trig(el) });
+    } else if (type === 'rise') {
+      G.fromTo(el, { opacity: 0, y: 34, scale: 0.965 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'expo.out', delay: d, clearProps: 'transform', scrollTrigger: trig(el) });
+      if (kids.length) {
+        G.fromTo(kids, { opacity: 0, filter: 'blur(6px)' },
+          { opacity: 1, filter: 'blur(0px)', duration: 1, ease: 'expo.out', stagger: 0.07, delay: d + 0.3, scrollTrigger: trig(el) });
+      }
+    } else if (type === 'slit') {
+      G.set(el, { opacity: 1 });
+      G.fromTo($$('.slit > span', el), { yPercent: 115 },
+        { yPercent: 0, duration: 1.3, ease: 'expo.out', delay: d, scrollTrigger: trig(el) });
+      if (kids.length) {
+        G.fromTo(kids, { opacity: 0, filter: 'blur(6px)' },
+          { opacity: 1, filter: 'blur(0px)', duration: 1, ease: 'expo.out', delay: d + 0.25, scrollTrigger: trig(el) });
+      }
+    } else if (type === 'img-wipe') {
+      G.set(el, { opacity: 1 });
+      G.fromTo(el, { clipPath: 'inset(0% 100% 0% 0%)' },
+        { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.7, ease: 'expo.out', delay: d, scrollTrigger: trig(el) });
+      var im = $('img', el);
+      if (im) {
+        G.fromTo(im, { filter: 'blur(16px)' },
+          { filter: 'blur(0px)', duration: 1.9, ease: 'expo.out', delay: d, scrollTrigger: trig(el) });
+      }
+    } else {
+      G.fromTo(el, { opacity: 0, filter: 'blur(6px)' },
+        { opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', delay: d, scrollTrigger: trig(el) });
+    }
+  }
+  function fadeOnly(el) {
+    G.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.7, ease: 'power1.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
+  }
+
+  /* ---------- Hero : arrivée ---------- */
+  function heroIntro(panel, c, fromPassage) {
+    var hero = $('.hero', panel);
+    if (!hero) return;
+    var words = $$('.hero-title .w', hero);
+    var rest = $$('[data-hero-in]', hero);
+    if (c.rm) {
+      if (!fromPassage) G.fromTo($('.hero-text', hero), { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out' });
+      return;
+    }
+    var tl = G.timeline({ defaults: { ease: 'expo.out' }, delay: fromPassage ? 0.12 : 0.1 });
+    if (!fromPassage) {
+      tl.fromTo($('.backdrop', hero), { opacity: 0 }, { opacity: 1, duration: 1.6 }, 0)
+        .fromTo($('.portrait', hero), { opacity: 0, y: 34, scale: 0.965, filter: 'blur(16px)' },
+          { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.8 }, 0.1);
+    }
+    tl.fromTo(words, { opacity: 0, filter: 'blur(10px)', scale: 1.12 },
+        { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 1.2, stagger: 0.07 }, fromPassage ? 0 : 0.45)
+      .fromTo(rest, { opacity: 0, filter: 'blur(6px)' },
+        { opacity: 1, filter: 'blur(0px)', duration: 1, stagger: 0.1 }, fromPassage ? 0.35 : 0.95);
+  }
+
+  /* ---------- Pro : défilement horizontal des apps ---------- */
+  function buildApps(panel) {
+    var sec = $('.apps', panel);
+    if (!sec) return null;
+    var track = $('.apps-track', sec);
+    var bar = $('.apps-bar i', sec);
+    var names = $$('.apps-names button', sec);
+    var panels = $$('.app-panel', track);
+    var active = -1;
+    sec.classList.add('is-h');
+    function dist() { return Math.max(0, track.scrollWidth - sec.clientWidth); }
+
+    var tween = G.to(track, {
+      x: function () { return -dist(); },
+      ease: 'none',
+      scrollTrigger: {
+        trigger: sec,
+        start: 'top top',
+        end: function () { return '+=' + dist(); },
+        pin: true,
+        scrub: 0.7,
+        anticipatePin: 1,
+        refreshPriority: 2,
+        invalidateOnRefresh: true,
+        onUpdate: function (self) {
+          if (bar) bar.style.transform = 'scaleX(' + self.progress.toFixed(4) + ')';
+          var cx = -G.getProperty(track, 'x') + sec.clientWidth * 0.5;
+          var idx = 0;
+          panels.forEach(function (p, i) { if (p.offsetLeft <= cx) idx = i; });
+          if (idx !== active) {
+            active = idx;
+            names.forEach(function (b, i) { b.classList.toggle('is-on', i === idx); });
+          }
+        }
+      }
+    });
+
+    var vw = sec.clientWidth;
+    panels.forEach(function (p) {
+      var st = p.offsetLeft < vw * 0.8
+        ? { trigger: sec, start: 'top 60%', once: true }
+        : { trigger: p, containerAnimation: tween, start: 'left 80%', once: true };
+      $$('[data-rv-h]', p).forEach(function (el, i) {
+        var rise = el.getAttribute('data-rv-h') === 'rise';
+        G.fromTo(el,
+          rise ? { opacity: 0, y: 34, scale: 0.965 } : { opacity: 0, filter: 'blur(8px)' },
+          rise ? { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'expo.out', delay: i * 0.07, scrollTrigger: st }
+               : { opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out', delay: i * 0.07, scrollTrigger: st });
+      });
+      var vis = $('.app-visual', p);
+      if (vis) {
+        G.fromTo(vis, { x: 50 }, { x: -50, ease: 'none', scrollTrigger: { trigger: p, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
+      }
+    });
+
+    function onName(e) {
+      var i = names.indexOf(e.currentTarget);
+      var p = panels[i];
+      var s = tween.scrollTrigger;
+      if (!p || !s) return;
+      var target = p.offsetLeft - (sec.clientWidth - p.offsetWidth) / 2;
+      var pr = Math.min(1, Math.max(0, target / (dist() || 1)));
+      scrollToY(s.start + pr * (s.end - s.start), { duration: 1.2 });
+    }
+    names.forEach(function (b) { b.addEventListener('click', onName); });
+
+    return function () {
+      sec.classList.remove('is-h');
+      names.forEach(function (b) { b.removeEventListener('click', onName); b.classList.remove('is-on'); });
+      if (bar) bar.style.transform = '';
+    };
+  }
+
+  /* ---------- Pro : le schéma des agents se construit ---------- */
+  function buildAgents(panel) {
+    var stage = $('.agents-stage', panel);
+    if (!stage) return;
+    var steps = $$('[data-step]', stage);
+    $$('[data-rv-ag]', stage).forEach(function (el) {
+      if (el.classList.contains('dia')) G.set(el, { opacity: 1 });
+      else if (!el.hasAttribute('data-step')) reveal(el, el.getAttribute('data-rv-ag'));
+    });
+    G.set(steps, { opacity: 0.28 });
+    function q(k) { return $$('[data-dia="' + k + '"]', stage); }
+    function from() { return { opacity: 0, y: 26, scale: 0.965 }; }
+    function to(extra) { return Object.assign({ opacity: 1, y: 0, scale: 1, duration: 1, ease: 'power3.out' }, extra || {}); }
+
+    var tl = G.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: stage,
+        start: 'top top',
+        end: function () { return '+=' + Math.round(window.innerHeight * 1.8); },
+        pin: true,
+        scrub: 0.6,
+        anticipatePin: 1,
+        refreshPriority: 1,
+        invalidateOnRefresh: true
+      }
+    });
+    tl.fromTo(q('hermes'), from(), to(), 0.2)
+      .to(steps[0], { opacity: 1, duration: 0.6 }, 0.2)
+      .fromTo(q('l1'), { scaleY: 0 }, { scaleY: 1, duration: 0.6 }, 1.2)
+      .fromTo(q('h1'), { scaleX: 0 }, { scaleX: 1, duration: 0.8 }, 1.8)
+      .fromTo(q('d'), { scaleY: 0 }, { scaleY: 1, duration: 0.4, stagger: 0.08 }, 2.5)
+      .fromTo(q('role'), from(), to({ stagger: 0.25 }), 2.8)
+      .fromTo(q('ring'), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 2.6)
+      .to(steps[1], { opacity: 1, duration: 0.6 }, 2.4)
+      .fromTo(q('u'), { scaleY: 0 }, { scaleY: 1, duration: 0.4, stagger: 0.06 }, 4.4)
+      .fromTo(q('h2'), { scaleX: 0 }, { scaleX: 1, duration: 0.8 }, 4.8)
+      .fromTo(q('l2'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 5.5)
+      .fromTo(q('mem'), from(), to(), 5.9)
+      .to(steps[2], { opacity: 1, duration: 0.6 }, 5.6)
+      .fromTo(q('l3'), { scaleY: 0 }, { scaleY: 1, duration: 0.5 }, 7.1)
+      .fromTo(q('ok'), from(), to(), 7.5)
+      .fromTo(q('okfill'), { opacity: 0 }, { opacity: 1, duration: 0.8 }, 8.1)
+      .to(steps[3], { opacity: 1, duration: 0.6 }, 7.4)
+      .to({}, { duration: 1 }, 9);
+  }
+
+  /* ---------- Créateur : masque vidéo et parallaxe ---------- */
+  function videoMask(panel) {
+    var fig = $('[data-rv-video]', panel);
+    if (!fig) return;
+    var img = $('img', fig);
+    G.set(fig, { opacity: 1 });
+    var st = { trigger: fig, start: 'top 92%', end: 'center 55%', scrub: 0.6 };
+    G.fromTo(fig, { clipPath: 'inset(14% 20% 14% 20% round 48px)' },
+      { clipPath: 'inset(0% 0% 0% 0% round 28px)', ease: 'none', scrollTrigger: st });
+    if (img) G.fromTo(img, { scale: 1.12 }, { scale: 1, ease: 'none', scrollTrigger: Object.assign({}, st) });
+  }
+  function parallax(panel) {
+    var grid = $('.dest-grid', panel);
+    if (!grid) return;
+    $$('.dest-col', grid).forEach(function (col) {
+      var s = parseFloat(col.getAttribute('data-speed')) || 6;
+      G.fromTo(col, { yPercent: s * 0.6 }, { yPercent: -s, ease: 'none', scrollTrigger: { trigger: grid, start: 'top bottom', end: 'bottom top', scrub: 0.5 } });
+    });
+  }
+
+  /* ---------- Construction d'un univers (et seulement celui-là) ---------- */
+  function buildSide(side, opts) {
+    var panel = document.getElementById(side);
+    if (!panel) return;
+    var passageIntro = !!(opts && opts.passage);
+    if (sideMM) sideMM.revert();
+    sideMM = G.matchMedia();
+    sideMM.add({ desk: DESK, mob: MOB, rm: RM, ag: AG }, function (ctx) {
+      var c = ctx.conditions;
+      heroIntro(panel, c, passageIntro);
+      passageIntro = false;
+      if (c.rm) {
+        $$('[data-rv], [data-rv-h], [data-rv-ag], [data-rv-video]', panel).forEach(fadeOnly);
+        return;
+      }
+      var cleanups = [];
+      $$('[data-rv]', panel).forEach(function (el) { reveal(el); });
+      if (side === 'pro') {
+        if (c.desk) cleanups.push(buildApps(panel));
+        else $$('[data-rv-h]', panel).forEach(function (el) { reveal(el, el.getAttribute('data-rv-h')); });
+        if (c.ag) buildAgents(panel);
+        else $$('[data-rv-ag]', panel).forEach(function (el) { reveal(el, el.getAttribute('data-rv-ag')); });
+      } else {
+        if (c.desk) { videoMask(panel); parallax(panel); }
+        else $$('[data-rv-video]', panel).forEach(function (el) { reveal(el, 'img-wipe'); });
+      }
+      return function () { cleanups.forEach(function (f) { if (typeof f === 'function') f(); }); };
+    });
+  }
+
+  /* ---------- Barre : section active ---------- */
+  function updateNav() {
+    var links = $$('.nl--' + (current === 'pro' ? 'pro' : 'cr') + ' a');
+    var mid = window.innerHeight * 0.45;
+    var act = null;
+    links.forEach(function (a) {
+      var el = document.getElementById((a.getAttribute('href') || '').slice(1));
+      if (el && el.getBoundingClientRect().top < mid) act = a;
+    });
+    $$('.nl a').forEach(function (a) {
+      var on = a === act;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    });
+  }
+
+  /* ---------- La loupe ---------- */
+  function strip(node) {
+    node.removeAttribute('id');
+    $$('[id]', node).forEach(function (n) { n.removeAttribute('id'); });
+    $$('.pz', node).forEach(function (n) { n.parentNode.removeChild(n); });
+    $$('img', node).forEach(function (im) { im.alt = ''; im.removeAttribute('fetchpriority'); });
+    return node;
+  }
+  function makeLens(hero) {
+    var portrait = $('.portrait', hero);
+    var loupe = $('.loupe', hero);
+    if (!portrait || !loupe) return null;
+    var disc = $('.loupe-disc', loupe);
+    var inner = $('.loupe-in', loupe);
+    var ring = $('.loupe-ring', loupe);
+    var cap = $('.loupe-cap', loupe);
+    var side = hero.closest('.side').id;
+    var S = 1.12, R = 75, LIFT = 56;
+    var state = 'idle', timer = 0, ticking = false, built = false;
+    var tx = 0, ty = 0, lx = 0, ly = 0, sx = 0, sy = 0;
+
+    function touchy(e) { return (e && e.pointerType === 'touch') || !hoverMQ.matches; }
+    function local(e) { var r = hero.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    function build() {
+      if (!built) {
+        var src = $('#' + otherOf(side) + ' .scene');
+        if (!src) return false;
+        inner.appendChild(strip(src.cloneNode(true)));
+        built = true;
+      }
+      inner.style.width = hero.offsetWidth + 'px';
+      inner.style.height = hero.offsetHeight + 'px';
+      R = (loupe.offsetWidth / 2) || 75;
+      var pr = portrait.getBoundingClientRect(), hr = hero.getBoundingClientRect();
+      pcx = pr.left - hr.left + pr.width / 2;
+      return true;
+    }
+    var pcx = 0;
+    function place() {
+      loupe.classList.toggle('cap-left', lx < pcx);
+      loupe.style.transform = 'translate3d(' + (lx - R).toFixed(1) + 'px,' + (ly - R).toFixed(1) + 'px,0)';
+      inner.style.transform = 'translate3d(' + (R - S * lx).toFixed(1) + 'px,' + (R - S * ly).toFixed(1) + 'px,0) scale(' + S + ')';
+    }
+    function tick(time, dt) {
+      var k = reduceMQ.matches ? 1 : 1 - Math.pow(0.8, (dt || 16.7) / 16.7);
+      lx += (tx - lx) * k;
+      ly += (ty - ly) * k;
+      place();
+    }
+    function open() {
+      timer = 0;
+      if (!motion || busy || state === 'open' || !build()) return;
+      state = 'open';
+      lx = tx; ly = ty;
+      place();
+      hero.classList.add('is-lens');
+      G.killTweensOf([disc, ring, cap]);
+      G.set(loupe, { visibility: 'visible' });
+      var rm = reduceMQ.matches;
+      G.fromTo(disc, { clipPath: 'circle(0px at 50% 50%)' },
+        { clipPath: 'circle(' + R + 'px at 50% 50%)', duration: rm ? 0.2 : 0.75, ease: rm ? 'power1.out' : 'expo.out' });
+      G.fromTo(ring, { opacity: 0, scale: rm ? 1 : 0.5 },
+        { opacity: 1, scale: 1, duration: rm ? 0.2 : 0.75, ease: rm ? 'power1.out' : 'expo.out' });
+      G.fromTo(cap, { opacity: 0, filter: 'blur(8px)' },
+        { opacity: 1, filter: 'blur(0px)', duration: rm ? 0.2 : 0.7, ease: 'expo.out', delay: rm ? 0 : 0.18 });
+      if (!ticking) { G.ticker.add(tick); ticking = true; }
+    }
+    function close(instant) {
+      if (timer) { clearTimeout(timer); timer = 0; }
+      if (state !== 'open') return;
+      state = 'idle';
+      hero.classList.remove('is-lens');
+      if (!G) return;
+      G.killTweensOf([disc, ring, cap]);
+      var d = instant ? 0 : 0.24;
+      G.to(disc, { clipPath: 'circle(0px at 50% 50%)', duration: d, ease: 'power2.in' });
+      G.to([ring, cap], {
+        opacity: 0, duration: d, ease: 'power2.in',
+        onComplete: function () {
+          if (state === 'open') return;
+          G.set(loupe, { visibility: 'hidden' });
+          if (ticking) { G.ticker.remove(tick); ticking = false; }
+        }
+      });
+    }
+    function go() {
+      var r = hero.getBoundingClientRect();
+      passage(otherOf(side), { x: r.left + lx, y: r.top + ly, r: R }, true);
+    }
+
+    /* Souris : survol de ~400 ms, la lentille suit, un clic ouvre le passage.
+       Juste après un passage, il faut un vrai mouvement pour la réarmer. */
+    function arm(e) {
+      if (!motion || busy || state === 'open' || timer || Date.now() < coolUntil) return;
+      var p = local(e); tx = p.x; ty = p.y;
+      timer = setTimeout(open, 400);
+    }
+    portrait.addEventListener('pointerenter', function (e) { if (!touchy(e)) arm(e); });
+    portrait.addEventListener('pointermove', function (e) {
+      var p = local(e);
+      if (touchy(e)) {
+        if (state === 'open') { tx = p.x; ty = p.y - LIFT; }
+        else if (timer && Math.abs(p.x - sx) + Math.abs(p.y - sy) > 12) { clearTimeout(timer); timer = 0; }
+        return;
+      }
+      tx = p.x; ty = p.y;
+      if (state !== 'open' && (e.movementX || e.movementY)) arm(e);
+    });
+    portrait.addEventListener('pointerleave', function (e) { if (!touchy(e)) close(false); });
+    portrait.addEventListener('click', function (e) {
+      if (touchy(e)) return;
+      if (state === 'open') { e.preventDefault(); go(); }
+    });
+    /* Doigt : appui long de ~500 ms, relâcher dans la lentille ouvre le passage */
+    portrait.addEventListener('pointerdown', function (e) {
+      if (!motion || busy || !touchy(e)) return;
+      var p = local(e);
+      sx = p.x; sy = p.y; tx = p.x; ty = p.y - LIFT;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(open, 500);
+    });
+    portrait.addEventListener('pointerup', function (e) {
+      if (!touchy(e)) return;
+      if (timer) { clearTimeout(timer); timer = 0; }
+      if (state !== 'open') return;
+      var r = portrait.getBoundingClientRect();
+      var inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top - LIFT && e.clientY <= r.bottom;
+      if (inside) go(); else close(false);
+    });
+    portrait.addEventListener('pointercancel', function () { close(false); });
+    portrait.addEventListener('touchmove', function (e) { if (state === 'open') e.preventDefault(); }, { passive: false });
+    portrait.addEventListener('contextmenu', function (e) { if (state === 'open' || timer) e.preventDefault(); });
+
+    return { close: close };
+  }
+
+  /* ---------- Le passage : la lentille s'ouvre ---------- */
+  function swapTo(to, fromPassage) {
+    if (sideMM) { sideMM.revert(); sideMM = null; }
+    current = to;
+    root.setAttribute('data-side', to);
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+    if (motion) { buildSide(to, { passage: fromPassage }); ST.refresh(); }
+    updateNav();
+    announce(to);
+  }
+  function passage(to, origin, push) {
+    if (busy || SIDES.indexOf(to) < 0 || to === current) return;
+    busy = true;
+    lenses.forEach(function (l) { if (l) l.close(true); });
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var x = origin ? origin.x : vw / 2;
+    var y = origin ? origin.y : vh / 2;
+    var r0 = origin && origin.r ? origin.r : 75;
+    var heroFrom = $('#' + current + ' .hero');
+    var hr = heroFrom ? heroFrom.getBoundingClientRect() : { top: 0, bottom: 0 };
+    var W = heroFrom ? heroFrom.offsetWidth : vw;
+    var H = heroFrom ? heroFrom.offsetHeight : vh;
+    var top0 = (hr.bottom > 0 && hr.top > -H) ? hr.top : 0;
+
+    function finish() {
+      coolUntil = Date.now() + 900;
+      var h1 = $('#' + to + ' .hero-title');
+      if (h1) { try { h1.focus({ preventScroll: true }); } catch (eF) { h1.focus(); } }
+      if (push) { try { history.pushState(null, '', '#' + to); } catch (eP) { /* fichier local */ } }
+      busy = false;
+      var want = sideFromHash(location.hash);
+      if (want && want !== current) passage(want, null, false);
+    }
+    if (!motion) { swapTo(to, false); finish(); return; }
+
+    var page = [$('main'), $('.nav')];
+    if (reduceMQ.matches) {
+      G.timeline({ onComplete: function () { G.set(page, { clearProps: 'opacity' }); finish(); } })
+        .to(page, { opacity: 0, duration: 0.15, ease: 'power1.in' })
+        .add(function () { swapTo(to, true); })
+        .to(page, { opacity: 1, duration: 0.15, ease: 'power1.out' });
+      return;
+    }
+
+    var ov = $('.passage');
+    var inner = $('.passage-in', ov);
+    var ring = $('.passage-ring');
+    inner.innerHTML = '';
+    var src = $('#' + to + ' .scene');
+    if (src) inner.appendChild(strip(src.cloneNode(true)));
+    inner.style.width = W + 'px';
+    inner.style.height = H + 'px';
+    var R = Math.ceil(Math.sqrt(Math.pow(Math.max(x, vw - x), 2) + Math.pow(Math.max(y, vh - y), 2))) + 60;
+    var pinned = ST.getAll().some(function (t) { return t.pin && t.isActive; });
+
+    G.set(ov, { visibility: 'visible', opacity: 1, pointerEvents: 'auto', clipPath: 'circle(' + r0 + 'px at ' + x + 'px ' + y + 'px)' });
+    G.set(ring, { visibility: 'visible', x: x - 75, y: y - 75, scale: r0 / 75, opacity: 0.9 });
+    var tl = G.timeline({
+      onComplete: function () {
+        G.set(ov, { visibility: 'hidden', pointerEvents: 'none', clearProps: 'clipPath,opacity' });
+        G.set(ring, { visibility: 'hidden' });
+        G.set(inner, { clearProps: 'transform,filter' });
+        inner.innerHTML = '';
+        finish();
+      }
+    });
+    tl.to(ov, { clipPath: 'circle(' + R + 'px at ' + x + 'px ' + y + 'px)', duration: 1.1, ease: 'expo.out' }, 0)
+      .fromTo(inner, { y: top0, scale: 1.12, filter: 'blur(6px)', transformOrigin: x + 'px ' + (y - top0) + 'px' },
+        { y: 0, scale: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, 0)
+      .to(ring, { scale: R / 75, duration: 1.1, ease: 'expo.out' }, 0)
+      .to(ring, { opacity: 0, duration: 0.8, ease: 'power2.out' }, 0.1)
+      .to(page, pinned
+        ? { opacity: 0.55, duration: 0.24, ease: 'power2.in' }
+        : { scale: 0.98, filter: 'blur(6px)', opacity: 0.55, duration: 0.24, ease: 'power2.in', transformOrigin: '50% ' + Math.round(window.pageYOffset + y) + 'px' }, 0)
+      .add(function () { G.set(page, { clearProps: 'transform,filter,opacity' }); swapTo(to, true); }, 0.8)
+      .to(ov, { opacity: 0, duration: 0.34, ease: 'power1.out' }, 1.0);
+  }
+
+  /* ---------- Liens internes, seconde porte, historique ---------- */
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-go], [data-passage], [data-go-top]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (a.hasAttribute('data-passage')) {
+      e.preventDefault();
+      var lensEl = $('.other-lens', a) || a;
+      var r = lensEl.getBoundingClientRect();
+      passage(a.getAttribute('data-passage'), { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 }, true);
+      return;
+    }
+    if (a.hasAttribute('data-go-top')) { e.preventDefault(); scrollToY(0, { duration: 1.6 }); return; }
+    var el = document.getElementById((a.getAttribute('href') || '').slice(1));
+    if (!el) return;
+    e.preventDefault();
+    var need = a.getAttribute('data-need');
+    var sel = document.getElementById('f-need');
+    if (need && sel) sel.value = need;
+    scrollToEl(el);
+  });
+  function onHash() {
+    var want = sideFromHash(location.hash);
+    if (want && want !== current) passage(want, null, false);
+  }
+  window.addEventListener('popstate', onHash);
+  window.addEventListener('hashchange', onHash);
+
+  /* ---------- Démarrage ---------- */
+  function fail(err) {
+    try { if (sideMM) sideMM.revert(); } catch (e1) { /* rien */ }
+    try { if (lenis) lenis.destroy(); } catch (e2) { /* rien */ }
+    lenis = null; sideMM = null; motion = false;
+    root.classList.remove('motion');
+    if (window.console) window.console.warn('Le fil : animations désactivées.', err);
+  }
+
+  if (motion) {
+    try {
+      G.registerPlugin(ST);
+      ST.config({ ignoreMobileResize: true });
+      if (!reduceMQ.matches && typeof window.Lenis === 'function') {
+        lenis = new window.Lenis({ lerp: 0.09, smoothWheel: true });
+        lenis.on('scroll', ST.update);
+        G.ticker.add(function (time) { if (lenis) lenis.raf(time * 1000); });
+        G.ticker.lagSmoothing(0);
+      }
+      G.fromTo('.nav', { opacity: 0, y: reduceMQ.matches ? 0 : -14 }, { opacity: 1, y: 0, duration: reduceMQ.matches ? 0.6 : 1.2, ease: 'expo.out', delay: 0.25, clearProps: 'transform' });
+      buildSide(current);
+      var fill = $('.page-thread i');
+      ST.create({
+        start: 0, end: 'max',
+        onUpdate: function (s) { if (fill) fill.style.transform = 'scaleY(' + s.progress.toFixed(4) + ')'; updateNav(); },
+        onRefresh: function () { updateNav(); }
+      });
+      lenses = $$('.hero').map(makeLens);
+    } catch (err) {
+      fail(err);
+    }
+  }
+  announce(current);
+
+  window.addEventListener('load', function () {
+    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    ready.then(function () {
+      if (motion) ST.refresh();
+      var h = location.hash.slice(1);
+      if (h && h !== 'pro' && h !== 'createur') {
+        var el = document.getElementById(h);
+        if (el && el.offsetParent !== null) scrollToEl(el, { immediate: true });
+      }
+      updateNav();
+    });
+  });
+})();
+</script>
+
+<a href="index.html" class="kz-back" aria-label="Revenir aux quatre propositions"><span aria-hidden="true">←</span><em>Propositions</em></a>
+<style>
+.kz-back{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;height:34px;min-width:34px;padding:0 11px;border-radius:999px;font:500 13px/1 "Inter",system-ui,sans-serif;color:#F4EFE6;background:rgba(26,25,24,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 10px 30px -12px rgba(0,0,0,.45);text-decoration:none;opacity:.7;transition:opacity .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.kz-back em{font-style:normal;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .3s,margin .5s cubic-bezier(.16,1,.3,1)}
+.kz-back:hover,.kz-back:focus-visible{opacity:1;transform:translateY(-2px)}
+.kz-back:hover em,.kz-back:focus-visible em{max-width:110px;opacity:1;margin-left:8px}
+.kz-back:focus-visible{outline:2px solid #E8322B;outline-offset:3px}
+</style>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "status": "awaiting-user-review",
+  "revision": 4,
+  "generator": "built-in image_gen",
+  "approvedConcept": "Trois petits robots qui collaborent, dans le style HYROX",
+  "styleReference": "/Users/kenz15/Documents/Dev/Kenz/kenz/maquettes/v6/assets/sport3d/planches/sombre-160.webp",
+  "assets": [
+    {
+      "id": "pro-noyau-ia",
+      "label": "Équipe d’agents IA",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-486988ed-9d0e-4efd-b371-4d951052810d.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    }
+  ]
+}

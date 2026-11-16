@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Page de test du module « apps » (V5), thème clair (variables façon Studio). Ne fait pas partie du site. -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Test — Apps clair</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="stylesheet" href="../shared/passage.css">
+<link rel="stylesheet" href="../shared/apps.css">
+<style>
+:root{
+  --kz-bg:#F5F3EF; --kz-surface:#FFFFFF; --kz-ink:#1A1918; --kz-muted:#4B4743;
+  --kz-line:rgba(26,25,24,.1); --kz-accent:#0F5D6B; --kz-radius:32px;
+  --kz-title:"Melodrama","Instrument Serif",Georgia,serif; --kz-text:"Inter",system-ui,sans-serif; --kz-word:"Instrument Serif",Georgia,serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0; background:var(--kz-bg); color:var(--kz-ink)}
+body{font:400 17px/1.6 var(--kz-text); -webkit-font-smoothing:antialiased; overflow-x:clip}
+.suite{min-height:70vh; display:grid; place-items:center; padding:0 24px; text-align:center; color:var(--kz-muted); font-size:15px}
+</style>
+</head>
+<body>
+<main>
+  <section id="apps" class="kz-apps" data-kz-apps data-theme="light" data-href="../golden/app.html" aria-label="Mes apps"></section>
+  <div class="suite"><p>Suite de la page (test).</p></div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="../shared/passage.js"></script>
+<script src="../shared/apps.js"></script>
+</body>
+</html>

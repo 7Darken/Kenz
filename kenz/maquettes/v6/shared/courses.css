@@ -1,0 +1,317 @@
+/* ==========================================================================
+   Mes courses (k15ze) : des compositions photo éditoriales, et la fenêtre de détail. Rempli par shared/courses.js
+   (les données, l'API et le mouvement y sont décrits). Pas de cartes, pas de boîtes : tout est posé sur le fond de la section.
+   Identité k15ze : sombre, texte #F7F7F2, vert #3DDC84 ; clair : texte #0D0F0E, vert #1E7A46. Noms et chiffres en Anton.
+   <div class="kc" data-variante="landing|page"> > ul.kc-liste > li.kc-item > article.kc-course
+     .kc-compo (figure.kc-calque--a|b|c > .kc-cadre > img ; .kc-nom) + .kc-texte (.kc-quand, .kc-resume, .kc-chiffres, button.kc-voir)
+   La fiche : .kcd > .kcd-fond + .kcd-feuille[role=dialog] (.kcd-haut, .kcd-scene > .kca (la scène animée) + .kcd-zoom, .kcd-corps,
+     .kcd-vignettes, .kcd-actions). La photo qui vole : img.kcd-vol.
+   --kc-fond : la couleur du fond sous les compositions (posée par courses.js) : le bas de la grande photo y fond.
+   ========================================================================== */
+
+.kc,.kcd{
+  --kc-vert:#3DDC84; --kc-vert-rgb:61 220 132;
+  --kc-texte:#F7F7F2; --kc-texte-rgb:247 247 242; --kc-doux:rgba(247,247,242,.72);
+  --kc-ligne:rgba(247,247,242,.14); --kc-media:#151917;
+  --kc-num:"Anton","Impact","Arial Narrow",sans-serif;
+  --kc-txt:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --kc-expo:cubic-bezier(.16,1,.3,1); --kc-io:cubic-bezier(.65,0,.35,1); --kc-out:cubic-bezier(.55,0,.75,.2);
+  --kcd-bg:#111412; --kcd-voile:rgba(5,7,6,.58)
+}
+html[data-theme="light"] .kc,html[data-theme="light"] .kcd{
+  --kc-vert:#1E7A46; --kc-vert-rgb:30 122 70;
+  --kc-texte:#0D0F0E; --kc-texte-rgb:13 15 14; --kc-doux:#4A504C;
+  --kc-ligne:rgba(13,15,14,.12); --kc-media:#E2E6E1;
+  --kcd-bg:#FAFBF8; --kcd-voile:rgba(232,236,230,.6)
+}
+.kc{--kc-fond:#0D0F0E; position:relative; color:var(--kc-texte); font-family:var(--kc-txt)}
+html[data-theme="light"] .kc{--kc-fond:#F4F5F1}
+.kc-sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* ---------- La disposition ---------- */
+.kc-liste{display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(72px,12vw,120px); margin:0; padding:0; list-style:none}
+.kc-item{min-width:0}
+@media (min-width:900px){
+  /* landing : côte à côte, en rythmes décalés (la 2e plus bas) */
+  .kc[data-variante="landing"] .kc-liste{grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:clamp(48px,7vw,120px); row-gap:clamp(72px,9vw,140px); align-items:start}
+  .kc[data-variante="landing"] .kc-item:nth-child(even){margin-top:clamp(72px,13vh,150px)}
+  .kc[data-variante="landing"][data-n="1"] .kc-liste{grid-template-columns:minmax(0,640px)}
+  /* page : une course par rangée, la composition et le texte côte à côte, en alternance */
+  .kc[data-variante="page"] .kc-liste{gap:clamp(72px,9vw,130px)}
+  .kc[data-variante="page"] .kc-course{display:grid; grid-template-columns:minmax(0,7fr) minmax(0,5fr); column-gap:clamp(40px,6vw,110px); align-items:center}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-course{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-compo{order:2}
+  .kc[data-variante="page"] .kc-texte{margin-top:0}
+}
+
+/* ---------- La composition : une grande photo, une ou deux en décalé, le nom qui mord sur le bas ---------- */
+.kc-compo{position:relative; padding-bottom:14%; cursor:pointer; isolation:isolate; -webkit-tap-highlight-color:transparent}
+.kc-calque{position:relative; margin:0}
+.kc-calque--a{z-index:1; width:64%}
+.kc-calque--b{position:absolute; z-index:3; right:0; bottom:0; width:42%}
+.kc-calque--c{position:absolute; z-index:2; right:7%; top:3%; width:30%}
+.kc-cadre{position:relative; width:100%; aspect-ratio:var(--r,.8); overflow:hidden; border-radius:6px; background:var(--kc-media)}
+.kc-cadre img{position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; transition:filter .9s var(--kc-expo)}
+/* le bas de la grande photo fond dans le fond de la section : le nom y reste lisible, en clair comme en sombre */
+.kc-cadre--a::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,0) 56%,var(--kc-fond) 99%)}
+/* les petites photos, découpées dans le fond (un liseré de la couleur du fond), avec de la profondeur */
+.kc-calque--b .kc-cadre,.kc-calque--c .kc-cadre{box-shadow:0 0 0 6px var(--kc-fond),0 34px 60px -26px rgba(0,0,0,.7)}
+html[data-theme="light"] .kc-calque--b .kc-cadre,html[data-theme="light"] .kc-calque--c .kc-cadre{box-shadow:0 0 0 6px var(--kc-fond),0 30px 50px -26px rgba(13,15,14,.38)}
+/* sans photo : le dessin au trait, posé tel quel */
+.kc-cadre--vide{display:grid; place-items:center; background:none; overflow:visible}
+.kc-compo--dessin{padding-bottom:6%}
+.kc-compo--dessin .kc-calque--a{width:74%}
+.kc-compo--dessin .kc-cadre--vide{aspect-ratio:16 / 10}
+.kc-cadre--vide::after{display:none}
+.kc-dessin{width:82%; height:auto; overflow:visible; fill:none; stroke:rgb(var(--kc-texte-rgb) / .8); stroke-width:1.3; stroke-linecap:round; stroke-linejoin:round; transform:perspective(700px) rotateX(48deg)}
+.kc-dessin .acc{stroke:var(--kc-vert); stroke-width:1.8}
+.kc-nom{position:absolute; z-index:4; left:-.03em; bottom:9%; margin:0; max-width:100%; font-family:var(--kc-num); font-weight:400; font-size:clamp(64px,8.4vw,136px); line-height:.86; letter-spacing:.004em; color:var(--kc-texte); pointer-events:none; text-wrap:balance}
+.kc[data-variante="page"] .kc-nom{font-size:clamp(64px,7.4vw,124px)}
+/* en sombre, une ombre douce : le nom reste lisible là où il passe sur une petite photo */
+html:not([data-theme="light"]) .kc-nom{text-shadow:0 2px 26px rgba(0,0,0,.4)}
+/* page, en alternance : la composition en miroir */
+@media (min-width:900px){
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-calque--a{margin-left:auto}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-calque--b{right:auto; left:0}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-calque--c{right:auto; left:7%}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-nom{left:auto; right:-.03em; text-align:right}
+}
+/* le survol suggère le clic : la photo s'éclaire, les petites s'écartent, le « + » tourne */
+.kc-calque--b,.kc-calque--c{transition:translate 1s var(--kc-expo)}
+@media (hover:hover) and (pointer:fine){
+  .kc-course:hover .kc-cadre--a img{filter:brightness(1.08) saturate(1.05)}
+  .kc-course:hover .kc-calque--b{translate:10px -8px}
+  .kc-course:hover .kc-calque--c{translate:-8px -6px}
+  .kc[data-variante="page"] .kc-item:nth-child(even) .kc-course:hover .kc-calque--b{translate:-10px -8px}
+}
+
+/* ---------- Le texte, dessous ---------- */
+.kc-texte{position:relative; z-index:2; max-width:46ch; margin-top:clamp(18px,2.2vw,28px)}
+.kc-quand{display:flex; flex-wrap:wrap; align-items:center; gap:4px 0; margin:0; font-size:14px; line-height:1.4; color:var(--kc-doux)}
+.kc-lieu{color:var(--kc-texte); font-weight:600}
+.kc-point{margin:0 .5em; opacity:.6}
+.kc-encours{display:inline-flex; align-items:center; gap:7px; margin-left:12px; color:var(--kc-vert); font-weight:600}
+.kc-encours i{position:relative; width:7px; height:7px; border-radius:50%; background:var(--kc-vert)}
+.kc--anim .kc-encours i::after{content:""; position:absolute; inset:-4px; border-radius:50%; box-shadow:0 0 0 1.5px var(--kc-vert); animation:kcPouls 2.2s var(--kc-expo) infinite}
+@keyframes kcPouls{from{transform:scale(.6); opacity:.9} to{transform:scale(2); opacity:0}}
+.kc-resume{margin:10px 0 0; font-size:clamp(16px,1.2vw,18px); line-height:1.5; color:rgb(var(--kc-texte-rgb) / .9); text-wrap:pretty}
+.kc-chiffres{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 10px; margin:12px 0 0; font-size:14px; color:var(--kc-doux)}
+.kc-chiffre b{margin-right:3px; font-family:var(--kc-num); font-weight:400; font-size:24px; line-height:1; color:var(--kc-vert)}
+.kc-sep{opacity:.5}
+.kc-voir{display:inline-flex; align-items:center; gap:12px; min-height:44px; margin-top:14px; padding:0; border:0; background:none; cursor:pointer;
+  font:600 15px/1.2 var(--kc-txt); color:var(--kc-texte);
+  background-image:linear-gradient(currentColor,currentColor); background-size:0 1px; background-position:0 calc(100% - 8px); background-repeat:no-repeat; transition:background-size .7s var(--kc-expo)}
+.kc-voir:focus-visible{outline:2px solid var(--kc-vert); outline-offset:4px; border-radius:6px}
+.kc-plus{display:grid; place-items:center; width:32px; height:32px; border-radius:50%; color:var(--kc-vert); box-shadow:inset 0 0 0 1.5px var(--kc-vert); transition:transform .7s var(--kc-expo),background-color .4s var(--kc-expo),color .4s var(--kc-expo)}
+.kc-plus svg{width:14px; height:14px}
+@media (hover:hover) and (pointer:fine){
+  .kc-course:hover .kc-voir{background-size:calc(100% - 44px) 1px}
+  .kc-course:hover .kc-plus{transform:rotate(90deg); background-color:var(--kc-vert); color:var(--kc-fond)}
+}
+
+/* ---------- L'entrée à l'écran (une fois ; seulement avec .kc--anim, hors mouvement réduit) ---------- */
+.kc--anim .kc-course .kc-cadre--a{clip-path:inset(100% 0 0 0 round 6px)}
+.kc--anim .kc-course.is-in .kc-cadre--a{clip-path:inset(0 0 0 0 round 6px); transition:clip-path 1.3s var(--kc-expo) calc(var(--i,0) * .12s)}
+.kc--anim .kc-course .kc-cadre--vide{clip-path:none}
+.kc--anim .kc-course .kc-dessin rect{stroke-dasharray:1; stroke-dashoffset:1}
+.kc--anim .kc-course.is-in .kc-dessin rect{stroke-dashoffset:0; transition:stroke-dashoffset 1.6s var(--kc-io) .2s}
+.kc--anim .kc-course .kc-calque--b>.kc-cadre,.kc--anim .kc-course .kc-calque--c>.kc-cadre{opacity:0; transform:translateY(40px)}
+.kc--anim .kc-course.is-in .kc-calque--b>.kc-cadre,.kc--anim .kc-course.is-in .kc-calque--c>.kc-cadre{opacity:1; transform:none;
+  transition:opacity 1s var(--kc-expo) calc(var(--i,0) * .12s + .45s),transform 1.4s var(--kc-expo) calc(var(--i,0) * .12s + .45s)}
+.kc--anim .kc-course.is-in .kc-calque--c>.kc-cadre{transition-delay:calc(var(--i,0) * .12s + .6s)}
+.kc--anim .kc-course .kc-nom{opacity:0; clip-path:inset(-10% 100% -20% 0); filter:blur(8px)}
+.kc--anim .kc-course.is-in .kc-nom{opacity:1; clip-path:inset(-10% -4% -20% -4%); filter:none; transition:opacity .4s var(--kc-expo) calc(var(--i,0) * .12s + .3s),clip-path 1.3s var(--kc-expo) calc(var(--i,0) * .12s + .3s),filter 1s var(--kc-expo) calc(var(--i,0) * .12s + .3s)}
+.kc--anim .kc-course .kc-texte>*{opacity:0; transform:translateY(12px)}
+.kc--anim .kc-course.is-in .kc-texte>*{opacity:1; transform:none; transition:opacity .9s var(--kc-expo) calc(var(--i,0) * .12s + .55s),transform 1.1s var(--kc-expo) calc(var(--i,0) * .12s + .55s)}
+
+/* ==========================================================================
+   La fiche de détail : compacte, centrée (une feuille qui monte du bas sur mobile), sur un fond flouté.
+   Au cœur, la scène animée qui explique le sport (.kca), puis une ou deux phrases, les vignettes, la vidéo.
+   ========================================================================== */
+html.kcd-verrou,html.kcd-verrou body{overflow:hidden}
+.kcd{--kc-boue-rgb:165 122 74; position:fixed; inset:0; z-index:2147483100; display:grid; place-items:center; padding:16px; color:var(--kc-texte); font-family:var(--kc-txt)}
+html[data-theme="light"] .kcd{--kc-boue-rgb:122 86 52}
+.kcd[hidden]{display:none}
+.kcd-fond{position:absolute; inset:0; background:var(--kcd-voile); -webkit-backdrop-filter:blur(14px) saturate(1.1); backdrop-filter:blur(14px) saturate(1.1); opacity:0; transition:opacity .4s var(--kc-expo)}
+.kcd-feuille{position:relative; width:min(680px,100%); max-height:min(80vh,760px); overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:20px 22px 22px; border-radius:24px;
+  background:var(--kcd-bg); box-shadow:0 0 0 1px var(--kc-ligne),0 40px 100px -30px rgba(0,0,0,.75); outline:none; scrollbar-width:thin;
+  opacity:0; transform:translateY(18px) scale(.97); transition:opacity .3s var(--kc-expo),transform .6s var(--kc-expo)}
+html[data-theme="light"] .kcd-feuille{box-shadow:0 0 0 1px var(--kc-ligne),0 40px 90px -30px rgba(13,15,14,.35)}
+.kcd.is-ouvert .kcd-fond{opacity:1}
+.kcd.is-ouvert .kcd-feuille{opacity:1; transform:none}
+/* pendant le vol de la photo, la fiche est déjà à sa place : la photo atterrit juste sur sa vignette */
+.kcd.is-envol .kcd-feuille{transform:none; transition:opacity .25s var(--kc-expo)}
+.kcd.is-envol .is-cible img{opacity:0}
+/* la fermeture : vite */
+.kcd.is-ferme .kcd-fond{opacity:0; transition:opacity .2s var(--kc-out)}
+.kcd.is-ferme .kcd-feuille{opacity:0; transform:translateY(12px) scale(.98); transition:opacity .18s var(--kc-out),transform .22s var(--kc-out)}
+.kcd-vol{position:fixed; z-index:2147483200; margin:0; max-width:none; object-fit:cover; pointer-events:none; box-shadow:0 24px 60px -24px rgba(0,0,0,.7)}
+@media (max-width:640px){
+  .kcd{place-items:end stretch; padding:0}
+  .kcd-feuille{width:100%; height:85svh; max-height:none; padding:16px 16px calc(20px + env(safe-area-inset-bottom)); border-radius:22px 22px 0 0; transform:translateY(100%)}
+  .kcd.is-ouvert .kcd-feuille{transform:none; transition:opacity .2s var(--kc-expo),transform .55s var(--kc-expo)}
+  .kcd.is-ferme .kcd-feuille{transform:translateY(40%)}
+}
+
+/* le haut : la date et le lieu, le titre, « Fermer » en petit */
+.kcd-haut{display:flex; align-items:flex-start; justify-content:space-between; gap:16px}
+.kcd-quand{display:flex; flex-wrap:wrap; align-items:center; margin:0; font-size:13.5px; line-height:1.4; color:var(--kc-doux)}
+.kcd-titre{margin:4px 0 0; font-family:var(--kc-num); font-weight:400; font-size:clamp(38px,5vw,46px); line-height:.95; letter-spacing:.004em}
+.kcd-fermer{flex:none; display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 4px 0 12px; border:0; border-radius:999px; cursor:pointer;
+  font:600 13px/1 var(--kc-txt); color:var(--kc-texte); background:rgb(var(--kc-texte-rgb) / .07); box-shadow:inset 0 0 0 1px var(--kc-ligne); transition:background-color .4s var(--kc-expo)}
+.kcd-fermer span{display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:rgb(var(--kc-texte-rgb) / .08)}
+.kcd-fermer svg{width:12px; height:12px}
+.kcd-fermer:hover{background:rgb(var(--kc-vert-rgb) / .16)}
+.kcd-fermer:focus-visible,.kcd-vignette:focus-visible,.kcd-video:focus-visible,.kcd-zoom__fermer:focus-visible{outline:2px solid var(--kc-vert); outline-offset:3px}
+
+/* la scène (et la photo agrandie, par-dessus) */
+.kcd-scene{position:relative; margin-top:14px; padding:12px 14px 12px; border-radius:16px; background:rgb(var(--kc-texte-rgb) / .035); box-shadow:inset 0 0 0 1px var(--kc-ligne); transition:min-height .5s var(--kc-expo)}
+.kcd.is-zoom .kcd-scene{min-height:min(50vh,420px)}
+.kcd.is-zoom .kcd-anim{visibility:hidden}
+.kcd-zoom{position:absolute; inset:0; z-index:2; display:grid; place-items:center; margin:0; padding:10px; border-radius:16px; background:var(--kcd-bg); cursor:zoom-out}
+.kcd-zoom[hidden]{display:none}
+/* jamais au-delà de la taille réelle de la photo (--nw × --nh) */
+.kcd-zoom img{display:block; width:auto; height:auto; max-width:min(100%,var(--nw,100%)); max-height:min(calc(min(50vh,420px) - 20px),var(--nh,420px)); border-radius:10px; object-fit:contain}
+.kcd-zoom__fermer{position:absolute; top:10px; right:10px; display:grid; place-items:center; width:34px; height:34px; border:0; border-radius:50%; cursor:pointer; color:#fff; background:rgba(13,15,14,.55); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px)}
+.kcd-zoom__fermer svg{width:12px; height:12px}
+
+/* une ou deux phrases ; les vignettes ; la vidéo */
+.kcd-corps p{margin:14px 0 0; max-width:60ch; font-size:15.5px; line-height:1.5; color:rgb(var(--kc-texte-rgb) / .9); text-wrap:pretty}
+.kcd-corps p + p{margin-top:4px}
+.kcd-vignettes{display:flex; gap:8px; margin:16px 0 0; padding:2px; list-style:none; overflow-x:auto; scrollbar-width:none}
+.kcd-vignettes::-webkit-scrollbar{display:none}
+.kcd-vignettes[hidden]{display:none}
+.kcd-vignette{display:block; height:124px; aspect-ratio:var(--ar,.66); padding:0; border:0; border-radius:10px; overflow:hidden; cursor:zoom-in; background:var(--kc-media); transition:transform .5s var(--kc-expo),box-shadow .4s var(--kc-expo)}
+.kcd-vignette img{display:block; width:100%; height:100%; max-width:none; object-fit:cover}
+.kcd-vignette:hover{transform:translateY(-2px); box-shadow:0 0 0 2px var(--kc-vert)}
+@media (max-width:640px){ .kcd-vignette{height:108px} }
+.kcd-actions{display:flex; margin-top:16px}
+.kcd-actions:empty{display:none}
+.kcd-video{display:inline-flex; align-items:center; gap:12px; min-height:46px; padding:4px 16px 4px 4px; border-radius:999px; text-decoration:none; font-size:14px; font-weight:600; color:var(--kc-texte);
+  background:rgb(var(--kc-texte-rgb) / .06); box-shadow:inset 0 0 0 1px var(--kc-ligne); transition:background-color .4s var(--kc-expo)}
+.kcd-video:hover{background:rgb(var(--kc-vert-rgb) / .14)}
+.kcd-play{display:grid; place-items:center; flex:none; width:38px; height:38px; border-radius:50%; background:var(--kc-vert); color:#0D0F0E}
+html[data-theme="light"] .kcd-play{color:#F7F7F2}
+.kcd-play svg{width:13px; height:13px; margin-left:2px}
+.kcd-duree{margin-left:2px; font-family:var(--kc-num); font-weight:400; font-size:18px; color:var(--kc-doux)}
+
+/* ---------- La scène animée (.kca) : des icônes 3D (assets/sport3d/), aux couleurs k15ze ---------- */
+.kca{position:relative; opacity:var(--kca-op,1)}
+.kca[hidden]{display:none}
+.kca-hud{position:relative; z-index:2; display:flex; justify-content:space-between; align-items:baseline; font-family:var(--kc-num); font-size:24px; line-height:1; font-variant-numeric:tabular-nums}
+.kca-km{color:var(--kc-vert)}
+.kca-svg{display:block; width:100%; height:auto; overflow:visible}
+.kca-fait{fill:none; stroke:var(--kc-vert); stroke-width:3; stroke-linecap:round}
+.kca-label{display:flex; flex-direction:column; align-items:center; gap:2px; min-height:44px; margin:2px 0 0; text-align:center}
+.kca-label__t{font-size:19px; font-weight:600; line-height:1.2; letter-spacing:-.01em}
+.kca-label.is-vert .kca-label__t{color:var(--kc-vert)}
+.kca-label__s{font-size:13px; line-height:1.3; color:var(--kc-doux)}
+.kca-label.is-chg{animation:kcaChg .5s var(--kc-expo)}
+@keyframes kcaChg{from{opacity:.1; transform:translateY(5px)} to{opacity:1; transform:none}}
+.kca-mots{display:flex; flex-wrap:wrap; justify-content:center; margin:6px 0 0; font-size:13.5px; color:var(--kc-doux)}
+.kca-mots span{transition:color .3s}
+.kca-mots span + span::before{content:"·"; margin:0 .55em; color:var(--kc-doux); opacity:.5}
+.kca-mots span.is-on{color:var(--kc-vert); font-weight:600}
+
+/* les icônes : en sombre, un liseré de lumière et une ombre les détachent du fond ; en clair, l'ombre seule (graphite sur fond clair) */
+.kca-img{position:relative; display:block; width:100%; height:100%; max-width:none; -webkit-user-drag:none; -webkit-user-select:none; user-select:none}
+html:not([data-theme="light"]) .kca-img{filter:drop-shadow(0 0 1px rgba(247,247,242,.28)) drop-shadow(0 10px 14px rgba(0,0,0,.5))}
+html[data-theme="light"] .kca-img{filter:drop-shadow(0 10px 12px rgba(13,15,14,.16))}
+.kca-halo{position:absolute; left:50%; top:50%; width:175%; aspect-ratio:1; translate:-50% -50%; border-radius:50%; pointer-events:none; opacity:0;
+  background:radial-gradient(closest-side,rgb(var(--kc-vert-rgb) / .26),rgb(var(--kc-vert-rgb) / .08) 55%,rgb(var(--kc-vert-rgb) / 0))}
+html:not([data-theme="light"]) .kca-halo{background:radial-gradient(closest-side,rgba(247,247,242,.17),rgb(var(--kc-vert-rgb) / .15) 45%,rgb(var(--kc-vert-rgb) / 0))}
+.kca-point{position:absolute; z-index:3; width:13px; height:13px; border-radius:50%; background:#F7F7F2; box-shadow:0 0 0 2.5px var(--kc-vert),0 0 12px rgb(var(--kc-vert-rgb) / .6)}
+html[data-theme="light"] .kca-point{background:var(--kc-vert); box-shadow:0 0 0 2.5px #fff,0 2px 8px rgb(var(--kc-vert-rgb) / .45)}
+
+/* HYROX : la formule (1 km + 1 station, × 8) qui se replie en une boucle de course, vue de dessus */
+.kca-3d{position:relative}
+.kca-3d--hx{height:276px}
+.kca-hx-svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible; transform-origin:50% 50%; opacity:0}
+.kca-anneau{fill:none; stroke:rgb(var(--kc-texte-rgb) / .24); stroke-width:6; stroke-dasharray:.112 .013; stroke-dashoffset:-.0965}
+.kca-anneau-fait{fill:none; stroke:var(--kc-vert); stroke-width:6; stroke-dasharray:0 1}
+.kca-trainee{fill:none; stroke:var(--kc-vert); stroke-width:12; stroke-linecap:round; stroke-dasharray:.16 .84; stroke-opacity:.2; opacity:0}
+.kca-trainee--vive{stroke-width:4; stroke-dasharray:.07 .93; stroke-opacity:.95}
+.kca-point--hx{left:0; top:0; margin:-7px 0 0 -7px; width:14px; height:14px; opacity:0}
+.kca-3d--hx.is-repos .kca-point--hx::after{content:""; position:absolute; inset:-5px; border-radius:50%; box-shadow:0 0 0 1.5px var(--kc-vert); animation:kcPouls 2.2s var(--kc-expo) infinite}
+.kca-poste{position:absolute; z-index:2; opacity:0}
+/* en sombre, un petit éclairage sous chaque station : les icônes graphite se détachent du fond */
+html:not([data-theme="light"]) .kca-poste::before,html:not([data-theme="light"]) .kca-arche::before{content:""; position:absolute; inset:-6%; border-radius:50%; background:radial-gradient(closest-side,rgba(247,247,242,.13),rgba(247,247,242,0))}
+.kca-poste .kca-img{transition:transform .35s var(--kc-expo)}
+.kca-poste.is-flash .kca-img{transform:translateY(-3px) scale(1.24)}
+.kca-poste .kca-halo{transition:opacity .3s var(--kc-expo)}
+.kca-poste.is-flash .kca-halo{opacity:1}
+.kca-poste__nom{position:absolute; z-index:3; left:50%; bottom:calc(100% + 4px); translate:-50% 4px; padding:4px 9px; border-radius:999px; white-space:nowrap; pointer-events:none;
+  font-size:12px; font-weight:600; line-height:1.2; color:var(--kc-texte); background:var(--kcd-bg); box-shadow:0 0 0 1px var(--kc-ligne),0 6px 16px -6px rgba(0,0,0,.4); opacity:0; transition:opacity .2s var(--kc-expo),translate .3s var(--kc-expo)}
+.kca-poste:hover .kca-poste__nom,.kca-poste.is-nom .kca-poste__nom{opacity:1; translate:-50% 0}
+.kca-arche{position:absolute; z-index:2; opacity:0}
+.kca-coeur{position:absolute; z-index:1; display:flex; flex-direction:column; align-items:center; gap:4px; white-space:nowrap; text-align:center; opacity:0; transform:translate(-50%,-50%)}
+.kca-coeur b{font-family:var(--kc-num); font-weight:400; font-size:28px; line-height:1; color:var(--kc-texte)}
+.kca-coeur small{font-size:13px; color:var(--kc-doux)}
+/* la formule */
+.kca-formule{position:absolute; z-index:3; left:50%; top:47%; display:flex; align-items:center; gap:16px; white-space:nowrap; transform:translate(-50%,-50%) scale(var(--s,1)); transform-origin:50% 50%}
+.kf{display:flex; align-items:center; opacity:0}
+.kf-a{gap:10px}
+.kf-ico{width:72px; height:72px}
+.kf-txt{display:flex; flex-direction:column; line-height:1}
+.kf-txt b{font-family:var(--kc-num); font-weight:400; font-size:44px; line-height:.95; color:var(--kc-texte)}
+.kf-txt small{margin-top:5px; font-size:13px; color:var(--kc-doux)}
+.kf-txt--c{align-items:center; text-align:center}
+.kf-plus{font-family:var(--kc-num); font-size:50px; line-height:1; color:var(--kc-vert)}
+.kf-b{flex-direction:column; gap:8px}
+.kf-carte{position:relative; width:84px; height:84px; overflow:hidden; border-radius:18px; background:rgb(var(--kc-texte-rgb) / .06); box-shadow:inset 0 0 0 1px var(--kc-ligne),0 12px 26px -14px rgba(0,0,0,.5)}
+.kf-slot{position:absolute; left:10px; top:10px; width:64px; height:64px; opacity:0}
+.kf-carte.is-tourne .kf-slot{filter:blur(1.2px)}
+.kf-x{position:relative; transform-origin:50% 62%}
+.kf-x b{position:relative; font-family:var(--kc-num); font-weight:400; font-size:68px; line-height:1; color:var(--kc-vert)}
+.kf-x .kca-halo{width:240%}
+.kca-formule-fixe{display:none}
+.kca-3d--hx.is-fige .kca-formule-fixe{display:block; position:absolute; left:0; right:0; top:0; margin:0; text-align:center; font-family:var(--kc-num); font-size:20px; line-height:1.1; color:var(--kc-texte)}
+.kca-formule-fixe span{margin:0 .2em; color:var(--kc-doux)}
+.kca-formule-fixe em{margin-left:.25em; font-style:normal; color:var(--kc-vert)}
+
+/* Spartan : le sentier, la nature, les obstacles posés dessus */
+.kca-terrain{position:relative; margin-top:34px}
+.kca-decor path{fill:none; stroke:rgb(var(--kc-texte-rgb) / .14); stroke-width:1.4; stroke-linejoin:round}
+.kca-sentier{fill:none; stroke:rgb(var(--kc-boue-rgb) / .55); stroke-width:3; stroke-linecap:round; stroke-dasharray:2 7}
+.kca-obs3d{position:absolute; inset:0; pointer-events:none}
+.kca-ob3d{--g:0; position:absolute; width:52px; height:52px; margin:-50px 0 0 -26px; transform-origin:50% 100%; transform:scale(calc(1 + var(--g) * .85)); opacity:.42; filter:grayscale(1);
+  transition:opacity .5s var(--kc-expo),filter .5s var(--kc-expo)}
+.kca-ob3d.is-on,.kca-ob3d.is-fait{opacity:1; filter:none}
+.kca-ob3d .kca-halo{opacity:var(--g)}
+.kca-point--sentier{margin:-6.5px 0 0 -6.5px}
+
+/* Boxe : les bandes, le sac suspendu, les gants (pas de personnage) */
+.kca-3d--boxe{padding-top:212px}
+.kca-bx{position:absolute; opacity:0}
+.kca-bx--bandes{left:50%; top:30px; width:120px; height:120px; margin-left:-60px}
+.kca-bx--bandes .kca-halo{opacity:1}
+.kca-bx--sac{left:58%; top:0; width:150px; height:150px; transform-origin:50% 3%}
+.kca-bx--gants{left:18%; top:78px; width:112px; height:112px}
+.kca-3d--boxe.is-fige .kca-bx--bandes{left:12%; top:76px; width:92px; height:92px; margin-left:0}
+.kca-3d--boxe.is-fige .kca-bx--gants{left:36%; top:66px}
+.kca-3d--boxe.is-fige .kca-bx--sac{left:64%}
+
+@media (max-width:640px){
+  .kca-3d--hx{height:250px}
+  /* la formule est réduite à l'échelle du téléphone : ses petites lignes sont écrites plus grand */
+  .kf-txt small{font-size:19px; margin-top:7px}
+  .kca-coeur b{font-size:21px}
+  .kca-coeur small{font-size:12px}
+  .kca-ob3d{width:38px; height:38px; margin:-36px 0 0 -19px}
+  .kca-terrain{margin-top:26px}
+  .kca-3d--boxe{padding-top:180px}
+  .kca-bx--bandes{width:100px; height:100px; margin-left:-50px}
+  .kca-bx--sac{width:122px; height:122px; left:58%}
+  .kca-bx--gants{width:90px; height:90px; left:8%; top:70px}
+  .kca-3d--boxe.is-fige .kca-bx--bandes{left:4%; width:76px; height:76px; top:70px}
+  .kca-3d--boxe.is-fige .kca-bx--gants{left:30%}
+}
+
+/* ---------- Mouvement réduit : tout est posé ; la fiche apparaît en fondu ; la scène est figée (courses.js) ---------- */
+@media (prefers-reduced-motion: reduce){
+  .kc-calque--b,.kc-calque--c,.kc-cadre img,.kc-plus,.kc-voir{transition:none !important}
+  .kc-course:hover .kc-calque--b,.kc-course:hover .kc-calque--c{translate:none !important}
+  .kcd-feuille{transform:none !important; transition:opacity .2s linear}
+  .kca-label.is-chg{animation:none}
+  .kca-poste .kca-img,.kca-ob3d,.kcd-vignette{transition:none !important}
+}

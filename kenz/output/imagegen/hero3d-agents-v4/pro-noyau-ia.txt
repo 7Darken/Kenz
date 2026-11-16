@@ -1,0 +1,23 @@
+Use case: style-transfer. Create ONE compact 3D icon of THREE SMALL AI ASSISTANT ROBOTS COLLABORATING, for the Pro hero of a personal website. This specific trio of robots has been explicitly chosen by the user. The essential idea is a small team of autonomous assistants working together on one shared task.
+
+INPUT REFERENCE ROLE: the attached HYROX contact sheet is a STYLE REFERENCE ONLY. Match the equipment's premium tactile miniature finish, full rounded proportions, soft bevels, graphite satin materials, restrained off-white details, studio lighting and readable silhouettes. Do not reproduce sports equipment, sheet labels, green colors or the dark backdrop.
+
+SUBJECT AND ACTION:
+Exactly THREE distinct compact assistant robots forming a close triangular group. One coordinating robot is in the middle, slightly behind and about 15% taller. Two supporting robots are in front at left and right, turned slightly inward. All three are visibly engaged in the SAME task: together they support and work on ONE small, smooth, blank Lagon-blue rounded rectangular task tile at the center of their group. One robot holds its edge with a small mechanical gripper, another reaches toward it, and the central coordinator gestures toward the same tile. The shared tile is a solid physical ceramic piece with no lettering or symbols, not a tablet display. Their cooperative arm poses make the teamwork unmistakable. One cohesive isolated group, not three separate panels.
+
+ROBOT DESIGN:
+Each has one softly rounded rectangular graphite head, one small squat rounded graphite body, two short sturdy mechanical arms and two short feet. Clear head/body separation. Their proportions are compact and weighty, like premium designer miniatures, not elongated humanoids. Each face is a recessed matte near-black visor with exactly TWO small off-white softly rounded horizontal eye shapes, no mouth, no nose, no human features. Simple neutral attentive expressions. All three faces remain visible from the camera, with a slight turn toward the shared task. A few off-white joint caps and collar details. Restrained mechanical details; no antennas, screens, labels or elaborate machinery. No human skin, realistic fingers or human hands. Small simple two-prong mechanical grippers only.
+
+MATERIALS AND COLORS:
+Matte/satin graphite #1A1D1C to #2A2F2D bodies and heads, subtle fine tactile grain, off-white #F7F7F2 eyes and small functional joint details. The ONE main accent is the shared Lagon-blue #3FB0C2 task tile. No green, no gold, no orange, no other vivid colors. Broad sculpted soft highlights, beautifully crafted rounded edges. Match the same physical-material quality as the HYROX kettlebells and sleds in the reference, avoiding a flat cartoon or cheap plastic toy appearance.
+
+LIGHTING AND CAMERA:
+Soft cool studio light from the upper left, very subtle cool rim on the right, same quiet tactile lighting as the reference. Ambient occlusion only inside the group, no detached shadows. Three-quarter front view, about 25 degrees elevated, showing the top and right-hand sides while keeping all three robot faces readable. Restrained orthographic perspective.
+
+COMPOSITION:
+Square 1024 x 1024 or larger. Center the COMPLETE group with clear transparent margin on all sides, occupying about 70–75% of the canvas. Exactly three robots, no extra body parts. Keep the group tight, with a strong triangular silhouette that reads as a cooperating team at 80 px and looks premium at 400 px. Every robot has its own complete silhouette; no fused bodies. No floor, platform, shared pedestal or surrounding scenery. All in focus.
+
+BACKGROUND:
+GENUINELY TRANSPARENT ALPHA, clean antialiased contours. No colored backdrop, no ground, no aura, no smoke, no light bloom, no floating interface windows, no painted checkerboard.
+
+ABSOLUTELY NO TEXT: no AI letters, words, numbers, captions, labels, logos, brand marks or watermark anywhere. No chip symbol, sphere, crystal orb, brain, gear, computer monitor or code. The subject is the three collaborating robot assistants with their shared blank blue task tile.

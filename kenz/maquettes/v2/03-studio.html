@@ -1,0 +1,1929 @@
+<!doctype html>
+<!--
+  Kenz — proposition 3 « Studio » (claire, galerie premium, containers d'exception)
+  Deux univers, deux entrées : #pro (ou sans hash) et #createur. Chacune n'affiche que son univers.
+  Interactions signature :
+  1. « La carte » : la carte portrait du hero est la porte secrète. Petit coin corné en haut à droite (couleur du dos).
+     Survol : la carte se soulève de 8 px, le coin se soulève (pli 3D ~20 px + ombre fine), « retourner » passe du flou au net.
+     Clic sur la carte ou le coin, ou on tire le coin (pré-rotation qui suit le doigt). Mobile : toucher le coin ou appui long.
+  2. Le retournement : rotateY 180°, perspective 1200 px, 0,9 s expo.out, vraie face arrière (l'autre portrait, sable ↔ brume).
+     L'ombre au sol se resserre quand la carte est de profil. Le fond se réchauffe ou se refroidit, les cartes visibles partent
+     vite (0,24 s, 0,98 + flou), les autres arrivent en cascade (34 px, 0,965 → 1, 60 ms). history.pushState, retour arrière
+     = la carte se retourne dans l'autre sens, focus sur le titre, annonce aria-live. Mouvement réduit : fondu de 300 ms.
+  3. Seconde porte en bas de page : mini-carte cornée « Il existe une autre version de moi. » (remonte en douceur, puis retourne).
+  4. Portrait qui sort du cadre (deux calques alignés), bento des apps (soulèvement, image à 1,03, flèche qui avance),
+     agents IA en 4 étapes qui s'allument puis coche tracée, chiffres qui montent d'une fente, titres balayés avec flou.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Studio</title>
+<meta name="description" content="Kenz : des apps où l’IA fait le vrai travail, des agents IA pour votre équipe, et l’Asie racontée en vrai.">
+<meta name="theme-color" content="#F5F3EF">
+<script>
+(function(){var d=document.documentElement;d.classList.add('js');var h=(location.hash||'').toLowerCase();var c=['#createur','#derniere','#chiffres','#destinations','#guides','#k15ze','#liens','#marques'];var s=c.indexOf(h)>-1?'createur':'pro';d.setAttribute('data-side',s);d.setAttribute('data-mood',s);})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="preload" as="image" href="assets/img/kenz-pro.webp">
+<link rel="preload" as="image" href="assets/img/kenz-moi.webp">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){var d=document.documentElement;if(window.gsap){d.classList.add('has-gsap','anim');setTimeout(function(){if(!window.__kenzIntro){d.classList.remove('anim');}},3000);}})();
+</script>
+<style>
+@property --s{syntax:'<length>';inherits:true;initial-value:16px}
+:root{
+  --paper:#F5F3EF;
+  --ink:#1A1918;
+  --ink-2:#4B4743;
+  --ink-3:#69645E;
+  --line:rgba(26,25,24,.08);
+  --line-2:rgba(26,25,24,.14);
+  --cream:#F4EFE6;
+  --red:#E8322B;
+  --lagoon:#0F5D6B;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --sh-1:0 0 0 1px rgba(26,25,24,.05),0 1px 1px rgba(26,25,24,.03),0 3px 6px -2px rgba(26,25,24,.04),0 12px 24px -10px rgba(26,25,24,.07),0 32px 64px -24px rgba(26,25,24,.10);
+  --sh-2:0 2px 4px -1px rgba(26,25,24,.05),0 22px 44px -14px rgba(26,25,24,.13),0 60px 120px -34px rgba(26,25,24,.22);
+  --noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0 0.09  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  --sand-1:#F6ECDD;--sand-2:#E9D5BC;--sand-3:#D9BE9C;
+  --mist-1:#EEF2F4;--mist-2:#D3DCE2;--mist-3:#B9C6CF;
+}
+
+/* ---------- Base ---------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;color-scheme:light}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:var(--f-text);font-size:16px;line-height:1.55;font-optical-sizing:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+@supports (overflow:clip){body{overflow-x:clip}}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+button,input,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4,p,ul,ol,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+::selection{background:rgba(15,93,107,.18)}
+:focus-visible{outline:2px solid var(--lagoon);outline-offset:3px;border-radius:12px}
+[tabindex="-1"]:focus{outline:none}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.kz-anchor{position:absolute;top:0;left:0;width:1px;height:1px}
+.skip{position:fixed;left:16px;top:-60px;z-index:90;padding:10px 16px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:600;transition:transform .3s var(--ease)}
+.skip:focus{transform:translateY(76px)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+
+/* Ambiance : froide côté Pro, chaude côté Créateur (fondu d'opacité) */
+.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;transition:opacity 1.1s var(--ease)}
+.ambient-pro{background:radial-gradient(55% 45% at 88% 4%,rgba(214,226,233,.75),rgba(214,226,233,0) 70%),radial-gradient(40% 40% at 0% 90%,rgba(226,232,234,.6),rgba(226,232,234,0) 70%)}
+.ambient-moi{opacity:0;background:radial-gradient(55% 45% at 88% 4%,rgba(240,218,190,.8),rgba(240,218,190,0) 70%),radial-gradient(45% 40% at 0% 92%,rgba(243,226,204,.75),rgba(243,226,204,0) 70%),#F7F0E6}
+html[data-mood="createur"] .ambient-moi,html:not([data-side]):has(#createur:target) .ambient-moi{opacity:1}
+html[data-mood="createur"] .ambient-pro{opacity:0}
+body::after{content:"";position:fixed;inset:0;z-index:80;pointer-events:none;opacity:.035;background-image:var(--noise);background-size:180px 180px}
+
+.wrap{width:100%;max-width:1288px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+@media (min-width:768px){.wrap{padding-left:max(32px,env(safe-area-inset-left));padding-right:max(32px,env(safe-area-inset-right))}}
+@media (min-width:1200px){.wrap{padding-left:max(44px,env(safe-area-inset-left));padding-right:max(44px,env(safe-area-inset-right))}}
+
+/* Un seul univers par entrée */
+html[data-side="pro"] main>[data-only="createur"],html[data-side="createur"] main>[data-only="pro"],
+html[data-side="pro"] .bar [data-only="createur"],html[data-side="createur"] .bar [data-only="pro"],
+html[data-side="pro"] .foot [data-only="createur"],html[data-side="createur"] .foot [data-only="pro"]{display:none!important}
+html:not([data-side]):not(:has(#createur:target)) [data-only="createur"],html:not([data-side]):has(#createur:target) [data-only="pro"]{display:none!important}
+
+/* ---------- Typographie ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:10px;min-height:30px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.66);box-shadow:inset 0 0 0 1px var(--line);font-size:11.5px;line-height:1.3;font-weight:550;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2)}
+.h1{font-family:var(--f-title);font-weight:600;font-size:clamp(54px,7.4vw,120px);line-height:.9;letter-spacing:-.028em;margin-top:24px}
+.h2{font-family:var(--f-title);font-weight:600;font-size:clamp(42px,5.4vw,84px);line-height:.94;letter-spacing:-.024em;margin-top:18px}
+.it{font-family:var(--f-word);font-style:italic;font-weight:400;font-size:1.06em;letter-spacing:-.01em;color:var(--lagoon);text-shadow:0 0 30px rgba(15,93,107,.16)}
+.w{display:inline-block;transform-origin:50% 70%}
+.lead{font-size:clamp(17px,1.32vw,20px);line-height:1.5;color:var(--ink-2);max-width:33ch;margin-top:22px}
+
+/* ---------- Boutons ---------- */
+.btn{position:relative;display:inline-flex;align-items:center;gap:14px;min-height:50px;padding:6px 6px 6px 22px;border-radius:999px;font-size:15px;font-weight:550;letter-spacing:-.005em;line-height:1.2;cursor:pointer;border:0;isolation:isolate;transition:transform .3s var(--ease)}
+.btn::before{content:"";position:absolute;inset:0;border-radius:inherit;z-index:-1;opacity:0;transition:opacity .3s var(--ease)}
+.btn:hover::before{opacity:1;transition-duration:.6s}
+.btn:active{transform:scale(.975);transition-duration:.12s}
+.btn .ic{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;transition:transform .35s var(--ease)}
+.btn:hover .ic{transform:translate(2px,-1px) scale(1.05);transition-duration:.7s}
+.btn-ink{background:var(--ink);color:var(--cream);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 24px -10px rgba(26,25,24,.55)}
+.btn-ink::before{background:rgba(255,255,255,.08)}
+.btn-ink .ic{background:rgba(244,239,230,.13)}
+.btn-ink .ic-red{background:var(--red);color:var(--cream);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-ghost{background:rgba(255,255,255,.62);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line-2)}
+.btn-ghost::before{background:#fff}
+.btn-ghost .ic{background:rgba(26,25,24,.06)}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.go{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:5px 5px 5px 14px;border-radius:999px;font-size:13.5px;font-weight:550;white-space:nowrap;background:rgba(26,25,24,.05);box-shadow:inset 0 0 0 1px rgba(26,25,24,.06);transition:transform .3s var(--ease)}
+.go:active{transform:scale(.97);transition-duration:.12s}
+.go .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 1px 2px rgba(26,25,24,.14);transition:transform .35s var(--ease)}
+.go:hover .ic{transform:translate(2px,-2px);transition-duration:.7s}
+.go .i{width:14px;height:14px}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:5px 12px;border-radius:999px;background:rgba(26,25,24,.05);font-size:13px;font-weight:500;color:var(--ink-2)}
+
+/* ---------- Barre (propre à chaque univers) ---------- */
+.top{position:fixed;left:0;right:0;top:0;z-index:50;pointer-events:none}
+.top::before{content:"";position:absolute;left:0;right:0;top:0;height:76px;background:rgba(245,243,239,.72);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);opacity:0;transition:opacity .4s var(--ease),transform .3s var(--ease)}
+html[data-mood="createur"] .top::before{background:rgba(247,240,230,.72)}
+.top.is-scrolled::before{opacity:1}
+.top.is-compact::before{opacity:0;transform:translateY(-100%)}
+.bar{position:relative;display:flex;align-items:center;gap:12px;height:64px;pointer-events:auto;transition:transform .3s var(--ease),opacity .24s ease}
+.top.is-compact .bar{transform:translateY(-100%);opacity:0;pointer-events:none}
+.top.is-compact:focus-within .bar{transform:none;opacity:1;pointer-events:auto}
+.top:not(.is-compact) .bar{transition-duration:.8s,.5s}
+.brand{display:inline-flex;align-items:center;gap:10px;margin-right:auto;font-family:var(--f-title);font-weight:600;font-size:27px;letter-spacing:-.015em;line-height:1;border-radius:10px}
+.brand img{width:28px;height:28px;filter:brightness(0);opacity:.88}
+.nav ul{display:flex;align-items:center;gap:2px}
+.nav a{position:relative;display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:500;color:var(--ink-2);isolation:isolate;transition:color .3s var(--ease)}
+.nav a::before{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(26,25,24,.06);opacity:0;transform:scale(.92);z-index:-1;transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.nav a:hover::before{opacity:1;transform:none;transition-duration:.6s}
+.nav a.is-active{color:var(--ink)}
+.nav a.is-active::before{opacity:1;transform:none;background:rgba(255,255,255,.85);box-shadow:inset 0 0 0 1px var(--line),0 4px 12px -6px rgba(26,25,24,.25)}
+.bar .btn{min-height:44px;padding:4px 4px 4px 18px;font-size:14px}
+.bar .btn .ic{width:34px;height:34px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;padding-top:calc(64px + clamp(24px,5vh,64px));padding-bottom:clamp(48px,7vh,96px);overflow-x:hidden}
+@supports (overflow:clip){.hero{overflow-x:clip}}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:clamp(32px,5vw,96px)}
+.htexts{display:grid;padding-bottom:clamp(8px,5vh,56px)}
+html[data-side] .htexts>.htext{grid-area:1/1}
+.htext{align-self:end}
+html[data-side="pro"] .htext[data-only="createur"],html[data-side="createur"] .htext[data-only="pro"]{visibility:hidden}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.live{display:flex;align-items:center;gap:10px;margin-top:28px;font-size:13.5px;color:var(--ink-3)}
+.live i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--lagoon);box-shadow:0 0 0 4px rgba(15,93,107,.12)}
+
+/* « La carte » : scène 3D, deux faces, géométrie en largeur de carte (--W) */
+.stage{--W:clamp(270px,min(31vw,calc((100vh - 150px) / 1.98)),430px);position:relative;width:calc(var(--W) + 14px);height:calc(var(--W) * 1.98 + 14px);perspective:1200px;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ground{position:absolute;left:10%;right:10%;bottom:-20px;height:44px;border-radius:50%;background:radial-gradient(closest-side,rgba(26,25,24,.2),rgba(26,25,24,0));pointer-events:none;transition:opacity .35s var(--ease)}
+.flip{position:absolute;inset:0;-webkit-transform-style:preserve-3d;transform-style:preserve-3d}
+html:not(.has-gsap) .flip{transition:transform .9s var(--ease)}
+html[data-side="createur"] .flip,html:not([data-side]):has(#createur:target) .flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;--s:16px;transition:--s .4s var(--ease)}
+.face-moi{transform:rotateY(180deg)}
+.face.is-peeling{transition:none}
+.face.is-pressing{--s:46px;transition-duration:.52s}
+.hcard{position:absolute;left:0;right:0;bottom:0;padding:7px;border-radius:34px 12px 34px 34px;background:rgba(255,255,255,.58);box-shadow:var(--sh-1),inset 0 1px 0 rgba(255,255,255,.9);transition:transform .35s var(--ease);
+  -webkit-clip-path:polygon(-40% -130%,calc(100% - var(--s)) -130%,calc(100% - var(--s)) 0,100% var(--s),140% var(--s),140% 170%,-40% 170%);
+  clip-path:polygon(-40% -130%,calc(100% - var(--s)) -130%,calc(100% - var(--s)) 0,100% var(--s),140% var(--s),140% 170%,-40% 170%)}
+.hcard::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--sh-2);opacity:0;z-index:-1;pointer-events:none;transition:opacity .35s var(--ease)}
+.hcore{position:relative;height:calc(var(--W) * 1.2);border-radius:27px 7px 27px 27px;overflow:hidden;isolation:isolate;background:#D9E1E6}
+.hcore::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(26,25,24,.06),inset 0 1px 0 rgba(255,255,255,.55);pointer-events:none;z-index:4}
+.hbg{position:absolute;inset:0}
+.hbg-pro{background:radial-gradient(85% 55% at 50% 14%,#F3F6F7 0%,rgba(243,246,247,0) 62%),linear-gradient(180deg,#E4EAEE 0%,#D5DEE4 52%,#C4D0D8 100%)}
+.hbg-moi{background:radial-gradient(85% 55% at 50% 14%,#FBF4EA 0%,rgba(251,244,234,0) 62%),linear-gradient(180deg,#F1E4D2 0%,#E8D3B9 52%,#DBC09E 100%)}
+.hgrain{position:absolute;inset:0;opacity:.07;background-image:var(--noise);background-size:180px 180px}
+.p-in{position:absolute;inset:0;z-index:1;-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 60%,transparent 86%);mask-image:linear-gradient(180deg,#000 0%,#000 60%,transparent 86%)}
+.p-out{position:absolute;left:7px;right:7px;bottom:7px;height:calc(var(--W) * 1.2);z-index:3;pointer-events:none;-webkit-clip-path:inset(-100% -25% calc(100% - 1px) -25%);clip-path:inset(-100% -25% calc(100% - 1px) -25%)}
+.pmove{position:absolute;inset:0;transition:transform .35s var(--ease)}
+.pimg{position:absolute;left:calc(var(--W) * -.12);top:calc(var(--W) * -1.014);width:calc(var(--W) * 1.24);height:calc(var(--W) * 2.2044);max-width:none;-webkit-user-drag:none}
+/* Coin corné : laisse voir la couleur du dos */
+.ear{position:absolute;top:0;right:0;width:var(--s);height:var(--s);z-index:7;pointer-events:none;filter:drop-shadow(-1px 2px 1.5px rgba(26,25,24,.2)) drop-shadow(-4px 7px 7px rgba(26,25,24,.12))}
+.ear-i{position:absolute;inset:0;-webkit-clip-path:polygon(0 0,100% 100%,0 100%);clip-path:polygon(0 0,100% 100%,0 100%);transform-origin:50% 50%;transform:perspective(140px) rotate3d(1,1,0,0deg);transition:transform .4s var(--ease)}
+.face-pro .ear-i,.door-pro .ear-i{background:linear-gradient(45deg,var(--sand-3) 0%,var(--sand-2) 50%,var(--sand-1) 100%)}
+.face-moi .ear-i,.door-moi .ear-i{background:linear-gradient(45deg,var(--mist-3) 0%,var(--mist-2) 50%,var(--mist-1) 100%)}
+.ear-cap{position:absolute;right:-10px;top:calc(var(--W) * .78 - 60px);z-index:9;display:flex;align-items:flex-start;gap:2px;font-family:var(--f-word);font-style:italic;font-size:19px;line-height:1;color:var(--ink-2);opacity:0;filter:blur(6px);transform:translateY(4px);pointer-events:none;white-space:nowrap;transition:opacity .24s ease,filter .24s ease,transform .3s var(--ease)}
+.ear-cap svg{width:18px;height:36px;margin-top:6px;fill:none;stroke:currentColor;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.ear-btn{position:absolute;right:-18px;top:calc(var(--W) * .78 - 22px);z-index:9;width:60px;height:60px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent}
+.ear-btn:focus-visible{outline:2px solid var(--lagoon);outline-offset:-12px;border-radius:50%}
+.face:focus-within{--s:34px}
+.face:focus-within .ear-cap{opacity:1;filter:blur(0);transform:none}
+@media (hover:hover){
+  .stage:hover .face{--s:36px;transition-duration:.8s}
+  .stage:hover .hcard{transform:translateY(-8px);transition-duration:.9s}
+  .stage:hover .hcard::after{opacity:1;transition-duration:.9s}
+  .stage:hover .pmove{transform:translateY(-4px);transition-duration:.9s}
+  .stage:hover .ear-i{transform:perspective(140px) rotate3d(1,1,0,18deg);transition-duration:.8s}
+  .stage:hover .ear-cap{opacity:1;filter:blur(0);transform:translateY(-8px);transition:opacity .7s var(--ease) .1s,filter .7s var(--ease) .1s,transform .9s var(--ease)}
+  .stage:hover .ground{opacity:.7}
+}
+@media (hover:none){.ear-cap{opacity:.7;filter:none;transform:none}}
+.hcap{position:absolute;left:12px;right:12px;bottom:12px;z-index:5;display:flex;align-items:center;gap:12px;padding:9px 9px 9px 11px;border-radius:20px;background:rgba(255,255,255,.86);box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 1px 2px rgba(26,25,24,.06),0 12px 28px -14px rgba(26,25,24,.32);cursor:pointer;transition:transform .3s var(--ease)}
+.hcap:active{transform:scale(.98)}
+.hcap-stack{display:flex;flex:none}
+.hcap-stack img{width:26px;height:26px;border-radius:7px;box-shadow:0 0 0 2px #fff}
+.hcap-stack img+img{margin-left:-8px}
+.hcap-stack.round img{border-radius:50%;object-fit:cover}
+.hcap-t{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.hcap-t b{font-size:14px;font-weight:600}
+.hcap-t small{font-size:12px;color:var(--ink-2)}
+.hcap .ic{margin-left:auto;flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--ink);color:var(--cream);transition:transform .35s var(--ease)}
+.hcap:hover .ic{transform:translate(2px,-2px);transition-duration:.7s}
+.hcap .i{width:14px;height:14px}
+
+/* ---------- Sections ---------- */
+.sec{padding-block:clamp(44px,5vw,80px);scroll-margin-top:72px}
+.sec-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px 64px;align-items:end;margin-bottom:clamp(28px,3.8vw,52px)}
+.sec-head>p{font-size:17px;line-height:1.55;color:var(--ink-2);max-width:40ch;padding-bottom:8px}
+.sec-head .h2{max-width:14ch}
+
+/* Container « double bord » : coque + cœur */
+.card{position:relative;min-width:0}
+.shell{position:relative;height:100%;padding:6px;border-radius:30px;background:rgba(255,255,255,.52);box-shadow:var(--sh-1),inset 0 1px 0 rgba(255,255,255,.9);isolation:isolate;transition:transform .35s var(--ease)}
+.shell::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--sh-2);opacity:0;z-index:-1;pointer-events:none;transition:opacity .35s var(--ease)}
+.core{position:relative;height:100%;border-radius:24px;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,#FFFFFF 0%,#FBFAF8 100%)}
+.core::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(26,25,24,.05),inset 0 1px 0 rgba(255,255,255,.75);pointer-events:none;z-index:6}
+.media{position:relative;overflow:hidden}
+.media img{transition:transform .5s var(--ease)}
+@media (hover:hover){
+  .lift:hover .shell{transform:translateY(-6px);transition-duration:.9s}
+  .lift:hover .shell::after{opacity:1;transition-duration:.9s}
+  .lift:hover .media img{transform:scale(1.03);transition-duration:1.1s}
+  .lift:hover .go .ic{transform:translate(2px,-2px);transition-duration:.7s}
+}
+.lift:has(:focus-visible) .shell{transform:translateY(-6px)}
+.lift:has(:focus-visible) .shell::after{opacity:1}
+
+.bento{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px}
+.c-3{grid-column:span 3}.c-4{grid-column:span 4}.c-5{grid-column:span 5}.c-6{grid-column:span 6}.c-7{grid-column:span 7}.c-8{grid-column:span 8}.c-12{grid-column:span 12}
+.r-2{grid-row:span 2}
+
+/* ---------- Apps ---------- */
+.app .core{display:flex;flex-direction:column;padding:26px 26px 0}
+.app-head{display:flex;align-items:center;gap:14px;min-width:0}
+.ico{flex:none;width:52px;height:52px;border-radius:12px;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 6px 14px -6px rgba(26,25,24,.32)}
+.app-name{font-family:var(--f-title);font-weight:600;font-size:30px;line-height:1;letter-spacing:-.012em}
+.app-meta{font-size:13px;color:var(--ink-3);margin-top:5px}
+.app-line{font-size:15.5px;line-height:1.5;color:var(--ink-2);margin-top:16px;max-width:38ch}
+.app-links{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:18px}
+.app-more{position:relative;z-index:2;font-size:13px;font-weight:550;color:var(--ink-2);padding:9px 13px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line-2);transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.app-more:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(26,25,24,.28)}
+.app-more:active{transform:scale(.97)}
+.app .stretch{position:static}
+.stretch::after{content:"";position:absolute;inset:0;z-index:1;border-radius:24px}
+.app .stretch .ic{position:relative}
+.app-wide .media{flex:1;min-height:300px;margin:22px -26px 0}
+.app-wide .media img{position:absolute;left:50%;top:0;width:min(100%,780px);height:auto;transform-origin:50% 0;translate:-50% 0}
+.app--wado .core{background:#172727;color:var(--cream)}
+.app--wado .app-meta{color:rgba(244,239,230,.66)}
+.app--wado .app-line{color:rgba(244,239,230,.82)}
+.app--wado .go{background:rgba(244,239,230,.1);box-shadow:inset 0 0 0 1px rgba(244,239,230,.16)}
+.app--wado .go .ic{background:var(--cream);color:var(--ink)}
+.app--wado .app-more{color:rgba(244,239,230,.82);box-shadow:inset 0 0 0 1px rgba(244,239,230,.2)}
+.app--wado .core::after{box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.08)}
+.app--croc .core{background:#EFE7FC}
+.app--croc .app-meta{color:#5E5870}
+.app--oshii .core{background:linear-gradient(180deg,#FBF4F6 0%,#F3ECF4 100%)}
+.app--sago .core{background:linear-gradient(180deg,#F4F3F8 0%,#ECEAF3 100%)}
+.app--miru .core{background:linear-gradient(180deg,#F2F0FA 0%,#E9E5F7 100%)}
+.app--zenko .core{background:linear-gradient(180deg,#FBF6F0 0%,#F4EBDF 100%)}
+.shots{position:relative;display:flex;justify-content:center;align-items:flex-start;gap:14px;flex:none;height:330px;margin-top:auto;padding-top:26px}
+.shot{position:relative;flex:none;width:min(45%,176px);border-radius:22px;overflow:hidden;box-shadow:0 0 0 1px rgba(26,25,24,.08),0 2px 4px rgba(26,25,24,.06),0 22px 44px -18px rgba(26,25,24,.4)}
+.shot img{width:100%;height:auto;aspect-ratio:462/1000;object-fit:cover;object-position:50% 0}
+.shot+.shot{margin-top:42px}
+.shots.one .shot{width:min(58%,212px)}
+.app-sum .core{display:flex;flex-direction:column;padding:28px}
+.sum-n{font-family:var(--f-title);font-weight:600;font-size:clamp(96px,10vw,140px);line-height:.8;letter-spacing:-.04em}
+.sum-t{font-size:16px;color:var(--ink-2);margin-top:16px;max-width:26ch}
+.sum-icons{display:grid;grid-template-columns:repeat(3,56px);gap:12px;margin-top:auto;padding-top:28px}
+.sum-icons img{width:56px;height:56px;border-radius:13px;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 6px 14px -6px rgba(26,25,24,.3);transition:transform .5s var(--ease)}
+.app-sum .go{align-self:flex-start;margin-top:22px}
+@media (hover:hover){.app-sum:hover .sum-icons img{transform:translateY(-3px)}.app-sum:hover .sum-icons img:nth-child(2n){transform:translateY(-6px)}}
+@media (min-width:1024px){
+  .app-wide,.app-tall{min-height:600px}
+  .app-row3{min-height:540px}
+}
+
+/* ---------- Agents IA ---------- */
+.agents .core{padding:clamp(26px,4vw,52px);background:radial-gradient(70% 60% at 100% 0%,rgba(15,93,107,.06),rgba(15,93,107,0) 70%),linear-gradient(180deg,#FFFFFF 0%,#FAF9F7 100%)}
+.flow{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.step{position:relative;padding-right:22px}
+.node{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--line-2),0 6px 16px -8px rgba(26,25,24,.22)}
+.node svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.node-lit{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;background:var(--lagoon);color:var(--cream);box-shadow:0 0 0 6px rgba(15,93,107,.1),0 12px 24px -10px rgba(15,93,107,.6)}
+.node-lit svg{stroke-width:1.6}
+.conn{position:absolute;top:27.5px;left:68px;right:12px;height:1px;background:var(--line-2);overflow:hidden}
+.conn i{position:absolute;inset:0;background:var(--lagoon);transform-origin:0 50%;transform:scaleX(var(--p,1))}
+.step-txt h3{font-size:17px;font-weight:600;line-height:1.3;margin-top:22px}
+.step-txt p{font-size:15px;line-height:1.5;color:var(--ink-2);margin-top:6px;max-width:24ch}
+.agents-foot{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:36px 56px;margin-top:clamp(36px,4.6vw,60px);padding-top:clamp(26px,3.2vw,38px);border-top:1px solid var(--line)}
+.k{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.uses{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.uses li{display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:8px 16px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px var(--line),0 1px 2px rgba(26,25,24,.04);font-size:14.5px;color:var(--ink)}
+.uses li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lagoon);opacity:.8}
+.proof{display:grid;gap:14px;margin-top:16px}
+.proof li{display:flex;align-items:baseline;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.proof li:last-child{border-bottom:0;padding-bottom:0}
+.proof b{font-family:var(--f-title);font-weight:600;font-size:34px;line-height:1;letter-spacing:-.02em;min-width:2.4ch}
+.proof span{font-size:15px;color:var(--ink-2)}
+
+/* ---------- Offres ---------- */
+.offer .core{display:flex;flex-direction:column;padding:30px;min-height:430px}
+.offer h3{font-size:clamp(21px,1.8vw,25px);font-weight:600;line-height:1.2;letter-spacing:-.015em;max-width:20ch}
+.offer p{font-size:15.5px;line-height:1.5;color:var(--ink-2);margin-top:10px;max-width:36ch}
+.offer .go{align-self:flex-start;margin:20px 0 28px;position:relative;z-index:2}
+.o-vis{position:relative;margin-top:auto}
+.o-pills{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.opill{display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:8px 16px;border-radius:14px;background:#fff;font-size:14px;font-weight:500;box-shadow:inset 0 0 0 1px var(--line),0 8px 18px -12px rgba(26,25,24,.3);margin-left:calc(var(--i) * 26px);transition:transform .5s var(--ease)}
+.opill i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);opacity:.5}
+.opill.ok{background:var(--lagoon);color:var(--cream);box-shadow:0 10px 22px -12px rgba(15,93,107,.7)}
+.opill.ok .i{width:15px;height:15px;stroke-width:2}
+.o-shot{align-self:flex-end;width:88%;margin:auto -30px -30px 0;border-radius:18px 0 0 0;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 24px 48px -20px rgba(26,25,24,.35)}
+.o-shot img{width:100%;height:auto}
+.o-fan{height:150px}
+.o-fan img{position:absolute;left:50%;bottom:16px;width:72px;height:72px;margin-left:-36px;border-radius:17px;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 12px 24px -12px rgba(26,25,24,.45);transform:translateX(calc(var(--i) * 44px)) translateY(calc(var(--i) * var(--i) * 3px)) rotate(calc(var(--i) * 5deg));transition:transform .5s var(--ease)}
+.o-thumbs{height:220px}
+.o-thumbs img{position:absolute;bottom:4px;left:calc(var(--i) * 21%);width:54%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:14px;z-index:calc(3 - var(--i));box-shadow:0 0 0 1px rgba(26,25,24,.08),0 18px 36px -16px rgba(26,25,24,.45);transform:translateY(calc(var(--i) * -16px)) rotate(calc((var(--i) - 1) * 2deg));transition:transform .5s var(--ease)}
+@media (hover:hover){
+  .offer:hover .opill{transform:translateX(calc(var(--i) * 6px));transition-duration:.9s}
+  .offer:hover .o-fan img{transform:translateX(calc(var(--i) * 54px)) translateY(calc(var(--i) * var(--i) * 4px - 8px)) rotate(calc(var(--i) * 7deg));transition-duration:.9s}
+  .offer:hover .o-thumbs img{transform:translateY(calc(var(--i) * -24px - 4px)) rotate(calc((var(--i) - 1) * 3deg));transition-duration:.9s}
+}
+
+/* ---------- Startup Weekend ---------- */
+.sw .core{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);min-height:540px}
+.sw-media{min-height:320px;background:#D9D2C8}
+.sw-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:40% 15%;transform-origin:40% 15%;transform:scale(1.36)}
+@media (hover:hover){.lift.sw:hover .sw-media img{transform:scale(1.4)}}
+.sw-txt{display:flex;flex-direction:column;padding:clamp(28px,4vw,56px)}
+.sw-txt .lead{max-width:30ch}
+.sw-mini{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:30px}
+.sw-mini img{width:132px;height:99px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 12px 24px -12px rgba(26,25,24,.35)}
+.sw-mini figcaption{font-size:14px;color:var(--ink-3);max-width:20ch}
+
+/* ---------- Formulaires ---------- */
+.form-card .core{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px clamp(32px,5vw,80px);padding:clamp(26px,4.4vw,60px)}
+.form-txt .lead{max-width:30ch}
+.sign{display:flex;align-items:center;gap:14px;margin-top:30px}
+.sign-av{width:48px;height:48px;border-radius:50%;background-size:250% auto;background-repeat:no-repeat;box-shadow:0 0 0 3px #fff,0 6px 14px -6px rgba(26,25,24,.35)}
+.sign-av.pic{object-fit:cover}
+.av-pro{background-image:url("assets/img/kenz-pro.webp");background-position:50% 22%;background-color:#DCE4EA}
+.av-moi{background-image:url("assets/img/kenz-moi.webp");background-position:52% 18%;background-color:#ECDCC6}
+.sign b{display:block;font-size:15px;font-weight:600}
+.sign small{font-size:13px;color:var(--ink-3)}
+.links-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.form{display:grid;gap:20px;align-content:start}
+.form[hidden]{display:none}
+.field{display:grid;gap:8px;min-width:0;border:0;padding:0;margin:0}
+.field label,.field legend{font-size:14px;font-weight:550;color:var(--ink);padding:0}
+.field legend{margin-bottom:10px}
+.field .opt{font-weight:400;color:var(--ink-3)}
+.in{width:100%;min-height:52px;padding:14px 16px;border-radius:16px;border:0;background:#fff;box-shadow:inset 0 0 0 1px var(--line-2),0 1px 2px rgba(26,25,24,.04);font-size:16px;outline:none;transition:box-shadow .3s var(--ease)}
+.in:hover{box-shadow:inset 0 0 0 1px rgba(26,25,24,.26),0 1px 2px rgba(26,25,24,.04)}
+textarea.in{min-height:132px;resize:vertical;line-height:1.5}
+.in::placeholder{color:#76716B}
+.in:focus-visible{box-shadow:inset 0 0 0 1.5px var(--lagoon),0 0 0 4px rgba(15,93,107,.12)}
+.in[aria-invalid="true"]{box-shadow:inset 0 0 0 1.5px #A3352A,0 0 0 4px rgba(163,53,42,.08)}
+.f-err{font-size:13px;color:#A3352A}
+.f-err:empty{display:none}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{position:relative}
+.pill input{position:absolute;opacity:0;width:1px;height:1px}
+.pill span{position:relative;display:inline-flex;align-items:center;min-height:40px;padding:8px 15px;border-radius:999px;font-size:14px;font-weight:500;background:#fff;box-shadow:inset 0 0 0 1px var(--line-2);cursor:pointer;isolation:isolate;transition:color .3s var(--ease),transform .3s var(--ease)}
+.pill span:hover{box-shadow:inset 0 0 0 1px rgba(26,25,24,.28)}
+.pill span:active{transform:scale(.97)}
+.pill span::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--ink);opacity:0;z-index:-1;transition:opacity .3s var(--ease)}
+.pill input:checked+span{color:var(--cream)}
+.pill input:checked+span::before{opacity:1}
+.pill input:focus-visible+span{outline:2px solid var(--lagoon);outline-offset:3px}
+fieldset[data-invalid] .pill span{box-shadow:inset 0 0 0 1.5px #A3352A}
+.form .btn{justify-self:start;margin-top:4px}
+.f-done{display:grid;align-content:center;justify-items:start;gap:14px;min-height:320px;outline:none}
+.f-done[hidden]{display:none}
+.done-ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--lagoon);color:var(--cream);box-shadow:0 0 0 8px rgba(15,93,107,.1),0 14px 28px -12px rgba(15,93,107,.6)}
+.done-ic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.f-done h3{font-family:var(--f-title);font-weight:600;font-size:40px;line-height:1;letter-spacing:-.02em;margin-top:8px}
+.f-done p{color:var(--ink-2);max-width:34ch}
+.link-btn{border:0;background:none;padding:0;font-size:14px;font-weight:550;color:var(--lagoon);cursor:pointer;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+
+/* ---------- Créateur : vidéo ---------- */
+.vid .core{display:flex;flex-direction:column}
+.vid-media{display:block;aspect-ratio:16/9;background:#C9B9A6}
+.vid-media img{width:100%;height:100%;object-fit:cover}
+.play{position:absolute;left:clamp(16px,3vw,28px);bottom:clamp(16px,3vw,28px);display:grid;place-items:center;width:clamp(58px,6vw,72px);height:clamp(58px,6vw,72px);border-radius:50%;transition:transform .35s var(--ease)}
+.play svg{width:24px;height:24px;fill:var(--cream);margin-left:3px}
+@media (hover:hover){.lift:hover .play{transform:scale(1.06);transition-duration:.9s}}
+.glass{background:rgba(28,27,26,.42);-webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);color:var(--cream)}
+.vid-info{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 28px;padding:24px 26px 26px}
+.vid-info h3{font-size:clamp(20px,1.9vw,26px);font-weight:600;line-height:1.25;letter-spacing:-.015em;max-width:26ch;margin-top:8px}
+.vid-info .meta{font-size:13.5px;color:var(--ink-3)}
+.vlist .core{display:flex;flex-direction:column;padding:26px 14px 14px}
+.vlist .k{padding:0 12px}
+.vlist ul{display:grid;gap:4px;margin-top:14px}
+.vrow{position:relative;display:flex;align-items:center;gap:14px;padding:14px 12px;border-radius:18px;isolation:isolate;transition:transform .3s var(--ease)}
+.vrow::before{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(26,25,24,.045);opacity:0;z-index:-1;transition:opacity .3s var(--ease)}
+.vrow:hover::before{opacity:1;transition-duration:.6s}
+.vrow:active{transform:scale(.985)}
+.vrow-ic{flex:none;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#F3EEE6;color:var(--ink)}
+.vrow-ic svg{width:16px;height:16px;fill:currentColor;margin-left:2px}
+.vrow-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.vrow-t b{font-size:15px;font-weight:600;line-height:1.3}
+.vrow-t small{font-size:13px;color:var(--ink-3)}
+.vrow .arr{margin-left:auto;flex:none;color:var(--ink-3);transition:transform .35s var(--ease)}
+.vrow:hover .arr{transform:translate(2px,-2px);transition-duration:.7s}
+.vlist .note{margin-top:auto;padding:16px 12px 6px;font-size:13px;color:var(--ink-3)}
+
+/* ---------- Créateur : chiffres ---------- */
+.num-card .core{display:flex;flex-direction:column;padding:28px;min-height:250px}
+.num{font-family:var(--f-title);font-weight:600;font-size:clamp(54px,5.8vw,92px);line-height:.9;letter-spacing:-.035em}
+.num-l{font-size:16px;color:var(--ink);margin-top:14px;font-weight:500}
+.num-d{font-size:13px;color:var(--ink-3);margin-top:auto;padding-top:18px}
+.slot{display:inline-flex;overflow:hidden;vertical-align:bottom;padding:.06em .02em .1em;margin:-.06em -.02em -.1em}
+.slot>span{display:inline-block;white-space:pre}
+.num-photo .core{min-height:520px;background:#C59C6B}
+.num-photo .media{position:absolute;inset:0}
+.num-photo .media img{width:100%;height:100%;object-fit:cover;object-position:50% 60%}
+.np-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(0deg,rgba(18,16,14,.5) 0%,rgba(18,16,14,0) 55%)}
+.np-panel{position:absolute;left:clamp(14px,2.4vw,24px);bottom:clamp(14px,2.4vw,24px);z-index:2;padding:22px 26px 24px;border-radius:22px;max-width:min(380px,calc(100% - 28px))}
+.np-panel .k{color:rgba(244,239,230,.82)}
+.np-panel .num{font-size:clamp(56px,6.6vw,104px);margin-top:12px}
+.np-panel p:last-child{font-size:15px;color:rgba(244,239,230,.9);margin-top:12px}
+.countries{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.num-card .go{align-self:flex-start;margin-top:18px;position:relative;z-index:2}
+
+/* ---------- Créateur : destinations ---------- */
+.dest{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.dest .shell{display:block;padding:5px;border-radius:24px}
+.dest .core{display:block;border-radius:19px;padding:0 0 4px}
+.dest .media{display:block;aspect-ratio:16/9;border-radius:19px 19px 14px 14px;background:#CDBFAE}
+.dest .media img{width:100%;height:100%;object-fit:cover}
+.dest-lab{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 10px 10px 14px}
+.dest-lab b{font-family:var(--f-title);font-weight:600;font-size:23px;line-height:1;letter-spacing:-.01em}
+.dest-lab small{display:block;font-size:12.5px;color:var(--ink-3);margin-top:4px}
+.dest-lab .ic{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(26,25,24,.05);transition:transform .35s var(--ease)}
+.dest-lab .i{width:14px;height:14px}
+@media (hover:hover){.lift:hover .dest-lab .ic{transform:translate(2px,-2px);transition-duration:.7s}}
+
+/* ---------- Créateur : guides ---------- */
+.guide .core{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;padding:clamp(28px,4.4vw,60px);min-height:420px;background:radial-gradient(60% 70% at 100% 100%,rgba(232,211,185,.45),rgba(232,211,185,0) 70%),linear-gradient(180deg,#FFFFFF 0%,#FBF8F3 100%)}
+.g-txt{display:flex;flex-direction:column;align-items:flex-start}
+.g-txt h3{font-size:clamp(24px,2.4vw,32px);font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-top:18px;max-width:18ch}
+.g-txt p{font-size:16px;color:var(--ink-2);margin-top:12px;max-width:36ch}
+.g-txt .btn{margin-top:auto}
+.g-txt .soon{font-size:13.5px;color:var(--ink-3);margin:16px 0 28px}
+.live-chip i{width:7px;height:7px;border-radius:50%;background:var(--lagoon)}
+.g-vis{position:relative;min-height:340px}
+.booklet{position:absolute;top:50%;left:50%;width:min(280px,78%);border-radius:20px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 2px 4px rgba(26,25,24,.04),0 30px 60px -26px rgba(26,25,24,.4);transition:transform .5s var(--ease)}
+.b-front{transform:translate(-56%,-50%) rotate(-3deg);z-index:2;padding:10px}
+.b-front img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:12px}
+.bk-body{padding:16px 10px 8px}
+.bk-k{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.bk-t{font-family:var(--f-title);font-weight:600;font-size:44px;line-height:.95;letter-spacing:-.02em;margin-top:8px}
+.bk-s{font-family:var(--f-word);font-style:italic;font-size:22px;color:var(--lagoon);margin-top:2px}
+.b-back{transform:translate(-36%,-46%) rotate(5deg);z-index:1;height:300px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;background:#F4ECE0}
+.b-back .bk-t{font-size:30px;color:var(--ink-2)}
+@media (hover:hover){
+  .guide:hover .b-front{transform:translate(-58%,-52%) rotate(-1.5deg);transition-duration:.9s}
+  .guide:hover .b-back{transform:translate(-30%,-46%) rotate(7deg);transition-duration:.9s}
+}
+
+/* ---------- Créateur : k15ze ---------- */
+.k15 .core{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);min-height:560px}
+.k15-media{min-height:320px;background:#2A2B2E}
+.k15-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 36%}
+.k15-txt{display:flex;flex-direction:column;align-items:flex-start;padding:clamp(28px,4.4vw,60px)}
+.k15-name{font-family:var(--f-title);font-weight:600;font-size:clamp(48px,5vw,72px);line-height:.9;letter-spacing:-.03em}
+.k15-txt .lead{max-width:30ch;margin-top:18px}
+.k15-txt .countries{margin-top:22px}
+.k15-mini{display:flex;align-items:center;gap:16px;margin-top:auto;padding-top:30px}
+.k15-mini img{width:150px;height:100px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 1px rgba(26,25,24,.06),0 12px 24px -12px rgba(26,25,24,.35)}
+.k15-mini figcaption{font-size:14px;color:var(--ink-3);max-width:18ch}
+.k15-txt .btn{margin-top:26px}
+
+/* ---------- Créateur : lien en bio ---------- */
+.bio-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:44px clamp(40px,7vw,120px)}
+.bio-grid .lead{max-width:30ch}
+.phone{width:min(360px,100%);justify-self:center}
+.phone-frame{padding:10px;border-radius:54px;background:linear-gradient(150deg,#34312E 0%,#141312 60%,#1F1D1B 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.14),0 2px 4px rgba(26,25,24,.12),0 40px 80px -30px rgba(26,25,24,.5),0 14px 28px -14px rgba(26,25,24,.3);transition:transform .35s var(--ease)}
+@media (hover:hover){.phone:hover .phone-frame{transform:translateY(-6px);transition-duration:.9s}}
+.phone-screen{position:relative;overflow:hidden;border-radius:44px;padding:58px 18px 28px;background:radial-gradient(90% 50% at 50% 0%,#FBF4EA 0%,rgba(251,244,234,0) 70%),linear-gradient(180deg,#F3E6D5 0%,#EAD8C1 100%)}
+.phone-screen::before{content:"";position:absolute;inset:0;opacity:.06;background-image:var(--noise);background-size:180px 180px;pointer-events:none}
+.island{position:absolute;top:14px;left:50%;width:96px;height:28px;margin-left:-48px;border-radius:999px;background:#141312}
+.bio{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center}
+.bio-av{width:92px;height:92px;border-radius:50%;object-fit:cover;object-position:50% 30%;box-shadow:0 0 0 4px rgba(255,255,255,.85),0 12px 24px -10px rgba(26,25,24,.4)}
+.bio-name{font-family:var(--f-title);font-weight:600;font-size:30px;line-height:1;margin-top:16px}
+.bio-sub{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+.bio-links{display:grid;gap:9px;width:100%;margin-top:22px}
+.bl{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border-radius:18px;text-align:left;background:rgba(255,255,255,.82);box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 1px 2px rgba(26,25,24,.05),0 8px 18px -12px rgba(26,25,24,.3);transition:transform .35s var(--ease)}
+.bl:hover{transform:translateY(-2px);transition-duration:.8s}
+.bl:active{transform:scale(.98);transition-duration:.12s}
+.bl-ic{flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#F4EDE3;color:var(--ink)}
+.bl-ic .i{width:17px;height:17px;stroke-width:1.5}
+.bl-t{display:flex;flex-direction:column;min-width:0;line-height:1.25}
+.bl-t b{font-size:14.5px;font-weight:600}
+.bl-t small{font-size:12.5px;color:var(--ink-2)}
+.bl .arr{margin-left:auto;flex:none;color:var(--ink-3);transition:transform .35s var(--ease)}
+.bl:hover .arr{transform:translate(2px,-2px);transition-duration:.7s}
+
+/* ---------- Pied de page + seconde porte ---------- */
+.foot{padding:clamp(16px,3vw,40px) 0 max(28px,env(safe-area-inset-bottom))}
+.foot .core{padding:clamp(28px,4.6vw,64px)}
+.foot-top{display:flex;align-items:flex-end;justify-content:space-between;gap:28px 40px;flex-wrap:wrap}
+.foot-word{font-family:var(--f-title);font-weight:600;font-size:clamp(88px,17vw,248px);line-height:.78;letter-spacing:-.045em}
+.door{position:relative;display:block;width:min(360px,100%);margin-bottom:8px;padding:5px;border:0;border-radius:22px 8px 22px 22px;background:rgba(255,255,255,.62);text-align:left;cursor:pointer;--s:12px;
+  box-shadow:0 0 0 1px rgba(26,25,24,.05),0 2px 4px -1px rgba(26,25,24,.05),0 18px 36px -16px rgba(26,25,24,.22);
+  -webkit-clip-path:polygon(-20% -60%,calc(100% - var(--s)) -60%,calc(100% - var(--s)) 0,100% var(--s),120% var(--s),120% 180%,-20% 180%);
+  clip-path:polygon(-20% -60%,calc(100% - var(--s)) -60%,calc(100% - var(--s)) 0,100% var(--s),120% var(--s),120% 180%,-20% 180%);
+  transition:--s .4s var(--ease),transform .35s var(--ease)}
+.door-core{display:flex;align-items:center;gap:14px;padding:14px 22px 14px 14px;border-radius:17px 4px 17px 17px;background:linear-gradient(180deg,#FFFFFF 0%,#FBFAF8 100%);box-shadow:inset 0 0 0 1px rgba(26,25,24,.05)}
+.door-av{flex:none;width:52px;height:52px;border-radius:50%;background-size:250% auto;background-repeat:no-repeat;box-shadow:0 0 0 3px #fff,0 6px 14px -6px rgba(26,25,24,.35)}
+.door-t{font-size:16px;font-weight:500;line-height:1.35;color:var(--ink)}
+.door-t .it{font-size:1.12em}
+.door .ear{width:var(--s);height:var(--s)}
+.door:hover{--s:26px;transform:translateY(-3px);transition-duration:.8s,.9s}
+.door:hover .ear-i{transform:perspective(100px) rotate3d(1,1,0,18deg);transition-duration:.8s}
+.door:active{transform:scale(.985);transition-duration:.12s}
+.door:focus-visible{outline:none;--s:26px}
+.door:focus-visible .door-core{box-shadow:inset 0 0 0 2px var(--lagoon)}
+.foot-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px;margin-top:clamp(32px,4.4vw,56px);padding-top:24px;border-top:1px solid var(--line)}
+.foot-links{display:flex;flex-wrap:wrap;gap:6px 22px}
+.foot-links a{font-size:15px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;transition:color .3s var(--ease),transform .3s var(--ease)}
+.foot-links a:hover{color:var(--ink);transform:translateY(-1px)}
+.foot-legal{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--ink-3)}
+.foot-legal img{width:26px;height:26px;filter:brightness(0);opacity:.7}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){.nav{display:none}}
+@media (max-width:1023px){
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .c-8,.c-7,.c-12{grid-column:span 2}
+  .c-3,.c-4,.c-5,.c-6{grid-column:span 1}
+  .bento .c-sum,.bento .t-2{grid-column:span 2}
+  .bento .t-1{grid-column:span 1}
+  .r-2{grid-row:auto}
+  .num-photo .core{min-height:440px}
+  .dest{grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:40%;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 2px 18px;margin:-8px -2px -18px;scrollbar-width:none}
+  .dest::-webkit-scrollbar{display:none}
+  .dest>li{scroll-snap-align:start}
+  .app-wide .media{min-height:0;flex:none;aspect-ratio:1000/640}
+  .app-wide .media img{width:100%}
+}
+@media (max-width:899px){
+  .hero{padding-top:calc(64px + 18px)}
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:30px}
+  .stage{order:-1;justify-self:center;--W:clamp(220px,min(300px,calc(100vw - 110px),calc((100svh - 330px) / 1.98)),300px)}
+  .htexts{padding-bottom:0}
+  .h1{margin-top:18px}
+  .sec-head{grid-template-columns:minmax(0,1fr)}
+  .flow{grid-template-columns:minmax(0,1fr)}
+  .step{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:0 0 28px}
+  .step:last-child{padding-bottom:0}
+  .step-txt h3{margin-top:6px}
+  .conn{top:66px;bottom:8px;left:27.5px;right:auto;width:1px;height:auto}
+  .conn i{transform-origin:50% 0;transform:scaleY(var(--p,1))}
+  .agents-foot{grid-template-columns:minmax(0,1fr)}
+  .sw .core,.k15 .core,.form-card .core,.guide .core{grid-template-columns:minmax(0,1fr)}
+  .sw-media{aspect-ratio:4/3;min-height:0}
+  .k15-media{aspect-ratio:4/3;min-height:0}
+  .bio-grid{grid-template-columns:minmax(0,1fr)}
+  .ear-cap{font-size:17px}
+  .hcap{gap:10px}
+  .hcap-stack img:nth-child(n+4){display:none}
+  .hcap-t b,.hcap-t small{white-space:nowrap}
+}
+@media (max-width:639px){
+  .bento{grid-template-columns:minmax(0,1fr)}
+  .bento>*{grid-column:auto!important}
+  .brand{font-size:24px}
+  .bar .btn{padding-left:15px;font-size:13.5px;gap:10px}
+  .app .core{padding:22px 20px 0}
+  .app-wide .media{margin:20px -20px 0}
+  .offer .core{padding:24px;min-height:0}
+  .o-shot{margin:24px -24px -24px 0}
+  .dest{grid-auto-columns:76%}
+  .g-vis{min-height:300px}
+  .b-front{transform:translate(-50%,-50%)}
+  .b-back{transform:translate(-44%,-50%)}
+  .np-panel{padding:18px 20px 20px}
+  .foot-top{flex-direction:column;align-items:flex-start}
+  .ctas .btn{min-height:48px}
+}
+@media (max-width:380px){.brand img{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .lift:hover .shell,.stage:hover .hcard,.stage:hover .pmove,.phone:hover .phone-frame,.door:hover{transform:none!important}
+}
+
+/* Intro : états initiaux seulement si GSAP est chargé (classe retirée en fin d'intro ou après 3 s) */
+.anim [data-intro],.anim .htext .w,.anim .htext [data-hx],.anim .hcap,.anim .pimg{opacity:0}
+</style>
+</head>
+<body>
+<span class="kz-anchor" id="pro"></span><span class="kz-anchor" id="createur"></span>
+<a class="skip" href="#main">Aller au contenu</a>
+<div class="ambient ambient-pro" aria-hidden="true"></div>
+<div class="ambient ambient-moi" aria-hidden="true"></div>
+<p class="sr-only" id="kz-live" aria-live="polite"></p>
+
+<header class="top">
+  <div class="wrap bar" data-intro>
+    <a class="brand" href="#top" aria-label="Kenz, retour en haut"><img src="assets/img/logo-kz.webp" alt="" width="1024" height="1024">Kenz</a>
+    <nav class="nav" aria-label="Sections">
+      <ul data-only="pro">
+        <li><a href="#apps">Apps</a></li>
+        <li><a href="#agents">Agents IA</a></li>
+        <li><a href="#offres">Offres</a></li>
+        <li><a href="#distinction">Distinction</a></li>
+      </ul>
+      <ul data-only="createur">
+        <li><a href="#derniere">Vidéos</a></li>
+        <li><a href="#chiffres">Chiffres</a></li>
+        <li><a href="#destinations">Destinations</a></li>
+        <li><a href="#guides">Guides</a></li>
+        <li><a href="#k15ze">k15ze</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-ink" data-only="pro" href="#contact">Contact<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+    <a class="btn btn-ink" data-only="createur" href="#marques">Travaillons ensemble<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============ HERO : « La carte » ============ -->
+  <section class="hero" id="top" aria-label="Présentation">
+    <div class="wrap hero-grid">
+      <div class="htexts">
+        <div class="htext" data-only="pro">
+          <p class="eyebrow" data-hx>AI engineer · Développeur fullstack · Solopreneur</p>
+          <h1 class="h1"><span class="w">L’IA,</span> <span class="w">au</span><br><span class="w"><span class="it">travail</span>.</span></h1>
+          <p class="lead" data-hx>Je construis des apps où l’IA fait le vrai travail. Et j’installe des agents IA dans votre équipe.</p>
+          <div class="ctas" data-hx>
+            <a class="btn btn-ink" href="#contact">Parlons de votre projet<span class="ic ic-red"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <a class="btn btn-ghost" href="#apps">Voir les apps<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></a>
+          </div>
+          <p class="live" data-hx><i aria-hidden="true"></i><span>Oshii et Wado mis à jour <time datetime="2026-11-04" data-rel>le 04/11</time></span></p>
+        </div>
+        <div class="htext" data-only="createur">
+          <p class="eyebrow" data-hx>Kenz en Asie · k15ze</p>
+          <h1 class="h1"><span class="w">L’Asie,</span> <span class="w">en</span><br><span class="w"><span class="it">vrai</span>.</span></h1>
+          <p class="lead" data-hx>Je voyage en Asie et je raconte ce que ça coûte vraiment.</p>
+          <div class="ctas" data-hx>
+            <a class="btn btn-ink" href="#derniere">Voir la dernière vidéo<span class="ic ic-red"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <a class="btn btn-ghost" href="#marques">Travaillons ensemble<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></a>
+          </div>
+          <p class="live" data-hx><i aria-hidden="true"></i><span>Dernière vidéo <time datetime="2026-10-31" data-rel>le 31/10</time> · Short <time datetime="2026-11-07" data-rel>le 07/11</time></span></p>
+        </div>
+      </div>
+
+      <div class="stage" data-intro>
+        <span class="ground" aria-hidden="true"></span>
+        <div class="flip">
+          <!-- Face Pro (brume froide) -->
+          <div class="face face-pro" data-face="pro">
+            <div class="hcard">
+              <div class="hcore">
+                <div class="hbg hbg-pro"></div>
+                <div class="hgrain"></div>
+                <div class="p-in"><div class="pmove">
+                  <img class="pimg" src="assets/img/kenz-pro.webp" alt="Portrait de Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920" fetchpriority="high" decoding="async" draggable="false">
+                </div></div>
+                <a class="hcap" href="#apps">
+                  <span class="hcap-stack" aria-hidden="true">
+                    <img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320">
+                    <img src="assets/apps/sago-icone.jpg" alt="" width="320" height="320">
+                    <img src="assets/apps/wado-icone.jpg" alt="" width="320" height="320">
+                    <img src="assets/apps/croc-icone.jpg" alt="" width="320" height="320">
+                  </span>
+                  <span class="hcap-t"><b>Six apps</b><small>sur l’App Store</small></span>
+                  <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+                </a>
+              </div>
+              <div class="p-out" aria-hidden="true"><div class="pmove">
+                <img class="pimg" src="assets/img/kenz-pro.webp" alt="" width="1080" height="1920" decoding="async" draggable="false">
+              </div></div>
+              <span class="ear" aria-hidden="true"><span class="ear-i"></span></span>
+            </div>
+            <span class="ear-cap" aria-hidden="true">retourner<svg viewBox="0 0 18 36"><path d="M2 3c8 1 12 9 11 26"/><path d="M8.5 24.5 13 30l3.8-5.6"/></svg></span>
+            <button class="ear-btn" type="button" aria-label="Retourner la carte : il existe une autre version de moi"></button>
+          </div>
+          <!-- Face Créateur (sable chaud) -->
+          <div class="face face-moi" data-face="createur">
+            <div class="hcard">
+              <div class="hcore">
+                <div class="hbg hbg-moi"></div>
+                <div class="hgrain"></div>
+                <div class="p-in"><div class="pmove">
+                  <img class="pimg" src="assets/img/kenz-moi.webp" alt="Portrait de Kenz en t-shirt vert anis, regard de côté" width="1080" height="1920" decoding="async" draggable="false">
+                </div></div>
+                <a class="hcap" href="#chiffres">
+                  <span class="hcap-stack round" aria-hidden="true">
+                    <img src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900">
+                    <img src="assets/img/video-chine.jpg" alt="" width="960" height="540">
+                    <img src="assets/img/video-japon.jpg" alt="" width="960" height="540">
+                  </span>
+                  <span class="hcap-t"><b>≈&#8239;28&#8239;000 abonnés</b><small>sur TikTok</small></span>
+                  <span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+                </a>
+              </div>
+              <div class="p-out" aria-hidden="true"><div class="pmove">
+                <img class="pimg" src="assets/img/kenz-moi.webp" alt="" width="1080" height="1920" decoding="async" draggable="false">
+              </div></div>
+              <span class="ear" aria-hidden="true"><span class="ear-i"></span></span>
+            </div>
+            <span class="ear-cap" aria-hidden="true">retourner<svg viewBox="0 0 18 36"><path d="M2 3c8 1 12 9 11 26"/><path d="M8.5 24.5 13 30l3.8-5.6"/></svg></span>
+            <button class="ear-btn" type="button" aria-label="Retourner la carte : il existe une autre version de moi"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRO : APPS ============ -->
+  <section class="sec" id="apps" data-only="pro" aria-labelledby="t-apps">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Six apps sur l’App Store</p>
+          <h2 class="h2" id="t-apps" data-reveal="title">Conçues, codées, <span class="it">lancées</span>.</h2>
+        </div>
+        <p data-reveal="fade">Seul, de l’idée au store. Elles sont en ligne&#8239;: vous pouvez les essayer dès maintenant.</p>
+      </div>
+
+      <div class="bento">
+        <article class="card lift app app-wide app--wado c-8" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Wado</h3><p class="app-meta">iOS · v1.1.1</p></div>
+            </div>
+            <p class="app-line" data-in>Une photo de ton plat devient des macros. La muscu suit le même plan.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/us/app/wado-calories-ia-muscu/id6813179120" target="_blank" rel="noopener" aria-label="Wado sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="app-more" href="https://wado-lilac.vercel.app" target="_blank" rel="noopener">Le site</a>
+            </div>
+            <div class="media">
+              <img src="assets/apps/wado-ecran-1.jpg" alt="Capture App Store de Wado sur iPad : « Muscu et calories, un seul plan », journée avec repas et séance" width="1000" height="703" decoding="async">
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app app-tall app--oshii c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Oshii</h3><p class="app-meta">iOS + Android · v2.0.2</p></div>
+            </div>
+            <p class="app-line" data-in>Une vidéo TikTok, Instagram ou YouTube Shorts devient une recette pesée, prête à cuisiner.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905" target="_blank" rel="noopener" aria-label="Oshii sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="app-more" href="https://play.google.com/store/apps/details?id=com.x7kenz.Oshii" target="_blank" rel="noopener">Google Play</a>
+              <a class="app-more" href="https://oshii.fr" target="_blank" rel="noopener">oshii.fr</a>
+            </div>
+            <div class="shots">
+              <div class="shot media"><img src="assets/apps/oshii-ecran-1.jpg" alt="Capture d’Oshii : « Transforme tes recettes »" width="462" height="1000" decoding="async"></div>
+              <div class="shot media"><img src="assets/apps/oshii-ecran-2.jpg" alt="Capture d’Oshii : une recette avec ses macros, « Tous les détails »" width="462" height="1000" decoding="async"></div>
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app app-tall app--sago c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Sago</h3><p class="app-meta">iPhone et iPad · v2.0.1</p></div>
+            </div>
+            <p class="app-line" data-in>Apprendre le japonais par l’image. «&#8239;Là, tu ne comprends rien. 15 minutes plus tard&#8239;: maintenant, tu comprends.&#8239;» 180 épisodes en saison 1.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/fr/app/sago-apprendre-le-japonais/id6759610780" target="_blank" rel="noopener" aria-label="Sago sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="app-more" href="https://sago-landing.vercel.app" target="_blank" rel="noopener">Le site</a>
+            </div>
+            <div class="shots">
+              <div class="shot media"><img src="assets/apps/sago-ecran-1.jpg" alt="Capture de Sago : une scène d’anime sous-titrée en japonais" width="460" height="1000" decoding="async"></div>
+              <div class="shot media"><img src="assets/apps/sago-ecran-2.jpg" alt="Capture de Sago : l’épisode « Un matin sans voix »" width="460" height="1000" decoding="async"></div>
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app app-wide app--croc c-8" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Croc</h3><p class="app-meta">iOS · v1.2.1</p></div>
+            </div>
+            <p class="app-line" data-in>Un petit pacte chaque jour&#8239;: ouvert le matin, validé le soir.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/app/croc-stop-ongles-rong%C3%A9s/id6801541157" target="_blank" rel="noopener" aria-label="Croc sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="app-more" href="https://croc-snowy.vercel.app" target="_blank" rel="noopener">Le site</a>
+            </div>
+            <div class="media">
+              <img src="assets/apps/croc-ecran-1.jpg" alt="Capture App Store de Croc sur iPad : « Arrête de te ronger les ongles », série de jours tenus et mascotte violette" width="1000" height="687" decoding="async">
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app app-tall app-row3 app--miru c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Miru</h3><p class="app-meta">iOS + web · v2.0</p></div>
+            </div>
+            <p class="app-line" data-in>Des jeux de soirée entre amis&#8239;: un thème inventé devient un jeu généré en direct. 9 jeux en V2.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/us/app/miru-jeux-entre-amis/id6761622088" target="_blank" rel="noopener" aria-label="Miru sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="app-more" href="https://v0-miru-website.vercel.app" target="_blank" rel="noopener">Version web</a>
+            </div>
+            <div class="shots one">
+              <div class="shot media"><img src="assets/apps/miru-ecran-1.jpg" alt="Capture de Miru : le salon d’une partie avec son code et les joueurs" width="462" height="1000" decoding="async"></div>
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app app-tall app-row3 app--zenko c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="app-head" data-in>
+              <img class="ico" src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <div><h3 class="app-name">Zenko</h3><p class="app-meta">iOS · v1.0</p></div>
+            </div>
+            <p class="app-line" data-in>Des programmes quotidiens selon tes envies et ton budget.</p>
+            <div class="app-links" data-in>
+              <a class="go stretch" href="https://apps.apple.com/ch/app/zenko/id6753706200" target="_blank" rel="noopener" aria-label="Zenko sur l’App Store">App Store<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+            </div>
+            <div class="shots one">
+              <div class="shot media"><img src="assets/apps/zenko-ecran-1.jpg" alt="Capture de Zenko : mes dernières journées et mes voyages" width="462" height="1000" decoding="async"></div>
+            </div>
+          </div></div>
+        </article>
+
+        <article class="card lift app-sum app-row3 c-4 c-sum" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="sum-n" data-in>6</p>
+            <p class="sum-t" data-in>apps sur l’App Store, conçues, codées et lancées seul.</p>
+            <div class="sum-icons" aria-hidden="true">
+              <img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <img src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <img src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <img src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <img src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" decoding="async">
+              <img src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" decoding="async">
+            </div>
+            <a class="go" href="https://play.google.com/store/apps/details?id=com.x7kenz.Oshii" target="_blank" rel="noopener">Oshii aussi sur Google Play<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRO : AGENTS IA ============ -->
+  <section class="sec" id="agents" data-only="pro" aria-labelledby="t-agents">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Agents IA pour votre équipe</p>
+          <h2 class="h2" id="t-agents" data-reveal="title">Une vraie <span class="it">équipe</span>.</h2>
+        </div>
+        <p data-reveal="fade">Je mets en place des équipes d’agents IA qui travaillent comme une vraie équipe&#8239;: chacun son rôle, une mémoire commune, et rien ne part sans votre validation.</p>
+      </div>
+
+      <article class="card agents" data-reveal="card">
+        <div class="shell"><div class="core">
+          <ol class="flow" data-flow aria-label="Comment ça marche, en quatre idées">
+            <li class="step">
+              <span class="node" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="3.6" r="1.3"/><circle cx="20.4" cy="12" r="1.3"/><circle cx="12" cy="20.4" r="1.3"/><circle cx="3.6" cy="12" r="1.3"/><path d="M12 5.2v3.4M18.8 12h-3.4M12 18.8v-3.4M5.2 12h3.4"/></svg>
+                <span class="node-lit"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="3.6" r="1.3"/><circle cx="20.4" cy="12" r="1.3"/><circle cx="12" cy="20.4" r="1.3"/><circle cx="3.6" cy="12" r="1.3"/><path d="M12 5.2v3.4M18.8 12h-3.4M12 18.8v-3.4M5.2 12h3.4"/></svg></span>
+              </span>
+              <span class="conn" aria-hidden="true"><i></i></span>
+              <div class="step-txt"><h3>Un coordinateur</h3><p>Hermes sait où en est chaque dossier.</p></div>
+            </li>
+            <li class="step">
+              <span class="node" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="8.5" y="13.5" width="7" height="7" rx="2"/></svg>
+                <span class="node-lit"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="8.5" y="13.5" width="7" height="7" rx="2"/></svg></span>
+              </span>
+              <span class="conn" aria-hidden="true"><i></i></span>
+              <div class="step-txt"><h3>Chacun son rôle</h3><p>Des agents aux missions bien séparées.</p></div>
+            </li>
+            <li class="step">
+              <span class="node" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 5.5A2 2 0 0 1 7 3.5h11.5v14H7a2 2 0 0 0-2 2z"/><path d="M5 19.5a2 2 0 0 0 2 2h11.5v-4M9 8h6M9 11h4"/></svg>
+                <span class="node-lit"><svg viewBox="0 0 24 24"><path d="M5 5.5A2 2 0 0 1 7 3.5h11.5v14H7a2 2 0 0 0-2 2z"/><path d="M5 19.5a2 2 0 0 0 2 2h11.5v-4M9 8h6M9 11h4"/></svg></span>
+              </span>
+              <span class="conn" aria-hidden="true"><i></i></span>
+              <div class="step-txt"><h3>Une mémoire commune</h3><p>Tout est noté et sourcé.</p></div>
+            </li>
+            <li class="step">
+              <span class="node" aria-hidden="true">
+                <svg viewBox="0 0 24 24" style="opacity:.45"><path d="M5.5 12.5l4.2 4.2L18.5 7.5"/></svg>
+                <span class="node-lit"><svg class="check-svg" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 7.5"/></svg></span>
+              </span>
+              <div class="step-txt"><h3>Vous validez</h3><p>Rien ne part sans votre accord.</p></div>
+            </li>
+          </ol>
+
+          <div class="agents-foot">
+            <div>
+              <p class="k">Ce qu’ils peuvent prendre en charge</p>
+              <ul class="uses">
+                <li>Veille et recherches sourcées</li>
+                <li>Réponses clients et support</li>
+                <li>Production de contenu et de vidéos</li>
+                <li>Back-office et suivi</li>
+                <li>Agents qui codent, avec relecture</li>
+                <li>Mémoire d’équipe&#8239;: plus rien ne se perd</li>
+              </ul>
+            </div>
+            <div>
+              <p class="k">Ce qui le prouve</p>
+              <ul class="proof">
+                <li><b>6</b><span>apps livrées</span></li>
+                <li><b>180</b><span>épisodes en une saison</span></li>
+                <li><b>60+</b><span>vidéos produites</span></li>
+              </ul>
+            </div>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PRO : OFFRES ============ -->
+  <section class="sec" id="offres" data-only="pro" aria-labelledby="t-offres">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Ce que je peux faire pour vous</p>
+          <h2 class="h2" id="t-offres" data-reveal="title">Par où <span class="it">commencer</span>&#8239;?</h2>
+        </div>
+        <p data-reveal="fade">Quatre façons de travailler ensemble. Choisissez-en une, on en parle.</p>
+      </div>
+      <div class="bento">
+        <article class="card lift offer c-7" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div data-in>
+              <h3>Agents IA pour votre équipe</h3>
+              <p>Une équipe d’agents prend en charge le répétitif. Vous gardez la main&#8239;: rien ne part sans votre validation.</p>
+            </div>
+            <a class="go" href="#contact" data-need="agents">En parler<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <div class="o-vis o-pills" aria-hidden="true">
+              <span class="opill" style="--i:0"><i></i>Veille et recherches</span>
+              <span class="opill" style="--i:1"><i></i>Réponses clients</span>
+              <span class="opill" style="--i:2"><i></i>Contenu et vidéos</span>
+              <span class="opill ok" style="--i:3"><svg class="i" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 7.5"/></svg>Vous validez</span>
+            </div>
+          </div></div>
+        </article>
+        <article class="card lift offer c-5" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div data-in>
+              <h3>Intégrer l’IA dans votre produit</h3>
+              <p>L’IA qui fait le vrai travail, au cœur de votre app. Comme dans Wado, où une photo de plat devient des macros.</p>
+            </div>
+            <a class="go" href="#contact" data-need="produit">En parler<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <div class="o-shot media"><img src="assets/apps/wado-ecran-2.jpg" alt="Capture de Wado : « Ton repas en photo, calories comptées », un plat et ses macros" width="1000" height="703" decoding="async"></div>
+          </div></div>
+        </article>
+        <article class="card lift offer c-5" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div data-in>
+              <h3>Votre app, de l’idée au store</h3>
+              <p>Conception, développement, publication. Le chemin que j’ai déjà fait six fois.</p>
+            </div>
+            <a class="go" href="#contact" data-need="app">En parler<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <div class="o-vis o-fan" aria-hidden="true">
+              <img src="assets/apps/zenko-icone.jpg" alt="" style="--i:-2.5" width="320" height="320" decoding="async">
+              <img src="assets/apps/miru-icone.jpg" alt="" style="--i:-1.5" width="320" height="320" decoding="async">
+              <img src="assets/apps/sago-icone.jpg" alt="" style="--i:-.5" width="320" height="320" decoding="async">
+              <img src="assets/apps/oshii-icone.jpg" alt="" style="--i:.5" width="320" height="320" decoding="async">
+              <img src="assets/apps/croc-icone.jpg" alt="" style="--i:1.5" width="320" height="320" decoding="async">
+              <img src="assets/apps/wado-icone.jpg" alt="" style="--i:2.5" width="320" height="320" decoding="async">
+            </div>
+          </div></div>
+        </article>
+        <article class="card lift offer c-7" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div data-in>
+              <h3>Contenu vidéo automatisé pour votre marque</h3>
+              <p>La méthode derrière plus de 60 vidéos produites, mise au service de votre marque.</p>
+            </div>
+            <a class="go" href="#contact" data-need="video">En parler<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+            <div class="o-vis o-thumbs" aria-hidden="true">
+              <img src="assets/img/video-japon.jpg" alt="" style="--i:0" width="960" height="540" decoding="async">
+              <img src="assets/img/video-coree.jpg" alt="" style="--i:1" width="960" height="540" decoding="async">
+              <img src="assets/img/video-islande.jpg" alt="" style="--i:2" width="960" height="540" decoding="async">
+            </div>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRO : STARTUP WEEKEND ============ -->
+  <section class="sec" id="distinction" data-only="pro" aria-labelledby="t-sw">
+    <div class="wrap">
+      <article class="card lift sw" data-reveal="card">
+        <div class="shell"><div class="core">
+          <figure class="sw-media media">
+            <img src="assets/img/startup-weekend-2.jpg" alt="Kenz, bras levés, au moment de l’annonce des résultats du Startup Weekend" width="1200" height="800" decoding="async">
+          </figure>
+          <div class="sw-txt">
+            <p class="eyebrow" data-in>Distinction</p>
+            <h2 class="h2" id="t-sw" data-reveal="title">Première <span class="it">place</span>.</h2>
+            <p class="lead" data-in>Au Startup Weekend&#8239;: 54 h pour concevoir, prototyper et pitcher en équipe.</p>
+            <figure class="sw-mini" data-in>
+              <img src="assets/img/startup-weekend-1.jpg" alt="Remise du prix du Startup Weekend avec l’équipe" width="1200" height="900" decoding="async">
+              <figcaption>La remise du prix, avec l’équipe.</figcaption>
+            </figure>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PRO : CONTACT ============ -->
+  <section class="sec" id="contact" data-only="pro" aria-labelledby="t-contact">
+    <div class="wrap">
+      <article class="card form-card" data-reveal="card">
+        <div class="shell"><div class="core">
+          <div class="form-txt">
+            <p class="eyebrow">Contact</p>
+            <h2 class="h2" id="t-contact" data-reveal="title">Parlons <span class="it">projet</span>.</h2>
+            <p class="lead">Dites-m’en un peu plus sur votre équipe et votre idée.</p>
+            <div class="sign">
+              <span class="sign-av av-pro" aria-hidden="true"></span>
+              <span><b>Kenz</b><small>AI engineer · Solopreneur</small></span>
+            </div>
+            <div class="links-row">
+              <a class="go" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+              <a class="go" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+            </div>
+          </div>
+          <div>
+            <form class="form" data-form novalidate aria-label="Formulaire de contact">
+              <div class="field">
+                <label for="c-nom">Votre nom</label>
+                <input class="in" id="c-nom" name="nom" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+                <p class="f-err" id="c-nom-err" aria-live="polite"></p>
+              </div>
+              <fieldset class="field" data-req data-msg="Choisissez ce qui vous amène.">
+                <legend>Votre besoin</legend>
+                <div class="pills">
+                  <label class="pill"><input type="radio" name="besoin" value="agents"><span>Agents IA</span></label>
+                  <label class="pill"><input type="radio" name="besoin" value="produit"><span>L’IA dans mon produit</span></label>
+                  <label class="pill"><input type="radio" name="besoin" value="app"><span>Une app</span></label>
+                  <label class="pill"><input type="radio" name="besoin" value="video"><span>Vidéo</span></label>
+                  <label class="pill"><input type="radio" name="besoin" value="autre"><span>Autre</span></label>
+                </div>
+                <p class="f-err" aria-live="polite"></p>
+              </fieldset>
+              <div class="field">
+                <label for="c-msg">Votre message</label>
+                <textarea class="in" id="c-msg" name="message" placeholder="Votre équipe, votre idée, vos délais…" data-min="10" data-msg="Quelques mots de plus, s’il vous plaît (10 caractères minimum)." aria-describedby="c-msg-err"></textarea>
+                <p class="f-err" id="c-msg-err" aria-live="polite"></p>
+              </div>
+              <button class="btn btn-ink" type="submit">Envoyer<span class="ic ic-red"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+            </form>
+            <div class="f-done" hidden tabindex="-1" role="status">
+              <span class="done-ic" aria-hidden="true"><svg class="check-svg" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 7.5"/></svg></span>
+              <h3>Merci.</h3>
+              <p>Votre message est bien noté.</p>
+              <button class="link-btn" type="button" data-again>Écrire un autre message</button>
+            </div>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : DERNIÈRE VIDÉO ============ -->
+  <section class="sec" id="derniere" data-only="createur" aria-labelledby="t-video">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Dernière vidéo</p>
+          <h2 class="h2" id="t-video" data-reveal="title">Direction <span class="it">Chine</span>.</h2>
+        </div>
+        <p data-reveal="fade">Ce qui marche le mieux chez moi&#8239;: le pratique. Le budget, les astuces, tout ce qu’il faut savoir avant de partir.</p>
+      </div>
+      <div class="bento">
+        <article class="card lift vid c-8" data-reveal="card">
+          <div class="shell"><div class="core">
+            <a class="vid-media media" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener" aria-label="Regarder « Premier voyage en Chine : itinéraire de 14 jours » sur YouTube">
+              <img src="assets/img/video-chine-14-jours.jpg" alt="Miniature « 14 jours » : Kenz sur la Grande Muraille de Chine" width="960" height="540" decoding="async">
+              <span class="play glass" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            </a>
+            <div class="vid-info" data-in>
+              <div>
+                <p class="meta">31/10/2026 · <time datetime="2026-10-31" data-rel>le 31/10</time></p>
+                <h3>Premier voyage en Chine&#8239;: itinéraire de 14 jours</h3>
+              </div>
+              <a class="go" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener">Regarder sur YouTube<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+            </div>
+          </div></div>
+        </article>
+        <article class="card vlist c-4 t-2" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="k">À voir aussi</p>
+            <ul>
+              <li><a class="vrow" href="https://www.youtube.com/watch?v=Fp3SsWY28WE" target="_blank" rel="noopener">
+                <span class="vrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+                <span class="vrow-t"><b>Tout savoir pour ton voyage en Malaisie</b><small>24&#8239;671 vues · la plus vue sur YouTube</small></span>
+                <svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="vrow" href="https://www.youtube.com/watch?v=rR6V6H3hFKA" target="_blank" rel="noopener">
+                <span class="vrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+                <span class="vrow-t"><b>15 choses à savoir avant de voyager en Chine</b><small>8&#8239;275 vues</small></span>
+                <svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="vrow" href="https://www.youtube.com/shorts/LRxxde_vebE" target="_blank" rel="noopener">
+                <span class="vrow-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+                <span class="vrow-t"><b>Réparer son iPhone en Chine</b><small>93&#8239;760 vues · Short</small></span>
+                <svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            </ul>
+            <p class="note">La Chine reste en tête de ce que vous regardez.</p>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : CHIFFRES ============ -->
+  <section class="sec" id="chiffres" data-only="createur" aria-labelledby="t-chiffres">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Les chiffres</p>
+          <h2 class="h2" id="t-chiffres" data-reveal="title">Merci à <span class="it">vous</span>.</h2>
+        </div>
+        <p data-reveal="fade">Chaque vue compte. Voici où on en est.</p>
+      </div>
+      <div class="bento">
+        <article class="card lift num-photo c-8 r-2" data-reveal="card">
+          <div class="shell"><div class="core">
+            <div class="media"><img src="assets/img/paysage-kuala-lumpur.jpg" alt="Les tours de Kuala Lumpur et des rizières en terrasses au coucher du soleil" width="1600" height="900" decoding="async"></div>
+            <div class="np-scrim" aria-hidden="true"></div>
+            <div class="np-panel glass">
+              <p class="k">Mon record</p>
+              <p class="num" data-slot>725&#8239;600</p>
+              <p>vues sur une vidéo budget, en Malaisie.</p>
+            </div>
+          </div></div>
+        </article>
+        <article class="card lift num-card c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="num" data-slot>7,83&#8239;M</p>
+            <p class="num-l" data-in>de vues sur TikTok</p>
+            <p class="num-d" data-in>Au 04/11/2026</p>
+          </div></div>
+        </article>
+        <article class="card lift num-card c-4" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="num" data-slot>≈&#8239;28&#8239;000</p>
+            <p class="num-l" data-in>abonnés sur TikTok</p>
+            <p class="num-d" data-in>Au 09/10/2026</p>
+          </div></div>
+        </article>
+        <article class="card lift num-card c-5" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="num" data-slot>1&#8239;530</p>
+            <p class="num-l" data-in>abonnés sur YouTube</p>
+            <a class="go" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">Kenz in Asia<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+            <p class="num-d" data-in>Au 04/11/2026</p>
+          </div></div>
+        </article>
+        <article class="card lift num-card c-7 t-1" data-reveal="card">
+          <div class="shell"><div class="core">
+            <p class="num" data-slot>9</p>
+            <p class="num-l" data-in>pays filmés</p>
+            <ul class="countries" data-in>
+              <li class="chip">Chine</li><li class="chip">Malaisie</li><li class="chip">Corée</li><li class="chip">Japon</li><li class="chip">Islande</li><li class="chip">et d’autres</li>
+            </ul>
+          </div></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : DESTINATIONS ============ -->
+  <section class="sec" id="destinations" data-only="createur" aria-labelledby="t-dest">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Pays filmés</p>
+          <h2 class="h2" id="t-dest" data-reveal="title">Où je <span class="it">filme</span>.</h2>
+        </div>
+        <p data-reveal="fade">Cinq des neuf pays filmés, avec ce que ça coûte vraiment.</p>
+      </div>
+      <ul class="dest">
+        <li class="card lift" data-reveal="card"><a class="shell" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener"><span class="core">
+          <span class="media"><img src="assets/img/video-chine.jpg" alt="Miniature « Chine » : Kenz dans une rue illuminée" width="960" height="540" decoding="async"></span>
+          <span class="dest-lab"><span><b>Chine</b><small>Itinéraire 14 jours</small></span><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span>
+        </span></a></li>
+        <li class="card lift" data-reveal="card"><a class="shell" href="https://www.youtube.com/watch?v=Fp3SsWY28WE" target="_blank" rel="noopener"><span class="core">
+          <span class="media"><img src="assets/img/video-malaisie.jpg" alt="Miniature « Malaisie » : Kenz devant les rizières de Kuala Lumpur" width="960" height="540" decoding="async"></span>
+          <span class="dest-lab"><span><b>Malaisie</b><small>Tout savoir avant de partir</small></span><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span>
+        </span></a></li>
+        <li class="card lift" data-reveal="card"><a class="shell" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener"><span class="core">
+          <span class="media"><img src="assets/img/video-coree.jpg" alt="Miniature « Corée » : Kenz en costume traditionnel à Séoul" width="960" height="540" decoding="async"></span>
+          <span class="dest-lab"><span><b>Corée</b><small>Sur la chaîne</small></span><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span>
+        </span></a></li>
+        <li class="card lift" data-reveal="card"><a class="shell" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener"><span class="core">
+          <span class="media"><img src="assets/img/video-japon.jpg" alt="Miniature illustrée « Japon » : Kenz devant le mont Fuji" width="960" height="540" decoding="async"></span>
+          <span class="dest-lab"><span><b>Japon</b><small>Sur la chaîne</small></span><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span>
+        </span></a></li>
+        <li class="card lift" data-reveal="card"><a class="shell" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener"><span class="core">
+          <span class="media"><img src="assets/img/video-islande.jpg" alt="Miniature « Islande » : Kenz sur une plage de sable noir" width="960" height="540" decoding="async"></span>
+          <span class="dest-lab"><span><b>Islande</b><small>Sur la chaîne</small></span><span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></span>
+        </span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : GUIDES ============ -->
+  <section class="sec" id="guides" data-only="createur" aria-labelledby="t-guides">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Pour les abonnés</p>
+          <h2 class="h2" id="t-guides" data-reveal="title">Partir <span class="it">prêt</span>.</h2>
+        </div>
+      </div>
+      <article class="card lift guide" data-reveal="card">
+        <div class="shell"><div class="core">
+          <div class="g-txt" data-in>
+            <span class="chip live-chip"><i aria-hidden="true"></i>En ligne</span>
+            <h3>L’itinéraire Chine, 14 jours</h3>
+            <p>Le parcours de ma dernière vidéo, à garder sous la main pendant le voyage.</p>
+            <p class="soon">D’autres guides arrivent bientôt.</p>
+            <a class="btn btn-ghost" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener">Ouvrir l’itinéraire<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+          </div>
+          <div class="g-vis" aria-hidden="true">
+            <div class="booklet b-back"><p class="bk-k">Bientôt</p><p class="bk-t">D’autres guides</p></div>
+            <div class="booklet b-front">
+              <img src="assets/img/video-chine-14-jours.jpg" alt="" width="960" height="540" decoding="async">
+              <div class="bk-body"><p class="bk-k">Itinéraire</p><p class="bk-t">Chine</p><p class="bk-s">14 jours</p></div>
+            </div>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : K15ZE ============ -->
+  <section class="sec" id="k15ze" data-only="createur" aria-labelledby="t-k15">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">k15ze</p>
+          <h2 class="h2" id="t-k15" data-reveal="title">Le <span class="it">sport</span>, aussi.</h2>
+        </div>
+      </div>
+      <article class="card lift k15" data-reveal="card">
+        <div class="shell"><div class="core">
+          <figure class="k15-media media"><img src="assets/img/hyrox-2.jpg" alt="Kenz pousse un traîneau pendant sa course HYROX" width="733" height="1100" decoding="async"></figure>
+          <div class="k15-txt">
+            <p class="k15-name" data-in>k15ze</p>
+            <p class="lead" data-in>Sport, nutrition et mes courses, sur une chaîne à part.</p>
+            <ul class="countries" data-in><li class="chip">HYROX · mai 2025</li><li class="chip">Spartan Race</li></ul>
+            <figure class="k15-mini" data-in>
+              <img src="assets/img/spartan-2.jpg" alt="Kenz saute au-dessus des flammes pendant la Spartan Race" width="768" height="511" decoding="async">
+              <figcaption>Spartan Race, le saut au-dessus du feu.</figcaption>
+            </figure>
+            <a class="btn btn-ghost" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">La chaîne k15ze<span class="ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : LIEN EN BIO ============ -->
+  <section class="sec" id="liens" data-only="createur" aria-labelledby="t-liens">
+    <div class="wrap bio-grid">
+      <div>
+        <p class="eyebrow" data-reveal="fade">Lien en bio</p>
+        <h2 class="h2" id="t-liens" data-reveal="title">Tout est <span class="it">ici</span>.</h2>
+        <p class="lead" data-reveal="fade">Mes chaînes et mon guide, au même endroit. Comme le lien dans ma bio.</p>
+      </div>
+      <div class="phone card" data-reveal="card">
+        <div class="phone-frame"><div class="phone-screen">
+          <span class="island" aria-hidden="true"></span>
+          <div class="bio">
+            <img class="bio-av" src="assets/img/kenz-carre.jpg" alt="Kenz en t-shirt vert devant les tours de Kuala Lumpur" width="900" height="855" decoding="async">
+            <p class="bio-name">Kenz</p>
+            <p class="bio-sub">Kenz en Asie · k15ze</p>
+            <ul class="bio-links">
+              <li><a class="bl" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener"><span class="bl-ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="4"/><path d="M10.5 9.8v4.4l3.8-2.2z"/></svg></span><span class="bl-t"><b>YouTube</b><small>Kenz in Asia</small></span><svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="bl" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener"><span class="bl-ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18.5a2.5 2.5 0 1 1-2.5-2.5H9V4.5h4.5a4 4 0 0 0 4 4"/><path d="M9 16v2.5"/></svg></span><span class="bl-t"><b>TikTok</b><small>En Bien en Asie</small></span><svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="bl" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener"><span class="bl-ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r=".6"/></svg></span><span class="bl-t"><b>Instagram</b><small>kenzvoyage_enbien</small></span><svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="bl" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener"><span class="bl-ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M7 7v10M17 7v10M20 9v6M7 12h10"/></svg></span><span class="bl-t"><b>k15ze</b><small>Sport et nutrition</small></span><svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+              <li><a class="bl" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener"><span class="bl-ic"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span class="bl-t"><b>Itinéraire Chine</b><small>14 jours, en ligne</small></span><svg class="i arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
+            </ul>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CRÉATEUR : MARQUES ============ -->
+  <section class="sec" id="marques" data-only="createur" aria-labelledby="t-marques">
+    <div class="wrap">
+      <article class="card form-card" data-reveal="card">
+        <div class="shell"><div class="core">
+          <div class="form-txt">
+            <p class="eyebrow">Marques</p>
+            <h2 class="h2" id="t-marques" data-reveal="title">Travaillons <span class="it">ensemble</span>.</h2>
+            <p class="lead">Une marque, une idée, un voyage à raconter&#8239;? Parlez-m’en ici.</p>
+            <div class="sign">
+              <img class="sign-av pic" src="assets/img/kenz-carre.jpg" alt="" width="900" height="855" decoding="async">
+              <span><b>Kenz</b><small>Kenz en Asie · k15ze</small></span>
+            </div>
+          </div>
+          <div>
+            <form class="form" data-form novalidate aria-label="Proposer une collaboration">
+              <div class="field">
+                <label for="m-marque">Votre marque</label>
+                <input class="in" id="m-marque" name="marque" autocomplete="organization" placeholder="Nom de la marque" data-min="2" data-msg="Indiquez le nom de votre marque." aria-describedby="m-marque-err">
+                <p class="f-err" id="m-marque-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="m-idee">Votre idée</label>
+                <textarea class="in" id="m-idee" name="idee" placeholder="Le pays, le format, ce que vous imaginez…" data-min="10" data-msg="Décrivez votre idée en quelques mots (10 caractères minimum)." aria-describedby="m-idee-err"></textarea>
+                <p class="f-err" id="m-idee-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="m-budget">Budget <span class="opt">(facultatif)</span></label>
+                <input class="in" id="m-budget" name="budget" placeholder="Une fourchette suffit">
+              </div>
+              <button class="btn btn-ink" type="submit">Proposer<span class="ic ic-red"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+            </form>
+            <div class="f-done" hidden tabindex="-1" role="status">
+              <span class="done-ic" aria-hidden="true"><svg class="check-svg" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 7.5"/></svg></span>
+              <h3>Merci.</h3>
+              <p>Votre idée est bien notée.</p>
+              <button class="link-btn" type="button" data-again>Proposer une autre idée</button>
+            </div>
+          </div>
+        </div></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="shell"><div class="core">
+      <div class="foot-top">
+        <p class="foot-word">Kenz</p>
+        <button class="door door-pro" type="button" data-door data-only="pro" aria-label="Il existe une autre version de moi. Retourner la carte.">
+          <span class="door-core">
+            <span class="door-av av-moi" aria-hidden="true"></span>
+            <span class="door-t">Il existe une <span class="it">autre</span> version de moi.</span>
+          </span>
+          <span class="ear" aria-hidden="true"><span class="ear-i"></span></span>
+        </button>
+        <button class="door door-moi" type="button" data-door data-only="createur" aria-label="Il existe une autre version de moi. Retourner la carte.">
+          <span class="door-core">
+            <span class="door-av av-pro" aria-hidden="true"></span>
+            <span class="door-t">Il existe une <span class="it">autre</span> version de moi.</span>
+          </span>
+          <span class="ear" aria-hidden="true"><span class="ear-i"></span></span>
+        </button>
+      </div>
+      <div class="foot-row">
+        <ul class="foot-links" data-only="pro">
+          <li><a href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn</a></li>
+        </ul>
+        <ul class="foot-links" data-only="createur">
+          <li><a href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">YouTube · Kenz in Asia</a></li>
+          <li><a href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">TikTok · En Bien en Asie</a></li>
+          <li><a href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">YouTube · k15ze</a></li>
+        </ul>
+        <p class="foot-legal"><img src="assets/img/logo-kz.webp" alt="" width="1024" height="1024">© 2026 Kenz</p>
+      </div>
+    </div></div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const html = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const G = window.gsap || null;
+  const ST = window.ScrollTrigger || null;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const CRE = ['#createur', '#derniere', '#chiffres', '#destinations', '#guides', '#k15ze', '#liens', '#marques'];
+  let side = html.getAttribute('data-side') === 'createur' ? 'createur' : 'pro';
+  let angle = side === 'createur' ? 180 : 0;
+  let busy = false;
+  let pending = false;
+  let introTl = null;
+  if (G && ST) G.registerPlugin(ST);
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  /* Les ancres #pro / #createur ne servent qu'au rendu sans JavaScript */
+  $$('.kz-anchor').forEach((n) => n.remove());
+
+  /* ---------- Dates relatives douces ---------- */
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const rel = (n) => {
+    if (n === 0) return 'aujourd’hui';
+    if (n === 1) return 'hier';
+    if (n < 14) return `il y a ${n} jours`;
+    if (n < 60) return `il y a ${Math.round(n / 7)} semaines`;
+    if (n < 365) return `il y a ${Math.round(n / 30)} mois`;
+    const y = Math.round(n / 365);
+    return `il y a ${y} an${y > 1 ? 's' : ''}`;
+  };
+  $$('time[data-rel]').forEach((t) => {
+    const d = new Date(t.getAttribute('datetime') + 'T00:00:00');
+    const n = Math.round((today - d) / 864e5);
+    if (!Number.isNaN(n) && n >= 0) t.textContent = rel(n);
+  });
+
+  /* ---------- Chiffres : découpe pour la fente ---------- */
+  $$('[data-slot]').forEach((el) => {
+    const txt = el.textContent;
+    const chars = Array.from(txt).map((c) => `<span>${c}</span>`).join('');
+    el.innerHTML = `<span class="sr-only">${txt}</span><span class="slot" aria-hidden="true">${chars}</span>`;
+  });
+
+  /* ---------- Défilement doux ---------- */
+  let lenis = null;
+  if (window.Lenis && !reduce) {
+    lenis = new window.Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    if (G && ST) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add((time) => lenis.raf(time * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = (time) => { lenis.raf(time); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  }
+  const scrollToEl = (el) => {
+    if (lenis) lenis.scrollTo(el, { offset: -72, duration: 1.2 });
+    else el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  };
+  const scrollTop = (dur) => new Promise((res) => {
+    if (window.scrollY < 2) { res(); return; }
+    let done = false;
+    const end = () => { if (!done) { done = true; res(); } };
+    if (lenis) lenis.scrollTo(0, { duration: dur, onComplete: end });
+    else window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    setTimeout(end, reduce ? 0 : dur * 1000 + 250);
+  });
+
+  /* ---------- Barre : s'efface en descendant, revient en remontant ---------- */
+  const topEl = $('.top');
+  let lastY = window.scrollY;
+  const onScrollY = (y, dir) => {
+    topEl.classList.toggle('is-scrolled', y > 8);
+    if (y < 160) topEl.classList.remove('is-compact');
+    else if (dir > 0) topEl.classList.add('is-compact');
+    else if (dir < 0) topEl.classList.remove('is-compact');
+  };
+  if (G && ST) {
+    ST.create({ start: 0, end: 'max', onUpdate: (self) => onScrollY(self.scroll(), self.direction) });
+  } else {
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { const y = window.scrollY; onScrollY(y, Math.sign(y - lastY)); lastY = y; ticking = false; });
+    }, { passive: true });
+  }
+
+  /* ---------- « La carte » ---------- */
+  const stage = $('.stage');
+  const flip = $('.flip');
+  const ground = $('.ground');
+  const faces = { pro: $('.face-pro'), createur: $('.face-moi') };
+  const live = $('#kz-live');
+  const other = (s) => (s === 'pro' ? 'createur' : 'pro');
+  const sectionsOf = (s) => $$(`main > section[data-only="${s}"]`);
+  const syncFaces = () => {
+    Object.keys(faces).forEach((k) => {
+      const on = k === side;
+      faces[k].toggleAttribute('inert', !on);
+      faces[k].setAttribute('aria-hidden', on ? 'false' : 'true');
+    });
+  };
+  syncFaces();
+  if (G) G.set(flip, { rotationY: angle });
+
+  let curIdx = (history.state && typeof history.state.kzIdx === 'number') ? history.state.kzIdx : 0;
+  try { history.replaceState({ kzIdx: curIdx }, ''); } catch (err) { /* fichier local */ }
+
+  function heroTextIn(s, fast) {
+    const t = $(`.htext[data-only="${s}"]`);
+    const tl = G.timeline();
+    const words = $$('.w', t);
+    const others = $$('[data-hx]', t);
+    if (reduce) {
+      tl.fromTo([...words, ...others], { opacity: 0 }, { opacity: 1, duration: 0.3, ease: 'power1.out' });
+      return tl;
+    }
+    tl.fromTo(words, { opacity: 0, filter: 'blur(12px)', scale: 1.07 }, { opacity: 1, filter: 'blur(0px)', scale: 1, duration: fast ? 0.9 : 1.15, ease: 'expo.out', stagger: fast ? 0.06 : 0.07 }, 0);
+    tl.fromTo(others, { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: fast ? 0.7 : 0.95, ease: 'expo.out', stagger: fast ? 0.06 : 0.08 }, fast ? 0.16 : 0.22);
+    return tl;
+  }
+
+  /* Le retournement : la carte pivote, puis la grille se redistribue */
+  async function go(to, opt = {}) {
+    if (to !== 'pro' && to !== 'createur' || to === side) return;
+    if (busy) { pending = true; return; }
+    busy = true;
+    if (introTl && introTl.progress() < 1) introTl.progress(1);
+    const dir = opt.dir === 'back' ? 1 : -1;
+    if (window.scrollY > 40) await scrollTop(opt.fromBottom ? 1.4 : 0.8);
+    const from = side;
+    const finish = () => {
+      if (opt.push !== false) {
+        curIdx += 1;
+        try { history.pushState({ kzIdx: curIdx }, '', '#' + to); } catch (err) { /* fichier local */ }
+      }
+      const h1 = $(`.htext[data-only="${to}"] h1`);
+      if (h1) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); }
+      if (live) live.textContent = to === 'pro' ? 'Version Pro : mes apps et les agents IA.' : 'Version Créateur : Kenz en Asie et k15ze.';
+      busy = false;
+      if (pending) { pending = false; syncFromUrl('back'); }
+    };
+
+    if (!G) {
+      side = to;
+      html.setAttribute('data-side', to);
+      html.setAttribute('data-mood', to);
+      syncFaces();
+      finish();
+      return;
+    }
+
+    const mainEl = $('main');
+    const barEls = $$(`.bar [data-only="${from}"]`);
+    const toBar = $$(`.bar [data-only="${to}"]`);
+    const swap = () => {
+      side = to;
+      html.setAttribute('data-side', to);
+      syncFaces();
+      killReveals(from);
+      setupReveals(to);
+      if (ST) ST.refresh();
+    };
+
+    if (reduce) {
+      html.setAttribute('data-mood', to);
+      G.timeline({ onComplete: finish })
+        .to([mainEl, ...barEls], { opacity: 0, duration: 0.15, ease: 'power1.out' })
+        .add(() => { angle = to === 'createur' ? 180 : 0; G.set(flip, { rotationY: angle }); G.set(barEls, { clearProps: 'opacity' }); swap(); })
+        .fromTo([mainEl, ...toBar], { opacity: 0 }, { opacity: 1, duration: 0.15, ease: 'power1.out', clearProps: 'opacity' });
+      return;
+    }
+
+    const fromText = $(`.htext[data-only="${from}"]`);
+    const vh = window.innerHeight;
+    const outCards = sectionsOf(from).flatMap((s) => $$('[data-reveal="card"], .sec-head', s)).filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.top < vh && r.bottom > 0;
+    });
+    const target = Math.round(G.getProperty(flip, 'rotationY') <= angle - 1 ? angle - 180 : angle + dir * 180);
+    html.setAttribute('data-mood', to);
+    const tl = G.timeline({
+      onComplete: () => {
+        angle = ((target % 360) + 360) % 360;
+        G.set(flip, { rotationY: angle });
+        G.set(ground, { clearProps: 'transform' });
+        G.set($$('.htext .w, .htext [data-hx]'), { clearProps: 'opacity,filter,transform' });
+        finish();
+      }
+    });
+    tl.to([fromText, ...barEls], { opacity: 0, filter: 'blur(6px)', duration: 0.24, ease: 'power2.in' }, 0);
+    if (outCards.length) tl.to(outCards, { opacity: 0, scale: 0.98, filter: 'blur(6px)', duration: 0.24, ease: 'power2.in' }, 0);
+    tl.to(flip, {
+      rotationY: target,
+      duration: 0.9,
+      ease: 'expo.out',
+      onUpdate: () => {
+        const a = G.getProperty(flip, 'rotationY') * Math.PI / 180;
+        G.set(ground, { scaleX: 0.3 + 0.7 * Math.abs(Math.cos(a)) });
+      }
+    }, 0);
+    tl.add(() => {
+      G.set([fromText, ...barEls, ...outCards], { clearProps: 'opacity,filter,transform' });
+      swap();
+    }, 0.3);
+    tl.add(heroTextIn(to, true), 0.36);
+    tl.fromTo(toBar, { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: 'expo.out', stagger: 0.05, clearProps: 'opacity,filter' }, 0.42);
+  }
+
+  const sideFromHash = () => (CRE.includes((location.hash || '').toLowerCase()) ? 'createur' : 'pro');
+  function syncFromUrl(dir) {
+    const t = sideFromHash();
+    if (t !== side) go(t, { push: false, dir });
+  }
+  window.addEventListener('popstate', (e) => {
+    const idx = (e.state && typeof e.state.kzIdx === 'number') ? e.state.kzIdx : 0;
+    const dir = idx < curIdx ? 'back' : 'fwd';
+    curIdx = idx;
+    if (busy) { pending = true; return; }
+    syncFromUrl(dir);
+  });
+  window.addEventListener('hashchange', () => {
+    if (busy) { pending = true; return; }
+    syncFromUrl('back');
+  });
+
+  /* Gestes : clic sur la carte (souris), coin à toucher ou à tirer, appui long (tactile) */
+  let lastPointer = 'mouse';
+  let drag = null;
+  let dragMoved = false;
+  let lp = null;
+  const cancelLp = () => {
+    if (!lp) return;
+    clearTimeout(lp.t);
+    lp.face.classList.remove('is-pressing');
+    lp = null;
+  };
+  stage.addEventListener('pointerdown', (e) => {
+    lastPointer = e.pointerType || 'mouse';
+    if (lastPointer !== 'touch' || busy || e.target.closest('a, .ear-btn')) return;
+    const face = faces[side];
+    face.classList.add('is-pressing');
+    lp = { x: e.clientX, y: e.clientY, face, t: setTimeout(() => { const f = lp && lp.face; lp = null; if (f) f.classList.remove('is-pressing'); go(other(side)); }, 520) };
+  });
+  stage.addEventListener('pointermove', (e) => { if (lp && Math.hypot(e.clientX - lp.x, e.clientY - lp.y) > 10) cancelLp(); });
+  stage.addEventListener('pointerup', cancelLp);
+  stage.addEventListener('pointercancel', cancelLp);
+  stage.addEventListener('contextmenu', (e) => { if (lastPointer === 'touch') e.preventDefault(); });
+  stage.addEventListener('click', (e) => {
+    if (e.target.closest('a, .ear-btn')) return;
+    if (lastPointer === 'touch') return;
+    go(other(side));
+  });
+
+  $$('.ear-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (dragMoved) { dragMoved = false; return; }
+      go(other(side));
+    });
+    btn.addEventListener('pointerdown', (e) => {
+      lastPointer = e.pointerType || 'mouse';
+      if (busy || !G || reduce) return;
+      e.stopPropagation();
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId, d: 0, face: faces[side] };
+      dragMoved = false;
+      try { btn.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    });
+    btn.addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = Math.max(0, ((drag.x - e.clientX) + (e.clientY - drag.y)) / Math.SQRT2);
+      if (d > 6 && !dragMoved) { dragMoved = true; drag.face.classList.add('is-peeling'); }
+      if (!dragMoved) return;
+      drag.d = d;
+      drag.face.style.setProperty('--s', `${Math.round(36 + Math.min(d, 130) * 0.6)}px`);
+      G.set(flip, { rotationY: angle - Math.min(d * 0.22, 28) });
+    });
+    const endDrag = () => {
+      if (!drag) return;
+      const { d, face } = drag;
+      drag = null;
+      if (!dragMoved) return;
+      const settle = (s) => G.to(face, { '--s': s, duration: 0.5, ease: 'expo.out', onComplete: () => { face.style.removeProperty('--s'); face.classList.remove('is-peeling'); } });
+      if (d > 56) { settle('16px'); go(other(side)); }
+      else { settle('36px'); G.to(flip, { rotationY: angle, duration: 0.6, ease: 'expo.out' }); }
+    };
+    btn.addEventListener('pointerup', endDrag);
+    btn.addEventListener('pointercancel', endDrag);
+  });
+
+  /* Seconde porte : remonte en douceur, puis retourne la carte */
+  $$('[data-door]').forEach((b) => b.addEventListener('click', () => go(other(side), { fromBottom: true })));
+
+  /* Liens internes : défilement doux, le hash garde l'univers */
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const id = a.getAttribute('href').slice(1);
+    if (id === 'pro' || id === 'createur') { e.preventDefault(); go(id); return; }
+    const el = id ? document.getElementById(id) : null;
+    if (!el) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const need = a.dataset.need;
+    if (need) {
+      const r = $(`input[name="besoin"][value="${need}"]`);
+      if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
+    }
+    if (id === 'top') { if (lenis) lenis.scrollTo(0, { duration: 1.1 }); else window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); return; }
+    scrollToEl(el);
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  }, true);
+
+  /* ---------- Révélations au défilement (par univers) ---------- */
+  const triggers = { pro: [], createur: [] };
+  function killReveals(s) { triggers[s].forEach((t) => t.kill()); triggers[s] = []; }
+  const revealTitle = (el, delay) => G.to(el, { clipPath: 'inset(-25% -4% -25% -4%)', filter: 'blur(0px)', duration: 1, delay: delay || 0, ease: 'expo.out', clearProps: 'clipPath,filter' });
+
+  let flowTl = null;
+  function setupFlow() {
+    const flow = $('[data-flow]');
+    if (!flow) return;
+    if (flowTl) flowTl.kill();
+    const steps = $$('.step', flow);
+    const lits = steps.map((s) => $('.node-lit', s));
+    const texts = steps.map((s) => $('.step-txt', s));
+    const conns = $$('.conn i', flow);
+    const check = $('.check-svg', flow);
+    G.set(lits, { opacity: 0 });
+    G.set(texts, { opacity: 0.38 });
+    G.set(conns, { '--p': 0 });
+    G.set(check, { clipPath: 'inset(0% 100% 0% 0%)' });
+    const tl = G.timeline({ paused: true });
+    flowTl = tl;
+    const gap = 0.7;
+    steps.forEach((s, i) => {
+      tl.to(lits[i], { opacity: 1, duration: 0.6, ease: 'expo.out' }, i * gap);
+      tl.to(texts[i], { opacity: 1, duration: 0.6, ease: 'expo.out' }, i * gap);
+      if (conns[i]) tl.to(conns[i], { '--p': 1, duration: 0.6, ease: 'power2.inOut' }, i * gap + 0.2);
+    });
+    tl.to(check, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.75, ease: 'expo.out' }, (steps.length - 1) * gap + 0.2);
+    triggers.pro.push(ST.create({ trigger: flow, start: 'top 80%', once: true, onEnter: () => tl.play() }));
+  }
+
+  function setupReveals(s) {
+    if (!G || !ST) return;
+    killReveals(s);
+    const secs = sectionsOf(s);
+    const q = (sel) => secs.flatMap((x) => $$(sel, x));
+    const list = triggers[s];
+
+    /* Lien actif dans la barre */
+    $$(`.nav [data-only="${s}"] a`).forEach((a) => {
+      const sec = document.getElementById(a.getAttribute('href').slice(1));
+      a.classList.remove('is-active');
+      if (sec) list.push(ST.create({ trigger: sec, start: 'top 45%', end: 'bottom 45%', onToggle: (self) => a.classList.toggle('is-active', self.isActive) }));
+    });
+    if (reduce) return;
+
+    G.killTweensOf(q('[data-reveal], [data-in], .slot > span'));
+    const cards = q('[data-reveal="card"]');
+    const inCard = (el) => !!el.closest('[data-reveal="card"]');
+
+    /* Titres : balayage doux gauche → droite avec flou */
+    q('[data-reveal="title"]').forEach((el) => G.set(el, { clipPath: 'inset(-25% 100% -25% -4%)', filter: 'blur(6px)' }));
+    q('[data-reveal="title"]').filter((el) => !inCard(el)).forEach((el) => {
+      list.push(ST.create({ trigger: el, start: 'top 94%', once: true, onEnter: () => revealTitle(el) }));
+    });
+
+    /* Petits textes : du flou au net */
+    const fades = q('[data-reveal="fade"]');
+    if (fades.length) {
+      G.set(fades, { opacity: 0, filter: 'blur(6px)' });
+      list.push(...ST.batch(fades, { start: 'top 95%', once: true, onEnter: (b) => G.to(b, { opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: 'expo.out', stagger: 0.07, overwrite: true, clearProps: 'opacity,filter' }) }));
+    }
+
+    /* Cartes : montent de 34 px et se posent (0,965 → 1), puis leur contenu arrive */
+    G.set(cards, { opacity: 0, y: 34, scale: 0.965 });
+    G.set(cards.flatMap((c) => $$('[data-in]', c)), { opacity: 0, filter: 'blur(6px)' });
+    list.push(...ST.batch(cards, {
+      start: 'top 96%',
+      once: true,
+      onEnter: (b) => {
+        G.to(b, { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: 'expo.out', stagger: 0.06, overwrite: true, clearProps: 'opacity,transform' });
+        const ins = b.flatMap((c) => $$('[data-in]', c));
+        if (ins.length) G.to(ins, { opacity: 1, filter: 'blur(0px)', duration: 0.6, ease: 'expo.out', stagger: 0.04, delay: 0.14, clearProps: 'opacity,filter' });
+        b.flatMap((c) => $$('[data-reveal="title"]', c)).forEach((t) => revealTitle(t, 0.12));
+      }
+    }));
+
+    /* Chiffres : montent d'une fente */
+    q('[data-slot]').forEach((el) => {
+      const chars = $$('.slot > span', el);
+      if (!chars.length) return;
+      G.set(chars, { yPercent: 115 });
+      list.push(ST.create({ trigger: el, start: 'top 96%', once: true, onEnter: () => G.to(chars, { yPercent: 0, duration: 1, ease: 'expo.out', stagger: 0.04, delay: 0.18 }) }));
+    });
+
+    if (s === 'pro') setupFlow();
+  }
+
+  /* ---------- Formulaires simulés ---------- */
+  $$('form[data-form]').forEach((form) => {
+    const done = form.parentElement.querySelector('.f-done');
+    const errOf = (f) => document.getElementById(f.getAttribute('aria-describedby') || '');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let firstBad = null;
+      $$('[data-min]', form).forEach((f) => {
+        const bad = f.value.trim().length < Number(f.dataset.min);
+        f.setAttribute('aria-invalid', bad ? 'true' : 'false');
+        const err = errOf(f);
+        if (err) err.textContent = bad ? f.dataset.msg : '';
+        if (bad && !firstBad) firstBad = f;
+      });
+      $$('fieldset[data-req]', form).forEach((fs) => {
+        const ok = !!fs.querySelector('input:checked');
+        const err = fs.querySelector('.f-err');
+        if (err) err.textContent = ok ? '' : fs.dataset.msg;
+        fs.toggleAttribute('data-invalid', !ok);
+        if (!ok && !firstBad) firstBad = fs.querySelector('input');
+      });
+      if (firstBad) { firstBad.focus(); return; }
+      const show = () => {
+        form.hidden = true;
+        done.hidden = false;
+        done.focus({ preventScroll: true });
+        if (ST) ST.refresh();
+      };
+      if (G && !reduce) {
+        G.to(form, {
+          opacity: 0, filter: 'blur(6px)', duration: 0.24, ease: 'power2.in',
+          onComplete: () => {
+            show();
+            G.set(form, { clearProps: 'opacity,filter' });
+            G.fromTo(done, { opacity: 0, y: 34, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'expo.out', clearProps: 'opacity,transform' });
+            const ck = $('.check-svg', done);
+            if (ck) G.fromTo(ck, { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8, delay: 0.35, ease: 'expo.out' });
+          }
+        });
+      } else {
+        show();
+      }
+    });
+    form.addEventListener('input', (e) => {
+      const f = e.target;
+      if (f.getAttribute('aria-invalid') === 'true' && f.value.trim().length >= Number(f.dataset.min || 0)) {
+        f.setAttribute('aria-invalid', 'false');
+        const err = errOf(f);
+        if (err) err.textContent = '';
+      }
+    });
+    form.addEventListener('change', (e) => {
+      const fs = e.target.closest('fieldset[data-req]');
+      if (fs) { fs.removeAttribute('data-invalid'); const err = fs.querySelector('.f-err'); if (err) err.textContent = ''; }
+    });
+    const again = done && done.querySelector('[data-again]');
+    if (again) again.addEventListener('click', () => {
+      form.reset();
+      $$('[aria-invalid]', form).forEach((f) => f.setAttribute('aria-invalid', 'false'));
+      done.hidden = true;
+      form.hidden = false;
+      const first = form.querySelector('input, textarea');
+      if (first) first.focus();
+      if (ST) ST.refresh();
+    });
+  });
+
+  /* ---------- Intro ---------- */
+  function intro() {
+    window.__kenzIntro = true;
+    const face = faces[side];
+    const imgs = $$('.pimg', face);
+    const cap = $('.hcap', face);
+    const done = () => {
+      html.classList.remove('anim');
+      G.set(['.bar', '.stage', ...$$('.pimg'), ...$$('.hcap'), ...$$('.htext .w'), ...$$('.htext [data-hx]')], { clearProps: 'opacity,transform,filter' });
+    };
+    introTl = G.timeline({ defaults: { ease: 'expo.out' }, onComplete: done });
+    if (reduce) {
+      introTl.to(['.bar', '.stage', ...$$('.pimg'), ...$$('.hcap')], { opacity: 1, duration: 0.6, ease: 'power1.out' }, 0);
+      introTl.add(heroTextIn(side), 0.1);
+      return;
+    }
+    introTl
+      .fromTo('.bar', { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, 0)
+      .fromTo('.stage', { opacity: 0, y: 34, scale: 0.965 }, { opacity: 1, y: 0, scale: 1, duration: 1.3 }, 0.12)
+      .fromTo(imgs, { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 1.6 }, 0.4)
+      .add(heroTextIn(side), 0.2);
+    if (cap) introTl.fromTo(cap, { opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.9 }, 1.0);
+    introTl.set([...$$('.pimg').filter((i) => !imgs.includes(i)), ...$$('.hcap').filter((c) => c !== cap)], { opacity: 1 }, 1.0);
+  }
+
+  try {
+    if (G) {
+      intro();
+      setupReveals(side);
+      if (ST) {
+        const refresh = () => ST.refresh();
+        window.addEventListener('load', refresh);
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(refresh);
+        if ('ResizeObserver' in window) {
+          let t = null;
+          let lastH = 0;
+          new ResizeObserver((entries) => {
+            const h = Math.round(entries[0].contentRect.height);
+            if (Math.abs(h - lastH) < 2) return;
+            lastH = h;
+            clearTimeout(t);
+            t = setTimeout(refresh, 180);
+          }).observe($('main'));
+        }
+      }
+    }
+  } catch (err) {
+    html.classList.remove('anim');
+    if (window.console) console.error(err);
+  }
+})();
+</script>
+
+<a href="index.html" class="kz-back" aria-label="Revenir aux quatre propositions"><span aria-hidden="true">←</span><em>Propositions</em></a>
+<style>
+.kz-back{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;height:34px;min-width:34px;padding:0 11px;border-radius:999px;font:500 13px/1 "Inter",system-ui,sans-serif;color:#F4EFE6;background:rgba(26,25,24,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 10px 30px -12px rgba(0,0,0,.45);text-decoration:none;opacity:.7;transition:opacity .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.kz-back em{font-style:normal;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .3s,margin .5s cubic-bezier(.16,1,.3,1)}
+.kz-back:hover,.kz-back:focus-visible{opacity:1;transform:translateY(-2px)}
+.kz-back:hover em,.kz-back:focus-visible em{max-width:110px;opacity:1;margin-left:8px}
+.kz-back:focus-visible{outline:2px solid #E8322B;outline-offset:3px}
+</style>
+</body>
+</html>

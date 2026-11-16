@@ -1,0 +1,139 @@
+/* ==========================================================================
+   Le pied de page commun (V6) : classique et compact. Rempli par shared/footer.js (contrat et contenu y sont décrits).
+
+   Ligne 1 : « Kenz· » en petit (le logo de la nav) et la phrase, discrète ; la navigation en ligne ; les réseaux.
+   Un filet fin. Ligne 2 : © 2026 Kenz (et Marques & collaborations) ; Revenir en haut.
+   Environ 160 à 200 px de haut sur ordinateur. Inter 14 px, couleurs sourdes, soulignement au survol, un fondu discret.
+   Tout passe par les jetons de shared/theme.css (clair et sombre) ; k15ze a les siens, ici.
+   Aucun composant « tag ». Le coin en bas à gauche reste libre pour l'outil de revue (marge basse).
+
+   Classes : .kzf (le <footer>) .kzf--pro|--createur|--k15ze  .kzf--anim (JS)  .is-in (arrivé à l'écran)
+     .kzf__in > .kzf__l1 (.kzf__id > .kzf__logo + .kzf__phrase ; .kzf__nav > .kzf__liste--nav + .kzf__liste--reseaux)
+              + .kzf__ciel (Créateur : le ciel de shared/etoiles.*) + .kzf__bas (.kzf__copy, .kzf__a--bas, .kzf__fin)
+     .kzf__a (.kzf__t : le texte souligné ; .kzf__ico)
+   ========================================================================== */
+
+.kzf{
+  --kzf-ease:var(--expo,cubic-bezier(.16,1,.3,1));
+  --kzf-vert:currentColor;
+  position:relative; z-index:1;
+  padding:40px 0 calc(40px + env(safe-area-inset-bottom));
+  font-family:var(--f-text); font-size:14px; line-height:1.4; color:var(--muted);
+}
+/* Le seuil : un filet fin qui s'efface aux deux bouts */
+.kzf::before{content:""; position:absolute; top:0; left:var(--gl,16px); right:var(--gr,16px); height:1px; pointer-events:none;
+  background:linear-gradient(90deg,rgb(var(--fg-rgb) / 0),rgb(var(--fg-rgb) / .1) 12%,rgb(var(--fg-rgb) / .1) 88%,rgb(var(--fg-rgb) / 0))}
+.kzf__in{position:relative; max-width:calc(var(--maxw,1240px) + 2 * var(--gutter,16px)); margin-inline:auto; padding-left:var(--gl,16px); padding-right:var(--gr,16px)}
+:where(.kzf) p,:where(.kzf) ul{margin:0}
+:where(.kzf) ul{padding:0; list-style:none}
+
+/* =========================================================
+   1. Ligne 1
+   ========================================================= */
+.kzf__l1{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 40px}
+.kzf__id{display:flex; align-items:baseline; gap:14px; min-width:0; min-height:44px; padding-top:2px}
+.kzf__logo{flex:none; font-family:var(--f-title); font-weight:600; font-size:22px; line-height:1; letter-spacing:-.01em; color:var(--fg)}
+.kzf__point{display:inline-block; width:.1em; height:.1em; margin-left:.035em; border-radius:50%; background:currentColor; vertical-align:baseline}
+.kzf__phrase{min-width:0; font-size:14px; color:var(--faint)}
+
+.kzf__nav{display:flex; flex-wrap:wrap; align-items:center; gap:0 28px}
+.kzf__liste{display:flex; flex-wrap:wrap; align-items:center; gap:0 22px}
+.kzf__liste--reseaux{position:relative; padding-left:28px}
+.kzf__liste--reseaux::before{content:""; position:absolute; left:0; top:50%; width:1px; height:14px; margin-top:-7px; background:var(--line)}
+
+/* Un lien : 44 px de haut, un soulignement qui glisse au survol */
+.kzf__a{display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:0 1px; font-size:14px; font-weight:400; line-height:1.3;
+  color:var(--muted); -webkit-tap-highlight-color:transparent; transition:color .35s var(--kzf-ease)}
+.kzf__t{padding-bottom:2px; margin-bottom:-2px; background:linear-gradient(currentColor,currentColor) no-repeat 100% 100% / 0 1px;
+  transition:background-size .45s var(--kzf-ease)}
+.kzf__a:hover,.kzf__a:focus-visible{color:var(--fg)}
+.kzf__a:hover .kzf__t,.kzf__a:focus-visible .kzf__t,.kzf__a:active .kzf__t{background-size:100% 1px; background-position:0 100%}
+.kzf__a[aria-current="page"]{color:var(--fg)}
+.kzf__a[aria-current="page"] .kzf__t{background-image:linear-gradient(rgb(var(--fg-rgb) / .35),rgb(var(--fg-rgb) / .35)); background-size:100% 1px}
+.kzf__a:focus-visible{outline:2px solid var(--focus); outline-offset:2px; border-radius:4px}
+.kzf__ico{display:inline-grid; place-items:center; flex:none; width:11px; height:11px; opacity:.5; transition:opacity .35s var(--kzf-ease),transform .45s var(--kzf-ease)}
+.kzf__ico svg{width:11px; height:11px}
+.kzf__a:hover .kzf__ico{opacity:.9}
+.kzf__a:hover .kzf__ico--sortie{transform:translate(1px,-1px)}
+.kzf__a:hover .kzf__ico--haut{transform:translateY(-2px)}
+.kzf__a:hover .kzf__ico--retour{transform:translateX(-2px)}
+
+/* =========================================================
+   2. Le ciel (Créateur) et la ligne 2
+   ========================================================= */
+.kzf__ciel{margin-top:12px}
+.kzf__ciel .kz-etoiles{margin-bottom:0}
+.kzf__bas{display:flex; flex-wrap:wrap; align-items:center; gap:0 22px; margin-top:16px; border-top:1px solid var(--line); font-size:13px}
+.kzf__ciel + .kzf__bas{margin-top:4px}
+.kzf__copy{display:inline-flex; align-items:center; min-height:44px; color:var(--faint); font-variant-numeric:tabular-nums}
+.kzf__bas .kzf__a{font-size:13px}
+.kzf__fin{display:flex; align-items:center; gap:8px; margin-left:auto}
+/* Le bouton de mode, sans pastille : juste l'icône */
+html .kzf .kzf__mode::before,html[data-theme] .kzf .kzf__mode::before{background:transparent; box-shadow:none; -webkit-backdrop-filter:none; backdrop-filter:none}
+html[data-theme] .kzf .kzf__mode:hover::before{background-color:rgb(var(--fg-rgb) / .07)}
+.kzf .kzf__mode{color:var(--muted)}
+.kzf .kzf__mode:hover{color:var(--fg)}
+.kzf .kzf__mode svg{width:17px; height:17px}
+
+/* =========================================================
+   3. Téléphone : la navigation et les réseaux en deux colonnes, des cibles de 44 px
+   ========================================================= */
+@media (max-width:639px){
+  .kzf{padding:36px 0 calc(64px + env(safe-area-inset-bottom))}
+  .kzf__l1{display:block}
+  .kzf__id{display:block; min-height:0}
+  .kzf__logo{display:block; margin-bottom:8px}
+  .kzf__phrase{display:block; max-width:34ch; line-height:1.5}
+  .kzf__nav{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:0 16px; margin-top:14px}
+  .kzf__liste{display:grid; gap:0}
+  .kzf__liste--reseaux{padding-left:0}
+  .kzf__liste--reseaux::before{content:none}
+  .kzf__a{max-width:100%}
+  .kzf__ciel{margin-top:16px}
+  /* Le lien discret (Marques & collaborations) passe au-dessus ; © et « Revenir en haut » restent sur une ligne */
+  .kzf__bas > .kzf__a--bas{order:-1; flex-basis:100%}
+}
+
+/* =========================================================
+   4. Grand écran : la phrase tient sur une ligne ; Créateur : le ciel à droite, hors du flux
+   ========================================================= */
+@media (min-width:960px){
+  .kzf__phrase{white-space:nowrap}
+}
+@media (min-width:1100px){
+  .kzf--createur{padding-top:44px}
+  .kzf--createur .kzf__l1{flex-direction:column; align-items:flex-start; justify-content:flex-start; gap:0; padding-right:460px}
+  .kzf--createur .kzf__id{min-height:0; padding-top:0}
+  .kzf--createur .kzf__ciel{position:absolute; right:var(--gr,16px); bottom:46px; width:420px; margin:0}
+  .kzf--createur .kzf__ciel + .kzf__bas{margin-top:16px}
+  .kzf--createur::before{right:calc(var(--gr,16px) + 460px)}
+}
+
+/* =========================================================
+   5. k15ze : son identité (fond #0D0F0E, vert #3DDC84 au survol ; #1E7A46 en clair)
+   ========================================================= */
+.kzf--k15ze{
+  --fg:#F7F7F2; --fg-rgb:247 247 242; --muted:rgba(247,247,242,.72); --faint:#9DA39F;
+  --line:rgba(247,247,242,.12); --line-2:rgba(247,247,242,.08); --lum:61 220 132; --focus:#3DDC84;
+  --kzf-vert:#3DDC84; --kzf-fond:#0D0F0E;
+  background:linear-gradient(180deg,rgb(13 15 14 / 0),var(--kzf-fond) 48px);
+}
+html[data-theme="light"] .kzf--k15ze{
+  --fg:#0D0F0E; --fg-rgb:13 15 14; --muted:#454B47; --faint:#5C635F;
+  --line:rgba(13,15,14,.12); --line-2:rgba(13,15,14,.08); --lum:30 122 70; --focus:#1E7A46;
+  --kzf-vert:#1E7A46; --kzf-fond:#F4F5F1;
+  background:linear-gradient(180deg,rgb(244 245 241 / 0),var(--kzf-fond) 48px);
+}
+.kzf--k15ze .kzf__a:hover,.kzf--k15ze .kzf__a:focus-visible,.kzf--k15ze .kzf__mode:hover{color:var(--kzf-vert)}
+.kzf--k15ze .kzf__a[aria-current="page"] .kzf__t{background-image:linear-gradient(var(--kzf-vert),var(--kzf-vert))}
+
+/* =========================================================
+   6. L'arrivée : un fondu discret
+   ========================================================= */
+.kzf--anim .kzf__in{opacity:0}
+.kzf--anim.is-in .kzf__in{opacity:1; transition:opacity .9s ease .05s}
+@media (prefers-reduced-motion: reduce){
+  .kzf--anim.is-in .kzf__in{transition-duration:.4s}
+  .kzf__t,.kzf__ico{transition:none}
+  .kzf__a:hover .kzf__ico{transform:none}
+}

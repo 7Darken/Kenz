@@ -1,0 +1,11 @@
+Use case: stylized-concept icon series. One transparent PNG 3D icon for the k15ze sport universe (Kenz's personal site): part of a matching set of HYROX stations, Spartan Race obstacles and boxing gear. Every icon in the set must share the exact same lighting, camera angle, materials and palette.
+
+Create ONE isolated miniature object or the explicitly requested compact equipment group: a compact pair of TWO matching rounded black kettlebells side by side, slightly staggered, with sturdy open handles and flattened functional bottoms. One single narrow green band around the nearer kettlebell handle; the other kettlebell entirely graphite with off-white highlights.
+
+Style: premium tactile 3D product illustration, sophisticated miniature collectible design, slightly chunky refined proportions, strong clean silhouette. Materials: matte anodized graphite and black metal (#1A1D1C to #2A2F2D), satin rubber, technical fabric, with off-white (#F7F7F2) details and exactly ONE accent in vivid green #3DDC84 (a handle, strap, edge or button). No other saturated colors. Soft studio light from upper left, subtle rim light on the right edge so it separates from a near-black background, ambient occlusion only within the object. Camera: three-quarter front view, looking down about 25 degrees, showing front and right-hand side, orthographic product camera, identical for the whole set.
+
+Composition: square 1024 x 1024 or higher PNG. Center the complete object at about 70% of the canvas height; for wide objects fit the entire object within 80% canvas width. Clear transparent margin on every side, no cropping. Must stay readable at 40 px and look premium at 160 px, over near-black #0D0F0E and over light #F4F6F2. Emphasize readable geometry, broad sculpted highlights and restrained fine detail.
+
+Background: GENUINELY TRANSPARENT ALPHA, clean antialiased edges. No floor, no pedestal, no detached drop shadow, no glow or halo outside the object, no checkerboard painted into the image. The equipment's own functional structural base is allowed but no decorative display plinth.
+
+Avoid: text, letters, numbers, logos, brand marks (no HYROX, Spartan, Concept2 or sportswear logos), people, faces, hands, bodies, childish cartoon style, toy-like plastic, photoreal gym background, unrelated extra objects, motion lines.

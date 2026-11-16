@@ -1,0 +1,24 @@
+../public/images/projects/oshii/screenshots/460x996bb.webp
+../public/images/projects/oshii/icon.webp
+../public/images/destinations/Chine.webp
+../public/images/projects/sago/icon.webp
+../public/images/projects/miru/icon.webp
+../public/images/projects/zenko/icon.webp
+../public/images/Pro-pp.webp
+../public/images/Moi-pp.webp
+../public/images/projects/oshii/screenshots/460x996bb (1).webp
+../public/images/projects/oshii/screenshots/460x996bb (2).webp
+../public/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.27.19.webp
+../public/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.29.59.webp
+../public/images/projects/miru/screenshots/Capture d’écran 2026-04-22 à 00.30.20.webp
+../public/images/projects/zenko/screenshots/Simulator Screenshot - iPhone 16 - 2025-10-07 at 14.51.22.webp
+../public/images/projects/zenko/screenshots/simulator_screenshot_0F87DCF3-7B95-49D6-A78C-14F2DAC1B13E.webp
+../public/images/projects/zenko/screenshots/simulator_screenshot_2AFCECC9-DC68-4C66-9685-EF373A9913FD.webp
+../public/images/KzLogo.webp
+../public/images/startupwknd/1764593040113.webp
+../public/images/startupwknd/1773051513158.webp
+../public/images/startupwknd/1773051515851.webp
+../public/images/destinations/Japon.webp
+../public/images/sport/hyrox/12586_20250531_130056_500865369_socialmedia.webp
+../public/images/destinations/Malaisie.webp
+../public/images/sport/spartan/14571_AFA1_02724.webp

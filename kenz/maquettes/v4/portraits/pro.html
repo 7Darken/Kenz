@@ -1,0 +1,599 @@
+<!doctype html>
+<!--
+  Kenz — Pro (V5), style « Deux portraits »
+  Porcelaine, éditorial, beaucoup d'air. Base commune : portraits.css (même dossier).
+  Signatures : le « Kenz. » géant derrière le portrait (son point porte aussi le cordon), l'iris qui s'ouvre
+  à l'entrée des chapitres, les grandes cartes blanches, une typographie magazine.
+  A0 hero sobre → A1 les apps (module partagé shared/apps.*) → A2 les 54 heures (module partagé shared/victoire.*)
+  → A3 pour votre équipe → A4 contact.
+  Les deux modules prennent leur apparence dans les variables --kz-* de la page (bloc « Modules partagés »).
+  Ordinateur (≥ 900 × 600, sans mouvement réduit) : les 54 heures sont épinglées et se jouent au défilement.
+  Mobile et mouvement réduit : rien n'est épinglé, chaque moment se déclenche à l'entrée à l'écran.
+  Transitions (shared/passage.*) et passage secret (shared/cordon.*) : écrits à part, contrat du brief V4 §3.
+  La page fonctionne sans eux.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Pro</title>
+<meta name="description" content="Je construis des apps où l'IA fait le vrai travail.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F7F5F1">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/kenz-pro.webp">
+<link rel="stylesheet" href="portraits.css">
+<style>
+/* =========================================================
+   Deux portraits · Pro (accueil). La base commune est dans portraits.css.
+   ========================================================= */
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+
+/* =========================================================
+   A3 Pour votre équipe : l'aperçu dans une grande carte blanche
+   ========================================================= */
+.team{position:relative; padding:calc(var(--sec) * .5) 0 var(--sec)}
+.team__grid{display:grid; gap:clamp(44px,6vw,104px); align-items:center}
+.team__copy{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(28px,3vw,40px)}
+.team__q{max-width:17ch; font-size:clamp(32px,4.2vw,68px); line-height:1.04; letter-spacing:-.045em; font-weight:500; text-wrap:balance}
+@media (min-width:960px){ .team__grid{grid-template-columns:6fr 5fr} }
+
+.ag{--iy:62%; position:relative; width:min(100%, 440px); margin-inline:auto; aspect-ratio:100 / 126; border-radius:var(--r-xl); background:rgba(255,255,255,.6);
+  box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 1px 2px rgba(26,25,24,.03), 0 10px 24px -12px rgba(26,25,24,.08), 0 50px 90px -46px rgba(26,25,24,.26)}
+.ag__core{position:absolute; inset:6px; border-radius:calc(var(--r-xl) - 6px); overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgba(15,93,107,.07), transparent 70%), linear-gradient(180deg, #FFFFFF, #F8F6F2); box-shadow:inset 0 0 0 1px rgba(26,25,24,.045), inset 0 1px 0 #fff}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%}
+.ag-wires path{fill:none; stroke:rgba(26,25,24,.26); stroke-width:.4; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#fff; box-shadow:0 0 0 1px rgba(26,25,24,.07), 0 2cqw 5cqw -2cqw rgba(26,25,24,.2)}
+.ag-src svg{width:4.4cqw; height:4.4cqw; color:var(--ink-2); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-src span{font-size:max(10px,3.3cqw); line-height:1.2; font-weight:500; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:#2F7A55; box-shadow:0 0 0 2px #fff}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#fff; stroke-width:2.6}
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2.2cqw; border-radius:99px; background:#fff; color:var(--ink); box-shadow:0 0 0 1px rgba(26,25,24,.09), 0 2cqw 4cqw -2cqw rgba(26,25,24,.18); font-size:max(11px,3.5cqw); line-height:1; font-weight:600}
+.ag-node > i{flex:none; width:2.4cqw; height:2.4cqw; border-radius:50%; background:var(--ink-3)}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1.5px rgba(15,93,107,.75), 0 0 6cqw rgba(15,93,107,.2); opacity:0; pointer-events:none}
+.ag-node--v{left:12cqw; top:30cqw; width:34cqw; height:10cqw}
+.ag-node--c{left:52cqw; top:30cqw; width:40cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(18px,6cqw); background:var(--ink); color:#fff}
+.ag-node--h .ag-glow{opacity:1}
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:36cqw; transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:#fff; color:var(--ink); box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 4cqw 10cqw -4cqw rgba(26,25,24,.3)}
+.ag-note__t{font-family:var(--f-title); font-weight:600; font-size:max(15px,5.2cqw); line-height:1.1; letter-spacing:-.01em; margin-bottom:1.4cqw}
+.ag-line{display:flex; align-items:center; gap:3cqw; padding:2.3cqw 0; border-top:1px solid rgba(26,25,24,.08)}
+.ag-line i{flex:1; height:1.6cqw; border-radius:1cqw; background:rgba(26,25,24,.09)}
+.ag-line span{font-size:max(9.5px,2.9cqw); line-height:1.2; font-weight:500; color:var(--ink-2); white-space:nowrap}
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:#2F7A55; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-family:var(--f-title); font-weight:600; font-size:max(22px,7cqw); letter-spacing:-.01em; line-height:1.1; color:var(--ink); opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:106cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:#fff; font-size:max(18px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 3cqw 8cqw -3cqw rgba(232,50,43,.55); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--ink); outline-offset:4px}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{bottom:5.5%; right:auto; left:50%; translate:-50% 0}
+
+/* =========================================================
+   A4 Contact
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(44px,5.8vw,92px); line-height:1; letter-spacing:-.045em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+
+/* =========================================================
+   Mouvement réduit
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .ag-sent{transform:none !important; filter:none !important}
+  .ag.is-sent .ag-noteW{transform:none}
+}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+<link rel="stylesheet" href="../shared/apps.css"><link rel="stylesheet" href="../shared/victoire.css">
+<style>
+/* =========================================================
+   Modules partagés (V5) : A1 les apps, A2 les 54 heures.
+   Raccord Deux portraits : porcelaine, Lagon, et l'air éditorial (légendes en Instrument Serif, grandes cartes blanches).
+   ========================================================= */
+:root{
+  --kz-bg:#F7F5F1; --kz-surface:#FFFFFF; --kz-ink:#1A1918; --kz-muted:#55514C; --kz-line:rgba(26,25,24,.09);
+  --kz-accent:#0F5D6B;
+  --kz-title:var(--f-title); --kz-text:var(--f-text); --kz-word:var(--f-word);
+  --kz-radius:var(--r-xl);
+  --kz-victoire-nuit:#141A2A;
+}
+.kz-apps,.kz-victoire{background:transparent}
+/* Le titre discret devient une légende de magazine */
+.kz-apps__titre{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:clamp(20px,1.6vw,24px); line-height:1.3; letter-spacing:0; color:var(--ink-3)}
+.kz-apps__titre em{font-size:1em; color:var(--accent)}
+/* Le dock : une grande carte blanche, comme les étagères de la page */
+.kz-apps__dock{background:rgba(255,255,255,.55); box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 1px 2px rgba(26,25,24,.03), 0 10px 24px -12px rgba(26,25,24,.08), 0 36px 72px -36px rgba(26,25,24,.16)}
+/* Les légendes des 54 heures, en italique éditorial */
+.kv-end{font-family:var(--f-word); font-style:italic; font-size:clamp(20px,1.7vw,25px); line-height:1.35; color:var(--ink-2)}
+.kv-credit{font-family:var(--f-word); font-style:italic; font-size:15px}
+/* Voir le contournement en fin de page : la légende du premier temps ne reste pas affichée */
+.kz-victoire.is-pin.kz-v-cap-off .kv-cap{visibility:hidden}
+</style>
+</head>
+<body>
+<a class="skip" href="#apps">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<i class="progress" aria-hidden="true" data-progress></i>
+
+<!-- ========== Navigation (markup commun du brief V4 §3) ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== A0 Hero : un portrait devant « Kenz. » ========== -->
+  <section class="hero kz-hero" id="top" aria-label="Kenz">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <i class="kz-hero__tint" aria-hidden="true"></i>
+    <div class="kz-hero__in">
+      <div class="kz-hero__stage">
+        <h1 class="kz-hero__word"><span class="kz-hero__wordIn">Kenz</span><span class="kz-hero__dot" data-cordon data-vers="createur.html" data-symbole="soleil" aria-hidden="true"></span></h1>
+        <span class="kz-hero__floor" aria-hidden="true"></span>
+        <figure class="kz-hero__fig">
+          <span class="kz-hero__shadow" aria-hidden="true"></span>
+          <span class="kz-hero__img"><img src="../assets/img/kenz-pro.webp" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920" fetchpriority="high" decoding="async"></span>
+        </figure>
+      </div>
+      <div class="kz-hero__copy">
+        <p class="kz-hero__line" data-words data-hero-words>Je construis des apps où l’IA fait le <em class="word">vrai</em> travail.</p>
+        <div class="kz-hero__aside">
+          <a class="kz-down" href="#apps" data-anim><span class="kz-down__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span>Voir ce que je construis</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== A1 Les apps : choisis une app (module partagé, shared/apps.*) ========== -->
+  <section id="apps" class="kz-apps" data-kz-apps data-theme="light" aria-label="Mes apps"></section>
+
+  <!-- ========== A2 Les 54 heures (module partagé, shared/victoire.*) ========== -->
+  <section id="victoire" class="kz-victoire" data-kz-victoire data-theme="light" aria-label="Startup Weekend"></section>
+
+  <!-- ========== A3 Pour votre équipe ========== -->
+  <section class="team" id="equipe" aria-labelledby="equipe-q">
+    <div class="wrap team__grid">
+      <div class="team__copy">
+        <h2 class="team__q" id="equipe-q" data-words>Et si des agents IA travaillaient pour vous, <em class="word">sans</em> jamais rien envoyer sans votre accord&nbsp;?</h2>
+        <a class="btn btn--light" href="agents.html" data-passage data-couleur="#F7F5F1" data-reveal="fade" style="--wd:.6s">Voir comment<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></a>
+      </div>
+      <div class="ag" data-agents data-iris>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Aperçu : trois sources tombent, un site concurrent, un appel d’offres et un article. L’agent Veille les trie, l’agent Vérification les contrôle, puis Hermes les assemble en une note du lundi, qui attend votre validation.">
+            <svg class="ag-wires" viewBox="0 0 100 126" preserveAspectRatio="none" aria-hidden="true">
+              <path pathLength="1" d="M18 20C18 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M50 20C50 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M82 20C82 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M46 35H52"/>
+              <path pathLength="1" d="M72 40C72 44.5 50 43.5 50 47"/>
+              <path pathLength="1" d="M50 59V66"/>
+            </svg>
+            <div class="ag-src ag-src--0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-node ag-node--v"><i></i>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c"><i></i>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h">Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW">
+              <div class="ag-note">
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line"><i></i><span>Site concurrent</span></div>
+                <div class="ag-line"><i></i><span>Appel d’offres</span></div>
+                <div class="ag-line"><i></i><span>Article</span></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW"><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== A4 Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word">idée</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA"><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  $$('[data-words]').forEach(splitWords);
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      en.target.classList.add('is-in');
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal]').forEach(el => { if (!el.closest('.hero')) io.observe(el); });
+
+  /* ---------- L'iris : le point attend au bord du chapitre, puis s'ouvre en cercle ----------
+     On observe le parent : un élément entièrement découpé ne « croise » pas toujours l'écran. */
+  const irisOpen = el => {
+    if (el.classList.contains('is-in')) return;
+    el.classList.add('is-in');
+    setTimeout(() => el.classList.add('is-open'), RM ? 0 : 1750);
+  };
+  safe('iris', () => {
+    const io2 = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        (en.target.__iris || []).forEach(irisOpen);
+        io2.unobserve(en.target);
+      });
+    }, { threshold: .22 });
+    $$('[data-iris]').forEach(el => {
+      const p = el.parentElement;
+      (p.__iris = p.__iris || []).push(el);
+      io2.observe(p);
+    });
+  });
+
+  /* ---------- A0 : entrée du hero (après un passage ou une porte, sinon au chargement) ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn, { once: true });
+  document.addEventListener('porte:arrivee', heroIn, { once: true });
+  let arriving = d.hasAttribute('data-porte-arrivee');
+  if (!arriving) {
+    try {
+      const p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null');
+      arriving = !!(p && Date.now() - p.t < 6000);
+    } catch (e) { arriving = false; }
+  }
+  if (arriving) setTimeout(heroIn, 2500);
+  else requestAnimationFrame(() => setTimeout(heroIn, 60));
+
+  /* ---------- Nav : fond au défilement ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+
+  /* ---------- Défilement doux (ordinateur) ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!window.Lenis || RM || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    if (hasG) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add(t => lenis.raf(t * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  });
+
+  /* ---------- Repère : un fil de progression, tout en haut ---------- */
+  safe('progress', () => {
+    const bar = $('[data-progress]');
+    if (!hasG || !bar) return;
+    bar.classList.add('is-on');
+    G.to(bar, { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: .3 } });
+  });
+
+  /* ---------- Passage vers une autre page (repli : navigation directe) ---------- */
+  const go = (src, url, couleur) => {
+    const P = window.Passage;
+    if (P && typeof P.ouvrir === 'function') {
+      try { P.ouvrir(src, url, { couleur }); return; } catch (e) { console.error('[kz] passage : ' + e.message); }
+    }
+    location.href = url;
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-passage]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const src = (a.dataset.source && document.querySelector(a.dataset.source)) || a;
+    go(src, a.getAttribute('href'), a.dataset.couleur);
+  });
+
+  /* ---------- Ancres internes et logo ---------- */
+  const scrollToY = y => {
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+  };
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l || e.defaultPrevented) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    scrollToY(id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY);
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  });
+  /* Sur l'accueil, « Kenz » remonte en douceur. Le point garde son propre comportement (shared/cordon.js). */
+  safe('logo', () => {
+    const logo = $('.kz-logo');
+    logo.addEventListener('click', e => {
+      if (e.defaultPrevented || e.target.closest('.kz-dot') || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      scrollToY(0);
+    });
+  });
+
+  /* =========================================================
+     Scènes. État final = CSS par défaut ; GSAP pose l'état de départ et joue vers l'état final.
+     ========================================================= */
+  const B = {
+    agents(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const srcs = q('.ag-src'), ticks = q('.ag-tick'), wires = q('.ag-wires path'), glows = q('.ag-glow'), nodes = q('.ag-node');
+      const note = q1('.ag-note'), title = q1('.ag-note__t'), lines = q('.ag-line'), okW = q1('.ag__okW');
+      G.set(srcs, { opacity: 0, y: 0, xPercent: 0, yPercent: -230, rotation: i => [-7, 5, -4][i] });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set(wires, { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .4 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0%)' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { opacity: 0, y: 12, scale: .965 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(srcs, { opacity: 1, yPercent: 0, rotation: 0, duration: .9, stagger: .15 }, .1)
+        .to([wires[0], wires[1], wires[2]], { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, .95)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.2)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.25)
+        .to(srcs[2], { xPercent: -220.7, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to([srcs[0], srcs[1]], { xPercent: 110.35, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to(wires[3], { strokeDashoffset: 0, duration: .3, ease: 'power2.out' }, 2)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.1)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.15)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.15)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .12 }, 2.3)
+        .to(wires[4], { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 2.65)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 2.85)
+        .to(glows[1], { opacity: 0, duration: .4 }, 2.9)
+        .to(glows[2], { opacity: 1, duration: .5 }, 2.9)
+        .to(wires[5], { strokeDashoffset: 0, duration: .3 }, 3.1)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(-14% -14% -30% -14%)', duration: 1 }, 3.2)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 3.35)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 3.5)
+        .to(okW, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, 4.05);
+    }
+  };
+
+  /* Une scène : timeline + bouton « Rejouer » */
+  function makeScene(el, opts = {}) {
+    const s = { el, tl: null, seen: false, pending: null, rb: el.querySelector('[data-replay]') };
+    if (!hasG) return s;
+    try { s.tl = B[opts.name || el.dataset.scene](el, opts); } catch (e) { console.error('[kz] scène : ' + e.message); s.tl = null; return s; }
+    if (opts.speed) s.tl.timeScale(opts.speed);
+    if (RM) { s.tl.progress(1, true); s.seen = true; return s; }
+    el.classList.add('has-tl');
+    s.tl.eventCallback('onComplete', () => { s.seen = true; if (opts.onDone) opts.onDone(); else if (s.rb) s.rb.classList.add('is-on'); });
+    if (s.rb && !opts.ownReplay) s.rb.addEventListener('click', () => { s.rb.classList.remove('is-on'); s.tl.restart(); });
+    return s;
+  }
+  const play = (s, delay = .4) => {
+    if (!s || !s.tl || s.seen) return;
+    if (s.pending) s.pending.kill();
+    s.pending = G.delayedCall(delay, () => { s.pending = null; s.tl.restart(); });
+  };
+
+  /* =========================================================
+     A3 : l'aperçu agents (≈ 2 s), puis c'est au visiteur de valider
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const ok = $('[data-ok]', ag), live = $('[data-ag-live]', ag), rb = $('[data-replay]', ag);
+    ag.dataset.scene = 'agents';
+    const ready = () => { live.textContent = 'La note du lundi est prête. Elle attend votre validation.'; };
+    const s = makeScene(ag, { ownReplay: true, onDone: ready, speed: 2.3 });
+    ag.classList.add('has-tl');
+    if (!s.tl || RM) ready();
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => { rb.classList.add('is-on'); if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true }); }, RM ? 300 : 1900);
+    });
+    rb.addEventListener('click', () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (s.tl) { s.seen = false; s.tl.restart(); }
+      else ready();
+    });
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(s, .25); o.disconnect(); } }, { threshold: .4 });
+    if (s.tl && !RM) o.observe(ag);
+  });
+
+  /* =========================================================
+     A4 : formulaire (envoi simulé)
+     ========================================================= */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) window.addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="../shared/apps.js"></script>
+<script src="../shared/victoire.js"></script>
+<script>
+/* Contournement d'un défaut du module « victoire » (shared/ n'est pas modifié) : en arrivant directement au milieu
+   de l'épinglage (rechargement, outil de revue), deux timelines au défilement règlent l'opacité de la légende
+   « Startup Weekend, Grenoble. » et elle restait affichée sur les temps suivants. La page la masque
+   (visibility, que GSAP ne touche pas) une fois le premier temps passé ; en remontant, elle revient. */
+(() => {
+  const ST = window.ScrollTrigger, sec = document.getElementById('victoire');
+  if (!ST || !sec) return;
+  const pinOf = () => ST.getAll().find(s => s.pin === sec);
+  const go = () => {
+    ST.create({
+      start: () => { const p = pinOf(); return p ? p.start + (p.end - p.start) * .14 : 0; },
+      end: 'max',
+      onToggle: s => sec.classList.toggle('kz-v-cap-off', s.isActive)
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+  else go();
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,1808 @@
+<!doctype html>
+<!--
+  Kenz — Pro (V3 « le récit »)
+  Heure bleue. Une idée par écran : hero → icônes (dock) → six onboardings d'apps (problème → animation → résultat)
+  → équipe d'agents (le visiteur valide) → méthode → un moment → contact → le sceau.
+  Ordinateur (≥ 900 × 600, sans mouvement réduit) : chaque app est un chapitre épinglé, le scroll fait avancer les 3 temps.
+  Mobile et mouvement réduit : pas d'épinglage, chaque temps se déclenche à l'entrée à l'écran.
+  Le sceau (shared/sceau.css + shared/sceau.js) est écrit à part ; cette page respecte son contrat.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash==='#porte'&&document.documentElement.setAttribute('data-sceau-arrivee','lune')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Pro</title>
+<meta name="description" content="Kenz transforme une idée en app que les gens utilisent, et l'IA y fait le vrai travail.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1220">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="stylesheet" href="shared/sceau.css">
+<link rel="preload" as="image" href="assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   Jetons
+   ========================================================= */
+:root{
+  --bg:#0E1220;
+  --bg-2:#121A2B;
+  --creme:#F4EFE6;
+  --sceau-lumiere:#F2B45A;
+  --ink:#0E1220;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+  --lagon-l:#6FBCCB;
+  --dusk:157 184 255;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.65,0,.35,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(88px,11vw,168px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p{margin:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(55% 45% at 88% 0%, rgba(110,150,214,.10), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(15,93,107,.14), transparent 70%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+main{overflow-x:clip}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte éventuel : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:18px; line-height:1.3; letter-spacing:0; color:var(--faint)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,7vw,112px); line-height:.92; letter-spacing:-.01em}
+.say{margin:0; font-size:clamp(30px,4.4vw,64px); line-height:1.08; letter-spacing:-.03em; font-weight:500; text-wrap:balance}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#171E31,#121827); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); border:1px solid rgba(255,255,255,.16)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:54px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:40px; height:40px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(14,18,32,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.2)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link::after{content:""; position:absolute; left:2px; right:2px; bottom:10px; height:1px; background:currentColor; opacity:.5; transform-origin:left; transition:transform .7s var(--expo), opacity .4s}
+.link:hover{color:var(--creme)}
+.link:hover::after{opacity:1; transform:scaleX(1.0)}
+
+/* Rejouer : discret, dans le coin de l'animation */
+.replay{position:absolute; z-index:4; bottom:14px; right:14px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:500; color:rgba(244,239,230,.86); background:rgba(14,18,32,.55); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo) var(--wd, 0s), filter 1.2s var(--expo) var(--wd, 0s)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+.js [data-slit] .slit .num{transform:translateY(108%); filter:blur(6px); transition:transform .24s var(--out), filter .24s var(--out)}
+.js [data-slit].is-in .slit .num{transform:none; filter:none; transition:transform 1.2s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 110ms)}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(14,18,32,.86), rgba(14,18,32,.5)); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.brand{display:flex; align-items:baseline; margin-right:auto}
+.brand__name{font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; padding:6px 0 6px 2px; border-radius:10px}
+.brand__dot{position:relative; display:grid; place-items:center; width:30px; height:44px; margin:-12px 0 -12px -6px; border-radius:12px; align-self:center}
+.brand__dot i{display:block; width:6px; height:6px; margin-top:12px; border-radius:50%; background:var(--creme); transition:background .6s var(--expo), box-shadow .6s var(--expo), transform .6s var(--expo)}
+.brand__dot:hover i,.brand__dot:focus-visible i{background:var(--sceau-lumiere); box-shadow:0 0 10px var(--sceau-lumiere); transform:scale(1.25)}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(14,18,32,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--creme); color:var(--ink); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .brand__name{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* =========================================================
+   P0 Hero (heure bleue)
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate; background:#0B0F1B}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__bg{position:absolute; inset:-5% -4%; z-index:0}
+.hero__bgIn{position:absolute; inset:0}
+.hero__land{width:100%; height:100%; object-fit:cover; object-position:46% 50%; filter:sepia(.8) hue-rotate(-168deg) saturate(1.3) brightness(.5) contrast(1.1)}
+.hero__wash{position:absolute; inset:0; background:linear-gradient(180deg, rgba(34,58,108,.42), rgba(10,18,36,.18) 55%, rgba(8,12,24,.5))}
+.hero__shade{position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(180deg, rgba(11,15,27,.8) 0%, rgba(11,15,27,.42) 36%, rgba(11,15,27,0) 58%), linear-gradient(0deg, var(--bg) 0%, rgba(14,18,32,.55) 12%, rgba(14,18,32,0) 32%)}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + 92px)}
+.hero__copy{position:relative; z-index:3; padding-left:var(--gl); padding-right:var(--gr)}
+.hero__title{position:relative; margin:0 0 .14em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(92px,26vw,150px); line-height:.82; letter-spacing:-.015em; color:var(--creme)}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.hero__line{margin:0 0 28px; max-width:25ch; font-size:clamp(18px,1.6vw,22px); line-height:1.45; color:rgba(244,239,230,.94); text-wrap:balance; --wd:1.05s}
+.hero__cta{display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px}
+.hero__stage{position:relative; z-index:1; flex:1 1 auto; min-height:48vh; min-height:48svh}
+.hero__glow{position:absolute; left:50%; top:2%; width:min(130%, 920px); aspect-ratio:1; translate:-50% 0; border-radius:50%; background:radial-gradient(closest-side, rgba(118,158,228,.28), rgba(118,158,228,0))}
+.hero__fig{position:absolute; top:0; left:50%; height:calc(100% / .79); aspect-ratio:9 / 16; translate:-50% 0;
+  -webkit-mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+          mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%)}
+.portrait{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 0}
+@media (min-width:861px){
+  .hero__layout{justify-content:flex-end; padding:0 var(--gr) clamp(56px,11svh,128px) var(--gl)}
+  .hero__copy{padding:0; max-width:min(640px, 44%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__stage{position:absolute; right:0; bottom:0; top:9vh; top:9svh; width:58%; min-height:0}
+  .hero__shade{background:linear-gradient(180deg, rgba(11,15,27,.55) 0%, rgba(11,15,27,0) 20%), linear-gradient(90deg, rgba(11,15,27,.7) 0%, rgba(11,15,27,.3) 34%, rgba(11,15,27,0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(14,18,32,.5) 10%, rgba(14,18,32,0) 30%)}
+}
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .hero__bgIn{opacity:0; transform:scale(1.07)}
+.hero-in .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo), transform 2.6s var(--expo)}
+.js .hero__stage{opacity:0; filter:blur(10px); transform:translateY(3%)}
+.hero-in .hero__stage{opacity:1; filter:none; transform:none; transition:opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.hero-in .ttl--main{animation:ttlMain 1.7s var(--expo) .6s both}
+.hero-in .ttl--ghost{animation:ttlGhost 1.5s var(--expo) .42s both}
+.js .hero [data-anim]{opacity:0}
+.hero-in .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad, 0s)}
+.hero__cta [data-anim]{--ad:1.75s}
+.hero__cta .link[data-anim]{--ad:1.9s}
+</style>
+<style>
+/* =========================================================
+   P1 Les icônes (le dock)
+   ========================================================= */
+.icons{position:relative; overflow:clip; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(34px,4.6vw,60px); min-height:100vh; min-height:100svh; padding:var(--sec) var(--gr) var(--sec) var(--gl); text-align:center}
+.icons::before{content:""; position:absolute; left:50%; top:46%; width:min(120vw,1100px); aspect-ratio:2 / 1; translate:-50% -50%; border-radius:50%; background:radial-gradient(closest-side, rgb(var(--dusk) / .09), transparent); pointer-events:none}
+.icons__say{position:relative; max-width:19ch}
+.dock{position:relative; display:flex; align-items:center; gap:clamp(8px,1.5vw,18px); padding:clamp(10px,1.2vw,14px); border-radius:clamp(24px,2.6vw,34px);
+  background:linear-gradient(180deg, rgba(244,239,230,.075), rgba(244,239,230,.03));
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.1), inset 0 1px 0 rgba(255,255,255,.08), 0 40px 80px -40px rgba(0,0,0,.9), 0 2px 6px rgba(0,0,0,.25)}
+.dock__btn{position:relative; display:block; flex:none; width:clamp(44px,5.2vw,72px); aspect-ratio:1; border-radius:23%}
+.dock__btn img{width:100%; height:100%; border-radius:inherit; object-fit:cover; box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 10px 24px -10px rgba(0,0,0,.8); transition:transform .7s var(--expo), opacity .6s var(--expo), filter .6s var(--expo)}
+.dock__btn:hover img{transform:translateY(-4px)}
+.dock__btn:active img{transform:translateY(-2px) scale(.97)}
+.dock__btn:focus-visible{outline-offset:4px}
+.dock__bar{position:absolute; left:22%; right:22%; bottom:-7px; height:2px; border-radius:2px; background:rgba(244,239,230,.2); overflow:hidden; opacity:0; transition:opacity .5s var(--expo)}
+.dock__bar::after{content:""; position:absolute; inset:0; background:var(--creme); transform-origin:left; transform:scaleX(var(--p, 1))}
+.icons .dock__btn:first-child .dock__bar{bottom:-9px}
+.icons.is-pointed .dock__btn:first-child img{transform:translateY(-8px)}
+.icons.is-pointed .dock__btn:first-child .dock__bar{opacity:1; transition-delay:.2s}
+.js .icons .dock{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .icons.is-in .dock{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo)}
+.js .icons .dock__btn{opacity:0; transform:translateY(34px) scale(.965)}
+.js .icons.is-in .dock__btn{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(.18s + var(--i) * 80ms)}
+.icons__say{--wd:.85s}
+.js .icons .icons__go{opacity:0; transform:translateY(16px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .icons.is-pointed .icons__go{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo)}
+
+/* Dock fixe : repère de progression des chapitres apps */
+.dockbar{position:fixed; z-index:40; left:50%; bottom:calc(14px + env(safe-area-inset-bottom)); transform:translate(-50%, 26px) scale(.965); opacity:0; visibility:hidden;
+  transition:opacity .24s var(--out), transform .24s var(--out), visibility 0s .24s}
+.dockbar.is-on{opacity:1; visibility:visible; transform:translate(-50%, 0); transition:opacity .9s var(--expo), transform 1.2s var(--expo), visibility 0s}
+.dockbar .dock{gap:2px; padding:5px; border-radius:20px; background:rgba(14,18,32,.74); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 0 0 1px rgba(244,239,230,.12), 0 20px 40px -18px rgba(0,0,0,.8)}
+.dockbar .dock__btn{width:46px; height:46px; padding:5px; border-radius:14px}
+.dockbar .dock__btn img{border-radius:10px; opacity:.46; filter:saturate(.55)}
+.dockbar .dock__btn:hover img{opacity:.85; filter:none}
+.dockbar .dock__btn[aria-current] img{opacity:1; filter:none; transform:translateY(-3px)}
+.dockbar .dock__btn[aria-current] .dock__bar{opacity:1}
+.dockbar .dock__bar{bottom:1px}
+@media (max-width:899px){
+  .dockbar{left:auto; right:max(12px, env(safe-area-inset-right)); transform:translateY(26px) scale(.965)}
+  .dockbar.is-on{transform:none}
+  .dockbar .dock__btn{width:40px; height:44px; padding:6px 4px}
+}
+
+/* =========================================================
+   P2 à P7 : une app = un onboarding en 3 temps
+   ========================================================= */
+.app{position:relative; --tint:244 239 230; overflow:clip;
+  background:radial-gradient(60% 52% at 50% 46%, rgb(var(--tint) / .10), transparent 72%), var(--bg)}
+.app__in{position:relative; max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+.beat{position:relative}
+.beat--pb{display:flex; align-items:center; justify-content:center; min-height:62vh; min-height:62svh; padding-block:16svh 6svh; text-align:center}
+.beat--sc{padding-block:4svh 6svh}
+.beat--res{padding-block:8svh 18svh}
+.pb{max-width:16ch; margin-inline:auto; font-size:clamp(34px,5.6vw,86px); line-height:1.04; letter-spacing:-.035em; font-weight:500; text-wrap:balance}
+.pb .word{text-shadow:0 0 .5em rgb(var(--tint) / .5), 0 0 1.4em rgb(var(--tint) / .2)}
+
+/* Épinglage (ordinateur) : les trois temps se superposent dans le même écran */
+.is-pin .app{height:100vh}
+.is-pin .app__in{height:100%}
+.is-pin .beat{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; min-height:0; padding:96px var(--gr) 108px var(--gl);
+  opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s}
+.is-pin .beat.is-on{opacity:1; visibility:visible; transition:opacity .7s var(--expo), visibility 0s}
+.is-pin .beat--pb{padding-bottom:120px}
+.is-pin .sc{width:min(460px, calc((100vh - 220px) * .76))}
+
+/* Le résultat */
+.res{display:grid; gap:clamp(32px,4.4vw,80px); align-items:center; width:100%}
+.res__media{position:relative; display:flex; justify-content:center; align-items:center}
+.res__media::before{content:""; position:absolute; left:50%; top:50%; width:120%; aspect-ratio:1.4; translate:-50% -50%; border-radius:50%; background:radial-gradient(closest-side, rgb(var(--tint) / .16), transparent); pointer-events:none}
+.shot{position:relative; border-radius:20px; background:#111; box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 44px 80px -36px rgba(0,0,0,.9), 0 10px 22px -10px rgba(0,0,0,.5)}
+.res__media--duo .shot{width:44%; height:auto}
+.res__media--duo .shot + .shot{margin-left:-5%; transform:translateY(9%)}
+.res__media--solo .shot{width:56%; height:auto}
+.res__media--land .shot{width:100%; height:auto; border-radius:16px}
+.res__txt{display:flex; flex-direction:column; align-items:flex-start; gap:22px}
+.res__id{display:flex; align-items:center; gap:16px}
+.res__ico{width:60px; height:60px; border-radius:23%; box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 12px 28px -10px rgba(0,0,0,.7)}
+.res__name{margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,5vw,76px); line-height:.9}
+.res__line{max-width:27ch; font-size:clamp(19px,1.6vw,23px); line-height:1.45; color:rgba(244,239,230,.92); text-wrap:pretty}
+.res__links{display:flex; flex-wrap:wrap; gap:10px}
+@media (min-width:900px){
+  .res{grid-template-columns:7fr 5fr}
+  .res--rev{grid-template-columns:5fr 7fr}
+  .res--rev .res__media{order:2}
+  .res__media--duo .shot{width:auto; height:var(--sh, min(54vh, 540px))}
+  .res__media--solo .shot{width:auto; height:var(--sh, min(58vh, 560px))}
+  .res__media--land .shot{max-width:680px}
+  .is-pin .res__media--duo .shot{--sh:min(calc(100vh - 290px), 520px)}
+  .is-pin .res__media--solo .shot{--sh:min(calc(100vh - 250px), 560px)}
+  .is-pin .res__media--land .shot{max-height:calc(100vh - 260px); width:auto; max-width:100%}
+}
+.res [data-reveal="card"]{--d:0}
+.res__txt [data-reveal="fade"]:nth-child(2){--d:2}
+.res__txt [data-reveal="fade"]:nth-child(3){--d:4}
+.res__txt [data-reveal="fade"]:nth-child(4){--d:5}
+
+/* =========================================================
+   Scènes (animations des apps) — unités cqw, état final par défaut
+   ========================================================= */
+.sc{position:relative; width:min(100%, 440px); margin-inline:auto}
+.sc__view{position:relative; aspect-ratio:4 / 5; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -46px rgba(0,0,0,.9)}
+.sc__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(90% 60% at 50% 0%, rgb(var(--tint) / .22), transparent 70%), linear-gradient(180deg, var(--sc-a, #161D30), var(--sc-b, #0F1424));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.sc__ex{position:absolute; left:5.5cqw; bottom:4cqw; z-index:5; font-size:max(11px,2.9cqw); color:rgba(244,239,230,.6); letter-spacing:.01em}
+.js .beat--sc .sc{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .beat--sc .sc.is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo)}
+
+/* --- Oshii : la vidéo devient une recette --- */
+.sc--oshii{--tint:236 104 84; --sc-a:#2A1715; --sc-b:#160E0D}
+.sc--oshii .sc__ex{top:4.4cqw; bottom:auto}
+.os-video{position:absolute; left:28cqw; top:7cqw; width:44cqw; height:78cqw; border-radius:5cqw; overflow:hidden; opacity:0; transform-origin:-35% 125%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1), 0 4cqw 10cqw -3cqw rgba(0,0,0,.7)}
+.os-food{position:absolute; inset:0; width:100%; height:100%}
+.os-video::after{content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,0) 34%); pointer-events:none}
+.os-rail{position:absolute; right:2.6cqw; bottom:17cqw; z-index:1; display:grid; gap:3.6cqw}
+.os-rail svg{width:5.4cqw; height:5.4cqw; color:#fff; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.os-cap{position:absolute; left:3.2cqw; right:10cqw; bottom:6.4cqw; z-index:1; font-size:max(10px,3cqw); font-weight:600; line-height:1.25; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.os-bar{position:absolute; left:3.2cqw; right:3.2cqw; bottom:3.4cqw; z-index:1; height:.7cqw; border-radius:1cqw; background:rgba(255,255,255,.3); overflow:hidden}
+.os-bar i{position:absolute; inset:0; background:#fff; transform-origin:left; transform:scaleX(.72)}
+.os-sheet{position:absolute; left:0; right:0; bottom:0; height:40cqw; padding:4.6cqw 6cqw 0; border-radius:6cqw 6cqw 0 0; background:#201C21; transform:translateY(105%);
+  box-shadow:0 -1px 0 rgba(255,255,255,.08), 0 -6cqw 14cqw -6cqw rgba(0,0,0,.6)}
+.os-sheet::before{content:""; position:absolute; top:1.8cqw; left:50%; width:9cqw; height:1cqw; margin-left:-4.5cqw; border-radius:1cqw; background:rgba(255,255,255,.22)}
+.os-sheet__t{font-size:max(10px,3.2cqw); line-height:1.3; font-weight:600; color:rgba(244,239,230,.82)}
+.os-row{display:flex; gap:7.2cqw; margin-top:3.6cqw}
+.os-app{position:relative; display:grid; justify-items:center; gap:1.6cqw; font-size:max(9px,2.6cqw); line-height:1.2; color:rgba(244,239,230,.8)}
+.os-app > i{display:block; width:13cqw; height:13cqw; border-radius:3.4cqw; background:rgba(255,255,255,.1)}
+.os-app > b{display:block; width:9cqw; height:1.6cqw; margin-top:.6cqw; border-radius:1cqw; background:rgba(255,255,255,.1)}
+.os-app img{width:13cqw; height:13cqw; border-radius:3.4cqw}
+.os-tap{position:absolute; left:50%; top:6.5cqw; width:17cqw; height:17cqw; margin:-8.5cqw 0 0 -8.5cqw; border-radius:50%; border:.5cqw solid rgba(255,255,255,.85); opacity:0; pointer-events:none}
+.os-recipe{position:absolute; left:9cqw; right:9cqw; top:12cqw; padding:5.4cqw 6cqw 4.6cqw; border-radius:5.4cqw; background:var(--creme); color:#1A1918; box-shadow:0 5cqw 12cqw -5cqw rgba(0,0,0,.85)}
+.os-recipe__head{display:flex; align-items:center; gap:3cqw}
+.os-recipe__head img{flex:none; width:9cqw; height:9cqw; border-radius:2.4cqw}
+.os-recipe__t{font-size:max(13px,4.8cqw); font-weight:600; letter-spacing:-.02em; line-height:1.15}
+.os-ing{margin-top:4cqw}
+.os-ing li{display:flex; align-items:baseline; justify-content:space-between; gap:2cqw; padding:2.2cqw 0; border-top:1px solid rgba(26,25,24,.1); font-size:max(11px,3.7cqw); line-height:1.3}
+.os-ing b{font-weight:600; font-variant-numeric:tabular-nums}
+.os-steps{display:flex; align-items:center; justify-content:space-between; margin-top:1cqw; padding-top:3cqw; border-top:1px solid rgba(26,25,24,.1); font-size:max(11px,3.7cqw); font-weight:600}
+.os-steps svg{width:4cqw; height:4cqw}
+
+/* --- Sago : le japonais devient lisible --- */
+.sc--sago{--tint:150 128 255; --sc-a:#1E1736; --sc-b:#110D21}
+.sg-line{position:absolute; left:0; right:0; top:52cqw; display:flex; justify-content:center; align-items:flex-end; gap:3.4cqw; margin:0; font-family:var(--f-ja); font-weight:600; font-size:13.5cqw; line-height:1; letter-spacing:.02em}
+.sg-w{position:relative; display:inline-block}
+.sg-k{display:inline-block}
+.sg-draw{position:absolute; left:50%; bottom:calc(100% + 3.4cqw); width:24cqw; height:auto; translate:-50% 0; overflow:visible}
+.sg-draw path,.sg-draw circle{fill:none; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round}
+.sg-cat path{stroke:var(--creme)}
+.sg-heart path{stroke:#C2B3FF}
+.sg-fr{position:absolute; left:6cqw; right:6cqw; top:84cqw; text-align:center; font-size:max(17px,6.6cqw); font-weight:500; letter-spacing:-.02em; line-height:1.2}
+.sg-fw{display:inline-block}
+.sg-rule{position:absolute; left:20cqw; right:20cqw; top:76cqw; height:1px; background:linear-gradient(90deg, transparent, rgba(244,239,230,.25), transparent)}
+
+/* --- Wado : la photo devient des macros --- */
+.sc--wado{--tint:84 196 128; --sc-a:#10261C; --sc-b:#0A1812}
+.wd-plate{position:absolute; left:22cqw; top:8cqw; width:56cqw; aspect-ratio:1}
+.wd-food{position:absolute; inset:0; width:100%; height:100%}
+.wd-scan{position:absolute; inset:-3cqw; overflow:hidden; border-radius:3cqw; pointer-events:none}
+.wd-sweep{position:absolute; left:0; right:0; top:0; height:100%; opacity:0; transform:translateY(-100%);
+  background:linear-gradient(180deg, rgba(140,236,176,0), rgba(140,236,176,.18)); border-bottom:.5cqw solid #B4F3CC; box-shadow:0 1.2cqw 4cqw -1cqw rgba(140,240,180,.7)}
+.wd-br{position:absolute; width:8cqw; height:8cqw; border:0 solid rgba(244,239,230,.9)}
+.wd-br--a{left:-4cqw; top:-4cqw; border-width:.6cqw 0 0 .6cqw; border-radius:2.6cqw 0 0 0}
+.wd-br--b{right:-4cqw; top:-4cqw; border-width:.6cqw .6cqw 0 0; border-radius:0 2.6cqw 0 0}
+.wd-br--c{left:-4cqw; bottom:-4cqw; border-width:0 0 .6cqw .6cqw; border-radius:0 0 0 2.6cqw}
+.wd-br--d{right:-4cqw; bottom:-4cqw; border-width:0 .6cqw .6cqw 0; border-radius:0 0 2.6cqw 0}
+.wd-pills{position:absolute; left:6cqw; top:73cqw; width:60cqw; display:grid; grid-template-columns:1fr 1fr; gap:2.4cqw}
+.wd-pills li{padding:2.4cqw 3cqw; border-radius:3.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.wd-pills span{display:block; font-size:max(10px,2.9cqw); line-height:1.3; color:var(--muted)}
+.wd-pills b{display:block; font-size:max(13px,4.7cqw); line-height:1.25; font-weight:600; white-space:nowrap}
+.wd-pills .slit{display:block}
+.wd-pills small{font-size:.66em; font-weight:500; letter-spacing:0}
+.wd-pills .wd-k{display:flex; align-items:center}
+.wd-ring{position:absolute; right:6cqw; top:73cqw; width:25cqw; display:grid; justify-items:center; gap:1.6cqw}
+.wd-ring svg{width:21cqw; height:21cqw; transform:rotate(-90deg)}
+.wd-ring circle{fill:none; stroke-width:4.6}
+.wd-ring__bg{stroke:rgba(244,239,230,.12)}
+.wd-ring__fg{stroke:#93E6B2; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:.24}
+.wd-ring span{font-size:max(10px,3cqw); line-height:1.2; color:var(--muted); text-align:center}
+
+/* --- Croc : le pacte du matin, validé le soir --- */
+.sc--croc{--tint:178 160 255; --sc-a:#221D3A; --sc-b:#141127}
+.cr-top{position:absolute; left:7cqw; right:7cqw; top:8cqw; display:flex; align-items:center; gap:4.4cqw}
+.cr-mascot{flex:none; width:19cqw; height:19cqw; overflow:visible}
+.cr-streak{display:grid; gap:1cqw}
+.cr-streak__l{font-size:max(10px,3.2cqw); color:var(--muted)}
+.cr-streak__v{display:flex; align-items:baseline; gap:2cqw; font-size:max(26px,11.5cqw); font-weight:600; letter-spacing:-.04em; line-height:1}
+.roll-w{display:inline-block; height:1.04em; overflow:hidden; vertical-align:top}
+.roll{display:flex; flex-direction:column}
+.roll b{display:block; height:1.04em; line-height:1.04em; font-weight:inherit; text-align:right; font-variant-numeric:tabular-nums}
+.cr-roll{transform:translateY(-87.5%)}
+.cr-streak__u{font-size:max(13px,4.6cqw); font-weight:500; letter-spacing:-.01em; color:var(--muted)}
+.cr-pact{position:absolute; left:7cqw; right:7cqw; top:38cqw; display:grid; grid-template-columns:1fr 1fr; gap:3cqw}
+.cr-pill{display:flex; align-items:center; gap:2.6cqw; padding:3.2cqw; border-radius:4.4cqw; background:rgba(244,239,230,.06); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.cr-pill small{display:block; font-size:max(9px,2.8cqw); line-height:1.25; color:var(--muted)}
+.cr-pill span{display:block; font-size:max(11px,3.6cqw); line-height:1.25; font-weight:600; white-space:nowrap}
+.chk{position:relative; flex:none; display:block; width:8cqw; height:8cqw; border-radius:50%; box-shadow:inset 0 0 0 .5cqw rgba(244,239,230,.28)}
+.chk > i{position:absolute; inset:0; border-radius:50%; background:#B9A5FF}
+.chk svg{position:absolute; inset:0; width:100%; height:100%}
+.chk path{fill:none; stroke:#15122A; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0}
+.cr-week{position:absolute; left:7cqw; right:7cqw; top:66cqw; display:flex; justify-content:space-between}
+.cr-week li{display:grid; justify-items:center; gap:2cqw; font-size:max(10px,3cqw); line-height:1; color:var(--muted)}
+.cr-week .chk{width:9.6cqw; height:9.6cqw}
+.cr-week .chk > i{background:#9C88F6}
+.cr-bravo{position:absolute; left:0; right:0; top:90cqw; text-align:center; font-size:max(14px,4.4cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; color:#D9CFFF}
+
+/* --- Miru : un thème, un jeu, un téléphone qui tourne --- */
+.sc--miru{--tint:120 128 255; --sc-a:#1C1B4A; --sc-b:#111130}
+.mr-field{position:absolute; left:7cqw; right:7cqw; top:6cqw; height:15cqw; display:flex; flex-direction:column; justify-content:center; gap:.6cqw; padding:0 4.4cqw; border-radius:4.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.15)}
+.mr-field__l{font-size:max(9px,2.7cqw); line-height:1.2; color:var(--muted)}
+.mr-type{font-size:max(12px,4.4cqw); line-height:1.25; font-weight:500; white-space:nowrap}
+.mr-caret{display:inline-block; width:.5cqw; height:1.1em; margin-left:.4cqw; vertical-align:-.2em; background:#B4BAFF; opacity:0}
+.mr-av{position:absolute; z-index:2; width:14cqw; height:14cqw; border-radius:50%; box-shadow:0 0 0 .7cqw #15153A}
+.mr-av svg{display:block; width:100%; height:100%}
+.mr-av .mr-hi{position:absolute; inset:-1.4cqw; border-radius:50%; box-shadow:0 0 0 .5cqw rgba(244,239,230,.85), 0 0 5cqw rgba(180,186,255,.5); opacity:0}
+.mr-av--0{left:43cqw; top:31cqw} .mr-av--1{left:75.3cqw; top:54.5cqw} .mr-av--2{left:63cqw; top:92.5cqw} .mr-av--3{left:23cqw; top:92.5cqw} .mr-av--4{left:10.7cqw; top:54.5cqw}
+.mr-av--2 .mr-hi{opacity:1}
+.mr-card{position:absolute; z-index:1; left:44cqw; top:64cqw; width:12cqw; height:16cqw; border-radius:2cqw; background:var(--creme); box-shadow:0 1.4cqw 3cqw -1cqw rgba(0,0,0,.6)}
+.mr-card::before{content:""; position:absolute; left:2.2cqw; right:2.2cqw; top:5cqw; height:1.6cqw; border-radius:1cqw; background:#3B3FB8; box-shadow:0 3.2cqw 0 -.3cqw rgba(59,63,184,.35)}
+.mr-card::after{content:""; position:absolute; right:2cqw; bottom:2cqw; width:2.2cqw; height:2.2cqw; border-radius:50%; background:#FFB86B}
+.mr-card--0{transform:translate(0%,-250.75%) rotate(-6deg) scale(.75)}
+.mr-card--1{transform:translate(318%,-77.5%) rotate(10deg) scale(.75)}
+.mr-card--2{transform:translate(196.5%,202.8%) rotate(14deg) scale(.75)}
+.mr-card--3{transform:translate(-196.5%,202.8%) rotate(-12deg) scale(.75)}
+.mr-card--4{transform:translate(-318%,-77.5%) rotate(-9deg) scale(.75)}
+.mr-phone{position:absolute; z-index:3; left:45.5cqw; top:64cqw; width:9cqw; height:16cqw; border-radius:2.2cqw; background:#0C0C22; box-shadow:inset 0 0 0 .5cqw #CDD1FF, 0 2cqw 4cqw -1cqw rgba(0,0,0,.7); transform:translate(122.1%,94.5%)}
+.mr-phone i{position:absolute; inset:1.3cqw; border-radius:1.2cqw; background:linear-gradient(160deg,#8A90FF,#3B3FB8)}
+
+/* --- Zenko : un budget, une journée qui se recompose --- */
+.sc--zenko{--tint:214 146 88; --sc-a:#2C1D12; --sc-b:#1A110B}
+.zk-budget{position:absolute; left:7cqw; right:7cqw; top:8cqw}
+.zk-head{display:flex; align-items:baseline; justify-content:space-between}
+.zk-l{font-size:max(11px,3.4cqw); color:var(--muted)}
+.zk-v{display:flex; align-items:baseline; gap:1.2cqw; font-size:max(26px,11cqw); font-weight:600; letter-spacing:-.04em; line-height:1}
+.zk-v small{font-size:.56em; font-weight:500; color:var(--muted)}
+.zk-roll{transform:translateY(-93.75%)}
+.zk-track{position:relative; height:2cqw; margin-top:6cqw; border-radius:2cqw; background:rgba(244,239,230,.12)}
+.zk-fill{position:absolute; inset:0; border-radius:inherit; background:linear-gradient(90deg,#B97A47,#F0B987); transform-origin:left; transform:scaleX(.5)}
+.zk-knobwrap{position:absolute; left:0; top:50%; width:100%; height:0; transform:translateX(50%)}
+.zk-knob{position:absolute; left:0; top:0; width:7.4cqw; height:7.4cqw; margin:-3.7cqw 0 0 -3.7cqw; border-radius:50%; background:var(--creme); box-shadow:0 1cqw 3cqw rgba(0,0,0,.5), 0 0 0 1.4cqw rgba(240,185,135,.2)}
+.zk-ends{display:flex; justify-content:space-between; margin-top:3.4cqw; font-size:max(9px,2.7cqw); color:var(--faint)}
+.zk-day{position:absolute; left:7cqw; right:7cqw; top:45cqw; display:grid; gap:3cqw}
+.zk-card{display:flex; align-items:center; gap:4cqw; height:18cqw; padding:0 4cqw; border-radius:4.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.zk-act{position:relative; flex:none; width:11cqw; height:11cqw; border-radius:3cqw; background:rgba(240,185,135,.16)}
+.zk-a{position:absolute; left:2.2cqw; top:2.2cqw; width:6.6cqw; height:6.6cqw; color:#F3C79C; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; backface-visibility:hidden}
+.zk-a--1{opacity:0}
+.zk-txt{display:grid; gap:2cqw; flex:1}
+.zk-when{font-size:max(12px,4cqw); line-height:1.1; font-weight:600}
+.zk-cost{position:relative; height:1.2cqw; border-radius:1cqw; background:rgba(244,239,230,.1); overflow:hidden}
+.zk-cost i{position:absolute; inset:0; background:#E2A877; transform-origin:left; transform:scaleX(var(--c2))}
+
+/* =========================================================
+   P8 Et pour votre équipe
+   ========================================================= */
+.team{position:relative; padding:var(--sec) 0 calc(var(--sec) * .6); background:radial-gradient(50% 40% at 70% 30%, rgb(var(--dusk) / .07), transparent 70%)}
+.team__grid{display:grid; gap:clamp(36px,5vw,80px); align-items:center}
+.team__copy{display:flex; flex-direction:column; gap:22px}
+.team__pb{max-width:15ch; font-size:clamp(34px,4.6vw,70px); line-height:1.04; letter-spacing:-.035em; font-weight:500; text-wrap:balance}
+.team__hint{opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.team__hint.is-on{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo)}
+@media (min-width:960px){ .team__grid{grid-template-columns:5fr 6fr} }
+
+.ag{position:relative; width:min(100%, 520px); margin-inline:auto; aspect-ratio:100 / 126; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -46px rgba(0,0,0,.9)}
+.ag__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgb(var(--dusk) / .15), transparent 70%), linear-gradient(180deg,#151C30,#0E1322); box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%}
+.ag-wires path{fill:none; stroke:rgba(244,239,230,.34); stroke-width:.4; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#1C2439; box-shadow:inset 0 0 0 1px rgba(244,239,230,.13), 0 2cqw 5cqw -2cqw rgba(0,0,0,.6)}
+.ag-src svg{width:4.4cqw; height:4.4cqw; color:var(--muted); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-src span{font-size:max(10px,3.3cqw); line-height:1.2; font-weight:500; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:#A8E6BE}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#0E1322; stroke-width:2.6}
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2.2cqw; border-radius:99px; background:#161E32; box-shadow:inset 0 0 0 1px rgba(244,239,230,.15); font-size:max(11px,3.5cqw); line-height:1; font-weight:500}
+.ag-node > i{flex:none; width:2.4cqw; height:2.4cqw; border-radius:50%; background:rgba(244,239,230,.5)}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1px rgba(170,195,255,.75), 0 0 6cqw rgba(157,184,255,.38); opacity:0; pointer-events:none}
+.ag-node--v{left:12cqw; top:30cqw; width:34cqw; height:10cqw}
+.ag-node--c{left:52cqw; top:30cqw; width:40cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(17px,5.6cqw); background:#1D2640}
+.ag-node--h .ag-glow{opacity:1}
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:36cqw}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:var(--creme); color:#141A2A; box-shadow:0 4cqw 10cqw -4cqw rgba(0,0,0,.8)}
+.ag-note__t{font-size:max(12px,4.2cqw); line-height:1.3; font-weight:600; letter-spacing:-.02em; margin-bottom:1.4cqw}
+.ag-line{display:flex; align-items:center; gap:3cqw; padding:2.3cqw 0; border-top:1px solid rgba(20,26,42,.1)}
+.ag-line i{flex:1; height:1.6cqw; border-radius:1cqw; background:rgba(20,26,42,.16)}
+.ag-line span{font-size:max(9.5px,2.9cqw); line-height:1.2; font-weight:500; color:#39415A; white-space:nowrap}
+.ag-noteW{transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:#A8E6BE; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-size:max(16px,4.8cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; color:var(--creme); opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:106cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; gap:3cqw; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:var(--creme); font-size:max(19px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset, 0 3cqw 8cqw -3cqw rgba(232,50,43,.7); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--creme); outline-offset:4px}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{bottom:5.5%; right:auto; left:50%; translate:-50% 0}
+
+/* Phrase de l'équipe, révélée au défilement */
+.team__say{padding:calc(var(--sec) * .5) 0 calc(var(--sec) * .4)}
+.team__say .say{max-width:24ch; font-size:clamp(30px,4.2vw,62px)}
+
+/* Autres besoins, en onglets */
+.needs{padding:calc(var(--sec) * .4) 0 var(--sec)}
+.needs__lead{margin-bottom:20px}
+.needs__tabs{display:flex; flex-wrap:wrap; gap:10px}
+.need{position:relative; min-height:52px; padding:13px 20px; border-radius:22px; text-align:left; font-size:16px; line-height:1.35; color:var(--muted); background:rgba(244,239,230,.03); box-shadow:inset 0 0 0 1px var(--line); isolation:isolate; transition:transform .5s var(--expo), color .4s var(--expo)}
+.need::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:var(--creme); opacity:0; transform:scale(.96); transition:opacity .24s var(--out), transform .24s var(--out)}
+.need:hover{color:var(--creme)}
+.need:active{transform:scale(.98)}
+.need[aria-selected="true"]{color:var(--ink)}
+.need[aria-selected="true"]::before{opacity:1; transform:none; transition:opacity .6s var(--expo), transform .8s var(--expo)}
+.needs__panel{margin-top:30px; min-height:3.6em}
+.needs__panel p{max-width:32ch; font-size:clamp(22px,2.3vw,32px); line-height:1.25; letter-spacing:-.025em; font-weight:500; text-wrap:balance}
+
+/* =========================================================
+   P9 Comment on avance
+   ========================================================= */
+.steps{padding:var(--sec) 0}
+.steps__list{position:relative; display:grid; gap:44px; margin-top:clamp(40px,5vw,72px); padding-left:40px}
+.steps__line{position:absolute; left:6px; top:12px; bottom:12px; width:1px; background:var(--line)}
+.steps__line i{position:absolute; inset:0; background:linear-gradient(180deg, rgba(244,239,230,.9), rgb(var(--dusk))); transform-origin:top; transform:scaleY(var(--sp, 1))}
+.step{position:relative; max-width:16ch; font-size:clamp(26px,3vw,42px); line-height:1.12; letter-spacing:-.03em; font-weight:500; color:var(--creme); transition:color .8s var(--expo)}
+.step::before{content:""; position:absolute; left:-40px; top:.42em; width:13px; height:13px; margin-left:0; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.5); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.step.is-lit::before{background:var(--creme); box-shadow:0 0 0 5px rgb(var(--dusk) / .14), 0 0 18px rgb(var(--dusk) / .6)}
+.has-scrub .step:not(.is-lit){color:rgba(244,239,230,.32)}
+@media (min-width:900px){
+  .steps__list{grid-template-columns:repeat(3,1fr); gap:40px; padding:44px 0 0}
+  .steps__line{left:6px; right:6px; top:6px; bottom:auto; width:auto; height:1px}
+  .steps__line i{background:linear-gradient(90deg, rgba(244,239,230,.9), rgb(var(--dusk))); transform-origin:left; transform:scaleX(var(--sp, 1))}
+  .step::before{left:0; top:-44px}
+}
+
+/* =========================================================
+   P10 Un moment
+   ========================================================= */
+.moment{position:relative; padding-top:calc(var(--sec) * .4)}
+.moment__fig{position:relative; margin:0; aspect-ratio:2.2 / 1; max-height:88vh; overflow:hidden}
+.moment__fig img{width:100%; height:100%; object-fit:cover; object-position:50% 18%; transform-origin:50% 30%}
+.moment__fig::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, var(--bg) 0%, rgba(14,18,32,0) 18%, rgba(14,18,32,0) 70%, rgba(14,18,32,.55) 100%)}
+.moment__card{position:absolute; z-index:1; right:var(--gr); bottom:clamp(20px,4vw,56px); width:min(440px, calc(100% - 2 * var(--gutter))); padding:26px 30px 24px; border-radius:28px}
+.moment__say{font-size:clamp(26px,2.7vw,40px); line-height:1.12; letter-spacing:-.03em; font-weight:500}
+.moment__card .cap{margin-top:14px; font-size:16px; color:rgba(244,239,230,.78)}
+@media (max-width:760px){
+  .moment__fig{aspect-ratio:4 / 5}
+  .moment__fig img{object-position:40% 30%}
+  .moment__card{position:relative; right:auto; bottom:auto; width:auto; margin:-96px var(--gr) 0 var(--gl); padding:22px 22px 20px}
+}
+
+/* =========================================================
+   P11 Contact
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13.5px; font-weight:500; color:var(--muted)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.24); box-shadow:inset 0 0 0 1px rgba(244,239,230,.14); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.42)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.26)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.6), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,180,90,.9)}
+textarea.input{min-height:132px; resize:vertical}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; color:var(--muted); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); transition:background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo)}
+.choice input:hover + span{color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.34)}
+.choice input:checked + span{background:var(--creme); color:var(--ink); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--creme); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1px rgba(242,180,90,.7)}
+.field__err{margin:0; font-size:13px; color:#F2C48A}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:var(--creme); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{margin:0; outline:none; font-size:clamp(28px,3vw,40px); line-height:1.1; letter-spacing:-.03em; font-weight:500}
+.form__ok p{max-width:34ch; color:var(--muted)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+[tabindex="-1"]:focus{outline:none}
+
+/* =========================================================
+   Pied de page (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:40px var(--gr) calc(36px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--creme)}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal],.js [data-slit] .slit .num,.js .hero__bgIn,.js .hero__stage,
+  .js .icons .dock,.js .icons .dock__btn,.js .icons .icons__go,.js .beat--sc .sc,.team__hint,.form__ok,.ag-sent{transform:none !important; filter:none !important}
+  .js [data-sweep]{clip-path:none; filter:none; opacity:0; transition:opacity .4s}
+  .js [data-sweep].is-in{opacity:1; transition:opacity 1s var(--expo)}
+  .js .ttl--main{clip-path:none}
+  .hero-in .ttl--main,.hero-in .ttl--ghost,.hero-in .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .js [data-slit] .slit .num{opacity:0}
+  .js [data-slit].is-in .slit .num{opacity:1}
+  .icons.is-pointed .dock__btn:first-child img,.dockbar .dock__btn[aria-current] img,.dock__btn:hover img{transform:none}
+  .dockbar,.dockbar.is-on{transform:translate(-50%,0)}
+  .ag.is-sent .ag-noteW{transform:none}
+  .btn,.btn__ico,.need,.choice span,.replay svg{transition-property:opacity,background,color,box-shadow}
+}
+@media (prefers-reduced-motion: reduce) and (max-width:899px){
+  .dockbar,.dockbar.is-on{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#icones">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ========== Navigation ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <div class="brand">
+      <a class="brand__name" href="#top" aria-label="Kenz, revenir en haut">Kenz</a><a class="brand__dot" href="#sceau" aria-label="Il existe une autre version de moi"><i></i></a>
+    </div>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<!-- Dock fixe : repère de progression (chapitres apps) -->
+<div class="dockbar" data-dockbar>
+  <nav class="dock" aria-label="Progression dans les apps">
+    <a class="dock__btn" href="#oshii" data-go="oshii" aria-label="Oshii"><img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    <a class="dock__btn" href="#sago" data-go="sago" aria-label="Sago"><img src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    <a class="dock__btn" href="#wado" data-go="wado" aria-label="Wado"><img src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    <a class="dock__btn" href="#croc" data-go="croc" aria-label="Croc"><img src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    <a class="dock__btn" href="#miru" data-go="miru" aria-label="Miru"><img src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    <a class="dock__btn" href="#zenko" data-go="zenko" aria-label="Zenko"><img src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+  </nav>
+</div>
+
+<main>
+  <!-- ========== P0 Hero ========== -->
+  <section class="hero" id="top" aria-label="Kenz">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bgIn">
+        <img class="hero__land" src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high">
+        <i class="hero__wash"></i>
+      </div>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <h1 class="hero__title"><span class="ttl ttl--main">Kenz</span><span class="ttl ttl--ghost" aria-hidden="true">Kenz</span></h1>
+        <p class="hero__line" data-words data-hero-words>Je transforme une idée en app que les gens utilisent. Et l’IA y fait le <em class="word glow">vrai</em> travail.</p>
+        <div class="hero__cta">
+          <a class="btn btn--light" href="#icones" data-anim>Découvrir<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+          <a class="link" href="#contact" data-anim>Me contacter</a>
+        </div>
+      </div>
+      <div class="hero__stage">
+        <i class="hero__glow" aria-hidden="true"></i>
+        <div class="hero__fig">
+          <img class="portrait" src="assets/img/kenz-pro.webp" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P1 Les icônes ========== -->
+  <section class="icons" id="icones" tabindex="-1" aria-labelledby="icons-say" data-icons>
+    <nav class="dock" aria-label="Les apps">
+      <a class="dock__btn" href="#oshii" data-go="oshii" style="--i:0" aria-label="Oshii"><img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+      <a class="dock__btn" href="#sago" data-go="sago" style="--i:1" aria-label="Sago"><img src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+      <a class="dock__btn" href="#wado" data-go="wado" style="--i:2" aria-label="Wado"><img src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+      <a class="dock__btn" href="#croc" data-go="croc" style="--i:3" aria-label="Croc"><img src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+      <a class="dock__btn" href="#miru" data-go="miru" style="--i:4" aria-label="Miru"><img src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+      <a class="dock__btn" href="#zenko" data-go="zenko" style="--i:5" aria-label="Zenko"><img src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><i class="dock__bar"></i></a>
+    </nav>
+    <h2 class="say icons__say" id="icons-say" data-words data-icons-say>Chaque app part d’un petit problème du <em class="word glow">quotidien</em>.</h2>
+    <a class="btn btn--light icons__go" href="#oshii" data-go="oshii">Commençons par celui-ci.<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+  </section>
+
+  <!-- =====================================================
+       P2 à P7 : une app = un onboarding (problème → animation → résultat)
+       ===================================================== -->
+  <div class="apps" data-apps>
+
+  <!-- ========== P2 Oshii ========== -->
+  <section class="app" id="oshii" data-app="oshii" style="--tint:236 104 84" aria-labelledby="oshii-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="oshii-pb" data-words>Tu enregistres des recettes sur TikTok. Tu ne les refais <em class="word">jamais</em>.</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--oshii" data-scene="oshii">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : une vidéo de recette, « pâtes crémeuses au citron », est partagée à Oshii. Elle se replie dans l’icône et devient une fiche pesée : pâtes 200 g, parmesan 40 g, citron 1, crème 10 cl, 4 étapes.">
+              <div class="os-video">
+                <svg class="os-food" viewBox="0 0 90 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="osT" cx="50%" cy="40%" r="72%"><stop offset="0" stop-color="#6A4E3A"/><stop offset="1" stop-color="#1F1712"/></radialGradient>
+                    <radialGradient id="osS" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#FCEBC0"/><stop offset="1" stop-color="#E4BC6E"/></radialGradient>
+                  </defs>
+                  <rect width="90" height="160" fill="url(#osT)"/>
+                  <ellipse cx="46" cy="71" rx="40" ry="37" fill="#140F0B" opacity=".45"/>
+                  <circle cx="45" cy="66" r="37" fill="#EDE5D8"/>
+                  <circle cx="45" cy="66" r="29" fill="#F8F3EB"/>
+                  <circle cx="45" cy="66" r="24" fill="url(#osS)"/>
+                  <g fill="none" stroke="#F7DC94" stroke-width="2.4" stroke-linecap="round">
+                    <path d="M28 60c6-8 16-8 20 0s12 10 18 2"/>
+                    <path d="M26 70c8-6 14 4 22-2s14-8 18 0"/>
+                    <path d="M32 78c6-4 12 4 18-1s10-5 14 1"/>
+                    <path d="M34 52c4-4 10-4 14 0s10 4 12 1"/>
+                  </g>
+                  <g fill="none" stroke="#D8AA58" stroke-width="1.3" stroke-linecap="round" opacity=".85">
+                    <path d="M30 65c5-5 11 3 17-1s11-4 15 1"/>
+                    <path d="M33 74c5-3 9 2 14 0"/>
+                  </g>
+                  <g transform="translate(60 53)"><circle r="8.5" fill="#F2CF3A"/><circle r="7" fill="#FBE68A"/><path d="M0 0V-7M0 0L6-3.5M0 0L6 3.5M0 0V7M0 0L-6 3.5M0 0L-6-3.5" stroke="#F2CF3A" stroke-width=".9"/></g>
+                  <ellipse cx="33" cy="58" rx="5.4" ry="2.6" fill="#5C8F45" transform="rotate(-35 33 58)"/>
+                  <ellipse cx="38" cy="54.5" rx="4.4" ry="2.2" fill="#76A85A" transform="rotate(20 38 54.5)"/>
+                  <g fill="#FFF8E6"><circle cx="44" cy="64" r=".9"/><circle cx="50" cy="70" r=".8"/><circle cx="40" cy="72" r=".8"/><circle cx="52" cy="60" r=".9"/><circle cx="47" cy="77" r=".7"/></g>
+                  <path d="M80 98L66 132" stroke="#B9B2A6" stroke-width="2.6" stroke-linecap="round"/>
+                </svg>
+                <span class="os-rail" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4c4.7 0 8 2.9 8 6.6s-3.3 6.6-8 6.6c-.9 0-1.8-.1-2.6-.3L5 19l1-3.6C4.8 14.2 4 12.5 4 10.6 4 6.9 7.3 4 12 4z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 5l7 6.5-7 6.5v-4c-4.5 0-7 1.3-9 4.5.5-5 3-8.5 9-9.3V5z"/></svg>
+                </span>
+                <p class="os-cap">pâtes crémeuses au citron</p>
+                <span class="os-bar"><i></i></span>
+              </div>
+              <div class="os-sheet">
+                <p class="os-sheet__t">Partager vers</p>
+                <div class="os-row">
+                  <span class="os-app os-app--oshii"><img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><span>Oshii</span><span class="os-tap"></span></span>
+                  <span class="os-app"><i></i><b></b></span>
+                  <span class="os-app"><i></i><b></b></span>
+                  <span class="os-app"><i></i><b></b></span>
+                </div>
+              </div>
+              <div class="os-recipe">
+                <div class="os-recipe__head"><img src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><p class="os-recipe__t">Pâtes crémeuses au citron</p></div>
+                <ul class="os-ing">
+                  <li><span>Pâtes</span><b class="slit"><span class="num">200 g</span></b></li>
+                  <li><span>Parmesan</span><b class="slit"><span class="num">40 g</span></b></li>
+                  <li><span>Citron</span><b class="slit"><span class="num">1</span></b></li>
+                  <li><span>Crème</span><b class="slit"><span class="num">10 cl</span></b></li>
+                </ul>
+                <p class="os-steps"><span>4 étapes</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></p>
+              </div>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res">
+          <div class="res__media res__media--duo" data-reveal="card">
+            <img class="shot" src="assets/apps/oshii-ecran-1.jpg" alt="Écran App Store d’Oshii : « Transforme tes recettes », une marmite rouge entourée des logos TikTok, YouTube et Instagram." width="462" height="1000" loading="lazy" decoding="async">
+            <img class="shot" src="assets/apps/oshii-ecran-2.jpg" alt="Écran d’Oshii : la fiche « Cheese Nans &amp; Kefta », avec calories, glucides, protéines et lipides." width="462" height="1000" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Oshii</h3></div>
+            <p class="res__line" data-reveal="fade">Partage la vidéo à Oshii&nbsp;: elle devient une recette pesée, prête à cuisiner.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+              <a class="btn btn--ghost btn--sm" href="https://play.google.com/store/apps/details?id=com.x7kenz.Oshii" target="_blank" rel="noopener">Google Play<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P3 Sago ========== -->
+  <section class="app" id="sago" data-app="sago" style="--tint:150 128 255" aria-labelledby="sago-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="sago-pb" data-words>Le japonais, ça a l’air <em class="word">impossible</em>.</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--sago" data-scene="sago">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : la phrase japonaise « ねこ が すき », d’abord floue. Un chat se dessine au-dessus de ねこ, un cœur au-dessus de すき, les mots deviennent nets et la traduction apparaît : « J’aime les chats. »">
+              <p class="sg-line" lang="ja">
+                <span class="sg-w"><svg class="sg-draw sg-cat" viewBox="0 0 80 64" aria-hidden="true"><path pathLength="1" d="M14 56C8 44 10 30 16 22L14 6l14 10c7-3 17-3 24 0L66 6l-2 16c6 8 8 22 2 34-10 6-42 6-52 0z"/><path pathLength="1" d="M30 35v4M50 35v4"/><path pathLength="1" d="M37 44l3 2.4 3-2.4"/><path pathLength="1" d="M5 41l17 2.5M5 48l17-1M75 41l-17 2.5M75 48l-17-1"/></svg><span class="sg-k">ねこ</span></span>
+                <span class="sg-w"><span class="sg-k">が</span></span>
+                <span class="sg-w"><svg class="sg-draw sg-heart" viewBox="0 0 80 64" aria-hidden="true"><path pathLength="1" d="M40 58C18 44 8 34 8 22 8 13 15 7 23 7c8 0 14 5 17 11 3-6 9-11 17-11 8 0 15 6 15 15 0 12-10 22-32 36z"/></svg><span class="sg-k">すき</span></span>
+              </p>
+              <span class="sg-rule"></span>
+              <p class="sg-fr"><span class="sg-fw">J’aime</span> <span class="sg-fw">les</span> <span class="sg-fw">chats.</span></p>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res res--rev">
+          <div class="res__media res__media--duo" data-reveal="card">
+            <img class="shot" src="assets/apps/sago-ecran-1.jpg" alt="Écran App Store de Sago : « Sago apprend le japonais », une scène d’anime avec des phrases en japonais et leur lecture." width="460" height="1000" loading="lazy" decoding="async">
+            <img class="shot" src="assets/apps/sago-ecran-2.jpg" alt="Écran de Sago : l’épisode « Un matin sans voix », à travers des histoires anime." width="460" height="1000" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Sago</h3></div>
+            <p class="res__line" data-reveal="fade">Là, tu ne comprends rien. 15&nbsp;minutes plus tard&nbsp;: maintenant, tu <em class="word">comprends</em>.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/fr/app/sago-apprendre-le-japonais/id6759610780" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P4 Wado ========== -->
+  <section class="app" id="wado" data-app="wado" style="--tint:84 196 128" aria-labelledby="wado-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="wado-pb" data-words>Compter ses calories&nbsp;? Personne n’a le <em class="word">temps</em>.</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--wado" data-scene="wado">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : une assiette est scannée. Les macros apparaissent : protéines 38 g, glucides 62 g, lipides 14 g, environ 520 kcal, puis l’anneau « Ta journée » se remplit. Données d’exemple.">
+              <div class="wd-plate">
+                <svg class="wd-food" viewBox="0 0 200 200" aria-hidden="true">
+                  <circle cx="100" cy="106" r="95" fill="#04100A" opacity=".5"/>
+                  <circle cx="100" cy="100" r="94" fill="#E6E0D2"/>
+                  <circle cx="100" cy="100" r="78" fill="#F4F0E6"/>
+                  <path d="M44 104C40 80 62 64 84 68c20 4 26 26 18 44-8 18-50 18-58-8z" fill="#FFFDF7"/>
+                  <g fill="#E8E1D0"><ellipse cx="62" cy="88" rx="3" ry="1.4" transform="rotate(-20 62 88)"/><ellipse cx="74" cy="96" rx="3" ry="1.4" transform="rotate(30 74 96)"/><ellipse cx="58" cy="104" rx="3" ry="1.4" transform="rotate(10 58 104)"/><ellipse cx="84" cy="84" rx="3" ry="1.4" transform="rotate(-40 84 84)"/><ellipse cx="70" cy="112" rx="3" ry="1.4" transform="rotate(-10 70 112)"/></g>
+                  <g transform="rotate(-14 134 84)"><rect x="104" y="68" width="60" height="34" rx="15" fill="#F28E6C"/><path d="M118 72c4 8 4 18 0 26M132 70c4 9 4 21 0 30M146 71c4 9 4 20 0 29" stroke="#FFC4AA" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/></g>
+                  <circle cx="122" cy="132" r="15" fill="#4E9C5C"/><circle cx="142" cy="124" r="12" fill="#68B46C"/><circle cx="134" cy="147" r="11" fill="#3F8A4E"/><circle cx="153" cy="141" r="9" fill="#5BAA60"/>
+                  <g transform="rotate(-24 80 146)"><ellipse cx="80" cy="146" rx="22" ry="12" fill="#BFD776"/><ellipse cx="80" cy="146" rx="15" ry="7.5" fill="#E7EFAE"/></g>
+                  <g fill="#2B2B2B" opacity=".5"><ellipse cx="122" cy="80" rx="1.6" ry=".8"/><ellipse cx="138" cy="86" rx="1.6" ry=".8" transform="rotate(30 138 86)"/><ellipse cx="150" cy="78" rx="1.6" ry=".8"/></g>
+                </svg>
+                <span class="wd-scan" aria-hidden="true"><span class="wd-sweep"></span></span>
+                <i class="wd-br wd-br--a"></i><i class="wd-br wd-br--b"></i><i class="wd-br wd-br--c"></i><i class="wd-br wd-br--d"></i>
+              </div>
+              <ul class="wd-pills">
+                <li><span>Protéines</span><b class="slit"><span class="num">38 g</span></b></li>
+                <li><span>Glucides</span><b class="slit"><span class="num">62 g</span></b></li>
+                <li><span>Lipides</span><b class="slit"><span class="num">14 g</span></b></li>
+                <li class="wd-k"><b class="slit"><span class="num">≈ 520 <small>kcal</small></span></b></li>
+              </ul>
+              <div class="wd-ring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="wd-ring__bg" cx="22" cy="22" r="18"/><circle class="wd-ring__fg" cx="22" cy="22" r="18" pathLength="1"/></svg><span>Ta journée</span></div>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res">
+          <div class="res__media res__media--land" data-reveal="card">
+            <img class="shot" src="assets/apps/wado-ecran-1.jpg" alt="Écran de Wado sur tablette : « Muscu et calories, un seul plan », la journée avec le déjeuner à scanner et la séance du jour." width="1000" height="703" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Wado</h3></div>
+            <p class="res__line" data-reveal="fade">Une photo de ton plat. Wado compte, et ajuste ton plan.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/us/app/wado-calories-ia-muscu/id6813179120" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P5 Croc ========== -->
+  <section class="app" id="croc" data-app="croc" style="--tint:178 160 255" aria-labelledby="croc-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="croc-pb" data-words>Tu te ronges les ongles depuis <em class="word">toujours</em>&nbsp;?</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--croc" data-scene="croc">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le matin, « Je m’engage » se coche ; le soir, « Tenu ». Les jours de la semaine se cochent un à un et la série monte jusqu’à 12 jours. « Cette série tient. Bravo. » Données d’exemple.">
+              <div class="cr-top">
+                <svg class="cr-mascot" viewBox="0 0 60 60" aria-hidden="true">
+                  <defs><radialGradient id="crG" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#CDBFFF"/><stop offset="1" stop-color="#7F69E6"/></radialGradient></defs>
+                  <path d="M30 6C40 6 46 16 49 28c4 14 1 26-19 26S7 42 11 28C14 16 20 6 30 6z" fill="url(#crG)"/>
+                  <ellipse cx="19.5" cy="38.5" rx="2.8" ry="1.5" fill="#F4A6C8" opacity=".55"/><ellipse cx="40.5" cy="38.5" rx="2.8" ry="1.5" fill="#F4A6C8" opacity=".55"/>
+                  <circle cx="24" cy="33" r="2" fill="#1C1733"/><circle cx="36" cy="33" r="2" fill="#1C1733"/>
+                  <path class="cr-m1" d="M27 40.5h6" stroke="#1C1733" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0"/>
+                  <path class="cr-m2" d="M26 39.5q4 4 8 0" stroke="#1C1733" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                </svg>
+                <div class="cr-streak">
+                  <span class="cr-streak__l">Série</span>
+                  <span class="cr-streak__v"><span class="roll-w"><span class="roll cr-roll"><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b><b>10</b><b>11</b><b>12</b></span></span><span class="cr-streak__u">jours</span></span>
+                </div>
+              </div>
+              <div class="cr-pact">
+                <div class="cr-pill"><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span><div><small>Matin</small><span>Je m’engage</span></div></div>
+                <div class="cr-pill"><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span><div><small>Soir</small><span>Tenu</span></div></div>
+              </div>
+              <ol class="cr-week">
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>L</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>M</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>M</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>J</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>V</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>S</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>D</li>
+              </ol>
+              <p class="cr-bravo">Cette série tient. Bravo.</p>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res res--rev">
+          <div class="res__media res__media--land" data-reveal="card">
+            <img class="shot" src="assets/apps/croc-ecran-1.jpg" alt="Écran de Croc sur tablette : « Arrête de te ronger les ongles », une série de 12 jours et la promesse du matin." width="1000" height="687" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Croc</h3></div>
+            <p class="res__line" data-reveal="fade">Un petit pacte le matin, validé le soir. Croc t’accompagne, sans te <em class="word">juger</em>.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/app/croc-stop-ongles-rong%C3%A9s/id6801541157" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P6 Miru ========== -->
+  <section class="app" id="miru" data-app="miru" style="--tint:120 128 255" aria-labelledby="miru-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="miru-pb" data-words>Ce soir, on joue à <em class="word">quoi</em>&nbsp;?</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--miru" data-scene="miru">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le thème « Les films des années 2000 » s’écrit. Des cartes se battent puis se distribuent à cinq joueurs en cercle, et un téléphone passe de main en main.">
+              <div class="mr-field"><span class="mr-field__l">Thème</span><span class="mr-type"><span class="mr-txt">Les films des années 2000</span><i class="mr-caret"></i></span></div>
+              <span class="mr-card mr-card--0"></span><span class="mr-card mr-card--1"></span><span class="mr-card mr-card--2"></span><span class="mr-card mr-card--3"></span><span class="mr-card mr-card--4"></span>
+              <span class="mr-av mr-av--0"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFB86B"/><path d="M5 17c2-8 8-13 15-13s13 5 15 13c-5-3-9-4-15-4S10 14 5 17z" fill="#7A4A1E" opacity=".55"/><circle cx="15" cy="21" r="1.8" fill="#2A1C3D"/><circle cx="25" cy="21" r="1.8" fill="#2A1C3D"/><path d="M15.5 27q4.5 3.5 9 0" stroke="#2A1C3D" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--1"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#7FD1C7"/><path d="M6 15c3-7 8-11 14-11 7 0 12 5 14 12-6-4-10-1-14-5-4 4-9 2-14 4z" fill="#1F4F4A" opacity=".55"/><circle cx="15" cy="21" r="1.8" fill="#16302E"/><circle cx="25" cy="21" r="1.8" fill="#16302E"/><path d="M16 27h8" stroke="#16302E" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--2"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#B9A5FF"/><path d="M4 22c0-11 7-18 16-18s16 7 16 18c-3-5-8-8-16-8S7 17 4 22z" fill="#3B2A7A" opacity=".5"/><circle cx="15" cy="22" r="1.8" fill="#221A45"/><circle cx="25" cy="22" r="1.8" fill="#221A45"/><path d="M15.5 28q4.5 3.5 9 0" stroke="#221A45" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--3"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFA493"/><path d="M8 13c3-6 7-9 12-9s9 3 12 9c-4-2-8-2-12-2s-8 0-12 2z" fill="#6B2A22" opacity=".5"/><circle cx="15" cy="21" r="1.8" fill="#3A1A16"/><circle cx="25" cy="21" r="1.8" fill="#3A1A16"/><path d="M15.5 26.5q4.5 4 9 0" stroke="#3A1A16" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--4"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#8EC5FF"/><path d="M5 18c1-9 7-14 15-14s14 5 15 14c-4-4-8-6-15-6S9 14 5 18z" fill="#1E3F66" opacity=".5"/><circle cx="15" cy="21" r="1.8" fill="#14263D"/><circle cx="25" cy="21" r="1.8" fill="#14263D"/><path d="M15.5 27q4.5 3 9 0" stroke="#14263D" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-phone"><i></i></span>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res">
+          <div class="res__media res__media--solo" data-reveal="card">
+            <img class="shot" src="assets/apps/miru-ecran-1.jpg" alt="Écran de Miru : « Tout le monde avec son téléphone », le salon de jeu avec le code de la partie et les joueurs." width="462" height="1000" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Miru</h3></div>
+            <p class="res__line" data-reveal="fade">Tu choisis un thème, Miru crée le jeu en direct. Un téléphone qui tourne, ou chacun le sien.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/us/app/miru-jeux-entre-amis/id6761622088" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P7 Zenko ========== -->
+  <section class="app" id="zenko" data-app="zenko" style="--tint:214 146 88" aria-labelledby="zenko-pb">
+    <div class="app__in">
+      <div class="beat beat--pb" data-beat="1">
+        <h2 class="pb" id="zenko-pb" data-words>Une journée à remplir, un budget à <em class="word">tenir</em>.</h2>
+      </div>
+      <div class="beat beat--sc" data-beat="2">
+        <div class="sc sc--zenko" data-scene="zenko">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le curseur du budget glisse de 40 € à 25 €, et les trois moments de la journée, matin, après-midi et soir, se recomposent avec des activités moins chères. Données d’exemple.">
+              <div class="zk-budget">
+                <div class="zk-head"><span class="zk-l">Budget</span><span class="zk-v"><span class="roll-w"><span class="roll zk-roll"><b>40</b><b>39</b><b>38</b><b>37</b><b>36</b><b>35</b><b>34</b><b>33</b><b>32</b><b>31</b><b>30</b><b>29</b><b>28</b><b>27</b><b>26</b><b>25</b></span></span><small>€</small></span></div>
+                <div class="zk-track"><i class="zk-fill"></i><span class="zk-knobwrap"><i class="zk-knob"></i></span></div>
+                <div class="zk-ends"><span>0 €</span><span>50 €</span></div>
+              </div>
+              <ol class="zk-day">
+                <li class="zk-card" style="--c1:.86; --c2:.42"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16.5h14M4.5 16.5v-3.2l1.8-4.6a2 2 0 0 1 1.9-1.2h7.6a2 2 0 0 1 1.9 1.2l1.8 4.6v3.2M7 16.5v2M17 16.5v2M7.5 13h.01M16.5 13h.01"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4.5c1.6 0 2.5 1.6 2.5 3.6S10 12 8.5 12 6 10.1 6 8.1s.9-3.6 2.5-3.6zM7.8 14.5h1.6M15.5 9.5c1.6 0 2.5 1.6 2.5 3.6S17 17 15.5 17 13 15.1 13 13.1s.9-3.6 2.5-3.6zM14.8 19.5h1.6"/></svg></span><span class="zk-txt"><span class="zk-when">Matin</span><span class="zk-cost"><i></i></span></span></li>
+                <li class="zk-card" style="--c1:.74; --c2:.36"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9 12 4.5 20.5 9M5.5 9.5v7M10 9.5v7M14 9.5v7M18.5 9.5v7M3.5 19.5h17"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5V15M12 15c-3.6 0-5.5-2.3-5.5-5S8.9 4 12 4s5.5 3.3 5.5 6-1.9 5-5.5 5z"/></svg></span><span class="zk-txt"><span class="zk-when">Après-midi</span><span class="zk-cost"><i></i></span></span></li>
+                <li class="zk-card" style="--c1:.92; --c2:.5"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16.5h16M5.5 16.5a6.5 6.5 0 0 1 13 0M12 10V8M10.5 8h3M3.5 19.5h17"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5h16a8 8 0 0 1-16 0zM13.5 4l-3 6.5M18 5l-5 5.5"/></svg></span><span class="zk-txt"><span class="zk-when">Soir</span><span class="zk-cost"><i></i></span></span></li>
+              </ol>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+      </div>
+      <div class="beat beat--res" data-beat="3">
+        <div class="res res--rev">
+          <div class="res__media res__media--solo" data-reveal="card">
+            <img class="shot" src="assets/apps/zenko-ecran-1.jpg" alt="Écran de Zenko : les dernières journées, comme « Ma journée à George Town », et les voyages." width="462" height="1000" loading="lazy" decoding="async">
+          </div>
+          <div class="res__txt">
+            <div class="res__id" data-reveal="fade"><img class="res__ico" src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><h3 class="res__name">Zenko</h3></div>
+            <p class="res__line" data-reveal="fade">Zenko compose ta journée selon tes envies et ton budget.</p>
+            <div class="res__links" data-reveal="fade">
+              <a class="btn btn--light btn--sm" href="https://apps.apple.com/ch/app/zenko/id6753706200" target="_blank" rel="noopener">App Store<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <!-- ========== P8 Et pour votre équipe ========== -->
+  <section class="team" id="equipe" aria-labelledby="team-pb">
+    <div class="wrap team__grid">
+      <div class="team__copy">
+        <h2 class="team__pb" id="team-pb" data-words>Vous passez trop de temps à chercher et trier l’<em class="word glow">info</em>&nbsp;?</h2>
+        <p class="cap team__hint" data-hint>La note attend votre validation.</p>
+      </div>
+      <div class="ag" data-agents>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Animation : trois sources tombent, un site concurrent, un appel d’offres et un article. L’agent Veille les trie, l’agent Vérification les contrôle, puis Hermes les assemble en une note du lundi, avec une source par ligne.">
+            <svg class="ag-wires" viewBox="0 0 100 126" preserveAspectRatio="none" aria-hidden="true">
+              <path pathLength="1" d="M18 20C18 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M50 20C50 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M82 20C82 25.5 29 24.5 29 30"/>
+              <path pathLength="1" d="M46 35H52"/>
+              <path pathLength="1" d="M72 40C72 44.5 50 43.5 50 47"/>
+              <path pathLength="1" d="M50 59V66"/>
+            </svg>
+            <div class="ag-src ag-src--0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick"><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-node ag-node--v"><i></i>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c"><i></i>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h">Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW">
+              <div class="ag-note">
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line"><i></i><span>Site concurrent</span></div>
+                <div class="ag-line"><i></i><span>Appel d’offres</span></div>
+                <div class="ag-line"><i></i><span>Article</span></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW"><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="team__say" aria-label="Ce que j’installe chez vous">
+    <div class="wrap">
+      <p class="say" data-scrub>J’installe une équipe d’agents IA chez vous. Chacun son rôle, une mémoire commune, et rien ne part sans votre <em class="word glow">validation</em>.</p>
+    </div>
+  </section>
+
+  <section class="needs" aria-labelledby="needs-t">
+    <div class="wrap">
+      <h2 class="cap needs__lead" id="needs-t">Ou plutôt…</h2>
+      <div class="needs__tabs" role="tablist" aria-labelledby="needs-t" data-tabs>
+        <button class="need" type="button" role="tab" id="tab-contenu" aria-selected="true" aria-controls="panel-need" data-answer="Des vidéos courtes, des carrousels et des visuels de store réguliers, à votre charte.">«&nbsp;Je veux publier plus de contenu sans y passer mes soirées&nbsp;»</button>
+        <button class="need" type="button" role="tab" id="tab-memoire" aria-selected="false" aria-controls="panel-need" tabindex="-1" data-answer="Retrouver l’état d’un dossier en 30 secondes, que l’on soit une personne ou un agent.">«&nbsp;Personne ne sait où en est un dossier&nbsp;»</button>
+        <button class="need" type="button" role="tab" id="tab-backoffice" aria-selected="false" aria-controls="panel-need" tabindex="-1" data-answer="Voir ce qui se passe vraiment, modifier des contenus sans code, allumer une fonction sans risque.">«&nbsp;Mon back-office, c’est un tableur&nbsp;»</button>
+      </div>
+      <div class="needs__panel" id="panel-need" role="tabpanel" aria-labelledby="tab-contenu" tabindex="0">
+        <p data-need-text data-words>Des vidéos courtes, des carrousels et des visuels de store réguliers, à votre charte.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P9 Comment on avance ========== -->
+  <section class="steps" id="methode" aria-labelledby="steps-t">
+    <div class="wrap">
+      <h2 class="h2" id="steps-t" data-sweep>Comment on avance</h2>
+      <div class="steps__list" data-steps>
+        <span class="steps__line" aria-hidden="true"><i></i></span>
+        <p class="step">On en parle.</p>
+        <p class="step">Je vous montre un premier <em class="word">prototype</em>.</p>
+        <p class="step">Vous validez, je lance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== P10 Un moment ========== -->
+  <section class="moment" aria-labelledby="moment-say">
+    <figure class="moment__fig">
+      <img src="assets/img/startup-weekend-2.jpg" alt="Kenz, bras levés, au moment où l’équipe apprend sa victoire au Startup Weekend" width="1200" height="800" loading="lazy" decoding="async" data-moment-img>
+    </figure>
+    <div class="moment__card glass" data-reveal="card" data-slit>
+      <p class="moment__say" id="moment-say"><span class="slit"><span class="num">54</span></span>&nbsp;heures, une équipe, la <em class="word">première</em> place.</p>
+      <p class="cap">Startup Weekend, photo d’Annie Frénot</p>
+    </div>
+  </section>
+
+  <!-- ========== P11 Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">idée</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA"><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== P12 Le sceau (rempli par shared/sceau.js) ========== -->
+  <section id="sceau" class="sceau" data-sceau data-vers="createur.html" data-symbole="soleil" aria-label="Il existe une autre version de moi"></section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+  const REVEAL = '[data-words],[data-reveal],[data-sweep],[data-slit]';
+  const isPin = () => d.classList.contains('is-pin');
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  $$('[data-words],[data-scrub]').forEach(splitWords);
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  /* Un élément masqué par clip-path ne « dépasse » jamais le seuil : on observe alors son parent */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      const t = en.target;
+      if (isPin() && t.closest('.app')) return;
+      (t._rev || [t]).forEach(el => el.classList.add('is-in'));
+      io.unobserve(t);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  const watch = el => {
+    if (el.matches('[data-sweep]') && el.parentElement) { const p = el.parentElement; (p._rev = p._rev || []).push(el); io.observe(p); }
+    else io.observe(el);
+  };
+  $$(REVEAL).forEach(el => { if (!el.closest('.hero') && !el.closest('[data-icons]')) watch(el); });
+
+  /* ---------- P0 : entrée du hero (attend la porte du sceau si on arrive par #porte) ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  if (location.hash === '#porte') {
+    document.addEventListener('sceau:arrivee', heroIn, { once: true });
+    setTimeout(heroIn, 2500);
+  } else {
+    requestAnimationFrame(() => setTimeout(heroIn, 60));
+  }
+
+  /* ---------- Nav : fond au défilement ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+
+  /* ---------- Défilement doux (ordinateur) ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!window.Lenis || RM || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    if (hasG) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add(t => lenis.raf(t * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  });
+
+  /* ---------- P1 : les icônes arrivent, puis la phrase, puis l'action ---------- */
+  safe('icons', () => {
+    const sec = $('[data-icons]'), say = $('[data-icons-say]');
+    const run = () => {
+      sec.classList.add('is-in');
+      say.classList.add('is-in');
+      setTimeout(() => sec.classList.add('is-pointed'), RM ? 0 : 1900);
+    };
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { run(); o.disconnect(); } }, { threshold: .35 });
+    o.observe(sec);
+  });
+
+  /* =========================================================
+     Les six animations (2 à 4 s). État final = CSS par défaut ;
+     GSAP pose l'état de départ et joue vers l'état final.
+     ========================================================= */
+  const B = {
+    oshii(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const v = q1('.os-video'), bar = q1('.os-bar i'), sheet = q1('.os-sheet'), tap = q1('.os-tap'), ico = q1('.os-app--oshii img');
+      const rec = q1('.os-recipe'), head = q1('.os-recipe__head'), lis = q('.os-ing li'), nums = q('.os-ing .num'), steps = q1('.os-steps');
+      G.set(v, { opacity: 1, scale: 1, filter: 'blur(0px)' });
+      G.set(bar, { scaleX: 0 });
+      G.set(sheet, { y: 0, yPercent: 105 });
+      G.set(tap, { opacity: 0, scale: .5 });
+      G.set(rec, { opacity: 0, y: 26, scale: .94, clipPath: 'inset(0% 0% 100% 0% round 18px)' });
+      G.set([head, ...lis, steps], { opacity: 0, y: 10, filter: 'blur(4px)' });
+      G.set(nums, { yPercent: 110 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(bar, { scaleX: .62, duration: 1.3, ease: 'none' }, 0)
+        .to(sheet, { yPercent: 0, duration: .8 }, .45)
+        .to(tap, { opacity: .9, scale: 1, duration: .25, ease: 'power2.out' }, 1.2)
+        .to(ico, { scale: .9, duration: .12, ease: 'power2.out' }, 1.2)
+        .to(ico, { scale: 1, duration: .5 }, 1.32)
+        .to(tap, { opacity: 0, scale: 1.3, duration: .4, ease: 'power2.out' }, 1.45)
+        .to(v, { scale: .08, opacity: 0, filter: 'blur(8px)', duration: .6, ease: 'power3.in' }, 1.5)
+        .to(sheet, { yPercent: 105, duration: .3, ease: 'power2.in' }, 2.15)
+        .to(rec, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round 18px)', duration: 1 }, 2.3)
+        .to(head, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 2.45)
+        .to(lis, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7, stagger: .16 }, 2.6)
+        .to(nums, { yPercent: 0, duration: .9, stagger: .16 }, 2.68)
+        .to(steps, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 3.3);
+    },
+    sago(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const ks = q('.sg-k'), cat = q('.sg-cat path'), heart = q('.sg-heart path'), fw = q('.sg-fw'), rule = q1('.sg-rule');
+      G.set(ks, { opacity: .3, filter: 'blur(9px)' });
+      G.set([...cat, ...heart], { strokeDasharray: 1, strokeDashoffset: 1 });
+      G.set(fw, { opacity: 0, filter: 'blur(8px)', y: 6 });
+      G.set(rule, { scaleX: 0 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(cat[0], { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, .2)
+        .to([cat[1], cat[2]], { strokeDashoffset: 0, duration: .35, ease: 'power2.out', stagger: .1 }, 1.05)
+        .to(cat[3], { strokeDashoffset: 0, duration: .5, ease: 'power2.out' }, 1.25)
+        .to(ks[0], { opacity: 1, filter: 'blur(0px)', duration: .9 }, .95)
+        .to(heart, { strokeDashoffset: 0, duration: .9, ease: 'power2.inOut' }, 1.45)
+        .to(ks[2], { opacity: 1, filter: 'blur(0px)', duration: .9 }, 2.05)
+        .to(ks[1], { opacity: 1, filter: 'blur(0px)', duration: .9 }, 2.2)
+        .to(rule, { scaleX: 1, duration: .9 }, 2.35)
+        .to(fw, { opacity: 1, filter: 'blur(0px)', y: 0, duration: .8, stagger: .07 }, 2.5);
+    },
+    wado(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const br = q('.wd-br'), sw = q1('.wd-sweep'), pills = q('.wd-pills li'), nums = q('.wd-pills .num'), fg = q1('.wd-ring__fg');
+      G.set(br, { opacity: 0, xPercent: i => [-45, 45, -45, 45][i], yPercent: i => [-45, -45, 45, 45][i] });
+      G.set(sw, { y: 0, yPercent: -100, opacity: 1 });
+      G.set(pills, { opacity: 0, y: 14, scale: .965 });
+      G.set(nums, { yPercent: 110 });
+      G.set(fg, { strokeDashoffset: .66 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(br, { opacity: 1, xPercent: 0, yPercent: 0, duration: .8, stagger: .04 }, .1)
+        .to(sw, { yPercent: 0, duration: 1.1, ease: 'power2.inOut' }, .55)
+        .to(sw, { opacity: 0, duration: .35, ease: 'power2.out' }, 1.65)
+        .to(br, { opacity: .35, duration: .5 }, 1.7)
+        .to(pills, { opacity: 1, y: 0, scale: 1, duration: .9, stagger: .12 }, 1.7)
+        .to(nums, { yPercent: 0, duration: 1, stagger: .12 }, 1.8)
+        .to(fg, { strokeDashoffset: .24, duration: 1.3, ease: 'power2.out' }, 2.35);
+    },
+    croc(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const pills = q('.cr-pact .chk'), days = q('.cr-week .chk'), roll = q1('.cr-roll'), m1 = q1('.cr-m1'), m2 = q1('.cr-m2'), bravo = q1('.cr-bravo');
+      const all = [...pills, ...days];
+      const fill = c => c.querySelector('i'), mark = c => c.querySelector('path');
+      G.set(all.map(fill), { scale: 0, opacity: 0 });
+      G.set(all.map(mark), { strokeDashoffset: 1 });
+      G.set(roll, { y: 0, yPercent: 0 });
+      G.set(m1, { opacity: 1 });
+      G.set(m2, { opacity: 0 });
+      G.set(bravo, { opacity: 0, y: 10, filter: 'blur(6px)' });
+      const tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' } });
+      const check = (c, t, dur = .6) => {
+        tl.to(fill(c), { scale: 1, opacity: 1, duration: dur }, t)
+          .to(mark(c), { strokeDashoffset: 0, duration: dur * .8, ease: 'power2.out' }, t + .12);
+      };
+      check(pills[0], .3);
+      check(pills[1], .85);
+      check(days[0], 1.3);
+      tl.to(roll, { yPercent: -12.5, duration: .5 }, 1.35);
+      for (let k = 1; k < 7; k++) {
+        const t = 1.55 + k * .2;
+        check(days[k], t, .45);
+        tl.to(roll, { yPercent: -12.5 * (k + 1), duration: .45 }, t + .05);
+      }
+      tl.to(m1, { opacity: 0, duration: .2 }, 3)
+        .to(m2, { opacity: 1, duration: .3 }, 3)
+        .to(bravo, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .9 }, 3.05);
+      return tl;
+    },
+    miru(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const txt = q1('.mr-txt');
+      if (!txt.dataset.split) {
+        const t = txt.textContent;
+        txt.textContent = '';
+        txt.dataset.split = '1';
+        Array.from(t).forEach(ch => { const s = document.createElement('span'); s.className = 'mr-ch'; s.textContent = ch; txt.appendChild(s); });
+      }
+      const chs = q('.mr-ch'), caret = q1('.mr-caret'), cards = q('.mr-card'), avs = q('.mr-av'), his = q('.mr-hi'), phone = q1('.mr-phone');
+      const T = [[0, -250.75, -6], [318, -77.5, 10], [196.5, 202.8, 14], [-196.5, 202.8, -12], [-318, -77.5, -9]];
+      const P = [[0, -116.9], [197.6, -36.1], [122.1, 94.5]];
+      G.set(chs, { display: 'none' });
+      G.set(caret, { opacity: 1 });
+      G.set(cards, { x: 0, y: 0, xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 0 });
+      G.set(avs, { opacity: .35, scale: .9 });
+      G.set(his, { opacity: 0 });
+      G.set(phone, { x: 0, y: 0, xPercent: 0, yPercent: 0, opacity: 0, scale: .8 });
+      const tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(chs, { display: 'inline', duration: 0, stagger: .034 }, .15)
+        .to(avs, { opacity: 1, scale: 1, duration: .8, stagger: .06 }, .25)
+        .to(caret, { opacity: 0, duration: .2 }, 1.1)
+        .to(cards, { opacity: 1, duration: .3, stagger: .03 }, 1.1)
+        .to(cards, { xPercent: i => (i % 2 ? 58 : -58), rotation: i => (i % 2 ? 8 : -8), duration: .28, ease: 'power2.out' }, 1.3)
+        .to(cards, { xPercent: 0, rotation: i => (i - 2) * 2, yPercent: i => -i * 4, duration: .32, ease: 'power3.inOut', stagger: .03 }, 1.6)
+        .to(cards, { xPercent: i => T[i][0], yPercent: i => T[i][1], rotation: i => T[i][2], scale: .75, duration: .7, stagger: .09 }, 2.0)
+        .to(phone, { opacity: 1, scale: 1, duration: .5 }, 2.6);
+      P.forEach((p, k) => {
+        const t = 2.85 + k * .36;
+        tl.to(phone, { xPercent: p[0], yPercent: p[1], duration: .4, ease: 'power3.inOut' }, t)
+          .to(his[k], { opacity: 1, duration: .3 }, t + .28);
+        if (k > 0) tl.to(his[k - 1], { opacity: 0, duration: .2 }, t + .1);
+      });
+      return tl;
+    },
+    zenko(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const roll = q1('.zk-roll'), fill = q1('.zk-fill'), kw = q1('.zk-knobwrap'), knob = q1('.zk-knob');
+      const cards = q('.zk-card'), a1 = q('.zk-a--1'), a2 = q('.zk-a--2'), costs = q('.zk-cost i');
+      const cv = (i, k) => parseFloat(getComputedStyle(cards[i]).getPropertyValue(k)) || .6;
+      G.set(roll, { y: 0, yPercent: 0 });
+      G.set(fill, { scaleX: .8 });
+      G.set(kw, { x: 0, xPercent: 80 });
+      G.set([...a1, ...a2], { transformPerspective: 240 });
+      G.set(a1, { opacity: 1, rotationX: 0 });
+      G.set(a2, { opacity: 0, rotationX: -90 });
+      G.set(costs, { scaleX: i => cv(i, '--c1') });
+      G.set(cards, { xPercent: i => [-3, 4, -2][i], rotation: i => [-1.4, 1.1, -.7][i] });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(knob, { scale: 1.15, duration: .25, ease: 'power2.out' }, .2)
+        .to(kw, { xPercent: 50, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(fill, { scaleX: .5, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(roll, { yPercent: -93.75, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(knob, { scale: 1, duration: .4 }, 1.75)
+        .to(cards, { xPercent: 0, rotation: 0, duration: .9, stagger: .12 }, 1.7)
+        .to(a1, { rotationX: 90, opacity: 0, duration: .24, ease: 'power2.in', stagger: .14 }, 1.75)
+        .to(a2, { rotationX: 0, opacity: 1, duration: .8, stagger: .14 }, 2)
+        .to(costs, { scaleX: i => cv(i, '--c2'), duration: 1, stagger: .14 }, 1.9);
+    },
+    agents(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const srcs = q('.ag-src'), ticks = q('.ag-tick'), wires = q('.ag-wires path'), glows = q('.ag-glow'), nodes = q('.ag-node');
+      const note = q1('.ag-note'), title = q1('.ag-note__t'), lines = q('.ag-line'), okW = q1('.ag__okW');
+      G.set(srcs, { opacity: 0, y: 0, xPercent: 0, yPercent: -230, rotation: i => [-7, 5, -4][i] });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set(wires, { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .4 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0% round 14px)' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { opacity: 0, y: 12, scale: .965 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(srcs, { opacity: 1, yPercent: 0, rotation: 0, duration: .9, stagger: .15 }, .1)
+        .to([wires[0], wires[1], wires[2]], { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, .95)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.2)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.25)
+        .to(srcs[2], { xPercent: -220.7, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to([srcs[0], srcs[1]], { xPercent: 110.35, duration: .6, ease: 'power3.inOut' }, 1.5)
+        .to(wires[3], { strokeDashoffset: 0, duration: .3, ease: 'power2.out' }, 2)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.1)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.15)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.15)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .12 }, 2.3)
+        .to(wires[4], { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 2.65)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 2.85)
+        .to(glows[1], { opacity: 0, duration: .4 }, 2.9)
+        .to(glows[2], { opacity: 1, duration: .5 }, 2.9)
+        .to(wires[5], { strokeDashoffset: 0, duration: .3 }, 3.1)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round 14px)', duration: 1 }, 3.2)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 3.35)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 3.5)
+        .to(okW, { opacity: 1, y: 0, scale: 1, duration: 1.1 }, 4.05);
+    }
+  };
+
+  /* Une scène : timeline + bouton « Rejouer » */
+  function makeScene(el, opts = {}) {
+    const s = { el, tl: null, seen: false, pending: null, rb: el.querySelector('[data-replay]') };
+    el._scene = s;
+    if (!hasG) return s;
+    try { s.tl = B[el.dataset.scene || opts.name](el); } catch (e) { console.error('[kz] scène ' + el.dataset.scene + ' : ' + e.message); s.tl = null; return s; }
+    if (RM) { s.tl.progress(1, true); s.seen = true; return s; }
+    el.classList.add('has-tl');
+    s.tl.eventCallback('onComplete', () => { s.seen = true; if (opts.onDone) opts.onDone(); else if (s.rb) s.rb.classList.add('is-on'); });
+    if (s.rb && !opts.ownReplay) s.rb.addEventListener('click', () => { s.rb.classList.remove('is-on'); s.tl.restart(); });
+    return s;
+  }
+  const play = (s, delay = .4) => {
+    if (!s || !s.tl || s.seen) return;
+    if (s.pending) s.pending.kill();
+    s.pending = G.delayedCall(delay, () => { s.pending = null; s.tl.restart(); });
+  };
+
+  /* =========================================================
+     P2 à P7 : épinglage (ordinateur) ou déclenchement à l'entrée (mobile)
+     ========================================================= */
+  const apps = $$('[data-app]').map(sec => ({
+    sec, id: sec.id, cur: -1, st: null,
+    beats: [1, 2, 3].map(n => sec.querySelector('[data-beat="' + n + '"]')),
+    scene: null
+  }));
+  apps.forEach(a => { const el = a.sec.querySelector('[data-scene]'); if (el) safe('scene ' + a.id, () => { a.scene = makeScene(el); }); });
+
+  function setBeat(a, n) {
+    if (a.cur === n) return;
+    const from = a.cur;
+    a.cur = n;
+    a.beats.forEach((b, i) => {
+      const on = i + 1 === n;
+      b.classList.toggle('is-on', on);
+      b.querySelectorAll(REVEAL).forEach(el => el.classList.toggle('is-in', on));
+      const sc = b.querySelector('.sc');
+      if (sc) sc.classList.toggle('is-in', on);
+    });
+    const s = a.scene;
+    if (!s || !s.tl || RM) return;
+    if (n === 2 && from < 2) play(s, .45);
+    if (n !== 2 && s.pending) { s.pending.kill(); s.pending = null; }
+    if (n === 3 && !s.seen) { s.tl.progress(1, true); if (s.rb) s.rb.classList.add('is-on'); }
+    if (n < 2 && !s.seen) { s.tl.pause(0); if (s.rb) s.rb.classList.remove('is-on'); }
+  }
+
+  /* Repère : le dock fixe */
+  const dockbar = $('[data-dockbar]');
+  const dockBtn = id => dockbar.querySelector('[data-go="' + id + '"]');
+  let activeId = null;
+  function setActive(id) {
+    if (id === activeId) return;
+    activeId = id;
+    dockbar.classList.toggle('is-on', !!id);
+    $$('.dock__btn', dockbar).forEach(b => { if (b.dataset.go === id) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+  }
+  safe('dock', () => {
+    const vis = new Set();
+    const o = new IntersectionObserver(es => {
+      es.forEach(en => { if (en.isIntersecting) vis.add(en.target.id); else vis.delete(en.target.id); });
+      setActive(apps.map(a => a.id).find(x => vis.has(x)) || null);
+    }, { rootMargin: '-49% 0px -49% 0px', threshold: 0 });
+    apps.forEach(a => o.observe(a.sec));
+  });
+
+  /* Mobile / mouvement réduit : la scène joue quand elle entre à l'écran */
+  const scIO = new IntersectionObserver(es => es.forEach(en => {
+    if (!en.isIntersecting || isPin()) return;
+    en.target.classList.add('is-in');
+    if (en.target._scene) play(en.target._scene, .35);
+    scIO.unobserve(en.target);
+  }), { threshold: .45 });
+  const observeFlow = () => apps.forEach(a => {
+    a.beats.forEach(b => b.querySelectorAll(REVEAL).forEach(el => { if (!el.classList.contains('is-in')) { io.unobserve(el); io.observe(el); } }));
+    const sc = a.sec.querySelector('.sc');
+    if (sc && !sc.classList.contains('is-in')) { scIO.unobserve(sc); scIO.observe(sc); }
+  });
+
+  if (hasG) {
+    safe('pin', () => {
+      const mm = G.matchMedia();
+      mm.add('(min-width: 900px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)', () => {
+        d.classList.add('is-pin');
+        apps.forEach(a => { a.cur = -1; setBeat(a, 0); });
+        apps.forEach(a => {
+          const btn = dockBtn(a.id);
+          const upd = self => {
+            if (!self.isActive && self.progress === 0) return;
+            const p = self.progress;
+            setBeat(a, p < .24 ? 1 : p < .62 ? 2 : 3);
+            if (btn) btn.style.setProperty('--p', p.toFixed(3));
+          };
+          a.st = ST.create({ trigger: a.sec, start: 'top top', end: '+=210%', pin: true, anticipatePin: 1, onUpdate: upd, onRefresh: upd });
+          ST.create({ trigger: a.sec, start: 'top 72%', onEnter: () => { if (a.cur <= 0) setBeat(a, 1); }, onLeaveBack: () => setBeat(a, 0) });
+        });
+        return () => {
+          d.classList.remove('is-pin');
+          apps.forEach(a => {
+            a.st = null; a.cur = -1;
+            a.beats.forEach(b => b.classList.remove('is-on'));
+            const btn = dockBtn(a.id); if (btn) btn.style.removeProperty('--p');
+          });
+          observeFlow();
+        };
+      });
+    });
+  }
+  if (!isPin()) observeFlow();
+
+  /* ---------- Navigation interne (dock, ancres) ---------- */
+  function goTo(t) {
+    let y;
+    const a = apps.find(x => x.sec === t);
+    if (t.id === 'top') y = 0;
+    else if (a && a.st) y = a.st.start + 2;
+    else y = t.getBoundingClientRect().top + scrollY - (a ? 40 : 0);
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  }
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    goTo(t);
+  });
+
+  /* =========================================================
+     P8 : la démo agents, c'est le visiteur qui valide
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const ok = $('[data-ok]', ag), live = $('[data-ag-live]', ag), rb = $('[data-replay]', ag), hint = $('[data-hint]');
+    ag.dataset.scene = 'agents';
+    const ready = () => { hint.classList.add('is-on'); live.textContent = 'La note du lundi est prête. Elle attend votre validation.'; };
+    const s = makeScene(ag, { ownReplay: true, onDone: ready });
+    ag.classList.add('has-tl');
+    if (!s.tl || RM) ready();
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      hint.classList.remove('is-on');
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => { rb.classList.add('is-on'); if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true }); }, RM ? 300 : 1900);
+    });
+    rb.addEventListener('click', () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (s.tl) { s.seen = false; s.tl.restart(); }
+      else ready();
+    });
+    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) { play(s, .2); o.disconnect(); } }, { threshold: .4 });
+    if (s.tl && !RM) o.observe(ag);
+  });
+
+  /* Phrase de l'équipe : les mots s'allument au défilement */
+  safe('scrub', () => {
+    if (!hasG || RM) return;
+    const el = $('[data-scrub]');
+    G.fromTo(el.querySelectorAll('.w'), { opacity: .14 }, { opacity: 1, ease: 'none', stagger: .1, scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 48%', scrub: .6 } });
+  });
+
+  /* Autres besoins : onglets */
+  safe('tabs', () => {
+    const tabs = $$('[data-tabs] [role="tab"]'), panel = $('#panel-need'), txt = $('[data-need-text]');
+    let swap = null;
+    const select = (t, focus) => {
+      if (t.getAttribute('aria-selected') === 'true') { if (focus) t.focus(); return; }
+      tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; });
+      panel.setAttribute('aria-labelledby', t.id);
+      if (focus) t.focus();
+      txt.classList.remove('is-in');
+      clearTimeout(swap);
+      swap = setTimeout(() => {
+        txt.textContent = t.dataset.answer;
+        delete txt.dataset.split;
+        splitWords(txt);
+        requestAnimationFrame(() => requestAnimationFrame(() => txt.classList.add('is-in')));
+      }, RM ? 0 : 260);
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', e => {
+        let j = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') j = (i + 1) % tabs.length;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') j = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') j = 0;
+        if (e.key === 'End') j = tabs.length - 1;
+        if (j !== null) { e.preventDefault(); select(tabs[j], true); }
+      });
+    });
+  });
+
+  /* P9 : la ligne se trace au défilement */
+  safe('steps', () => {
+    const box = $('[data-steps]'), items = $$('.step', box);
+    if (!hasG || RM) { items.forEach(x => x.classList.add('is-lit')); return; }
+    box.classList.add('has-scrub');
+    ST.create({
+      trigger: box, start: 'top 78%', end: 'bottom 52%', scrub: .5,
+      onUpdate: self => {
+        const p = self.progress;
+        box.style.setProperty('--sp', p.toFixed(3));
+        const th = innerWidth >= 900 ? [.01, .35, .69] : [.01, .45, .9];
+        items.forEach((it, i) => it.classList.toggle('is-lit', p >= th[i]));
+      }
+    });
+    box.style.setProperty('--sp', '0');
+  });
+
+  /* P10 : la photo se pose au défilement */
+  safe('moment', () => {
+    if (!hasG || RM) return;
+    const img = $('[data-moment-img]');
+    G.fromTo(img, { scale: 1.14 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'center 55%', scrub: .6 } });
+  });
+
+  /* P11 : formulaire (envoi simulé) */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) window.addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="shared/sceau.js" defer></script>
+
+<a href="index.html" class="kz-back" aria-label="Revenir à l'accueil des maquettes"><span aria-hidden="true">←</span><em>Accueil</em></a>
+<style>
+.kz-back{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;height:34px;min-width:34px;padding:0 11px;border-radius:999px;font:500 13px/1 "Inter",system-ui,sans-serif;color:#F4EFE6;background:rgba(20,18,16,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 10px 30px -12px rgba(0,0,0,.45);text-decoration:none;opacity:.7;transition:opacity .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.kz-back em{font-style:normal;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .3s,margin .5s cubic-bezier(.16,1,.3,1)}
+.kz-back:hover,.kz-back:focus-visible{opacity:1;transform:translateY(-2px)}
+.kz-back:hover em,.kz-back:focus-visible em{max-width:90px;opacity:1;margin-left:8px}
+.kz-back:focus-visible{outline:2px solid #F4EFE6;outline-offset:3px}
+html.sceau-arrivee .kz-back{opacity:0}
+</style>
+</body>
+</html>

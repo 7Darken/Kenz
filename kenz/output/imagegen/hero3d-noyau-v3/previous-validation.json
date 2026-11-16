@@ -1,0 +1,73 @@
+{
+  "status": "awaiting-user-review",
+  "revision": 2,
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "id": "pro-noyau-ia",
+      "exports": [
+        {
+          "file": "pro/pro-noyau-ia.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 731817
+        },
+        {
+          "file": "pro/pro-noyau-ia.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 384480
+        },
+        {
+          "file": "pro/512/pro-noyau-ia.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 182077
+        },
+        {
+          "file": "pro/512/pro-noyau-ia.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 23780
+        }
+      ]
+    },
+    {
+      "id": "createur-passeport",
+      "exports": [
+        {
+          "file": "createur/createur-passeport.png",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 687452
+        },
+        {
+          "file": "createur/createur-passeport.webp",
+          "width": 1024,
+          "height": 1024,
+          "hasAlpha": true,
+          "bytes": 360454
+        },
+        {
+          "file": "createur/512/createur-passeport.png",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 172486
+        },
+        {
+          "file": "createur/512/createur-passeport.webp",
+          "width": 512,
+          "height": 512,
+          "hasAlpha": true,
+          "bytes": 25630
+        }
+      ]
+    }
+  ]
+}

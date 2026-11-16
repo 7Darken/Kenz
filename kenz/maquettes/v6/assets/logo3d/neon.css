@@ -1,0 +1,44 @@
+/*
+  Reusable neon overlay for the hero assets, independent of profondeur.css.
+  1. Inline neon-filter.svg once in the page.
+  2. Put the normal image and a duplicate inside .hero3d-neon:
+     <span class="hero3d-neon" style="--neon-strength:.4">
+       <img src="...webp" width="512" height="512" alt="...">
+       <img class="hero3d-neon__glow" src="...webp" width="512" height="512" alt="" aria-hidden="true">
+     </span>
+  The overlay selects the cyan/blue areas and preserves the source alpha.
+  It leaves graphite, ivory, gold and cognac areas unlit. No raster changes.
+  Set --neon-strength:0 to disable. Add .hero3d-neon--pulse to opt into motion.
+  Place the wrapper inside .kz-prof__c so the existing parallax and blur stay on the parent.
+*/
+.hero3d-neon {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  --neon-strength: .4;
+}
+.hero3d-neon > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.hero3d-neon > .hero3d-neon__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: url(#hero3d-lagon-neon);
+  opacity: var(--neon-strength);
+  mix-blend-mode: screen;
+}
+.hero3d-neon--pulse > .hero3d-neon__glow {
+  animation: hero3dNeonPulse var(--neon-duration, 4.8s) ease-in-out infinite;
+}
+@keyframes hero3dNeonPulse {
+  0%, 100% { opacity: calc(var(--neon-strength) * .72); }
+  50% { opacity: var(--neon-strength); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero3d-neon--pulse > .hero3d-neon__glow { animation: none; }
+}

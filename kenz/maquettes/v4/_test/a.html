@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Page de test du cordon et du passage (V4). Univers : Pro (heure bleue). Ne fait pas partie du site. -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Test — Pro (heure bleue)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<style>
+:root{--bg:#0E1220; --creme:#F4EFE6; --cordon-lumiere:#F2B45A; --expo:cubic-bezier(.16,1,.3,1)}
+*{box-sizing:border-box}
+html{background:var(--bg); color:var(--creme)}
+body{margin:0; font:400 17px/1.5 "Inter",system-ui,sans-serif; overflow-x:clip}
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; height:64px; padding:0 clamp(16px,4vw,56px)}
+.kz-logo{font-family:"Melodrama","Instrument Serif",serif; font-weight:600; font-size:28px; line-height:1; color:var(--creme); text-decoration:none}
+.kz-logo .kz-dot{margin-left:3px}
+.hero{position:relative; min-height:100svh; display:grid; align-items:end; padding:0 clamp(16px,4vw,56px) 14vh; overflow:hidden}
+.hero__bg{position:absolute; inset:0; background:url(../assets/img/paysage-kuala-lumpur.jpg) center/cover; filter:sepia(.8) hue-rotate(-168deg) saturate(1.3) brightness(.5) contrast(1.1)}
+.hero__bg::after{content:""; position:absolute; inset:0; background:linear-gradient(90deg, var(--bg) 0%, transparent 70%), linear-gradient(0deg, var(--bg), transparent 40%)}
+.hero__in{position:relative}
+.hero h1{margin:0; font-family:"Melodrama",serif; font-weight:600; font-size:clamp(90px,14vw,200px); line-height:.85}
+.hero p{max-width:26ch; margin:18px 0 28px; font-size:clamp(19px,1.6vw,23px)}
+.hero em{font-family:"Instrument Serif",serif; font-style:italic; font-size:1.15em}
+.js .hero__in > *{opacity:0; filter:blur(8px); transform:translateY(16px)}
+.is-in .hero__in > *{opacity:1; filter:none; transform:none; transition:opacity 1s var(--expo), filter 1s var(--expo), transform 1.2s var(--expo)}
+.is-in .hero__in > :nth-child(2){transition-delay:.12s}
+.is-in .hero__in > :nth-child(3){transition-delay:.24s}
+.carte{display:inline-flex; align-items:center; gap:14px; min-height:56px; padding:10px 22px 10px 10px; border:0; border-radius:20px; background:#E8322B; color:#fff; font:600 16px/1 "Inter",sans-serif; cursor:pointer}
+.carte img{width:40px; height:40px; border-radius:11px}
+.etat{position:fixed; right:12px; bottom:12px; z-index:40; margin:0; font:12px/1.3 ui-monospace,monospace; color:rgba(244,239,230,.6)}
+.suite{min-height:120vh; padding:20vh clamp(16px,4vw,56px); font-size:24px; color:rgba(244,239,230,.7)}
+</style>
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<header class="nav">
+  <a class="kz-logo" href="a.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="b.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__in">
+      <h1>Kenz</h1>
+      <p>Je construis des apps où l’IA fait le <em>vrai</em> travail.</p>
+      <button class="carte" type="button" data-test-passage><img src="../assets/apps/oshii-icone.jpg" alt="">Passage vers B</button>
+    </div>
+  </section>
+  <section class="suite"><p>Une section pour défiler : le grondement ne doit pas faire sauter la navigation fixe.</p></section>
+</main>
+<p class="etat" aria-live="polite" data-etat>repos</p>
+<script>
+(function () {
+  var d = document.documentElement, etat = document.querySelector('[data-etat]');
+  var joue = false;
+  function hero(src) { if (joue) return; joue = true; d.classList.add('is-in'); etat.textContent = 'entrée du hero : ' + src; }
+  var viaPassage = false;
+  try { var kp = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); viaPassage = !!(kp && Date.now() - kp.t < 6000); } catch (e) {}
+  document.addEventListener('porte:arrivee', function () { hero('porte:arrivee'); });
+  document.addEventListener('passage:arrivee', function () { hero('passage:arrivee'); });
+  if (location.hash.indexOf('porte') > -1 || viaPassage) setTimeout(function () { hero('repli 2,5 s'); }, 2500);
+  else requestAnimationFrame(function () { requestAnimationFrame(function () { hero('chargement'); }); });
+  document.querySelector('[data-test-passage]').addEventListener('click', function () {
+    if (window.Passage) window.Passage.ouvrir(this, 'b.html', { couleur: '#E8322B' });
+    else location.href = 'b.html';
+  });
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+</body>
+</html>

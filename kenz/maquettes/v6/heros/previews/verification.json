@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-11-15T09:32:07.355Z",
+  "report": [
+    "horizon/pro: loaded and captured",
+    "horizon/createur: loaded and captured",
+    "passage/pro: loaded and captured",
+    "passage/createur: loaded and captured",
+    "atlas/pro: loaded and captured",
+    "atlas/createur: loaded and captured",
+    "Mode switch, direction switch, URL synchronization and separate parallax speeds pass",
+    "Manual motion pause and prefers-reduced-motion pass",
+    "320px and 390px mobile: both modes fit with visible controls"
+  ],
+  "errors": []
+}

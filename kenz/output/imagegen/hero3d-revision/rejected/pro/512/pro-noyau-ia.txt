@@ -1,0 +1,17 @@
+Use case: style-transfer. Redesign ONE miniature hero object to belong to the EXACT SAME art-directed family as the HYROX equipment icons in the attached reference sheet.
+
+INPUT IMAGE ROLE: reference sheet for the object design language, proportions, materials, lighting and finish ONLY. The dark sheet background and its labels are NOT part of the requested output. Do not reproduce any sports equipment. Make the new object specified below.
+
+The user's essential correction: match the HYROX objects themselves. Compact, weighty, slightly chunky, soft bevels, rounded thick edges, broad sculpted highlights, satin graphite surfaces and restrained tactile material grain. The restrained premium 3D miniature finish of the kettlebells, sandbag and medicine ball on the sheet is the target. This must convincingly sit next to those icons as part of one collection.
+
+NEW SUBJECT: a compact spherical AI network core, as a SOLID tactile graphite object with the same satin rubber and matte ceramic feel as the HYROX medicine ball and kettlebells. The round body is smooth, full and slightly chunky. Across its front and curving naturally around the sphere, a small organic network is neatly RECESSED into the surface: four or five short clean interconnected Lagon-blue inlaid lines and three small softly rounded off-white junctions. The connected blue network forms one single coherent accent, not multiple scattered accents. The lines are solid physical inlays flush with the surface, never glowing light trails. Keep most of the sphere plain graphite so the form reads first. No glass shell, no black inset screen, no eye, no visible machine parts, no orbit rings, no base.
+
+Materials and palette: matte graphite #1A1D1C to #2A2F2D, off-white #F7F7F2, and ONE restrained Lagon-blue #3FB0C2 accent zone, replacing the green accent of the reference icons. No other saturated color. Subtle fine grain, never strong wear or scratches. No polished gold. No elaborate photoreal surface effects.
+
+Lighting: the SAME soft studio light from upper left as the reference, broad gentle material highlights, very restrained rim light along the right edge. No dramatic backlight, no orange outline, no internal glow, no neon, no lens flares. Ambient occlusion ONLY inside the object.
+
+Camera and framing: three-quarter front view, slightly elevated looking down about 25 degrees, showing front and right side. One compact floating object, a restrained slight tilt, no extra accessories. Square 1024 by 1024 or higher. Center the complete object, occupying about 70% of canvas height or maximum dimension, clear transparent margins on every side, no cropping. Strong simple silhouette readable at 80 px. Do not fill the scene with detail.
+
+Background: TRUE TRANSPARENT ALPHA, not black or gray. Completely isolated object, no floor, no pedestal, no scene, no separate cast shadow, no haze, no halo, no background rectangle, no painted checkerboard.
+
+ABSOLUTELY NO TEXT ANYWHERE: no captions, labels, letters, numbers, symbols resembling writing, stamps, official crests, brand logos, watermark. No hands, person, face, robot, brain, gears, computer screen or UI. No antique realism, no magical crystal ball, no wispy luminous filaments, no overly shiny or transparent outer body. No toyish cartoon face.

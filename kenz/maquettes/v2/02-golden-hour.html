@@ -1,0 +1,2071 @@
+<!doctype html>
+<!--
+  Kenz — Proposition 2 « Golden hour » (V2.1)
+  Deux entrées séparées : #createur (heure dorée) et #pro ou sans hash (heure bleue). Chaque URL ne montre que son univers.
+  Interactions signature :
+  1. « L'heure », le passage secret : en bas du hero, une horloge posée sur la course du soleil. Glisser le soleil fait
+     tomber la lumière en continu ; au-delà de 60 % de la course on passe de l'autre côté, sinon retour doux.
+     Clic, Entrée, flèches (role="slider"). Seconde porte en pied de page : « Il existe une autre version de moi. »
+  2. La transition : paysage heure dorée ↔ heure bleue, portrait en fondu enchaîné avec flou, heure qui défile par la fente,
+     texte qui part vite puis revient mot par mot, contenu qui se reforme. history.pushState, retour arrière géré.
+  3. Hero à deux plans avec parallaxe lissée ; titre révélé par un balayage avec flou ; phrase mot par mot.
+  4. Créateur : bouton lecture qui s'étire, pellicule glissable avec inertie, chiffres qui montent d'une fente.
+  5. Pro : affiches d'apps avec halo qui suit le pointeur, schéma des agents qui s'allume étape par étape.
+  6. Formulaires simulés : validation douce et succès animé.
+-->
+<html lang="fr" data-side="pro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Golden hour</title>
+<meta name="description" content="Kenz : voyages en Asie côté Créateur, apps et agents IA côté Pro.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#121110">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    var h = (location.hash || '').slice(1);
+    var cre = ['createur', 'derniere', 'chiffres', 'destinations', 'guides', 'k15ze', 'liens', 'marques'];
+    var side = cre.indexOf(h) > -1 ? 'createur' : 'pro';
+    d.setAttribute('data-side', side);
+    d.style.setProperty('--t', side === 'pro' ? '1' : '0');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="preload" as="image" href="assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   Jetons
+   ========================================================= */
+:root{
+  --creme:#F4EFE6;
+  --ink:#1A1918;
+  --night:#121110;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+  --muted:rgba(244,239,230,.70);
+  --faint:rgba(244,239,230,.58);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --gold:242 182 109;
+  --dusk:150 182 224;
+  --t:1;
+  --glow:calc(242 - 92 * var(--t)) 182 calc(109 + 115 * var(--t));
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(76px,9vw,132px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  color-scheme:dark;
+}
+html[data-side="createur"]{ --t:0; }
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--night); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--night); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+/* Ambiance fixe : lumière chaude / lumière froide */
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none}
+.ambient i{position:absolute; inset:0}
+.ambient__gold{opacity:calc(1 - var(--t)); background:radial-gradient(55% 45% at 88% 0%, rgba(242,166,92,.10), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(232,140,70,.06), transparent 70%)}
+.ambient__blue{opacity:var(--t); background:radial-gradient(55% 45% at 88% 0%, rgba(110,150,214,.10), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(15,93,107,.12), transparent 70%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.veil{position:fixed; inset:0; z-index:70; background:var(--night); opacity:0; pointer-events:none; transition:opacity .9s var(--expo)}
+.veil.is-on{opacity:1; transition:opacity .26s var(--out)}
+.veil.is-quick,.veil.is-quick.is-on{transition-duration:.15s}
+
+main,.foot{position:relative; z-index:1}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+.sec{position:relative; padding-block:var(--sec)}
+.eyebrow{display:inline-flex; align-items:center; gap:10px; margin:0 0 20px; font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--muted)}
+.eyebrow--pill{padding:7px 13px; border-radius:999px; border:1px solid var(--line); background:rgba(244,239,230,.04)}
+.eyebrow i{width:6px; height:6px; border-radius:50%; background:rgb(var(--glow)); box-shadow:0 0 12px rgb(var(--glow) / .8)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,8vw,124px); line-height:.92; letter-spacing:-.01em; hyphens:manual}
+.h3{margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(32px,3.2vw,46px); line-height:1}
+.lead{margin:0; max-width:36ch; font-size:clamp(18px,1.45vw,21px); line-height:1.5; color:var(--muted); text-wrap:pretty}
+.statement{margin:0; max-width:21ch; font-size:clamp(30px,4.6vw,64px); line-height:1.1; letter-spacing:-.025em; font-weight:500; text-wrap:balance}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.16em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--glow) / .55), 0 0 1.4em rgb(var(--glow) / .25)}
+.head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:24px 56px; margin-bottom:clamp(32px,4.4vw,64px)}
+.head .lead{padding-bottom:.5em}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#1F1E1C,#181716); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); border:1px solid rgba(255,255,255,.16)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:54px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:40px; height:40px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(26,25,24,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn--sm{height:44px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:34px; height:34px}
+.chip{position:relative; display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 14px 0 16px; border-radius:999px; font-size:14px; font-weight:500; box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); isolation:isolate; transition:transform .5s var(--expo)}
+.chip::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.chip:hover::before{opacity:1}
+.chip:active{transform:scale(.98)}
+.chip svg{width:12px; height:12px; opacity:.7; transition:transform .6s var(--expo)}
+.chip:hover svg{transform:translate(2px,-2px)}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.08); transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path 1.4s var(--expo), filter 1.2s var(--expo)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--d, 0) * 90ms)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none}
+.js [data-reveal="card"] [data-child]{opacity:0; filter:blur(5px); transition:opacity .8s var(--expo), filter .8s var(--expo); transition-delay:calc(var(--d, 0) * 90ms + .3s + var(--c, 0) * 70ms)}
+.js [data-reveal="card"].is-in [data-child]{opacity:1; filter:none}
+
+.js [data-reveal="img"]{clip-path:inset(10% 5% 10% 5% round 28px); transition:clip-path 1.5s var(--expo); transition-delay:calc(var(--d, 0) * 90ms)}
+.js [data-reveal="img"] > img{transform:scale(1.12); transition:transform 2s var(--expo); transition-delay:calc(var(--d, 0) * 90ms)}
+.js [data-reveal="img"].is-in{clip-path:inset(0 0 0 0 round var(--rr, 0px))}
+.js [data-reveal="img"].is-in > img{transform:none}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--d, 0) * 90ms)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .1em; margin:0 -.05em -.1em}
+.slit .num{display:inline-block}
+.js .slit .num{transform:translateY(108%); filter:blur(6px); transition:transform 1.2s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--d, 0) * 110ms)}
+.js .is-in .slit .num{transform:none; filter:none}
+
+/* Bascule des univers : sortie rapide, entrée lente */
+.side.is-leaving{opacity:0; transition:opacity .24s var(--out)}
+.side.is-entering{opacity:0}
+.side.is-entered{opacity:1; transition:opacity 1s var(--expo)}
+html[data-side="createur"] [data-panel="pro"],
+html[data-side="pro"] [data-panel="createur"]{display:none}
+html[data-side="pro"] [data-only="createur"],
+html[data-side="createur"] [data-only="pro"]{display:none !important}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top)}
+.nav::before{content:""; position:absolute; inset:0; background:rgba(18,17,16,.66); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__brand{margin-right:auto; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; padding:6px 2px; border-radius:10px}
+.nav__links{display:none; align-items:center; gap:2px; margin-right:6px}
+.nav__link{position:relative; padding:10px 14px; border-radius:999px; font-size:14px; font-weight:500; color:rgba(244,239,230,.76); isolation:isolate; transition:transform .4s var(--expo)}
+.nav__link::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__link::after{content:""; position:absolute; left:50%; bottom:3px; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:rgb(var(--glow)); box-shadow:0 0 8px rgb(var(--glow) / .9); opacity:0; transform:scale(0); transition:opacity .5s var(--expo), transform .7s var(--expo)}
+.nav__link:hover,.nav__link[aria-current="true"]{color:var(--creme)}
+.nav__link:hover::before{opacity:1}
+.nav__link:active{transform:scale(.97)}
+.nav__link[aria-current="true"]::after{opacity:1; transform:none}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(18,17,16,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--red); color:var(--creme); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:15px; height:15px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.is-loaded .nav [data-only]{animation:kzIn .9s var(--expo) both}
+@media (min-width:960px){ .nav__links{display:flex} }
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .nav__brand{font-size:24px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* =========================================================
+   Hero
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate; background:#0D0C0B}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__bg{position:absolute; inset:-5% -4%; z-index:0; will-change:transform}
+.hero__bgIn{position:absolute; inset:0}
+.hero__land{width:100%; height:100%; object-fit:cover; object-position:46% 50%;
+  filter:sepia(.08) hue-rotate(-4deg) saturate(1.16) brightness(.86) contrast(1.04);
+  transition:filter .9s var(--expo)}
+html[data-side="pro"] .hero__land{filter:sepia(.8) hue-rotate(-168deg) saturate(1.3) brightness(.5) contrast(1.1)}
+.js .hero__land{transition:none}
+.hero__wash{position:absolute; inset:0}
+.hero__wash--gold{opacity:calc(1 - var(--t)); background:radial-gradient(70% 60% at 62% 14%, rgba(255,176,96,.28), transparent 70%)}
+.hero__wash--blue{opacity:var(--t); background:linear-gradient(180deg, rgba(34,58,108,.42), rgba(10,18,36,.18) 55%, rgba(8,12,24,.5))}
+.hero__shade{position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(180deg, rgba(13,12,11,.78) 0%, rgba(13,12,11,.42) 36%, rgba(13,12,11,0) 58%), linear-gradient(0deg, var(--night) 0%, rgba(18,17,16,.55) 12%, rgba(18,17,16,0) 32%)}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + 96px)}
+.hero__copy{position:relative; z-index:3; padding-left:var(--gl); padding-right:var(--gr)}
+.hero__title{position:relative; margin:0 0 .14em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(88px,24vw,150px); line-height:.82; letter-spacing:-.015em; color:var(--creme)}
+.ttl{display:block}
+.hero__title:focus{outline:none}
+.hero__title:focus-visible{outline:2px solid var(--creme); outline-offset:10px; border-radius:14px}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.hero__line{margin:0 0 28px; max-width:24ch; font-size:clamp(18px,1.6vw,22px); line-height:1.45; color:rgba(244,239,230,.94); text-wrap:balance}
+.hero__line{--wd:1.15s}
+.is-switched .hero__line{--wd:.2s}
+.hero__stage{position:relative; z-index:1; flex:1 1 auto; min-height:46vh; min-height:46svh}
+.hero__glow{position:absolute; left:50%; top:2%; width:min(130%, 920px); aspect-ratio:1; translate:-50% 0; border-radius:50%}
+.hero__glow--gold{opacity:calc(1 - var(--t)); background:radial-gradient(closest-side, rgba(255,168,88,.34), rgba(255,168,88,0))}
+.hero__glow--blue{opacity:var(--t); background:radial-gradient(closest-side, rgba(118,158,228,.28), rgba(118,158,228,0))}
+.hero__fig{position:absolute; top:0; left:50%; height:calc(100% / .79); aspect-ratio:9 / 16; translate:-50% 0; will-change:transform;
+  -webkit-mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+          mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%)}
+.portrait{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 0;
+  opacity:0; filter:blur(14px); transform:scale(1.02);
+  transition:opacity .5s var(--out), filter .5s var(--out), transform .6s var(--out)}
+html[data-side="createur"] .portrait--moi,
+html[data-side="pro"] .portrait--pro{opacity:1; filter:blur(0); transform:none;
+  transition:opacity .9s var(--expo) .1s, filter 1s var(--expo) .1s, transform 1.2s var(--expo) .1s}
+.js .portrait{transition:none !important}
+.hero__eyebrow,.hero__line,.hero__cta{transition:none}
+.hero.is-out .hero__eyebrow,.hero.is-out .hero__line,.hero.is-out .hero__cta{opacity:0; filter:blur(8px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.hero__cta{display:flex; flex-wrap:wrap; gap:10px}
+
+@media (min-width:861px){
+  .hero__layout{justify-content:flex-end; padding:0 var(--gr) clamp(56px,11svh,128px) var(--gl)}
+  .hero__copy{padding:0; max-width:min(640px, 44%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__line{max-width:23ch}
+  .hero__stage{position:absolute; right:0; bottom:0; top:9vh; top:9svh; width:58%; min-height:0}
+  .hero__shade{background:linear-gradient(180deg, rgba(13,12,11,.55) 0%, rgba(13,12,11,0) 20%), linear-gradient(90deg, rgba(13,12,11,.66) 0%, rgba(13,12,11,.3) 34%, rgba(13,12,11,0) 56%), linear-gradient(0deg, var(--night) 0%, rgba(18,17,16,.5) 10%, rgba(18,17,16,0) 30%)}
+}
+
+/* Intro du hero */
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .hero__bgIn{opacity:0; transform:scale(1.07)}
+.is-loaded .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo), transform 2.6s var(--expo)}
+.js .hero__stage{opacity:0; filter:blur(10px); transform:translateY(3%)}
+.is-loaded .hero__stage{opacity:1; filter:none; transform:none; transition:opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.is-loaded .ttl--main{animation:ttlMain 1.7s var(--expo) .7s both}
+.is-loaded .ttl--ghost{animation:ttlGhost 1.5s var(--expo) .52s both}
+.js .hero [data-anim]{opacity:0}
+.is-loaded .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad, 0s)}
+.hero .eyebrow[data-anim]{--ad:.45s}
+.hero__cta [data-anim]{--ad:1.7s}
+.hour[data-anim]{--ad:2.1s}
+.is-switched .hero [data-anim]{--ad:.15s}
+.is-switched .hero__cta [data-anim]{--ad:.5s}
+.js .nav__in{opacity:0}
+.is-loaded .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+
+/* =========================================================
+   Créateur
+   ========================================================= */
+.intro .statement .word{color:var(--creme)}
+
+/* Dernière vidéo */
+.poster{margin:0}
+.poster .bezel__core{aspect-ratio:16 / 9; background:#0D0C0B}
+.poster__link{position:absolute; inset:0; display:block; overflow:hidden; border-radius:inherit}
+.poster__img{width:100%; height:100%; object-fit:cover; transition:transform 1.6s var(--expo)}
+.poster__link::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(20deg, rgba(10,9,8,.6) 0%, rgba(10,9,8,0) 42%)}
+.poster__link:hover .poster__img{transform:scale(1.03)}
+.play{--ph:76px; --pw:188px; position:absolute; z-index:1; left:clamp(14px,3.4%,40px); bottom:clamp(14px,5.5%,44px); display:flex; align-items:center; width:calc(var(--ph) + var(--pw)); height:var(--ph); border-radius:999px; color:var(--creme);
+  clip-path:inset(0 var(--pw) 0 0 round 999px); transition:clip-path .85s var(--expo)}
+.js .poster .play{opacity:0; transition:clip-path .85s var(--expo), opacity .8s var(--expo) .95s}
+.js .poster.is-in .play{opacity:1}
+.play__ico{flex:none; display:grid; place-items:center; width:var(--ph); height:var(--ph); transition:transform .85s var(--expo)}
+.play__ico svg{width:22px; height:22px; margin-left:4px}
+.play__label{font-size:15px; font-weight:500; white-space:nowrap; opacity:0; filter:blur(4px); transform:translateX(-12px); transition:opacity .4s var(--expo), filter .5s var(--expo), transform .85s var(--expo)}
+.poster__link:hover .play, .poster__link:focus-visible .play{clip-path:inset(0 0 0 0 round 999px)}
+.poster__link:hover .play__ico{transform:scale(.92)}
+.poster__link:hover .play__label, .poster__link:focus-visible .play__label{opacity:1; filter:none; transform:none; transition-delay:.06s}
+@media (hover:none){
+  .play{--ph:60px; --pw:178px; clip-path:inset(0 0 0 0 round 999px)}
+  .play__label{opacity:1; filter:none; transform:none}
+}
+.latest__meta{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px 32px; margin-top:28px}
+.latest__title{margin:0; max-width:28ch; font-size:clamp(20px,2vw,28px); line-height:1.3; font-weight:500; letter-spacing:-.01em}
+.latest__title small{display:block; margin-top:6px; font-size:14px; font-weight:400; letter-spacing:0; color:var(--faint)}
+.also{list-style:none; margin:0; padding:0}
+.also__label{display:flex; margin:clamp(44px,5.5vw,76px) 0 6px}
+.also__row{position:relative; display:grid; grid-template-columns:1fr auto; align-items:center; gap:8px 24px; padding:22px 0}
+.also__row::before,.also__row::after{content:""; position:absolute; left:0; right:0; bottom:0; height:1px}
+.also__row::before{background:var(--line)}
+.also__row::after{background:rgba(244,239,230,.6); transform:scaleX(0); transform-origin:left; transition:transform 1s var(--expo)}
+.also__row:hover::after{transform:scaleX(1)}
+.also__t{font-size:clamp(18px,1.7vw,22px); font-weight:500; letter-spacing:-.01em}
+.also__m{grid-column:1; font-size:14px; color:var(--faint)}
+.also__go{grid-row:1 / span 2; grid-column:2; display:grid; place-items:center; width:44px; height:44px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); transition:transform .7s var(--expo)}
+.also__go svg{width:14px; height:14px}
+.also__row:hover .also__go{transform:translate(3px,-2px)}
+
+/* Chiffres */
+.stats__grid{display:grid; grid-template-columns:1fr; margin:0}
+.stat{position:relative; display:flex; flex-direction:column-reverse; justify-content:flex-end; gap:10px; padding:28px 24px 30px 0}
+.stat::before{content:""; position:absolute; top:0; left:0; right:24px; height:1px; background:var(--line); transform-origin:left; transition:transform 1.5s var(--expo); transition-delay:calc(var(--d, 0) * 110ms)}
+.js .stat:not(.is-in)::before{transform:scaleX(0)}
+.stat dd{margin:0; font-family:var(--f-word); font-weight:400; font-size:clamp(60px,5.4vw,88px); line-height:.95; letter-spacing:-.01em; white-space:nowrap}
+.stat dt{max-width:22ch; font-size:15px; line-height:1.45; color:var(--muted)}
+.stats__note{margin:28px 0 0; font-size:13px; color:var(--faint)}
+@media (min-width:600px){ .stats__grid{grid-template-columns:1fr 1fr} }
+@media (min-width:1180px){ .stats__grid{grid-template-columns:1.15fr 1fr 1.15fr .7fr} }
+
+/* Pellicule */
+.reel__ctrl{display:flex; align-items:center; gap:10px}
+.reel__hint{margin-right:8px; font-size:13px; color:var(--faint)}
+.round{display:grid; place-items:center; width:48px; height:48px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(244,239,230,.2); transition:transform .5s var(--expo), opacity .4s var(--expo)}
+.round svg{width:16px; height:16px}
+.round:hover{transform:scale(1.05)}
+.round:active{transform:scale(.96)}
+.round:disabled{opacity:.3; cursor:default; transform:none}
+.reel{position:relative; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  padding:8px max(var(--gr), calc((100% - var(--maxw)) / 2)) 16px max(var(--gl), calc((100% - var(--maxw)) / 2));
+  scroll-padding-inline:max(var(--gl), calc((100% - var(--maxw)) / 2)); cursor:grab}
+.reel::-webkit-scrollbar{display:none}
+.reel.is-dragging{scroll-snap-type:none; cursor:grabbing; user-select:none; -webkit-user-select:none}
+.reel__track{display:flex; gap:clamp(14px,1.8vw,24px); margin:0; padding:0; list-style:none; width:max-content}
+.reel__item{flex:none; width:clamp(270px,36vw,520px); scroll-snap-align:start}
+.reel__card{display:block; -webkit-user-drag:none}
+.reel__media{position:relative; display:block; aspect-ratio:16 / 9; overflow:hidden; border-radius:22px; background:#0D0C0B; box-shadow:0 0 0 1px rgba(244,239,230,.08), 0 30px 60px -30px rgba(0,0,0,.8); transition:transform .9s var(--expo)}
+.reel__media img{width:112%; max-width:none; height:100%; margin-left:-6%; object-fit:cover; pointer-events:none}
+.reel__card:hover .reel__media{transform:scale(.985)}
+.reel__name{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-top:18px}
+.reel__name b{font-family:var(--f-title); font-weight:600; font-size:clamp(28px,2.6vw,38px); line-height:1}
+.reel__name span{font-size:13px; color:var(--faint); transition:color .4s}
+.reel__card:hover .reel__name span{color:var(--creme)}
+.reel__bar{position:relative; height:1px; margin-top:28px; background:var(--line); overflow:hidden}
+.reel__bar i{position:absolute; inset:0; background:rgba(244,239,230,.7); transform:scaleX(.12); transform-origin:left; transition:transform .5s var(--expo)}
+@media (max-width:600px){ .reel__item{width:82vw} .reel__hint{display:none} }
+
+/* Guides */
+.guides__grid{display:grid; grid-template-columns:1fr; gap:16px}
+.guide__core{display:grid; grid-template-columns:1fr; min-height:100%}
+.guide__art{position:relative; display:flex; align-items:flex-end; gap:12px; min-height:240px; padding:clamp(24px,3vw,40px); overflow:hidden; background:radial-gradient(80% 90% at 20% 100%, rgba(242,166,92,.26), transparent 70%), linear-gradient(160deg,#2A211A,#171514)}
+.guide__num{font-family:var(--f-title); font-weight:600; font-size:clamp(150px,18vw,240px); line-height:.78; letter-spacing:-.03em; text-shadow:0 0 60px rgba(242,166,92,.25)}
+.guide__unit{padding-bottom:.4em; font-family:var(--f-word); font-style:italic; font-size:clamp(30px,3vw,42px); line-height:1}
+.guide__body{display:flex; flex-direction:column; align-items:flex-start; gap:16px; padding:clamp(24px,3vw,44px)}
+.guide__body p{margin:0; max-width:34ch; color:var(--muted)}
+.tag{display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:500; letter-spacing:.04em; box-shadow:inset 0 0 0 1px var(--line); color:var(--muted)}
+.tag i{width:6px; height:6px; border-radius:50%; background:rgb(var(--gold)); box-shadow:0 0 10px rgb(var(--gold) / .9)}
+.guide--soon .bezel__core{display:flex; flex-direction:column; justify-content:space-between; gap:40px; padding:clamp(24px,3vw,44px); background:linear-gradient(180deg,#1B1A19,#161514)}
+.guide--soon p{margin:0; font-size:clamp(26px,2.6vw,36px); line-height:1.15; letter-spacing:-.02em; font-weight:500; max-width:14ch}
+@media (min-width:900px){
+  .guides__grid{grid-template-columns:8fr 4fr}
+  .guide__core{grid-template-columns:1fr 1fr}
+  .guide__art{min-height:420px}
+}
+
+/* k15ze */
+.sport{position:relative; padding-block:var(--sec) 0}
+.sport__head{display:grid; grid-template-columns:1fr; gap:28px; align-items:end; margin-bottom:clamp(40px,5.5vw,80px)}
+.sport__mini{margin:0; display:flex; align-items:center; gap:14px}
+.sport__mini img{width:132px; height:88px; object-fit:cover; object-position:50% 25%; border-radius:14px; box-shadow:0 0 0 1px rgba(244,239,230,.1)}
+.sport__mini figcaption{font-size:13px; line-height:1.4; color:var(--faint)}
+.sport__mini figcaption b{display:block; font-size:15px; font-weight:500; color:var(--creme)}
+.sport__wide{position:relative; margin:0; aspect-ratio:2.4 / 1; overflow:hidden; --rr:0px}
+.sport__wide > img{width:100%; height:100%; object-fit:cover; object-position:50% 28%}
+.sport__wide::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(0deg, rgba(12,11,10,.55), rgba(12,11,10,0) 45%)}
+.sport__card{position:absolute; z-index:1; left:var(--gl); bottom:clamp(16px,4vw,48px); max-width:380px; padding:22px 24px; border-radius:26px}
+.sport__card p{margin:6px 0 18px; font-size:17px; line-height:1.45}
+.sport__card .eyebrow{margin:0}
+.sport__trio{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(10px,1.4vw,18px); margin-top:clamp(10px,1.4vw,18px); padding-left:var(--gl); padding-right:var(--gr)}
+.sport__trio figure{margin:0; aspect-ratio:4 / 5; overflow:hidden; border-radius:22px; --rr:22px}
+.sport__trio img{width:100%; height:100%; object-fit:cover; object-position:50% 15%}
+@media (min-width:900px){ .sport__head{grid-template-columns:1.1fr 1fr auto} }
+@media (max-width:700px){
+  .sport__wide{aspect-ratio:1 / 1}
+  .sport__wide > img{object-position:36% 50%}
+  .sport__card{left:12px; right:12px; bottom:12px; max-width:none; padding:18px 18px 18px 20px}
+  .sport__card p{margin-bottom:14px; font-size:16px}
+  .sport__trio{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; scroll-padding-inline:var(--gl)}
+  .sport__trio::-webkit-scrollbar{display:none}
+  .sport__trio figure{flex:0 0 74%; scroll-snap-align:start}
+}
+
+/* Liens « lien en bio » */
+.links{position:relative; isolation:isolate; overflow:hidden; padding-block:var(--sec); margin-top:calc(var(--sec) * .6)}
+.links__bg{position:absolute; inset:0; z-index:-1}
+.links__bg img{width:100%; height:100%; object-fit:cover; object-position:60% 60%; transform:scaleX(-1); filter:brightness(.62) saturate(1.08)}
+.links__bg::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, var(--night) 0%, rgba(18,17,16,.15) 22%, rgba(18,17,16,.15) 78%, var(--night) 100%)}
+.bio{max-width:540px; margin-inline:auto; text-align:center}
+.bio__avatar{width:108px; height:108px; margin:0 auto 20px; padding:4px; border-radius:50%; object-fit:cover; object-position:50% 24%; background:rgba(28,27,26,.42); box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 20px 50px -16px rgba(0,0,0,.7)}
+.bio__name{width:fit-content; margin:0 auto; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,6vw,72px); line-height:.95}
+.bio__sub{margin:10px 0 0; font-size:15px; color:rgba(244,239,230,.86)}
+.bio__list{display:grid; gap:12px; margin:36px 0 0; padding:0; list-style:none}
+.bio__row{position:relative; display:flex; align-items:center; gap:14px; min-height:70px; padding:10px 10px 10px 12px; border-radius:24px; overflow:hidden; text-align:left}
+.bio__row::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(100deg, transparent 30%, rgba(255,255,255,.09) 50%, transparent 70%); transform:translateX(-110%); transition:transform 1.1s var(--expo)}
+.bio__row:hover::after{transform:translateX(110%)}
+.bio__glyph{flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:15px; background:rgba(244,239,230,.09)}
+.bio__glyph svg{width:21px; height:21px}
+.bio__txt{flex:1; display:grid; line-height:1.3}
+.bio__txt b{font-size:16px; font-weight:600}
+.bio__txt span{font-size:13px; color:rgba(244,239,230,.74)}
+.bio__go{flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:rgba(244,239,230,.1); transition:transform .7s var(--expo)}
+.bio__go svg{width:14px; height:14px}
+.bio__row:hover .bio__go{transform:translate(2px,-1px) scale(1.06)}
+
+/* Formulaires */
+.sec.brands{padding-top:calc(var(--sec) * .5)}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.split__side{display:flex; flex-direction:column; gap:24px}
+.split__side .lead{max-width:30ch}
+.split__links{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+.form{position:relative}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px)}
+.field{display:grid; gap:8px; margin-bottom:18px}
+.field label{font-size:13px; font-weight:500; letter-spacing:.01em; color:var(--muted)}
+.field label small{font-weight:400; color:var(--faint)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.26); box-shadow:inset 0 0 0 1px rgba(244,239,230,.13); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.4)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.24)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.6), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,182,109,.85)}
+textarea.input{min-height:140px; resize:vertical}
+select.input{appearance:none; -webkit-appearance:none; padding-right:46px; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='%23F4EFE6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 18px center}
+select.input option{background:#1C1B1A; color:var(--creme)}
+.field__err{min-height:0; margin:0; font-size:13px; color:#F2B66D}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-top:8px}
+.form__note{margin:0; font-size:13px; color:var(--faint)}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{display:grid; place-items:center; width:64px; height:64px; border-radius:50%; background:var(--creme); color:var(--ink); transform:scale(.6); opacity:0; transition:transform 1s var(--expo) .45s, opacity .6s var(--expo) .45s}
+.ok__check svg{width:26px; height:26px}
+.form.is-sent .ok__check{transform:none; opacity:1}
+.form__ok h3{outline:none}
+.form__ok p{margin:0; max-width:34ch; color:var(--muted)}
+.form__ok > *:not(.ok__check){opacity:0; filter:blur(5px); transition:opacity .8s var(--expo), filter .8s var(--expo)}
+.form.is-sent .form__ok > *:not(.ok__check){opacity:1; filter:none; transition-delay:.6s}
+
+/* =========================================================
+   Pro
+   ========================================================= */
+.apps__grid{display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:clamp(14px,1.8vw,24px)}
+.app{grid-column:span 12; --mh:clamp(300px,32vw,460px)}
+@media (min-width:900px){ .app--7{grid-column:span 7} .app--5{grid-column:span 5} }
+.app .bezel__core{display:flex; flex-direction:column; background:radial-gradient(90% 70% at 70% 0%, rgb(var(--tint) / .13), transparent 70%), linear-gradient(180deg,#1E1D1B,#171615)}
+.halo{position:absolute; left:0; top:0; z-index:0; width:600px; height:600px; margin:-300px 0 0 -300px; border-radius:50%; pointer-events:none; opacity:0;
+  background:radial-gradient(closest-side, rgba(244,239,230,.11), rgb(var(--tint, 244 239 230) / .07) 45%, transparent 100%); transition:opacity .7s var(--expo); will-change:transform}
+[data-halo].is-hover .halo{opacity:1}
+.app__media{position:relative; z-index:1; display:flex; justify-content:center; align-items:flex-end; height:var(--mh); padding:clamp(22px,3vw,40px) clamp(22px,3vw,40px) 0}
+.shot{height:100%; width:auto; min-width:0; object-fit:cover; object-position:50% 0; border-radius:18px; box-shadow:0 0 0 1px rgba(255,255,255,.07), 0 30px 60px -24px rgba(0,0,0,.75); transition:transform 1.1s var(--expo)}
+.shot--land{width:100%; height:100%; object-fit:cover; object-position:50% 0; border-radius:18px 18px 0 0}
+.app__media--duo .shot + .shot{margin-left:-7%; transform:translateY(7%)}
+.app__media--duo .shot:first-child{position:relative; z-index:1}
+.app:hover .app__media--duo .shot:first-child{transform:translateY(-8px)}
+.app:hover .app__media--duo .shot + .shot{transform:translateY(5%)}
+.app__media--pano{gap:0}
+.app__media--pano .shot:first-child{border-radius:18px 0 0 18px}
+.app__media--pano .shot + .shot{border-radius:0 18px 18px 0}
+.app:hover .app__media--pano .shot,
+.app:hover .app__media--solo .shot{transform:translateY(-8px)}
+.app:hover .shot--land{transform:translateY(-6px)}
+.app__media--land{padding-bottom:0}
+.app__info{position:relative; z-index:1; display:grid; grid-template-columns:auto 1fr; align-items:center; column-gap:16px; padding:clamp(22px,3vw,40px)}
+.app__icon{width:58px; height:58px; border-radius:22%; box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 12px 28px -10px rgba(0,0,0,.7)}
+.app__name{margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(34px,3.2vw,46px); line-height:1}
+.app__line{grid-column:1 / -1; margin:20px 0 0; max-width:40ch; font-size:17px; line-height:1.5; color:rgba(244,239,230,.88)}
+.app__meta{grid-column:1 / -1; margin:10px 0 0; font-size:13px; color:var(--faint)}
+.app__links{grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:8px; margin-top:24px}
+.app--wide .app__media{height:calc(var(--mh) + 40px)}
+@media (min-width:900px){
+  .app--wide .bezel__core{display:grid; grid-template-columns:5fr 7fr; align-items:center}
+  .app--wide .app__media{height:calc(var(--mh) + 80px); padding-bottom:clamp(22px,3vw,40px)}
+  .app--wide.app--rev .bezel__core{grid-template-columns:7fr 5fr}
+  .app--wide.app--rev .app__media{order:-1}
+}
+@media (max-width:899px){ .app--wide .app__media{order:-1} }
+@media (max-width:600px){
+  .app{--mh:300px}
+  .app .app__media--land{height:auto}
+  .app .shot--land{height:auto; aspect-ratio:1000 / 700}
+}
+
+/* Agents IA */
+.agents .lead{max-width:44ch}
+.agents__map{position:relative; max-width:1160px; margin:clamp(36px,5vw,72px) auto 0; aspect-ratio:1200 / 640}
+.agents__svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.mem{fill:url(#memFill); stroke:rgba(244,239,230,.13); stroke-width:1; transform-origin:600px 290px; transition:opacity 1.2s var(--expo), transform 1.4s var(--expo); transition-delay:calc(var(--s) * 260ms)}
+.ln{fill:none; stroke:rgba(244,239,230,.32); stroke-width:1.2; stroke-linecap:round; transform-origin:600px 290px; transition:opacity .8s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--s) * 260ms)}
+.ln--v{stroke:rgba(244,239,230,.85); stroke-width:1.6}
+.ln--glow{stroke:rgba(244,239,230,.55); stroke-width:7}
+.js .agents__map:not(.is-on) .ln{opacity:0; transform:scale(0)}
+.js .agents__map:not(.is-on) .mem{opacity:0; transform:scale(.8)}
+.hub{position:absolute; left:var(--x); top:var(--y); translate:-50% -50%; z-index:2; display:grid; place-items:center; align-content:center; gap:4px; width:clamp(136px,14vw,172px); aspect-ratio:1; border-radius:50%; text-align:center;
+  background:radial-gradient(circle at 50% 30%, #2C2A28, #161514 72%); box-shadow:inset 0 0 0 1px rgba(244,239,230,.2), 0 0 0 10px rgba(244,239,230,.025), 0 0 90px rgb(var(--dusk) / .22);
+  transition:opacity 1s var(--expo), transform 1.2s var(--expo)}
+.hub b{font-family:var(--f-title); font-weight:600; font-size:clamp(28px,2.6vw,34px); line-height:1}
+.hub span{max-width:13ch; font-size:12px; line-height:1.35; color:var(--muted)}
+.js .agents__map:not(.is-on) .hub{opacity:.25; transform:scale(.94)}
+.agents__roles{display:contents; list-style:none; margin:0; padding:0}
+.node{position:absolute; left:var(--x); top:var(--y); translate:-50% -50%; z-index:1; display:flex; align-items:center; gap:10px; width:max-content; max-width:200px; margin:0; padding:10px 16px 10px 12px; border-radius:20px; background:#1C1B1A; box-shadow:inset 0 0 0 1px rgba(244,239,230,.14), 0 14px 30px -14px rgba(0,0,0,.8); font-size:14px; line-height:1.3; color:var(--creme);
+  transition:opacity .9s var(--expo), transform 1s var(--expo); transition-delay:calc(var(--s) * 260ms)}
+.node__dot{position:relative; flex:none; width:8px; height:8px; border-radius:50%; background:var(--creme)}
+.node__dot::after{content:""; position:absolute; inset:-8px; border-radius:50%; background:radial-gradient(closest-side, rgb(var(--dusk) / .8), transparent); transition:opacity .9s var(--expo); transition-delay:calc(var(--s) * 260ms + .2s)}
+.js .agents__map:not(.is-on) .node{opacity:.2; transform:scale(.96)}
+.js .agents__map:not(.is-on) .node__dot::after{opacity:0}
+.node--mem{max-width:232px; background:rgba(28,27,26,.7); color:var(--muted); font-size:13px}
+.node--mem .node__dot{background:transparent; box-shadow:inset 0 0 0 1px rgba(244,239,230,.7)}
+.node--ok{z-index:3; max-width:none; gap:12px; padding:10px 22px 10px 10px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:16px; white-space:nowrap;
+  box-shadow:0 0 0 7px rgba(244,239,230,.08), 0 0 70px 14px rgba(244,239,230,.16)}
+.node--ok small{font-size:13px; font-weight:400; color:rgba(26,25,24,.7)}
+.ok__ico{display:grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--ink); color:var(--creme)}
+.ok__ico svg{width:15px; height:15px}
+.js .agents__map:not(.is-on) .node--ok{opacity:.15}
+.spine{display:none}
+.proof{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:0; padding-top:32px; border-top:1px solid var(--line)}
+.proof div{display:flex; flex-direction:column-reverse; justify-content:flex-end; gap:8px}
+.proof dd{margin:0; font-family:var(--f-word); font-weight:400; font-size:clamp(50px,5.4vw,84px); line-height:.95}
+.proof dt{font-size:15px; color:var(--muted)}
+.proof__label{display:flex; margin:clamp(44px,5.5vw,76px) 0 18px}
+@media (max-width:959px){
+  .agents__map{aspect-ratio:auto; display:flex; flex-direction:column; align-items:center}
+  .agents__svg{display:none}
+  .hub,.node{position:relative; left:auto; top:auto; translate:none}
+  .agents__roles{display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%}
+  .node{width:auto; max-width:none; padding:12px 14px 12px 12px}
+  .node--mem{margin-top:10px; width:100%; justify-content:center}
+  .node--ok{white-space:normal}
+  .spine{display:block; width:1px; height:44px; background:linear-gradient(180deg, rgba(244,239,230,.1), rgba(244,239,230,.55)); transform-origin:top; transition:transform 1s var(--expo); transition-delay:calc(var(--s) * 260ms)}
+  .js .agents__map:not(.is-on) .spine{transform:scaleY(0)}
+  .proof{grid-template-columns:1fr; gap:22px}
+}
+@media (max-width:420px){ .agents__roles{grid-template-columns:1fr} }
+
+/* Offres */
+.offers__grid{display:grid; grid-template-columns:1fr; gap:16px}
+@media (min-width:760px){ .offers__grid{grid-template-columns:1fr 1fr} }
+.offer{--tint:150 182 224}
+.offer .bezel__core{display:flex; flex-direction:column; gap:16px; min-height:300px; padding:clamp(26px,3.2vw,44px)}
+.offer__n{position:relative; z-index:1; font-size:13px; letter-spacing:.14em; color:var(--faint)}
+.offer__t{position:relative; z-index:1; margin:auto 0 0; max-width:16ch; font-size:clamp(24px,2.3vw,32px); line-height:1.15; letter-spacing:-.02em; font-weight:600}
+.offer p{position:relative; z-index:1; margin:0; max-width:38ch; color:var(--muted)}
+.offer .btn{position:relative; z-index:1; align-self:flex-start; margin-top:8px}
+
+/* Startup Weekend */
+.win{position:relative; padding-top:var(--sec)}
+.win__fig{position:relative; margin:0; height:min(90svh, 62vw); min-height:440px; overflow:hidden; --rr:0px}
+.win__fig > img{width:100%; height:100%; object-fit:cover; object-position:50% 22%}
+.win__fig::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, var(--night) 0%, rgba(18,17,16,0) 16%, rgba(18,17,16,0) 72%, rgba(18,17,16,.5) 100%)}
+.win__card{position:absolute; z-index:1; right:var(--gr); bottom:clamp(20px,3vw,40px); width:min(410px, calc(100% - 2 * var(--gutter))); padding:28px 30px 26px; border-radius:28px}
+.win__card .eyebrow{margin-bottom:14px}
+.win__card .h2{font-size:clamp(56px,6vw,92px)}
+.win__card p{margin:14px 0 0; font-size:17px; line-height:1.5}
+.win__card small{display:block; margin-top:14px; font-size:12px; color:rgba(244,239,230,.7)}
+@media (max-width:760px){
+  .win__fig{height:auto; min-height:0; aspect-ratio:4 / 5}
+  .win__fig > img{object-position:46% 30%}
+  .win__card{position:relative; right:auto; bottom:auto; width:auto; margin:-88px var(--gr) 0 var(--gl)}
+}
+
+/* =========================================================
+   Pied de page
+   ========================================================= */
+.foot{padding:clamp(72px,8vw,120px) 0 calc(84px + env(safe-area-inset-bottom)); border-top:1px solid var(--line-2)}
+.foot__big{width:fit-content; margin:0 0 clamp(40px,5vw,64px) -.04em; font-family:var(--f-title); font-weight:600; font-size:clamp(120px,25vw,380px); line-height:.78; letter-spacing:-.02em}
+.foot__grid{display:grid; grid-template-columns:1fr; gap:36px; padding-top:32px; border-top:1px solid var(--line)}
+@media (min-width:860px){ .foot__grid{grid-template-columns:1.3fr 1fr 1fr} }
+.foot h3{margin:0 0 14px; font-size:11px; font-weight:500; letter-spacing:.22em; text-transform:uppercase; color:var(--faint)}
+.foot ul{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+.foot li{font-size:15px; color:var(--muted)}
+.foot a{position:relative; color:var(--creme)}
+.foot a::after{content:""; position:absolute; left:0; right:0; bottom:-2px; height:1px; background:currentColor; transform:scaleX(0); transform-origin:left; transition:transform .7s var(--expo)}
+.foot a:hover::after{transform:scaleX(1)}
+.foot__now li{display:flex; justify-content:space-between; gap:16px; max-width:420px; padding-bottom:8px; border-bottom:1px solid var(--line-2)}
+.foot__now time{color:var(--faint); white-space:nowrap}
+.foot__base{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-top:56px; font-size:13px; color:var(--faint)}
+.foot__logo{display:flex; align-items:center; gap:12px}
+.foot__logo img{width:34px; height:34px; opacity:.85}
+
+/* =========================================================
+   L'heure : le passage secret
+   ========================================================= */
+.hour{position:absolute; z-index:3; right:var(--gr); bottom:clamp(40px,6.5svh,72px); width:clamp(230px,19vw,290px); padding:10px 12px 12px; border-radius:22px; cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; outline:none; transition:box-shadow .5s var(--expo)}
+.hour::before{content:""; position:absolute; inset:-22px -28px; z-index:-1; border-radius:50%; pointer-events:none; background:radial-gradient(closest-side, rgba(13,12,11,.55), rgba(13,12,11,0))}
+.hour.is-active{cursor:grabbing}
+.hour:focus-visible{box-shadow:0 0 0 1.5px rgba(244,239,230,.75)}
+.hour__sky{position:relative; display:block; aspect-ratio:300 / 72}
+.hour__sky svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.hour__base path{fill:none; stroke:rgba(244,239,230,.32); stroke-width:1}
+.hour__base line{stroke:rgba(244,239,230,.18); stroke-width:1}
+.hour__trace{clip-path:inset(-20% 100% -20% 0); transition:clip-path 1.1s var(--expo)}
+.hour__trace path{fill:none; stroke:rgba(244,239,230,.8); stroke-width:1.3; stroke-linecap:round}
+.hour:focus-visible .hour__trace,.hour.is-active .hour__trace{clip-path:inset(-20% -2% -20% 0)}
+.sun__halo{transform-box:fill-box; transform-origin:center; transition:transform .8s var(--expo)}
+.sun__gold{fill:#F7C98E; opacity:calc(1 - var(--t))}
+.sun__blue{fill:#C9DAF2; opacity:var(--t)}
+.hour:focus-visible .sun__halo,.hour.is-active .sun__halo{transform:scale(1.45)}
+.hour__read{display:flex; align-items:baseline; gap:8px; margin:6px 0 0; font-size:13px; line-height:1.25; letter-spacing:.02em; color:rgba(244,239,230,.92); text-shadow:0 1px 10px rgba(0,0,0,.45)}
+.hour__time{display:inline-flex; align-items:flex-end; font-weight:500; color:var(--creme); font-variant-numeric:tabular-nums}
+.hour__city{color:rgba(244,239,230,.72)}
+.dg{display:inline-block; height:1.25em; overflow:hidden; vertical-align:bottom}
+.dg i{display:flex; flex-direction:column; font-style:normal; transition:transform 1s var(--expo); transition-delay:calc(var(--k, 0) * 70ms)}
+.dg b{display:block; height:1.25em; line-height:1.25em; font-weight:inherit}
+[data-clock].is-scrub .dg i{transition-duration:.14s; transition-delay:0s}
+.hour__time .sep{padding:0 .05em}
+.hour__hint{position:absolute; left:12px; right:12px; top:100%; margin:0; font-family:var(--f-word); font-style:italic; font-size:17px; line-height:1.2; color:var(--creme); text-shadow:0 0 .6em rgb(var(--glow) / .55); pointer-events:none;
+  opacity:0; filter:blur(6px); transition:opacity .45s var(--expo), filter .6s var(--expo)}
+.hour:focus-visible .hour__hint,.hour.is-active .hour__hint{opacity:1; filter:none}
+@media (hover:hover){
+  .hour:hover .hour__trace,.door__btn:hover .hour__trace{clip-path:inset(-20% -2% -20% 0)}
+  .hour:hover .sun__halo,.door__btn:hover .sun__halo{transform:scale(1.45)}
+  .hour:hover .hour__hint{opacity:1; filter:none}
+}
+@media (max-width:860px){
+  .hour{right:auto; left:50%; translate:-50% 0; width:min(272px, 76vw); bottom:calc(72px + env(safe-area-inset-bottom))}
+  .hour__read{justify-content:center}
+  .hour__hint{top:auto; bottom:calc(100% - 4px); text-align:center}
+}
+
+/* La seconde porte, tout en bas */
+.door{display:flex; flex-direction:column; align-items:center; gap:6px; margin:clamp(64px,8vw,112px) auto 0; text-align:center}
+.door__btn{position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 28px; border-radius:28px; color:var(--creme); isolation:isolate; transition:transform .6s var(--expo)}
+.door__btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:radial-gradient(closest-side, rgb(var(--glow) / .1), transparent); opacity:0; transition:opacity .6s var(--expo)}
+.door__btn:hover::before,.door__btn:focus-visible::before{opacity:1}
+.door__btn:active{transform:scale(.98)}
+.door__btn:focus-visible{outline-offset:4px}
+.door__clock{display:flex; flex-direction:column; align-items:center; width:132px}
+.door__clock .hour__sky{width:100%}
+.door__clock .hour__read{justify-content:center; margin-top:2px; font-size:12px}
+.door__btn:focus-visible .hour__trace{clip-path:inset(-20% -2% -20% 0)}
+.door__btn:focus-visible .sun__halo{transform:scale(1.45)}
+.door__txt{font-size:clamp(22px,2.4vw,30px); font-weight:500; line-height:1.2; letter-spacing:-.02em}
+.door__sub{margin:0; font-size:14px; color:var(--faint)}
+
+/* Finitions : focus et états */
+.reel__card:focus-visible{outline:none}
+.reel__card:focus-visible .reel__media{box-shadow:0 0 0 2px var(--creme), 0 30px 60px -30px rgba(0,0,0,.8)}
+.also__row:focus-visible{outline-offset:6px; border-radius:10px}
+.btn:focus-visible,.chip:focus-visible,.nav__cta:focus-visible,.nav__link:focus-visible{outline-offset:4px}
+.btn.is-busy{opacity:.75}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-sweep],.js [data-reveal],.js [data-reveal] > img,.js .slit .num,
+  .js .hero__bgIn,.js .hero__stage,.js .ttl--main,.portrait,.side.is-entering,
+  .js .agents__map .ln,.js .agents__map .mem,.js .agents__map .node,.js .agents__map .hub,.js .agents__map .spine,
+  .form__ok,.ok__check{transform:none !important; filter:none !important; clip-path:none !important}
+  .is-loaded .ttl--main,.is-loaded .ttl--ghost,.is-loaded .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .play,.reel__media,.shot,.bio__row,.poster__img{transition:none !important}
+  .dg i{transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"><i class="ambient__gold"></i><i class="ambient__blue"></i></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
+<p class="sr" id="kz-live" aria-live="polite"></p>
+
+<!-- ========== Navigation ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="nav__brand" href="#top" aria-label="Kenz, revenir en haut">Kenz</a>
+    <nav class="nav__links" data-only="pro" aria-label="Sections">
+      <a class="nav__link" href="#apps">Apps</a>
+      <a class="nav__link" href="#agents">Agents IA</a>
+      <a class="nav__link" href="#offres">Offres</a>
+    </nav>
+    <nav class="nav__links" data-only="createur" aria-label="Sections">
+      <a class="nav__link" href="#derniere">Vidéos</a>
+      <a class="nav__link" href="#destinations">Destinations</a>
+      <a class="nav__link" href="#k15ze">k15ze</a>
+      <a class="nav__link" href="#liens">Me suivre</a>
+    </nav>
+    <a class="nav__cta" href="#contact" data-only="pro"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+    <a class="nav__cta" href="#marques" data-only="createur"><span>Travaillons ensemble</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ========== Hero ========== -->
+  <section class="hero" aria-label="Kenz">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bgIn">
+        <img class="hero__land" src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high">
+        <i class="hero__wash hero__wash--gold"></i>
+        <i class="hero__wash hero__wash--blue"></i>
+      </div>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <div class="hero__eyebrow">
+          <p class="eyebrow eyebrow--pill" data-only="createur" data-anim><i></i>Kenz en Asie</p>
+          <p class="eyebrow eyebrow--pill" data-only="pro" data-anim><i></i>AI engineer · Solopreneur</p>
+        </div>
+        <h1 class="hero__title" tabindex="-1"><span class="ttl ttl--main">Kenz</span><span class="ttl ttl--ghost" aria-hidden="true">Kenz</span></h1>
+        <p class="hero__line" data-only="createur" data-words>Je voyage en Asie et je raconte ce que ça coûte <em class="word glow">vraiment</em>.</p>
+        <p class="hero__line" data-only="pro" data-words>Je construis des apps où l’IA fait le <em class="word glow">vrai</em> travail.</p>
+        <div class="hero__cta">
+          <a class="btn btn--light" href="#derniere" data-only="createur" data-anim>Voir la dernière vidéo<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+          <a class="btn btn--light" href="#apps" data-only="pro" data-anim>Voir mes apps<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+        </div>
+      </div>
+      <div class="hero__stage">
+        <i class="hero__glow hero__glow--gold" aria-hidden="true"></i>
+        <i class="hero__glow hero__glow--blue" aria-hidden="true"></i>
+        <div class="hero__fig">
+          <img class="portrait portrait--moi" src="assets/img/kenz-moi.webp" alt="Kenz en t-shirt vert anis, le regard tourné vers l’horizon" width="1080" height="1920">
+          <img class="portrait portrait--pro" src="assets/img/kenz-pro.webp" alt="Kenz en costume bleu nuit et chemise blanche, regard caméra" width="1080" height="1920">
+        </div>
+      </div>
+    </div>
+    <div class="hour" data-hour data-clock data-anim role="slider" tabindex="0" aria-orientation="horizontal"
+         aria-label="L’heure à Kuala Lumpur" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="19:12, heure bleue à Kuala Lumpur" aria-describedby="hour-hint">
+      <div class="hour__sky" aria-hidden="true"><svg class="hour__base" viewBox="0 0 300 72"><path d="M14 64 Q150 -30 286 64"/><line x1="0" y1="64" x2="300" y2="64"/></svg><svg class="hour__trace" viewBox="0 0 300 72"><path d="M14 64 Q150 -30 286 64"/></svg><svg class="hour__sunlayer" viewBox="0 0 300 72"><defs><clipPath id="hz-a"><rect x="-30" y="-60" width="360" height="124"/></clipPath><radialGradient id="sg-a"><stop offset="0" stop-color="#FBE6C8" stop-opacity=".85"/><stop offset="1" stop-color="#FBE6C8" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#hz-a)"><g class="sun" transform="translate(286 64)"><circle class="sun__halo" r="16" fill="url(#sg-a)"/><circle class="sun__gold" r="4.6"/><circle class="sun__blue" r="4.6"/></g></g></svg></div>
+      <p class="hour__read"><span class="hour__time" aria-hidden="true"><span class="dg" style="--k:0"><i style="transform:translateY(-10%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="dg" style="--k:1"><i style="transform:translateY(-90%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="sep">:</span><span class="dg" style="--k:2"><i style="transform:translateY(-10%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="dg" style="--k:3"><i style="transform:translateY(-20%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span></span><span class="hour__city">· Kuala Lumpur</span></p>
+      <p class="hour__hint" id="hour-hint"><span data-only="createur">glisse vers l’heure bleue</span><span data-only="pro">vers l’heure dorée</span></p>
+    </div>
+  </section>
+
+  <div id="contenu" tabindex="-1">
+
+  <!-- =====================================================
+       CÔTÉ CRÉATEUR
+       ===================================================== -->
+  <div class="side" data-panel="createur">
+
+    <section class="sec intro" aria-label="Ce que je raconte">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal="fade">Ce que je raconte</p>
+        <p class="statement" data-words>Le budget, les astuces, ce qu’il faut savoir <em class="word glow">avant</em> de partir. La Chine en tête.</p>
+      </div>
+    </section>
+
+    <section class="sec latest" id="derniere" aria-labelledby="t-latest" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">YouTube · <time datetime="2026-10-31" data-rel>le 31 octobre 2026</time></p>
+            <h2 class="h2" id="t-latest" data-sweep>Dernière vidéo</h2>
+          </div>
+        </header>
+        <figure class="poster bezel" data-reveal="card">
+          <div class="bezel__core">
+            <a class="poster__link" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener" aria-label="Regarder « Premier voyage en Chine : itinéraire de 14 jours » sur YouTube">
+              <img class="poster__img" src="assets/img/video-chine-14-jours.jpg" alt="Miniature « 14 jours » : Kenz sur la Grande Muraille de Chine" width="960" height="540" loading="lazy" decoding="async">
+              <span class="play glass" aria-hidden="true">
+                <span class="play__ico"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4c0 .6.7 1 1.2.7l11.3-7.2a.8.8 0 0 0 0-1.4L8.2 4.1C7.7 3.8 7 4.2 7 4.8z" fill="currentColor"/></svg></span>
+                <span class="play__label">Regarder sur YouTube</span>
+              </span>
+            </a>
+          </div>
+        </figure>
+        <div class="latest__meta">
+          <p class="latest__title" data-reveal="fade">Premier voyage en Chine&nbsp;: itinéraire de 14&nbsp;jours<small>Publiée le 31 octobre 2026</small></p>
+          <a class="btn btn--ghost btn--sm" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" data-reveal="fade">La chaîne Kenz in Asia<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+        <p class="eyebrow also__label" data-reveal="fade">Les plus regardées</p>
+        <ul class="also" role="list">
+          <li data-reveal="fade"><a class="also__row" href="https://www.youtube.com/watch?v=Fp3SsWY28WE" target="_blank" rel="noopener">
+            <span class="also__t">Tout savoir pour ton voyage en Malaisie</span>
+            <span class="also__m">24&#8239;671 vues · la plus vue sur YouTube</span>
+            <span class="also__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a></li>
+          <li data-reveal="fade" style="--d:1"><a class="also__row" href="https://www.youtube.com/shorts/LRxxde_vebE" target="_blank" rel="noopener">
+            <span class="also__t">Réparer son iPhone en Chine</span>
+            <span class="also__m">Short · 93&#8239;760 vues</span>
+            <span class="also__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a></li>
+          <li data-reveal="fade" style="--d:2"><a class="also__row" href="https://www.youtube.com/watch?v=rR6V6H3hFKA" target="_blank" rel="noopener">
+            <span class="also__t">15 choses à savoir avant de voyager en Chine</span>
+            <span class="also__m">8&#8239;275 vues</span>
+            <span class="also__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sec stats" id="chiffres" aria-labelledby="t-stats" style="padding-top:0">
+      <div class="wrap">
+        <p class="eyebrow" id="t-stats" data-reveal="fade">En chiffres</p>
+        <dl class="stats__grid">
+          <div class="stat" data-reveal="stat"><dt>abonnés sur TikTok</dt><dd><span class="slit"><span class="num" data-count="28000" data-prefix="≈&#8239;">≈&#8239;28&#8239;000</span></span></dd></div>
+          <div class="stat" data-reveal="stat" style="--d:1"><dt>vues sur TikTok</dt><dd><span class="slit"><span class="num" data-count="7.83" data-dec="2" data-suffix="&#8239;M">7,83&#8239;M</span></span></dd></div>
+          <div class="stat" data-reveal="stat" style="--d:2"><dt>vues pour ma vidéo record, sur le budget en Malaisie</dt><dd><span class="slit"><span class="num" data-count="725600">725&#8239;600</span></span></dd></div>
+          <div class="stat" data-reveal="stat" style="--d:3"><dt>pays filmés</dt><dd><span class="slit"><span class="num" data-count="9">9</span></span></dd></div>
+        </dl>
+        <p class="stats__note" data-reveal="fade">Chiffres relevés entre le 9 octobre et le 4 novembre 2026.</p>
+      </div>
+    </section>
+
+    <section class="sec dest" id="destinations" aria-labelledby="t-dest" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">9 pays filmés</p>
+            <h2 class="h2" id="t-dest" data-sweep>Destinations</h2>
+          </div>
+          <div class="reel__ctrl" data-reveal="fade">
+            <span class="reel__hint">Faites glisser</span>
+            <button class="round" type="button" data-reel-prev aria-label="Destination précédente" disabled><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg></button>
+            <button class="round" type="button" data-reel-next aria-label="Destination suivante"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></button>
+          </div>
+        </header>
+      </div>
+      <div class="reel" data-reel tabindex="0" role="region" aria-label="Destinations filmées, à faire défiler">
+        <ul class="reel__track" role="list">
+          <li class="reel__item" data-reveal="fade" style="--d:0"><a class="reel__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" draggable="false">
+            <span class="reel__media"><img src="assets/img/video-chine.jpg" alt="Miniature Chine : Kenz dans une rue de lanternes rouges, sous la pluie" width="960" height="540" loading="lazy" decoding="async" draggable="false"></span>
+            <span class="reel__name"><b>Chine</b><span>Voir sur YouTube</span></span></a></li>
+          <li class="reel__item" data-reveal="fade" style="--d:1"><a class="reel__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" draggable="false">
+            <span class="reel__media"><img src="assets/img/video-malaisie.jpg" alt="Miniature Malaisie : Kenz devant les rizières et les tours de Kuala Lumpur" width="960" height="540" loading="lazy" decoding="async" draggable="false"></span>
+            <span class="reel__name"><b>Malaisie</b><span>Voir sur YouTube</span></span></a></li>
+          <li class="reel__item" data-reveal="fade" style="--d:2"><a class="reel__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" draggable="false">
+            <span class="reel__media"><img src="assets/img/video-coree.jpg" alt="Miniature Corée : Kenz en hanbok devant Séoul au crépuscule" width="960" height="540" loading="lazy" decoding="async" draggable="false"></span>
+            <span class="reel__name"><b>Corée</b><span>Voir sur YouTube</span></span></a></li>
+          <li class="reel__item" data-reveal="fade" style="--d:3"><a class="reel__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" draggable="false">
+            <span class="reel__media"><img src="assets/img/video-japon.jpg" alt="Miniature Japon illustrée : Kenz devant le mont Fuji et la tour de Tokyo" width="960" height="540" loading="lazy" decoding="async" draggable="false"></span>
+            <span class="reel__name"><b>Japon</b><span>Voir sur YouTube</span></span></a></li>
+          <li class="reel__item" data-reveal="fade" style="--d:4"><a class="reel__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" draggable="false">
+            <span class="reel__media"><img src="assets/img/video-islande.jpg" alt="Miniature Islande : Kenz en capuche devant une plage de sable noir" width="960" height="540" loading="lazy" decoding="async" draggable="false"></span>
+            <span class="reel__name"><b>Islande</b><span>Voir sur YouTube</span></span></a></li>
+        </ul>
+      </div>
+      <div class="wrap"><div class="reel__bar" aria-hidden="true"><i></i></div></div>
+    </section>
+
+    <section class="sec guides" id="guides" aria-labelledby="t-guides" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">Pour les abonnés</p>
+            <h2 class="h2" id="t-guides" data-sweep>Guides</h2>
+          </div>
+        </header>
+        <div class="guides__grid">
+          <article class="bezel guide" data-reveal="card">
+            <div class="bezel__core guide__core">
+              <div class="guide__art" aria-hidden="true"><span class="guide__num">14</span><span class="guide__unit">jours</span></div>
+              <div class="guide__body">
+                <span class="tag" data-child><i></i>En ligne</span>
+                <h3 class="h3" data-child style="--c:1">Itinéraire Chine</h3>
+                <p data-child style="--c:2">L’itinéraire de mon premier voyage en Chine, sur 14&nbsp;jours, à garder sous la main.</p>
+                <a class="btn btn--light" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener" data-child style="--c:3">Ouvrir l’itinéraire<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+              </div>
+            </div>
+          </article>
+          <article class="bezel guide guide--soon" data-reveal="card" style="--d:1">
+            <div class="bezel__core">
+              <span class="tag" data-child>À venir</span>
+              <p data-child style="--c:1">D’autres guides arrivent <em class="word">bientôt</em>.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sport" id="k15ze" aria-labelledby="t-sport" style="padding-top:0">
+      <div class="wrap sport__head">
+        <div>
+          <p class="eyebrow" data-reveal="fade">Sport · Nutrition</p>
+          <h2 class="h2" id="t-sport" data-sweep>k15ze</h2>
+        </div>
+        <p class="lead" data-words>Le sport, la nutrition, et mes <em class="word glow">courses</em>.</p>
+        <figure class="sport__mini" data-reveal="fade">
+          <img src="assets/img/spartan-2.jpg" alt="Kenz saute au-dessus d’un feu pendant une Spartan Race" width="768" height="511" loading="lazy" decoding="async">
+          <figcaption><b>Spartan Race</b>Course d’obstacles</figcaption>
+        </figure>
+      </div>
+      <figure class="sport__wide" data-reveal="img">
+        <img src="assets/img/hyrox-4.jpg" alt="Kenz et un ami passent l’arrivée d’une course HYROX en riant" width="1100" height="733" loading="lazy" decoding="async">
+        <figcaption class="sport__card glass">
+          <p class="eyebrow">HYROX · 31 mai 2025</p>
+          <p>Ma course, du départ jusqu’à la ligne d’arrivée.</p>
+          <a class="btn btn--light btn--sm" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">La chaîne k15ze<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </figcaption>
+      </figure>
+      <div class="sport__trio">
+        <figure data-reveal="img"><img src="assets/img/hyrox-1.jpg" alt="Kenz, concentré, tire sur une machine pendant la course HYROX" width="733" height="1100" loading="lazy" decoding="async"></figure>
+        <figure data-reveal="img" style="--d:1"><img src="assets/img/hyrox-2.jpg" alt="Kenz pousse un traîneau lesté, le regard droit devant" width="733" height="1100" loading="lazy" decoding="async"></figure>
+        <figure data-reveal="img" style="--d:2"><img src="assets/img/hyrox-3.jpg" alt="Kenz lance un médecine-ball vers une cible" width="733" height="1100" loading="lazy" decoding="async"></figure>
+      </div>
+    </section>
+
+    <section class="links" id="liens" aria-labelledby="t-links">
+      <div class="links__bg" aria-hidden="true"><img src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" loading="lazy" decoding="async"></div>
+      <div class="wrap">
+        <div class="bio">
+          <img class="bio__avatar" src="assets/img/kenz-carre.jpg" alt="Kenz en t-shirt vert devant les rizières de Malaisie" width="900" height="855" loading="lazy" decoding="async" data-reveal="fade">
+          <h2 class="bio__name" id="t-links" data-sweep>Me suivre</h2>
+          <p class="bio__sub" data-reveal="fade">Kenz en Asie · k15ze</p>
+          <ul class="bio__list" role="list">
+            <li><a class="bio__row glass" data-reveal="card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4.5"/><path d="M10 9.3v5.4l4.6-2.7z"/></svg></span>
+              <span class="bio__txt"><b>YouTube · Kenz in Asia</b><span>1&#8239;530 abonnés</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row glass" data-reveal="card" style="--d:1" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14 3.5c.6 2.5 2.4 4.1 5 4.3"/></svg></span>
+              <span class="bio__txt"><b>TikTok · En Bien en Asie</b><span>≈&#8239;28&#8239;000 abonnés</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row glass" data-reveal="card" style="--d:2" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.1" cy="6.9" r=".7" fill="currentColor" stroke="none"/></svg></span>
+              <span class="bio__txt"><b>Instagram</b><span>kenzvoyage_enbien</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row glass" data-reveal="card" style="--d:3" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3.5h4M17.6 7.4l1.2-1.2"/></svg></span>
+              <span class="bio__txt"><b>YouTube · k15ze</b><span>Sport, nutrition, mes courses</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row glass" data-reveal="card" style="--d:4" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span>
+              <span class="bio__txt"><b>Itinéraire Chine, 14 jours</b><span>Le guide pour les abonnés</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec brands" id="marques" aria-labelledby="t-brands">
+      <div class="wrap split">
+        <div class="split__side">
+          <p class="eyebrow" data-reveal="fade" style="margin:0">Marques</p>
+          <h2 class="h2" id="t-brands" data-sweep>Travaillons ensemble</h2>
+          <p class="lead" data-words>Une destination, un produit, une <em class="word glow">idée</em>&nbsp;: je la raconte comme je raconte mes voyages.</p>
+        </div>
+        <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="t-brands">
+          <div class="bezel__core form__core">
+            <div class="form__body">
+              <div class="field">
+                <label for="b-marque">Marque</label>
+                <input class="input" id="b-marque" name="marque" type="text" autocomplete="organization" placeholder="Le nom de votre marque" data-required data-min="2" data-msg="Indiquez le nom de votre marque." aria-describedby="b-marque-err">
+                <p class="field__err" id="b-marque-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="b-idee">L’idée</label>
+                <textarea class="input" id="b-idee" name="idee" placeholder="Une destination, un format, une envie…" data-required data-min="10" data-msg="Racontez votre idée en quelques mots (10 caractères au moins)." aria-describedby="b-idee-err"></textarea>
+                <p class="field__err" id="b-idee-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="b-budget">Budget <small>(facultatif)</small></label>
+                <input class="input" id="b-budget" name="budget" type="text" placeholder="Un ordre de grandeur">
+              </div>
+              <div class="form__foot">
+                <p class="form__note">Pas d’adresse e-mail à copier&nbsp;: tout passe par ici.</p>
+                <button class="btn btn--light" type="submit"><span data-label>Envoyer</span><span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+              </div>
+            </div>
+          </div>
+          <div class="form__ok" hidden>
+            <span class="ok__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <h3 class="h3" tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+            <p>Je reviens vers vous très vite pour en parler. <span style="color:var(--faint)">(Maquette&nbsp;: rien n’est envoyé pour l’instant.)</span></p>
+            <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- =====================================================
+       CÔTÉ PRO
+       ===================================================== -->
+  <div class="side" data-panel="pro">
+
+    <section class="sec intro" aria-label="En bref">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal="fade">AI engineer · Développeur fullstack · Solopreneur</p>
+        <p class="statement" data-words>Et j’installe des agents IA dans votre <em class="word glow">équipe</em>.</p>
+      </div>
+    </section>
+
+    <section class="sec apps" id="apps" aria-labelledby="t-apps" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">App Store · Google Play</p>
+            <h2 class="h2" id="t-apps" data-sweep>Six apps</h2>
+          </div>
+          <p class="lead" data-words>Conçues, codées et lancées <em class="word">seul</em>, de l’idée au store.</p>
+        </header>
+
+        <div class="apps__grid">
+          <!-- Oshii -->
+          <article class="app app--wide bezel" data-halo data-reveal="card" style="--tint:226 170 205">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Oshii</h3>
+                <p class="app__line" data-child style="--c:1">Une vidéo TikTok, Instagram ou YouTube Shorts devient une recette pesée, prête à cuisiner.</p>
+                <p class="app__meta" data-child style="--c:2">iOS et Android · v2.0.2 · mise à jour <time datetime="2026-11-04" data-rel>le 4 novembre 2026</time></p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://play.google.com/store/apps/details?id=com.x7kenz.Oshii" target="_blank" rel="noopener">Google Play<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://oshii.fr" target="_blank" rel="noopener">oshii.fr<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+              <div class="app__media app__media--duo">
+                <img class="shot" src="assets/apps/oshii-ecran-1.jpg" alt="Écran Oshii : « Transforme tes recettes », une marmite et les logos TikTok, YouTube, Instagram" width="462" height="1000" loading="lazy" decoding="async">
+                <img class="shot" src="assets/apps/oshii-ecran-2.jpg" alt="Écran Oshii : une recette Cheese Nans et Kefta avec ses calories et macros" width="462" height="1000" loading="lazy" decoding="async">
+              </div>
+            </div>
+          </article>
+
+          <!-- Sago -->
+          <article class="app app--5 bezel" data-halo data-reveal="card" style="--tint:150 120 235">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__media app__media--pano">
+                <img class="shot" src="assets/apps/sago-ecran-1.jpg" alt="Écran Sago : « Sago apprend le japonais », une scène d’anime sous-titrée en japonais" width="460" height="1000" loading="lazy" decoding="async">
+                <img class="shot" src="assets/apps/sago-ecran-2.jpg" alt="Écran Sago : l’épisode « Un matin sans voix », à travers des histoires anime" width="460" height="1000" loading="lazy" decoding="async">
+              </div>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/sago-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Sago</h3>
+                <p class="app__line" data-child style="--c:1">Le japonais par l’image. Là, tu ne comprends rien. 15&nbsp;minutes plus tard&nbsp;: maintenant, tu comprends.</p>
+                <p class="app__meta" data-child style="--c:2">iPhone et iPad · 180 épisodes en saison 1 · v2.0.1 · mise à jour <time datetime="2026-10-30" data-rel>le 30 octobre 2026</time></p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/fr/app/sago-apprendre-le-japonais/id6759610780" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://sago-landing.vercel.app" target="_blank" rel="noopener">Le site<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Wado -->
+          <article class="app app--7 bezel" data-halo data-reveal="card" style="--tint:160 210 120; --d:1">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__media app__media--land">
+                <img class="shot shot--land" src="assets/apps/wado-ecran-1.jpg" alt="Écran Wado sur iPad : « Muscu et calories, un seul plan », la journée du jour avec repas et séance" width="1000" height="703" loading="lazy" decoding="async">
+              </div>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/wado-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Wado</h3>
+                <p class="app__line" data-child style="--c:1">Muscu et calories, un seul plan. Une photo de ton plat devient des macros.</p>
+                <p class="app__meta" data-child style="--c:2">iOS · v1.1.1 · mise à jour <time datetime="2026-11-04" data-rel>le 4 novembre 2026</time></p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/us/app/wado-calories-ia-muscu/id6813179120" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://wado-lilac.vercel.app" target="_blank" rel="noopener">Le site<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Croc -->
+          <article class="app app--7 bezel" data-halo data-reveal="card" style="--tint:170 150 240">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__media app__media--land">
+                <img class="shot shot--land" src="assets/apps/croc-ecran-1.jpg" alt="Écran Croc sur iPad : « Arrête de te ronger les ongles », la série du jour et la mascotte violette" width="1000" height="687" loading="lazy" decoding="async">
+              </div>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/croc-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Croc</h3>
+                <p class="app__line" data-child style="--c:1">Arrêter de se ronger les ongles&nbsp;: un petit pacte chaque jour, sans te juger.</p>
+                <p class="app__meta" data-child style="--c:2">iOS · v1.2.1 · mise à jour <time datetime="2026-10-19" data-rel>le 19 octobre 2026</time></p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/app/croc-stop-ongles-rong%C3%A9s/id6801541157" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://croc-snowy.vercel.app" target="_blank" rel="noopener">Le site<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Miru -->
+          <article class="app app--5 bezel" data-halo data-reveal="card" style="--tint:110 120 240; --d:1">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__media app__media--solo">
+                <img class="shot" src="assets/apps/miru-ecran-1.jpg" alt="Écran Miru : le salon d’une partie avec son code, son QR code et les joueurs" width="462" height="1000" loading="lazy" decoding="async">
+              </div>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/miru-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Miru</h3>
+                <p class="app__line" data-child style="--c:1">Des jeux de soirée entre amis&nbsp;: un thème inventé devient un jeu généré en direct.</p>
+                <p class="app__meta" data-child style="--c:2">iOS et web · 9 jeux · v2.0 · mise à jour <time datetime="2026-10-30" data-rel>le 30 octobre 2026</time></p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/us/app/miru-jeux-entre-amis/id6761622088" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                  <a class="chip" href="https://v0-miru-website.vercel.app" target="_blank" rel="noopener">Le site<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Zenko -->
+          <article class="app app--wide app--rev bezel" data-halo data-reveal="card" style="--tint:200 120 70">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <div class="app__info">
+                <img class="app__icon" src="assets/apps/zenko-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async" data-child>
+                <h3 class="app__name" data-child>Zenko</h3>
+                <p class="app__line" data-child style="--c:1">Des programmes quotidiens selon tes envies et ton budget.</p>
+                <p class="app__meta" data-child style="--c:2">iOS · v1.0</p>
+                <div class="app__links" data-child style="--c:3">
+                  <a class="chip" href="https://apps.apple.com/ch/app/zenko/id6753706200" target="_blank" rel="noopener">App Store<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></a>
+                </div>
+              </div>
+              <div class="app__media app__media--solo">
+                <img class="shot" src="assets/apps/zenko-ecran-1.jpg" alt="Écran Zenko : mes dernières journées, George Town, et mes voyages" width="462" height="1000" loading="lazy" decoding="async">
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec agents" id="agents" aria-labelledby="t-agents" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">Pour votre équipe</p>
+            <h2 class="h2" id="t-agents" data-sweep>Agents IA</h2>
+          </div>
+          <p class="lead" data-words>Des équipes d’agents qui travaillent comme une vraie équipe&nbsp;: chacun son rôle, une mémoire commune, et rien ne part sans votre <em class="word glow">validation</em>.</p>
+        </header>
+
+        <div class="agents__map" data-agents>
+          <svg class="agents__svg" viewBox="0 0 1200 640" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="memFill" cx="50%" cy="50%" r="50%">
+                <stop offset="0" stop-color="#96B6E0" stop-opacity=".14"/>
+                <stop offset="1" stop-color="#96B6E0" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="soft" filterUnits="userSpaceOnUse" x="0" y="0" width="1200" height="640"><feGaussianBlur stdDeviation="6"/></filter>
+            </defs>
+            <ellipse class="mem" cx="600" cy="290" rx="235" ry="140" style="--s:1"/>
+            <path class="ln" style="--s:2" d="M600 290 C470 270 330 112 215 100"/>
+            <path class="ln" style="--s:3" d="M600 290 L600 52"/>
+            <path class="ln" style="--s:4" d="M600 290 C730 270 870 112 985 100"/>
+            <path class="ln" style="--s:5" d="M600 290 C450 300 290 350 140 345"/>
+            <path class="ln" style="--s:6" d="M600 290 C750 300 910 350 1060 345"/>
+            <path class="ln ln--glow" style="--s:8" d="M600 300 L600 572" filter="url(#soft)"/>
+            <path class="ln ln--v" style="--s:8" d="M600 300 L600 572"/>
+          </svg>
+
+          <div class="hub" style="--x:50%; --y:45.3%; --s:0">
+            <b>Hermes</b>
+            <span>sait où en est chaque dossier</span>
+          </div>
+          <i class="spine" aria-hidden="true" style="--s:1"></i>
+          <ul class="agents__roles" role="list" aria-label="Les rôles">
+            <li class="node" style="--x:17.9%; --y:15.6%; --s:2"><i class="node__dot" aria-hidden="true"></i>Veille et recherches sourcées</li>
+            <li class="node" style="--x:50%; --y:8.1%; --s:3"><i class="node__dot" aria-hidden="true"></i>Réponses clients et support</li>
+            <li class="node" style="--x:82.1%; --y:15.6%; --s:4"><i class="node__dot" aria-hidden="true"></i>Contenu et vidéos</li>
+            <li class="node" style="--x:11.7%; --y:53.9%; --s:5"><i class="node__dot" aria-hidden="true"></i>Agents qui codent, avec relecture</li>
+            <li class="node" style="--x:88.3%; --y:53.9%; --s:6"><i class="node__dot" aria-hidden="true"></i>Back-office et suivi</li>
+          </ul>
+          <p class="node node--mem" style="--x:33%; --y:69%; --s:7"><i class="node__dot" aria-hidden="true"></i>Mémoire commune&nbsp;: tout est noté et sourcé</p>
+          <i class="spine" aria-hidden="true" style="--s:8"></i>
+          <p class="node node--ok" style="--x:50%; --y:89.4%; --s:9"><span class="ok__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg></span>Vous validez<span class="sr">,</span> <small>rien ne part sans vous</small></p>
+        </div>
+
+        <p class="eyebrow proof__label" data-reveal="fade">Ce qui le prouve</p>
+        <dl class="proof">
+          <div data-reveal="stat"><dt>apps livrées</dt><dd><span class="slit"><span class="num" data-count="6">6</span></span></dd></div>
+          <div data-reveal="stat" style="--d:1"><dt>épisodes en une saison</dt><dd><span class="slit"><span class="num" data-count="180">180</span></span></dd></div>
+          <div data-reveal="stat" style="--d:2"><dt>vidéos produites, et plus</dt><dd><span class="slit"><span class="num" data-count="60" data-suffix="+">60+</span></span></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="sec offers" id="offres" aria-labelledby="t-offers" style="padding-top:0">
+      <div class="wrap">
+        <header class="head">
+          <div>
+            <p class="eyebrow" data-reveal="fade">Ce que je peux faire</p>
+            <h2 class="h2" id="t-offers" data-sweep>Pour vous</h2>
+          </div>
+        </header>
+        <div class="offers__grid">
+          <article class="offer bezel" data-halo data-reveal="card">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <span class="offer__n" data-child>01</span>
+              <h3 class="offer__t" data-child style="--c:1">Agents IA pour votre équipe</h3>
+              <p data-child style="--c:2">Chacun son rôle, une mémoire commune, et vous gardez la main sur ce qui part.</p>
+              <a class="btn btn--ghost btn--sm" href="#contact" data-need="Agents IA pour votre équipe" data-child style="--c:3">En parler<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </article>
+          <article class="offer bezel" data-halo data-reveal="card" style="--d:1">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <span class="offer__n" data-child>02</span>
+              <h3 class="offer__t" data-child style="--c:1">Intégrer l’IA dans votre produit</h3>
+              <p data-child style="--c:2">L’IA à l’endroit où elle fait gagner du temps à vos utilisateurs.</p>
+              <a class="btn btn--ghost btn--sm" href="#contact" data-need="Intégrer l’IA dans votre produit" data-child style="--c:3">En parler<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </article>
+          <article class="offer bezel" data-halo data-reveal="card">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <span class="offer__n" data-child>03</span>
+              <h3 class="offer__t" data-child style="--c:1">Votre app, de l’idée au store</h3>
+              <p data-child style="--c:2">Conception, développement, mise en ligne&nbsp;: le chemin que j’ai fait six fois.</p>
+              <a class="btn btn--ghost btn--sm" href="#contact" data-need="Votre app, de l’idée au store" data-child style="--c:3">En parler<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </article>
+          <article class="offer bezel" data-halo data-reveal="card" style="--d:1">
+            <div class="bezel__core">
+              <i class="halo" aria-hidden="true"></i>
+              <span class="offer__n" data-child>04</span>
+              <h3 class="offer__t" data-child style="--c:1">Contenu vidéo automatisé pour votre marque</h3>
+              <p data-child style="--c:2">Des vidéos qui sortent au bon rythme, sans y passer vos journées.</p>
+              <a class="btn btn--ghost btn--sm" href="#contact" data-need="Contenu vidéo automatisé pour votre marque" data-child style="--c:3">En parler<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="win" id="startup-weekend" aria-labelledby="t-win" style="padding-top:0">
+      <figure class="win__fig" data-reveal="img">
+        <img src="assets/img/startup-weekend-2.jpg" alt="Kenz, bras levés, au moment où l’équipe apprend sa victoire au Startup Weekend" width="1200" height="800" loading="lazy" decoding="async">
+      </figure>
+      <div class="win__card glass" data-reveal="card">
+        <p class="eyebrow" data-child>Startup Weekend</p>
+        <h2 class="h2" id="t-win" data-child style="--c:1">1<sup style="font-size:.45em; vertical-align:.9em">re</sup>&nbsp;place</h2>
+        <p data-child style="--c:2">54&nbsp;heures pour concevoir, prototyper et pitcher, en <em class="word glow">équipe</em>.</p>
+        <small data-child style="--c:3">Photo&nbsp;: Annie Frénot</small>
+      </div>
+    </section>
+
+    <section class="sec contact" id="contact" aria-labelledby="t-contact">
+      <div class="wrap split">
+        <div class="split__side">
+          <p class="eyebrow" data-reveal="fade" style="margin:0">Contact</p>
+          <h2 class="h2" id="t-contact" data-sweep style="white-space:nowrap;font-size:clamp(3rem,7vw,5.6rem)">Parlons-en</h2>
+          <p class="lead" data-words>Un projet, une équipe, une idée d’app&nbsp;: racontez-moi <em class="word glow">tout</em>.</p>
+          <div class="split__links" data-reveal="fade">
+            <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+            <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          </div>
+        </div>
+        <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="t-contact">
+          <div class="bezel__core form__core">
+            <div class="form__body">
+              <div class="field">
+                <label for="c-nom">Nom</label>
+                <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Votre nom" data-required data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+                <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="c-besoin">Votre besoin</label>
+                <select class="input" id="c-besoin" name="besoin" data-required data-msg="Choisissez ce qui vous amène." aria-describedby="c-besoin-err">
+                  <option value="">Choisir…</option>
+                  <option>Agents IA pour votre équipe</option>
+                  <option>Intégrer l’IA dans votre produit</option>
+                  <option>Votre app, de l’idée au store</option>
+                  <option>Contenu vidéo automatisé pour votre marque</option>
+                  <option>Autre chose</option>
+                </select>
+                <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+              </div>
+              <div class="field">
+                <label for="c-message">Message</label>
+                <textarea class="input" id="c-message" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-required data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-message-err"></textarea>
+                <p class="field__err" id="c-message-err" aria-live="polite"></p>
+              </div>
+              <div class="form__foot">
+                <p class="form__note">Trois champs, et c’est parti.</p>
+                <button class="btn btn--light" type="submit"><span data-label>Envoyer</span><span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+              </div>
+            </div>
+          </div>
+          <div class="form__ok" hidden>
+            <span class="ok__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+            <h3 class="h3" tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+            <p>Je reviens vers vous très vite. <span style="color:var(--faint)">(Maquette&nbsp;: rien n’est envoyé pour l’instant.)</span></p>
+            <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  </div>
+</main>
+
+<!-- ========== Pied de page ========== -->
+<footer class="foot">
+  <div class="wrap">
+    <p class="foot__big" data-sweep aria-hidden="true">Kenz</p>
+    <div class="foot__grid" data-reveal="fade">
+      <div>
+        <h3>En ce moment</h3>
+        <ul class="foot__now">
+          <li data-only="createur"><span>Short publié</span><time datetime="2026-11-07" data-rel>le 7 novembre 2026</time></li>
+          <li data-only="createur"><span>Dernière vidéo</span><time datetime="2026-10-31" data-rel>le 31 octobre 2026</time></li>
+          <li data-only="pro"><span>Oshii mis à jour</span><time datetime="2026-11-04" data-rel>le 4 novembre 2026</time></li>
+          <li data-only="pro"><span>Wado mis à jour</span><time datetime="2026-11-04" data-rel>le 4 novembre 2026</time></li>
+          <li data-only="pro"><span>Sago et Miru mis à jour</span><time datetime="2026-10-30" data-rel>le 30 octobre 2026</time></li>
+        </ul>
+      </div>
+      <div class="foot__col" data-only="createur">
+        <h3>Me suivre</h3>
+        <ul>
+          <li><a href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">YouTube · Kenz in Asia</a></li>
+          <li><a href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">TikTok · En Bien en Asie</a></li>
+          <li><a href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">k15ze</a></li>
+        </ul>
+      </div>
+      <div class="foot__col" data-only="pro">
+        <h3>Ailleurs</h3>
+        <ul>
+          <li><a href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="https://oshii.fr" target="_blank" rel="noopener">oshii.fr</a></li>
+        </ul>
+      </div>
+      <div class="foot__col" data-only="createur">
+        <h3>Marques</h3>
+        <ul><li><a href="#marques">Travaillons ensemble</a></li><li><a href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener">Itinéraire Chine</a></li></ul>
+      </div>
+      <div class="foot__col" data-only="pro">
+        <h3>Contact</h3>
+        <ul><li><a href="#contact">Me contacter</a></li><li><a href="#offres">Ce que je peux faire</a></li></ul>
+      </div>
+    </div>
+
+    <div class="door" data-reveal="fade">
+      <button class="door__btn" type="button" data-door aria-describedby="door-sub">
+        <span class="door__clock" data-clock aria-hidden="true">
+          <span class="hour__sky"><svg class="hour__base" viewBox="0 0 300 72"><path d="M14 64 Q150 -30 286 64"/><line x1="0" y1="64" x2="300" y2="64"/></svg><svg class="hour__trace" viewBox="0 0 300 72"><path d="M14 64 Q150 -30 286 64"/></svg><svg class="hour__sunlayer" viewBox="0 0 300 72"><defs><clipPath id="hz-b"><rect x="-30" y="-60" width="360" height="124"/></clipPath><radialGradient id="sg-b"><stop offset="0" stop-color="#FBE6C8" stop-opacity=".85"/><stop offset="1" stop-color="#FBE6C8" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#hz-b)"><g class="sun" transform="translate(286 64)"><circle class="sun__halo" r="16" fill="url(#sg-b)"/><circle class="sun__gold" r="4.6"/><circle class="sun__blue" r="4.6"/></g></g></svg></span>
+          <span class="hour__read"><span class="hour__time"><span class="dg" style="--k:0"><i style="transform:translateY(-10%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="dg" style="--k:1"><i style="transform:translateY(-90%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="sep">:</span><span class="dg" style="--k:2"><i style="transform:translateY(-10%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span><span class="dg" style="--k:3"><i style="transform:translateY(-20%)"><b>0</b><b>1</b><b>2</b><b>3</b><b>4</b><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b></i></span></span></span>
+        </span>
+        <span class="door__txt">Il existe une autre <em class="word glow">version</em> de moi.</span>
+      </button>
+      <p class="door__sub" id="door-sub"><span data-only="createur">Elle vit à l’heure bleue.</span><span data-only="pro">Elle vit à l’heure dorée.</span></p>
+    </div>
+
+    <div class="foot__base">
+      <span class="foot__logo"><img src="assets/img/logo-kz.webp" alt="" width="1024" height="1024" loading="lazy" decoding="async">© 2026 Kenz</span>
+      <a href="#top">Revenir en haut</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const root = document.documentElement;
+  const $ = (s, c = document) => c.querySelector(s);
+  const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const hasIO = 'IntersectionObserver' in window;
+  const SIDES = ['pro', 'createur'];
+  const CREATEUR_IDS = ['createur', 'derniere', 'chiffres', 'destinations', 'guides', 'k15ze', 'liens', 'marques'];
+  const expoOut = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const safe = (name, fn) => { try { fn(); return true; } catch (err) { console.error('[kenz] ' + name, err); return false; } };
+
+  /* ---------- 1. Dates relatives (depuis la date du navigateur) ---------- */
+  safe('dates', () => {
+    if (!(window.Intl && Intl.RelativeTimeFormat)) return;
+    const rtf = new Intl.RelativeTimeFormat('fr', { numeric: 'auto' });
+    const today = new Date();
+    const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    $$('time[data-rel]').forEach((t) => {
+      const p = (t.getAttribute('datetime') || '').split('-').map(Number);
+      if (p.length !== 3) return;
+      const days = Math.round((t0 - new Date(p[0], p[1] - 1, p[2]).getTime()) / 864e5);
+      if (isNaN(days) || days < 0) return;
+      let txt;
+      if (days < 14) txt = rtf.format(-days, 'day');
+      else if (days < 60) txt = rtf.format(-Math.round(days / 7), 'week');
+      else if (days < 365) txt = rtf.format(-Math.round(days / 30.44), 'month');
+      else txt = rtf.format(-Math.round(days / 365.25), 'year');
+      t.title = t.textContent.trim();
+      t.textContent = txt;
+    });
+  });
+
+  /* ---------- 2. Découpage mot par mot ---------- */
+  safe('words', () => {
+    $$('[data-words]').forEach((el) => {
+      const frag = document.createDocumentFragment();
+      let i = 0;
+      let last = null;
+      const unit = () => { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--i', i++); return s; };
+      Array.from(el.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          n.textContent.split(/([ \t\n\r]+)/).forEach((part, idx) => {
+            if (!part) return;
+            if (/^[ \t\n\r]+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); last = null; return; }
+            if (last && idx === 0) { last.appendChild(document.createTextNode(part)); return; }
+            const s = unit(); s.textContent = part; frag.appendChild(s); last = s;
+          });
+        } else if (n.nodeType === 1) {
+          if (last) last.appendChild(n);
+          else { const s = unit(); s.appendChild(n); frag.appendChild(s); last = s; }
+        }
+      });
+      el.textContent = '';
+      el.appendChild(frag);
+    });
+  });
+
+  /* ---------- 3. Défilement doux ---------- */
+  let lenis = null;
+  safe('lenis', () => {
+    if (!reduce && typeof window.Lenis === 'function') lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true });
+  });
+  const scrollToY = (y, immediate) => {
+    if (lenis) lenis.scrollTo(y, { immediate: !!immediate, duration: 1.5, easing: expoOut });
+    else window.scrollTo({ top: y, behavior: immediate || reduce ? 'auto' : 'smooth' });
+  };
+  const scrollToEl = (el) => {
+    const nav = $('.nav');
+    const y = el.getBoundingClientRect().top + window.scrollY - (nav ? nav.offsetHeight : 72) - 8;
+    scrollToY(Math.max(0, y));
+  };
+
+  /* ---------- 4. Chiffres qui montent d'une fente (finissent sur la valeur exacte) ---------- */
+  const countUp = (el) => {
+    if (el.dataset.done) return;
+    el.dataset.done = '1';
+    const to = parseFloat(el.dataset.count);
+    const dec = parseInt(el.dataset.dec || '0', 10);
+    const pre = el.dataset.prefix || '';
+    const suf = el.dataset.suffix || '';
+    const fmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    const finalText = pre + fmt.format(to) + suf;
+    if (reduce || isNaN(to)) { if (!isNaN(to)) el.textContent = finalText; return; }
+    const dur = 1800;
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = p >= 1 ? finalText : pre + fmt.format(to * expoOut(p)) + suf;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    el.textContent = pre + fmt.format(0) + suf;
+    requestAnimationFrame(step);
+  };
+
+  /* ---------- 5. Apparitions au défilement (rejouables quand un univers revient) ---------- */
+  let revealIO = null;
+  const proxy = new Map();
+  const onReveal = (el) => {
+    el.classList.add('is-in');
+    $$('[data-count]', el).forEach(countUp);
+  };
+  const observeReveals = (scope) => {
+    const targets = $$('[data-reveal], [data-sweep], [data-words]', scope).filter((el) => !el.closest('.hero'));
+    if (!revealIO) { targets.forEach(onReveal); return; }
+    /* Un titre entièrement masqué par clip-path ne croise jamais l'écran : on observe son parent. */
+    targets.forEach((el) => {
+      const key = el.hasAttribute('data-sweep') && el.parentElement ? el.parentElement : el;
+      if (!proxy.has(key)) proxy.set(key, []);
+      const list = proxy.get(key);
+      if (list.indexOf(el) < 0) list.push(el);
+      revealIO.observe(key);
+    });
+  };
+  const revealOK = safe('reveal', () => {
+    if (hasIO) {
+      revealIO = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) { revealIO.unobserve(en.target); (proxy.get(en.target) || [en.target]).forEach(onReveal); } });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    }
+    observeReveals(document);
+  });
+
+  /* Schéma des agents : s'allume une fois par visite de l'univers */
+  let agentsIO = null;
+  const lightAgents = (map) => { if (agentsIO) agentsIO.observe(map); else map.classList.add('is-on'); };
+  safe('agents', () => {
+    if (hasIO) {
+      agentsIO = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('is-on'); agentsIO.unobserve(en.target); } });
+      }, { threshold: 0.35 });
+    }
+    $$('[data-agents]').forEach(lightAgents);
+  });
+  const resetReveals = (scope) => {
+    $$('.is-in', scope).forEach((el) => el.classList.remove('is-in'));
+    $$('[data-count]', scope).forEach((el) => { delete el.dataset.done; });
+    observeReveals(scope);
+    $$('[data-agents]', scope).forEach((m) => { m.classList.remove('is-on'); lightAgents(m); });
+  };
+
+  /* =========================================================
+     6. L'heure : t = 0 heure dorée (Créateur), t = 1 heure bleue (Pro)
+     ========================================================= */
+  const hero = $('.hero');
+  const land = $('.hero__land');
+  const title = $('.hero__title');
+  const veil = $('.veil');
+  const live = $('#kz-live');
+  const panels = { createur: $('[data-panel="createur"]'), pro: $('[data-panel="pro"]') };
+  const heroLines = { createur: $('.hero__line[data-only="createur"]'), pro: $('.hero__line[data-only="pro"]') };
+  const portraits = { createur: $('.portrait--moi'), pro: $('.portrait--pro') };
+  const clocks = $$('[data-clock]').map((el) => ({ el, sun: $('.sun', el), cols: $$('.dg i', el) }));
+  const sliders = $$('[data-hour]');
+  const sideFromHash = () => (CREATEUR_IDS.indexOf((location.hash || '').slice(1)) > -1 ? 'createur' : 'pro');
+  const tOf = (side) => (side === 'pro' ? 1 : 0);
+  let current = root.dataset.side === 'createur' ? 'createur' : 'pro';
+  let curT = tOf(current);
+  const other = () => (current === 'pro' ? 'createur' : 'pro');
+
+  const GOLD = [0.08, -4, 1.16, 0.86, 1.04];
+  const BLUE = [0.8, -168, 1.3, 0.5, 1.1];
+  const U_GOLD = 0.62;
+  const U_BLUE = 1;
+  const START = 17 * 60 + 48;
+  const SPAN = 84;
+
+  function renderLight(t) {
+    curT = t;
+    const f = GOLD.map((g, i) => lerp(g, BLUE[i], t));
+    /* Au milieu de la course, la lumière se désature (crépuscule) au lieu de virer au magenta. */
+    const mid = Math.sin(Math.PI * t);
+    f[0] = lerp(GOLD[0], BLUE[0], Math.sqrt(t));
+    f[2] -= 0.6 * mid;
+    f[3] -= 0.06 * mid;
+    if (land) land.style.filter = 'sepia(' + f[0].toFixed(3) + ') hue-rotate(' + f[1].toFixed(1) + 'deg) saturate(' + f[2].toFixed(3) + ') brightness(' + f[3].toFixed(3) + ') contrast(' + f[4].toFixed(3) + ')';
+    root.style.setProperty('--t', t.toFixed(4));
+    [['createur', 1 - t], ['pro', t]].forEach(([s, pres]) => {
+      const img = portraits[s];
+      if (!img) return;
+      const o = clamp((pres - 0.06) / 0.88, 0, 1);
+      img.style.opacity = (o * o * (3 - 2 * o)).toFixed(3);
+      img.style.filter = pres > 0.995 ? 'none' : 'blur(' + (Math.pow(1 - pres, 1.6) * 14).toFixed(2) + 'px)';
+      img.style.transform = 'scale(' + (1 + (1 - pres) * 0.02).toFixed(4) + ')';
+    });
+    const u = lerp(U_GOLD, U_BLUE, t);
+    const x = 14 + 272 * u;
+    const y = 64 - 188 * u + 188 * u * u;
+    clocks.forEach((c) => { if (c.sun) c.sun.setAttribute('transform', 'translate(' + x.toFixed(2) + ' ' + y.toFixed(2) + ')'); });
+    sliders.forEach((s) => s.setAttribute('aria-valuenow', String(Math.round(t * 100))));
+  }
+
+  function setTime(t, mode) {
+    const total = Math.round(START + SPAN * t);
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    const d = [Math.floor(h / 10), h % 10, Math.floor(m / 10), m % 10];
+    clocks.forEach((c) => {
+      c.el.classList.toggle('is-scrub', mode === 'scrub');
+      c.cols.forEach((col, i) => { col.style.transform = 'translateY(' + (-d[i] * 10) + '%)'; });
+    });
+    const label = h + ':' + String(m).padStart(2, '0') + ', heure ' + (t < 0.5 ? 'dorée' : 'bleue') + ' à Kuala Lumpur';
+    sliders.forEach((s) => s.setAttribute('aria-valuetext', label));
+  }
+
+  let animRaf = 0;
+  function animateT(from, to, dur, done) {
+    cancelAnimationFrame(animRaf);
+    if (reduce || dur <= 0) { renderLight(to); if (done) done(); return; }
+    const start = performance.now();
+    const step = (now) => {
+      const p = Math.min(1, (now - start) / dur);
+      renderLight(lerp(from, to, expoOut(p)));
+      if (p < 1) animRaf = requestAnimationFrame(step);
+      else if (done) done();
+    };
+    animRaf = requestAnimationFrame(step);
+  }
+
+  let busy = false;
+  let pending = null;
+
+  const settleBack = () => {
+    if (busy) return;
+    setTime(tOf(current), 'roll');
+    animateT(curT, tOf(current), 760);
+  };
+
+  function flip(next) {
+    const prev = current;
+    const line = heroLines[next];
+    if (line) line.classList.remove('is-in');
+    root.classList.add('is-switched');
+    root.dataset.side = next;
+    current = next;
+    hero.classList.remove('is-out');
+    SIDES.forEach((s) => { if (portraits[s]) portraits[s].setAttribute('aria-hidden', s === next ? 'false' : 'true'); });
+    if (panels[prev]) panels[prev].classList.remove('is-leaving');
+    const p = panels[next];
+    if (p) {
+      resetReveals(p);
+      p.classList.add('is-entering');
+      void p.offsetWidth;
+      p.classList.remove('is-entering');
+      p.classList.add('is-entered');
+      setTimeout(() => p.classList.remove('is-entered'), 1100);
+    }
+    if (line) { void line.offsetWidth; requestAnimationFrame(() => line.classList.add('is-in')); }
+    if (lenis) lenis.resize();
+  }
+
+  /* Le passage : la lumière tombe (1 à 1,6 s), ou un fondu de 300 ms en mouvement réduit */
+  function passage(next, opts) {
+    const o = opts || {};
+    if (SIDES.indexOf(next) < 0) return;
+    if (busy) { pending = next; return; }
+    if (next === current) { settleBack(); return; }
+    busy = true;
+    const from = typeof o.from === 'number' ? o.from : curT;
+    const to = tOf(next);
+    const deep = window.scrollY > hero.offsetHeight * 0.5;
+    const finish = () => {
+      if (o.push !== false) {
+        try { history.pushState({ kz: next }, '', '#' + next); } catch (e) { /* file:// strict */ }
+      }
+      if (live) live.textContent = next === 'pro' ? 'Côté Pro, à l’heure bleue.' : 'Côté Créateur, à l’heure dorée.';
+      if (title) title.focus({ preventScroll: true });
+      busy = false;
+      const q = pending;
+      pending = null;
+      if (q && q !== current) passage(q, { push: false });
+    };
+
+    if (reduce) {
+      veil.classList.add('is-quick', 'is-on');
+      setTimeout(() => {
+        if (deep) scrollToY(0, true);
+        renderLight(to);
+        setTime(to, 'scrub');
+        flip(next);
+        veil.classList.remove('is-on');
+        setTimeout(() => { veil.classList.remove('is-quick'); finish(); }, 160);
+      }, 150);
+      return;
+    }
+
+    const run = () => {
+      hero.classList.add('is-out');
+      if (panels[current]) panels[current].classList.add('is-leaving');
+      setTime(to, 'roll');
+      animateT(from, to, o.dur || (deep ? 1150 : 1300), finish);
+      setTimeout(() => flip(next), 260);
+    };
+    if (deep) {
+      veil.classList.add('is-on');
+      setTimeout(() => {
+        scrollToY(0, true);
+        requestAnimationFrame(() => { veil.classList.remove('is-on'); setTimeout(run, 110); });
+      }, 270);
+    } else {
+      run();
+    }
+  }
+
+  safe('heure', () => {
+    renderLight(curT);
+    setTime(curT, 'scrub');
+    requestAnimationFrame(() => clocks.forEach((c) => c.el.classList.remove('is-scrub')));
+    SIDES.forEach((s) => { if (portraits[s]) portraits[s].setAttribute('aria-hidden', s === current ? 'false' : 'true'); });
+
+    sliders.forEach((w) => {
+      let drag = null;
+      const sky = $('.hour__sky', w);
+      const course = () => Math.max(60, (sky ? sky.getBoundingClientRect().width : 280) * (U_BLUE - U_GOLD) * 272 / 300);
+
+      w.addEventListener('pointerdown', (e) => {
+        if (busy || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        drag = { id: e.pointerId, x0: e.clientX, t0: tOf(current), moved: false };
+        try { w.setPointerCapture(e.pointerId); } catch (_) { /* rien */ }
+        w.classList.add('is-active');
+      });
+      w.addEventListener('pointermove', (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const dx = e.clientX - drag.x0;
+        if (!drag.moved) {
+          if (Math.abs(dx) < 6) return;
+          drag.moved = true;
+          cancelAnimationFrame(animRaf);
+        }
+        const t = clamp(drag.t0 + dx / course(), 0, 1);
+        renderLight(t);
+        setTime(t, 'scrub');
+      });
+      const end = (e, cancelled) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const d = drag;
+        drag = null;
+        w.classList.remove('is-active');
+        if (!d.moved) { if (!cancelled) passage(other()); return; }
+        if (!cancelled && Math.abs(curT - d.t0) >= 0.6) passage(other(), { from: curT, dur: 1000 });
+        else settleBack();
+      };
+      w.addEventListener('pointerup', (e) => end(e, false));
+      w.addEventListener('pointercancel', (e) => end(e, true));
+      w.addEventListener('lostpointercapture', (e) => end(e, true));
+      w.addEventListener('click', (e) => { if (e.detail === 0 && !busy) passage(other()); });
+      w.addEventListener('keydown', (e) => {
+        if (busy) return;
+        const k = e.key;
+        if (k === 'Enter' || k === ' ') { e.preventDefault(); passage(other()); return; }
+        if (k === 'Escape') { settleBack(); return; }
+        let t = null;
+        if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'PageUp') t = curT + 0.1;
+        else if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'PageDown') t = curT - 0.1;
+        else if (k === 'Home') t = 0;
+        else if (k === 'End') t = 1;
+        if (t === null) return;
+        e.preventDefault();
+        t = clamp(Math.round(t * 10) / 10, 0, 1);
+        if (Math.abs(t - tOf(current)) > 0.999) { passage(other(), { from: curT, dur: 1000 }); return; }
+        setTime(t, 'scrub');
+        animateT(curT, t, 320);
+      });
+      w.addEventListener('blur', () => { if (!drag && Math.abs(curT - tOf(current)) > 0.001) settleBack(); });
+    });
+
+    $$('[data-door]').forEach((b) => b.addEventListener('click', () => passage(other())));
+
+    const onNav = () => { const s = sideFromHash(); if (s !== current) passage(s, { push: false }); };
+    window.addEventListener('popstate', onNav);
+    window.addEventListener('hashchange', onNav);
+  });
+
+  /* ---------- 7. Liens internes ---------- */
+  safe('anchors', () => {
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a) return;
+      const id = a.getAttribute('href').slice(1);
+      if (SIDES.indexOf(id) > -1) { e.preventDefault(); passage(id); return; }
+      if (!id || id === 'top') { e.preventDefault(); scrollToY(0); return; }
+      const el = document.getElementById(id);
+      if (!el) return;
+      const panel = el.closest('[data-panel]');
+      if (panel && panel.getAttribute('data-panel') !== current) return;
+      e.preventDefault();
+      if (a.dataset.need) { const sel = $('#c-besoin'); if (sel) sel.value = a.dataset.need; }
+      scrollToEl(el);
+      if (el.getAttribute('tabindex') === '-1') el.focus({ preventScroll: true });
+    });
+  });
+
+  /* ---------- 8. Lien de nav actif (section au centre de l'écran) ---------- */
+  safe('spy', () => {
+    if (!hasIO) return;
+    const links = $$('.nav__link');
+    const map = new Map();
+    links.forEach((a) => { const el = document.getElementById(a.getAttribute('href').slice(1)); if (el) map.set(el, a); });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        const a = map.get(en.target);
+        if (!a) return;
+        if (en.isIntersecting) { links.forEach((l) => { if (l !== a) l.removeAttribute('aria-current'); }); a.setAttribute('aria-current', 'true'); }
+        else a.removeAttribute('aria-current');
+      });
+    }, { rootMargin: '-42% 0px -52% 0px' });
+    map.forEach((_, el) => io.observe(el));
+  });
+
+  /* ---------- 9. Hero : parallaxe à deux plans ---------- */
+  let tickHero = () => {};
+  safe('parallax', () => {
+    const bg = $('.hero__bg');
+    const fig = $('.hero__fig');
+    const copy = $('.hero__copy');
+    if (!bg || !fig || !copy || reduce) return;
+    let heroH = hero.offsetHeight;
+    let visible = true;
+    let tx = 0, ty = 0, px = 0, py = 0;
+    window.addEventListener('resize', () => { heroH = hero.offsetHeight; }, { passive: true });
+    if (hasIO) new IntersectionObserver((en) => { visible = en[0].isIntersecting; }).observe(hero);
+    if (fine) {
+      window.addEventListener('pointermove', (e) => {
+        tx = (e.clientX / window.innerWidth) * 2 - 1;
+        ty = (e.clientY / window.innerHeight) * 2 - 1;
+      }, { passive: true });
+    }
+    let lastSy = -1;
+    tickHero = () => {
+      if (!visible) return;
+      const sy = clamp(window.scrollY, 0, heroH);
+      if (sy === lastSy && Math.abs(tx - px) < 0.0005 && Math.abs(ty - py) < 0.0005) return;
+      lastSy = sy;
+      px += (tx - px) * 0.06;
+      py += (ty - py) * 0.06;
+      bg.style.transform = 'translate3d(' + (-px * 10).toFixed(2) + 'px,' + (-py * 7 + sy * 0.3).toFixed(2) + 'px,0)';
+      fig.style.transform = 'translate3d(' + (-px * 22).toFixed(2) + 'px,' + (-py * 9 + sy * 0.1).toFixed(2) + 'px,0)';
+      copy.style.transform = 'translate3d(0,' + (sy * -0.12).toFixed(2) + 'px,0)';
+      copy.style.opacity = clamp(1 - sy / (heroH * 0.7), 0, 1).toFixed(3);
+    };
+  });
+
+  safe('loop', () => {
+    if (!lenis && reduce) return;
+    const frame = (t) => { if (lenis) lenis.raf(t); tickHero(); requestAnimationFrame(frame); };
+    requestAnimationFrame(frame);
+  });
+
+  /* ---------- 10. Barre du haut ---------- */
+  safe('nav', () => {
+    const nav = $('.nav');
+    const sentinel = $('.hero__sentinel');
+    if (!nav || !sentinel || !hasIO) return;
+    new IntersectionObserver((en) => nav.classList.toggle('is-scrolled', !en[0].isIntersecting)).observe(sentinel);
+  });
+
+  /* ---------- 11. Pellicule : glisser, inertie, aimantation ---------- */
+  safe('reel', () => {
+    $$('[data-reel]').forEach((reel) => {
+      const items = $$('.reel__item', reel);
+      if (!items.length) return;
+      const section = reel.closest('section');
+      const prev = $('[data-reel-prev]', section);
+      const next = $('[data-reel-next]', section);
+      const bar = $('.reel__bar i', section);
+      let raf = 0, down = false, moved = false, sx = 0, sl = 0, lx = 0, lt = 0, v = 0;
+      const max = () => reel.scrollWidth - reel.clientWidth;
+      const points = () => { const o = items[0].offsetLeft; const m = max(); return items.map((it) => clamp(it.offsetLeft - o, 0, m)); };
+
+      const animateTo = (to, dur, done) => {
+        cancelAnimationFrame(raf);
+        const from = reel.scrollLeft;
+        const start = performance.now();
+        const step = (now) => {
+          const p = Math.min(1, (now - start) / dur);
+          reel.scrollLeft = from + (to - from) * (1 - Math.pow(1 - p, 4));
+          if (p < 1) raf = requestAnimationFrame(step); else if (done) done();
+        };
+        raf = requestAnimationFrame(step);
+      };
+      const settle = () => {
+        const x = reel.scrollLeft;
+        let best = 0;
+        let bestD = Infinity;
+        points().concat([max()]).forEach((p) => { const d = Math.abs(p - x); if (d < bestD) { bestD = d; best = p; } });
+        animateTo(best, reduce ? 1 : 700, () => reel.classList.remove('is-dragging'));
+      };
+
+      reel.addEventListener('pointerdown', (e) => {
+        if (e.pointerType !== 'mouse' || e.button !== 0) return;
+        down = true; moved = false;
+        sx = lx = e.clientX; sl = reel.scrollLeft; lt = performance.now(); v = 0;
+        cancelAnimationFrame(raf);
+        reel.classList.add('is-dragging');
+        e.preventDefault();
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!down) return;
+        const dx = e.clientX - sx;
+        if (Math.abs(dx) > 4) moved = true;
+        reel.scrollLeft = sl - dx;
+        const now = performance.now();
+        const dt = Math.max(1, now - lt);
+        v = 0.8 * ((e.clientX - lx) / dt) + 0.2 * v;
+        lx = e.clientX; lt = now;
+      });
+      const release = () => {
+        if (!down) return;
+        down = false;
+        if (performance.now() - lt > 90) v = 0;
+        let vel = -v * 16;
+        if (reduce || Math.abs(vel) < 1) { settle(); return; }
+        const glide = () => {
+          vel *= 0.93;
+          reel.scrollLeft += vel;
+          const edge = reel.scrollLeft <= 0 || reel.scrollLeft >= max() - 1;
+          if (Math.abs(vel) > 0.6 && !edge) raf = requestAnimationFrame(glide); else settle();
+        };
+        raf = requestAnimationFrame(glide);
+      };
+      window.addEventListener('pointerup', release);
+      window.addEventListener('pointercancel', release);
+      reel.addEventListener('click', (e) => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+      reel.addEventListener('dragstart', (e) => e.preventDefault());
+      reel.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) e.stopPropagation(); }, { passive: true });
+
+      const stepW = () => (items[1] ? items[1].offsetLeft - items[0].offsetLeft : reel.clientWidth * 0.8);
+      if (prev) prev.addEventListener('click', () => reel.scrollBy({ left: -stepW(), behavior: reduce ? 'auto' : 'smooth' }));
+      if (next) next.addEventListener('click', () => reel.scrollBy({ left: stepW(), behavior: reduce ? 'auto' : 'smooth' }));
+
+      let ticking = false;
+      const update = () => {
+        ticking = false;
+        const m = max();
+        const p = m > 0 ? reel.scrollLeft / m : 0;
+        if (bar) bar.style.transform = 'scaleX(' + (0.12 + p * 0.88).toFixed(4) + ')';
+        if (prev) prev.disabled = reel.scrollLeft < 4;
+        if (next) next.disabled = m - reel.scrollLeft < 4;
+        if (reduce) return;
+        const r = reel.getBoundingClientRect();
+        if (!r.width) return;
+        const cx = r.left + r.width / 2;
+        items.forEach((it) => {
+          const img = it.querySelector('img');
+          if (!img) return;
+          const b = it.getBoundingClientRect();
+          const d = clamp((b.left + b.width / 2 - cx) / r.width, -1, 1);
+          img.style.transform = 'translate3d(' + (-d * 5).toFixed(2) + '%,0,0)';
+        });
+      };
+      const queue = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+      reel.addEventListener('scroll', queue, { passive: true });
+      window.addEventListener('resize', queue, { passive: true });
+      if (hasIO) new IntersectionObserver((en) => { if (en[0].isIntersecting) queue(); }).observe(reel);
+      queue();
+    });
+  });
+
+  /* ---------- 12. Halo qui suit le pointeur ---------- */
+  safe('halo', () => {
+    if (!fine || reduce) return;
+    $$('[data-halo]').forEach((card) => {
+      const h = $('.halo', card);
+      if (!h) return;
+      let x = 0, y = 0, cx = 0, cy = 0, on = false, raf = 0;
+      const loop = () => {
+        cx += (x - cx) * 0.12;
+        cy += (y - cy) * 0.12;
+        h.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+        if (on || Math.abs(x - cx) + Math.abs(y - cy) > 0.5) raf = requestAnimationFrame(loop); else raf = 0;
+      };
+      const pos = (e) => { const r = card.getBoundingClientRect(); x = e.clientX - r.left; y = e.clientY - r.top; };
+      card.addEventListener('pointerenter', (e) => {
+        pos(e); cx = x; cy = y; on = true;
+        card.classList.add('is-hover');
+        if (!raf) raf = requestAnimationFrame(loop);
+      });
+      card.addEventListener('pointermove', pos);
+      card.addEventListener('pointerleave', () => { on = false; card.classList.remove('is-hover'); });
+    });
+  });
+
+  /* ---------- 13. Formulaires simulés ---------- */
+  safe('forms', () => {
+    $$('form[data-form]').forEach((form) => {
+      const body = $('.form__body', form);
+      const ok = $('.form__ok', form);
+      const again = $('[data-again]', form);
+      const btn = $('button[type="submit"]', form);
+      const label = btn ? $('[data-label]', btn) : null;
+      const fields = $$('[data-required]', form);
+      const minOf = (f) => parseInt(f.dataset.min || '1', 10);
+      const errOf = (f) => document.getElementById(f.getAttribute('aria-describedby'));
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let first = null;
+        fields.forEach((f) => {
+          const valid = f.value.trim().length >= minOf(f);
+          f.setAttribute('aria-invalid', valid ? 'false' : 'true');
+          const err = errOf(f);
+          if (err) err.textContent = valid ? '' : (f.dataset.msg || 'Champ requis.');
+          if (!valid && !first) first = f;
+        });
+        if (first) { first.focus(); return; }
+        if (btn) { btn.disabled = true; btn.classList.add('is-busy'); }
+        if (label) label.textContent = 'Envoi…';
+        setTimeout(() => {
+          if (btn) { btn.disabled = false; btn.classList.remove('is-busy'); }
+          if (label) label.textContent = 'Envoyer';
+          ok.hidden = false;
+          void ok.offsetWidth;
+          form.classList.add('is-sent');
+          body.setAttribute('inert', '');
+          body.setAttribute('aria-hidden', 'true');
+          const t = $('[data-ok-title]', ok);
+          if (t) setTimeout(() => t.focus({ preventScroll: true }), 300);
+        }, reduce ? 0 : 650);
+      });
+      fields.forEach((f) => {
+        const clear = () => {
+          if (f.getAttribute('aria-invalid') === 'true' && f.value.trim().length >= minOf(f)) {
+            f.setAttribute('aria-invalid', 'false');
+            const err = errOf(f);
+            if (err) err.textContent = '';
+          }
+        };
+        f.addEventListener('input', clear);
+        f.addEventListener('change', clear);
+      });
+      if (again) again.addEventListener('click', () => {
+        form.reset();
+        form.classList.remove('is-sent');
+        body.removeAttribute('inert');
+        body.removeAttribute('aria-hidden');
+        setTimeout(() => { ok.hidden = true; }, 260);
+        const firstField = fields[0];
+        if (firstField) firstField.focus({ preventScroll: true });
+      });
+    });
+  });
+
+  /* ---------- 14. Entrée du hero ---------- */
+  safe('intro', () => {
+    const decode = (img) => (img && img.decode ? img.decode().catch(() => {}) : null);
+    const ready = Promise.all([document.fonts ? document.fonts.ready : null, decode(land), decode(portraits[current])]);
+    Promise.race([ready, new Promise((r) => setTimeout(r, 1500))]).then(() => {
+      requestAnimationFrame(() => {
+        root.classList.add('is-loaded');
+        if (heroLines[current]) heroLines[current].classList.add('is-in');
+      });
+    });
+  });
+
+  root.classList.add('ready');
+  if (!revealOK) root.classList.remove('js');
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+
+<a href="index.html" class="kz-back" aria-label="Revenir aux quatre propositions"><span aria-hidden="true">←</span><em>Propositions</em></a>
+<style>
+.kz-back{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;height:34px;min-width:34px;padding:0 11px;border-radius:999px;font:500 13px/1 "Inter",system-ui,sans-serif;color:#F4EFE6;background:rgba(26,25,24,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 10px 30px -12px rgba(0,0,0,.45);text-decoration:none;opacity:.7;transition:opacity .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.kz-back em{font-style:normal;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .3s,margin .5s cubic-bezier(.16,1,.3,1)}
+.kz-back:hover,.kz-back:focus-visible{opacity:1;transform:translateY(-2px)}
+.kz-back:hover em,.kz-back:focus-visible em{max-width:110px;opacity:1;margin-left:8px}
+.kz-back:focus-visible{outline:2px solid #E8322B;outline-offset:3px}
+</style>
+</body>
+</html>

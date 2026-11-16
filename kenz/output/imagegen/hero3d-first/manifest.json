@@ -1,0 +1,20 @@
+{
+  "status": "awaiting-user-review",
+  "generator": "built-in image_gen",
+  "assets": [
+    {
+      "id": "pro-noyau-ia",
+      "label": "Noyau IA",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-b04c6bda-b698-4104-ae1a-9b813e68b41d.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    },
+    {
+      "id": "createur-passeport",
+      "label": "Passeport",
+      "series": "createur",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-c8bd5694-2093-472f-ae6f-1f3c38ce31a7.png",
+      "background": "output/hero-horizon-valide/02-horizon-createur.png"
+    }
+  ]
+}

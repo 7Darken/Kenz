@@ -1,0 +1,1194 @@
+<!doctype html>
+<!--
+  Kenz — Créateur (V3, le récit)
+  Une histoire en neuf chapitres, pensée d'abord pour le pouce :
+  C0 hero heure dorée · C1 dernière vidéo · C2 le vrai prix (le cœur) · C3 la route · C4 l'itinéraire
+  C5 l'entraînement · C6 me suivre · C7 marques · C8 le sceau (rempli par shared/sceau.js).
+  Repère : une barre façon « stories » en haut, un segment par chapitre, + le nom du chapitre en cours.
+  Le vrai prix : sur ordinateur (≥ 900 × 600), la scène est épinglée et les tickets s'empilent au scroll ;
+  sur mobile et en mouvement réduit, chaque ticket se joue à son entrée à l'écran.
+  Sans JS ni CDN : tout est visible (classe .js + garde-fou). Aucune dépendance externe hors polices.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash==='#porte'&&document.documentElement.setAttribute('data-sceau-arrivee','soleil')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Créateur</title>
+<meta name="description" content="Kenz voyage en Asie et raconte ce que ça coûte vraiment.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#16110C">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('is-loaded'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="stylesheet" href="shared/sceau.css">
+<link rel="preload" as="image" href="assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   Jetons
+   ========================================================= */
+:root{
+  --bg:#16110C;
+  --creme:#F4EFE6;
+  --sceau-lumiere:#9DB8FF;
+  --ink:#1A140F;
+  --red:#E8322B;
+  --gold:242 182 109;
+  --muted:rgba(244,239,230,.72);
+  --faint:rgba(244,239,230,.6);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --hand:cubic-bezier(.62,.04,.32,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(96px,11vw,168px);
+  --nav-h:84px;
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none; -webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-200%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+/* Ambiance fixe, lumière chaude + grain */
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(55% 45% at 88% 0%, rgba(242,166,92,.09), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(232,140,70,.06), transparent 70%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+.ch{position:relative; padding-block:var(--sec)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(54px,8.4vw,128px); line-height:.9; letter-spacing:-.01em}
+.statement{margin:0; max-width:18ch; font-size:clamp(34px,5vw,72px); line-height:1.06; letter-spacing:-.03em; font-weight:500; text-wrap:balance}
+.lead{margin:0; max-width:26ch; font-size:clamp(20px,1.8vw,26px); line-height:1.4; letter-spacing:-.012em; color:rgba(244,239,230,.92); text-wrap:balance}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--gold) / .55), 0 0 1.4em rgb(var(--gold) / .25)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.75)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#221A13,#18120D); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); border:1px solid rgba(255,255,255,.16)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(26,20,15,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn:focus-visible{outline-offset:4px}
+.btn.is-busy{opacity:.75}
+.round{display:grid; place-items:center; width:48px; height:48px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(244,239,230,.2); transition:transform .5s var(--expo)}
+.round svg{width:16px; height:16px}
+.round:hover{transform:scale(1.05)}
+.round:active{transform:scale(.96)}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.08); transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path 1.4s var(--expo), filter 1.2s var(--expo)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--d, 0) * 80ms)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none}
+
+.js [data-reveal="img"]{clip-path:inset(8% 6% 8% 6% round 28px); transition:clip-path 1.5s var(--expo)}
+.js [data-reveal="img"] > img{transform:scale(1.12); transition:transform 2s var(--expo)}
+.js [data-reveal="img"].is-in{clip-path:inset(0 0 0 0 round var(--rr, 0px))}
+.js [data-reveal="img"].is-in > img{transform:none}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--d, 0) * 90ms)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:.04em .06em .12em; margin:-.04em -.06em -.12em}
+.slit .num{display:inline-block}
+
+/* =========================================================
+   Navigation : barre « stories » + nom du chapitre
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top)}
+.nav::before{content:""; position:absolute; inset:0; background:rgba(22,17,12,.68); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.story{position:relative; display:flex; gap:4px; padding:8px var(--gr) 0 var(--gl)}
+.story a{position:relative; flex:1 1 0; height:18px; border-radius:4px}
+.story a::before,.story a i{content:""; position:absolute; left:0; right:0; top:8px; height:2px; border-radius:2px}
+.story a::before{background:rgba(244,239,230,.2); transition:opacity .4s var(--expo)}
+.story a i{background:var(--creme); transform:scaleX(0); transform-origin:left; box-shadow:0 0 8px rgba(244,239,230,.35)}
+.story a:hover::before{background:rgba(244,239,230,.38)}
+.story a:focus-visible{outline-offset:1px}
+.nav__in{position:relative; display:flex; align-items:center; justify-content:space-between; gap:16px; height:58px; padding-left:var(--gl); padding-right:var(--gr)}
+.brand{display:flex; align-items:center}
+.brand__name{font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; padding:8px 0; border-radius:8px}
+.brand__dot{position:relative; display:block; width:30px; height:44px; margin-left:-2px; border-radius:12px}
+.brand__dot i{position:absolute; left:4px; top:23px; width:5px; height:5px; border-radius:50%; transition:opacity .6s var(--expo), transform .7s var(--expo)}
+.brand__dot i:first-child{background:var(--creme)}
+.brand__dot i:last-child{background:var(--sceau-lumiere); box-shadow:0 0 12px var(--sceau-lumiere); opacity:0}
+.brand__dot:hover i,.brand__dot:focus-visible i{transform:scale(1.35)}
+.brand__dot:hover i:first-child,.brand__dot:focus-visible i:first-child{opacity:0}
+.brand__dot:hover i:last-child,.brand__dot:focus-visible i:last-child{opacity:1}
+.nav__ch{display:flex; align-items:center; margin:0; height:30px; overflow:hidden; font-family:var(--f-word); font-style:italic; font-size:19px; line-height:1.3; color:rgba(244,239,230,.86)}
+.nav__chT{display:block; white-space:nowrap}
+.nav__chT.in{animation:chIn .8s var(--expo) both}
+@keyframes chIn{from{transform:translateY(110%); filter:blur(4px); opacity:0} to{transform:none; filter:none; opacity:1}}
+@media (max-width:600px){ .brand__name{font-size:25px} .nav__in{height:54px} }
+
+/* =========================================================
+   C0 · Hero heure dorée
+   ========================================================= */
+.hero{position:relative; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate; background:#0F0B08}
+.hero__bg{position:absolute; inset:-4%; z-index:0; will-change:transform}
+.hero__bgIn{position:absolute; inset:0}
+.hero__land{width:100%; height:100%; object-fit:cover; object-position:46% 50%; filter:sepia(.1) hue-rotate(-4deg) saturate(1.16) brightness(.84) contrast(1.04)}
+.hero__wash{position:absolute; inset:0; background:radial-gradient(70% 60% at 62% 14%, rgba(255,176,96,.28), transparent 70%)}
+.hero__shade{position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(180deg, rgba(15,11,8,.8) 0%, rgba(15,11,8,.45) 38%, rgba(15,11,8,0) 60%), linear-gradient(0deg, var(--bg) 0%, rgba(22,17,12,.55) 12%, rgba(22,17,12,0) 32%)}
+.hero__layout{display:flex; flex-direction:column; min-height:100vh; min-height:100svh; padding-top:calc(env(safe-area-inset-top) + var(--nav-h) + 22px)}
+.hero__copy{position:relative; z-index:3; padding-left:var(--gl); padding-right:var(--gr)}
+.hero__title{position:relative; width:fit-content; margin:0 0 .14em -.03em; font-family:var(--f-title); font-weight:600; font-size:clamp(92px,26vw,150px); line-height:.82; letter-spacing:-.015em}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.hero__line{margin:0 0 28px; max-width:24ch; font-size:clamp(19px,1.6vw,23px); line-height:1.42; color:rgba(244,239,230,.95); text-wrap:balance; --wd:1.15s}
+.is-porte .hero__line{--wd:.15s}
+.hero__stage{position:relative; z-index:1; flex:1 1 auto; min-height:44vh; min-height:44svh}
+.hero__glow{position:absolute; left:50%; top:2%; width:min(130%, 920px); aspect-ratio:1; translate:-50% 0; border-radius:50%; background:radial-gradient(closest-side, rgba(255,168,88,.34), rgba(255,168,88,0))}
+.hero__fig{position:absolute; top:0; left:50%; height:calc(100% / .79); aspect-ratio:9 / 16; translate:-50% 0; will-change:transform;
+  -webkit-mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%);
+          mask-image:radial-gradient(ellipse 60% 48% at 50% 32%, #000 70%, transparent 100%)}
+.portrait{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 0}
+@media (min-width:861px){
+  .hero__layout{justify-content:flex-end; padding:0 var(--gr) clamp(112px,15svh,160px) var(--gl)}
+  .hero__copy{padding:0; max-width:min(640px, 44%)}
+  .hero__title{font-size:clamp(120px,15vw,250px)}
+  .hero__stage{position:absolute; right:0; bottom:0; top:9vh; top:9svh; width:58%; min-height:0}
+  .hero__shade{background:linear-gradient(180deg, rgba(15,11,8,.55) 0%, rgba(15,11,8,0) 20%), linear-gradient(90deg, rgba(15,11,8,.68) 0%, rgba(15,11,8,.3) 34%, rgba(15,11,8,0) 56%), linear-gradient(0deg, var(--bg) 0%, rgba(22,17,12,.5) 10%, rgba(22,17,12,0) 30%)}
+}
+/* Entrée du hero */
+@keyframes kzIn{from{opacity:0; filter:blur(8px)} to{opacity:1; filter:none}}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .hero__bgIn{opacity:0; transform:scale(1.07)}
+.is-loaded .hero__bgIn,.is-porte .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo), transform 2.6s var(--expo)}
+.js .hero__stage{opacity:0; filter:blur(10px); transform:translateY(3%)}
+.is-loaded .hero__stage,.is-porte .hero__stage{opacity:1; filter:none; transform:none; transition:opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.is-loaded .ttl--main{animation:ttlMain 1.7s var(--expo) var(--td, .7s) both}
+.is-loaded .ttl--ghost{animation:ttlGhost 1.5s var(--expo) calc(var(--td, .7s) - .18s) both}
+.is-porte .hero__title{--td:.25s}
+.js .hero [data-anim]{opacity:0}
+.is-loaded .hero [data-anim]{opacity:1; animation:kzIn 1s var(--expo) both; animation-delay:var(--ad, 0s)}
+.hero__cta[data-anim]{--ad:1.75s}
+.is-porte .hero__cta[data-anim]{--ad:.8s}
+.js .nav{opacity:0}
+.is-loaded .nav{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+
+/* =========================================================
+   C1 · La dernière vidéo
+   ========================================================= */
+.latest__grid{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "poster" "meta"; gap:28px}
+.latest__head{grid-area:head}
+.latest__meta{grid-area:meta}
+.poster{grid-area:poster; margin:0}
+.poster .bezel__core{aspect-ratio:16 / 9; background:#0D0A08}
+.poster__link{position:absolute; inset:0; display:block; overflow:hidden; border-radius:inherit}
+.poster__img{width:100%; height:100%; object-fit:cover; transition:transform 1.6s var(--expo)}
+.poster__link::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(20deg, rgba(10,8,6,.6) 0%, rgba(10,8,6,0) 42%)}
+.poster__link:hover .poster__img{transform:scale(1.03)}
+.poster__link:focus-visible{outline-offset:-4px; outline-color:var(--creme)}
+.play{--ph:76px; --pw:196px; position:absolute; z-index:1; left:clamp(12px,3.4%,40px); bottom:clamp(12px,5.5%,44px); display:flex; align-items:center; width:calc(var(--ph) + var(--pw)); height:var(--ph); border-radius:999px; color:var(--creme);
+  clip-path:inset(0 var(--pw) 0 0 round 999px); transition:clip-path .85s var(--expo)}
+.js .poster .play{opacity:0; transition:clip-path .85s var(--expo), opacity .8s var(--expo) .95s}
+.js .poster.is-in .play{opacity:1}
+.play__ico{flex:none; display:grid; place-items:center; width:var(--ph); height:var(--ph); transition:transform .85s var(--expo)}
+.play__ico svg{width:22px; height:22px; margin-left:4px}
+.play__label{font-size:15px; font-weight:500; white-space:nowrap; opacity:0; filter:blur(4px); transform:translateX(-12px); transition:opacity .4s var(--expo), filter .5s var(--expo), transform .85s var(--expo)}
+.poster__link:hover .play,.poster__link:focus-visible .play{clip-path:inset(0 0 0 0 round 999px)}
+.poster__link:hover .play__ico{transform:scale(.92)}
+.poster__link:hover .play__label,.poster__link:focus-visible .play__label{opacity:1; filter:none; transform:none; transition-delay:.06s}
+@media (hover:none){
+  .play{--ph:56px; --pw:184px; clip-path:inset(0 0 0 0 round 999px)}
+  .play__ico svg{width:18px; height:18px}
+  .play__label{opacity:1; filter:none; transform:none; font-size:14px}
+}
+.latest__title{margin:0; max-width:24ch; font-size:clamp(21px,2vw,28px); line-height:1.28; font-weight:500; letter-spacing:-.015em; text-wrap:balance}
+.latest__date{display:block; margin-top:10px; font-family:var(--f-word); font-style:italic; font-size:18px; font-weight:400; letter-spacing:0; color:var(--muted)}
+@media (min-width:900px){
+  .latest__grid{grid-template-columns:minmax(0,4fr) minmax(0,7fr); grid-template-areas:"head poster" "meta poster"; column-gap:clamp(40px,5vw,88px); row-gap:28px; align-items:end}
+  .latest__head{align-self:end}
+  .latest .h2{font-size:clamp(56px,6.2vw,100px)}
+  .latest__meta{align-self:start}
+}
+
+/* =========================================================
+   C2 · Le vrai prix
+   ========================================================= */
+.prix__grid{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "deck" "note"; gap:clamp(36px,6vw,56px)}
+.prix__head{grid-area:head}
+.prix__head .lead{margin-top:30px}
+.prix__note{grid-area:note; margin:0; font-size:13px; letter-spacing:.01em; color:var(--faint)}
+.deck{grid-area:deck; position:relative; display:grid; grid-template-columns:minmax(0,1fr); gap:14px; margin:0; padding:0; list-style:none; --sh:58px}
+.tk{position:relative}
+.tk__shell{position:relative; padding:5px; border-radius:28px; background:rgba(244,239,230,.04); border:1px solid rgba(244,239,230,.08);
+  box-shadow:0 1px 1px rgba(0,0,0,.3), 0 -12px 28px -18px rgba(0,0,0,.6), 0 26px 60px -30px rgba(0,0,0,.85)}
+.tk__core{position:relative; overflow:hidden; border-radius:23px;
+  background:radial-gradient(70% 80% at 84% 62%, rgba(242,166,92,.15), transparent 70%), linear-gradient(180deg,#261C14,#1A130E);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.tk__core::after{content:""; position:absolute; inset:0; border-radius:inherit; background:rgba(12,9,6,.26); opacity:0; pointer-events:none; transition:opacity .7s var(--expo)}
+.tk__top{position:relative; display:flex; align-items:center; gap:12px; height:var(--sh); padding:0 20px 0 10px}
+.tk__top::after{content:""; position:absolute; left:16px; right:16px; bottom:0; height:1px; background:repeating-linear-gradient(90deg, rgba(244,239,230,.2) 0 5px, transparent 5px 10px)}
+.tk__ico{flex:none; display:grid; place-items:center; width:min(34px, calc(var(--sh) - 16px)); aspect-ratio:1}
+.tk__ico svg{width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.35; stroke-linecap:round; stroke-linejoin:round; --acc:currentColor}
+.tk__poste{flex:1; min-width:0; margin:0; font-size:15px; font-weight:500; line-height:1.3; letter-spacing:-.005em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:opacity .5s var(--expo)}
+.prix:not(.is-pinned) .tk__top{height:auto; min-height:var(--sh); padding-block:10px}
+.prix:not(.is-pinned) .tk__poste{white-space:normal; text-wrap:balance}
+.tk__mini{flex:none; font-family:var(--f-title); font-weight:600; font-size:clamp(20px,2.6vh,26px); line-height:1; opacity:0; transition:opacity .5s var(--expo)}
+.tk__body{position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:12px 16px; padding:18px 20px 20px}
+.tk__val{margin:0}
+.tk__pre,.tk__det{display:block; margin-bottom:6px; font-size:14px; line-height:1.35; color:var(--muted)}
+.tk__suf{display:block; margin-top:8px; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1; color:rgba(244,239,230,.86)}
+.tk__price{display:block; font-family:var(--f-title); font-weight:600; font-size:clamp(54px,15vw,104px); line-height:.9; letter-spacing:-.01em; white-space:nowrap}
+.tk__art{display:block; width:clamp(84px,24vw,156px); height:auto; overflow:visible; color:var(--creme); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; --acc:rgb(var(--gold))}
+.tk__art .acc{stroke:rgb(var(--gold))}
+/* La finale : l'iPhone */
+.tk--fin .tk__core{background:radial-gradient(70% 80% at 82% 58%, rgba(242,166,92,.22), transparent 70%), linear-gradient(180deg,#2A1F16,#1B140E)}
+.tk__was{display:block; margin-bottom:12px}
+.tk__old{position:relative; display:inline-block; font-family:var(--f-title); font-weight:600; font-size:clamp(34px,8vw,48px); line-height:1; color:rgba(244,239,230,.62); text-decoration:none}
+.strike{position:absolute; left:-12%; top:6%; width:124%; height:84%; overflow:visible; pointer-events:none}
+.strike path{fill:none; stroke:var(--red); stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke}
+.tk__src{display:block; margin-top:8px; font-size:13px; line-height:1.35; color:var(--faint)}
+.crack{stroke:rgba(244,239,230,.85)}
+.screen{fill:rgb(var(--gold)); stroke:none; opacity:.15}
+
+/* Gestes des tickets */
+.js .tk{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .tk.is-in{opacity:1; transform:none; transition:opacity .8s var(--expo), transform 1.1s var(--expo)}
+.js .tk__art{clip-path:inset(-6% 100% -6% -6%); filter:blur(6px); transition:clip-path .2s var(--out), filter .2s var(--out)}
+.js .tk.is-in .tk__art{clip-path:inset(-6% -6% -6% -6%); filter:none; transition:clip-path 1.3s var(--expo) .16s, filter 1s var(--expo) .16s}
+.js .tk .slit .num{transform:translateY(110%); filter:blur(6px); transition:transform .2s var(--out), filter .2s var(--out)}
+.js .tk.is-in .slit .num{transform:none; filter:none; transition:transform 1.15s var(--expo) .36s, filter .9s var(--expo) .36s}
+.js .tk__pre,.js .tk__det,.js .tk__suf,.js .tk__src{opacity:0; transition:opacity .2s var(--out)}
+.js .tk.is-in .tk__pre,.js .tk.is-in .tk__det,.js .tk.is-in .tk__suf,.js .tk.is-in .tk__src{opacity:1; transition:opacity .9s var(--expo) .6s}
+.js .tk__was{opacity:0; transition:opacity .2s var(--out)}
+.js .tk--fin.is-in .tk__was{opacity:1; transition:opacity .8s var(--expo) .3s}
+.js .strike{clip-path:inset(-30% 100% -30% -4%); transition:clip-path .15s var(--out)}
+.js .tk--fin.is-in .strike{clip-path:inset(-30% -4% -30% -4%); transition:clip-path .55s var(--hand) 1s}
+.js .tk--fin .slit .num{transition-delay:0s}
+.js .tk--fin.is-in .slit .num{transition-delay:1.45s}
+.js .tk--fin.is-in .crack{opacity:0; transition:opacity .6s var(--expo) 1.7s}
+.js .tk--fin .screen{opacity:0}
+.js .tk--fin.is-in .screen{opacity:.15; transition:opacity 1s var(--expo) 1.8s}
+.tk.is-under .tk__core::after{opacity:1}
+.tk.is-under .tk__poste{opacity:0}
+.tk.is-under .tk__mini{opacity:1}
+
+/* Ordinateur : la scène est épinglée, les tickets s'empilent */
+@media (min-width:900px) and (min-height:600px){
+  .prix.is-pinned{height:calc(100vh + 6 * 52vh); padding:0}
+  .prix.is-pinned .prix__stage{position:sticky; top:0; height:100vh; display:flex; align-items:center}
+  .prix.is-pinned .prix__grid{width:100%; grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-areas:"head deck" "note deck"; grid-template-rows:auto auto; align-content:center; column-gap:clamp(48px,6vw,112px); row-gap:24px; padding-top:calc(var(--nav-h) + 16px); padding-bottom:28px; height:100%}
+  .prix.is-pinned .prix__head{align-self:end}
+  .prix.is-pinned .prix__note{align-self:start}
+  .prix.is-pinned .deck{display:block; align-self:center; --sh:clamp(44px,6.4vh,60px); --ch:clamp(272px,45vh,420px); height:calc(5 * var(--sh) + var(--ch));
+    transform:translateY(calc((5 - var(--s, 0)) * var(--sh) / 2)); transition:transform 1.1s var(--expo)}
+  .prix.is-pinned .tk{position:absolute; left:0; right:0; top:calc(var(--k) * var(--sh)); height:var(--ch); z-index:var(--k)}
+  .prix.is-pinned .tk__shell{height:100%}
+  .prix.is-pinned .tk__core{display:flex; flex-direction:column; height:100%}
+  .prix.is-pinned .tk__body{flex:1; padding:16px 28px clamp(18px,3vh,28px)}
+  .prix.is-pinned .tk__art{width:min(210px, calc(var(--ch) - var(--sh) - 64px)); align-self:center}
+  .prix.is-pinned .tk__price{font-size:clamp(66px,11.5vh,124px)}
+  .prix.is-pinned .tk__old{font-size:clamp(32px,5vh,46px)}
+  .prix.is-pinned .tk--fin .tk__price{font-size:clamp(72px,12.5vh,136px)}
+}
+@media (min-width:900px){
+  .prix:not(.is-pinned) .deck{max-width:640px}
+}
+
+/* =========================================================
+   C3 · La route
+   ========================================================= */
+.voyage__head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px 32px; margin-bottom:clamp(28px,4vw,64px)}
+.voyage__ctrl{display:flex; align-items:center; gap:10px}
+.voyage__hint{display:flex; align-items:center; gap:8px; margin:0; font-family:var(--f-word); font-style:italic; font-size:18px; color:var(--muted)}
+.voyage__hint svg{width:16px; height:16px}
+.voyage__btns{display:none; gap:10px}
+@media (hover:hover) and (pointer:fine){ .voyage__btns{display:flex} .voyage__hint{display:none} }
+@media (min-width:900px){ .voyage__ctrl{display:none} }
+.route{position:relative; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; scrollbar-width:none; -webkit-overflow-scrolling:touch; scroll-padding-inline:var(--gl)}
+.route::-webkit-scrollbar{display:none}
+.route:focus-visible{outline-offset:-2px; border-radius:12px}
+.route__track{display:flex; gap:16px; width:max-content; margin:0; padding:6px var(--gr) 18px var(--gl); list-style:none}
+.stop{position:relative; flex:none; width:min(78vw, 360px); scroll-snap-align:start}
+.stop__mark{position:relative; display:flex; align-items:center; gap:12px; height:52px; margin:0}
+.stop__dot{position:relative; flex:none; width:12px; height:12px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 2px rgb(var(--gold)), 0 0 14px rgb(var(--gold) / .5)}
+.stop__dot::after{content:""; position:absolute; inset:3px; border-radius:50%; background:rgb(var(--gold))}
+.stop__name{flex:none; font-family:var(--f-title); font-weight:600; font-size:30px; line-height:1; letter-spacing:-.01em}
+.stop__line{flex:1; height:1px; margin-right:-16px; background:repeating-linear-gradient(90deg, rgba(244,239,230,.42) 0 6px, transparent 6px 12px)}
+.stop:last-child .stop__line{background:linear-gradient(90deg, rgba(244,239,230,.42), transparent)}
+.stop__card{display:block; margin-top:10px; border-radius:22px}
+.stop__media{position:relative; display:block; aspect-ratio:16 / 9; overflow:hidden; border-radius:20px; background:#0D0A08; box-shadow:0 0 0 1px rgba(244,239,230,.09), 0 26px 50px -28px rgba(0,0,0,.85); transition:transform .9s var(--expo)}
+.stop__media img{width:100%; height:100%; object-fit:cover; transition:transform 1.4s var(--expo)}
+.stop__card:hover .stop__media{transform:scale(.985)}
+.stop__card:hover .stop__media img{transform:scale(1.05)}
+.stop__card:focus-visible{outline:none}
+.stop__card:focus-visible .stop__media{box-shadow:0 0 0 2px var(--creme)}
+.stop__best{display:block; margin-top:14px; font-size:15px; line-height:1.35; font-weight:500; color:var(--creme)}
+.stop__cta{display:inline-flex; align-items:center; gap:8px; min-height:32px; margin-top:8px; font-size:14px; color:var(--muted); transition:color .4s}
+.stop__best + .stop__cta{margin-top:2px}
+.stop__cta svg{width:12px; height:12px; transition:transform .6s var(--expo)}
+.stop__card:hover .stop__cta{color:var(--creme)}
+.stop__card:hover .stop__cta svg{transform:translate(2px,-2px)}
+.js .stop{opacity:0; transform:translateY(24px); transition:opacity .9s var(--expo), transform 1.1s var(--expo); transition-delay:calc(var(--i) * 110ms + .1s)}
+.js .route.is-in .stop{opacity:1; transform:none}
+.js .stop__line{clip-path:inset(0 100% 0 0); transition:clip-path 1.2s var(--expo); transition-delay:calc(var(--i) * 110ms + .5s)}
+.js .route.is-in .stop__line{clip-path:inset(0 0 0 0)}
+
+/* Ordinateur : la route se lit d'un coup d'œil, arrêts en quinconce */
+@media (min-width:900px){
+  .route{overflow:visible; scroll-snap-type:none; max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+  .route__track{display:grid; width:auto; grid-template-columns:repeat(5, minmax(0,1fr)); grid-template-rows:auto 104px auto; gap:0; padding:0 5.36%}
+  .route__track::before{content:""; grid-row:2; grid-column:1 / -1; align-self:center; height:1px; margin-inline:10%;
+    background:repeating-linear-gradient(90deg, rgba(244,239,230,.42) 0 6px, transparent 6px 12px)}
+  .js .route__track::before{clip-path:inset(0 100% 0 0); transition:clip-path 1.8s var(--expo) .15s}
+  .js .route.is-in .route__track::before{clip-path:inset(0 0 0 0)}
+  .stop{width:auto; grid-row:1 / 4; display:grid; grid-template-rows:subgrid}
+  .stop:nth-child(1){grid-column:1} .stop:nth-child(2){grid-column:2} .stop:nth-child(3){grid-column:3} .stop:nth-child(4){grid-column:4} .stop:nth-child(5){grid-column:5}
+  .stop__mark{grid-row:2; display:block; height:auto}
+  .stop__line{display:none}
+  .stop__dot{position:absolute; left:50%; top:50%; margin:-6px 0 0 -6px; z-index:1}
+  .stop__mark::before{content:""; position:absolute; left:50%; width:1px; height:50%; background:rgba(244,239,230,.3)}
+  .stop__name{position:absolute; left:50%; translate:-50% 0; font-size:clamp(28px,2.4vw,36px)}
+  .stop__card{width:160%; margin:0 0 0 -30%}
+  .stop:nth-child(odd) .stop__card{grid-row:1; align-self:end}
+  .stop:nth-child(odd) .stop__mark::before{top:0}
+  .stop:nth-child(odd) .stop__name{top:calc(50% + 16px)}
+  .stop:nth-child(even) .stop__card{grid-row:3; align-self:start; margin-top:0}
+  .stop:nth-child(even) .stop__mark::before{bottom:0}
+  .stop:nth-child(even) .stop__name{bottom:calc(50% + 16px)}
+  .stop:nth-child(odd) .stop__card{display:flex; flex-direction:column-reverse}
+  .stop:nth-child(odd) .stop__cta{margin:0 0 10px}
+}
+
+/* =========================================================
+   C4 · Pour ton voyage
+   ========================================================= */
+.guide__wrap{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(32px,4.4vw,56px)}
+.gcard{width:100%; max-width:920px}
+.gcard__core{display:grid; grid-template-columns:minmax(0,1fr)}
+.gcard__art{position:relative; padding:clamp(22px,3vw,36px); background:radial-gradient(90% 100% at 15% 100%, rgba(242,166,92,.22), transparent 70%), linear-gradient(160deg,#2B2018,#18120D)}
+.days{display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:clamp(6px,1vw,10px); margin:0; padding:0; list-style:none}
+.days li{position:relative; display:grid; place-items:center; aspect-ratio:1; border-radius:clamp(9px,1.2vw,13px); font-size:clamp(11px,1.1vw,13px); font-weight:500; font-variant-numeric:tabular-nums; color:rgba(244,239,230,.86); box-shadow:inset 0 0 0 1px rgba(244,239,230,.12); isolation:isolate}
+.days li::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(160deg, rgba(242,182,109,.42), rgba(242,182,109,.16)); box-shadow:inset 0 0 0 1px rgba(242,182,109,.5)}
+.js .days li::before{opacity:0; transform:scale(.7); transition:opacity .2s var(--out), transform .2s var(--out)}
+.js .gcard.is-in .days li::before{opacity:1; transform:none; transition:opacity .7s var(--expo), transform .9s var(--expo); transition-delay:calc(.5s + var(--i) * 75ms)}
+.gcard__body{display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:24px; padding:clamp(24px,3.4vw,44px)}
+.gcard__title{margin:0; max-width:16ch; font-size:clamp(24px,2.4vw,34px); line-height:1.15; font-weight:500; letter-spacing:-.02em; text-wrap:balance}
+.guide__soon{margin:0; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1.3; color:var(--muted)}
+@media (min-width:760px){
+  .gcard__core{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .gcard__art{display:flex; align-items:center}
+  .days{width:100%}
+}
+
+/* =========================================================
+   C5 · Entre deux voyages
+   ========================================================= */
+.sport__grid{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"title" "photo" "side"; gap:28px}
+.sport__title{grid-area:title}
+.sport__photo{grid-area:photo; position:relative; margin:0 calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); aspect-ratio:4 / 5; overflow:hidden; background:#0D0A08}
+.sport__photo > img{width:100%; height:100%; object-fit:cover; object-position:50% 15%}
+.sport__photo::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(0deg, rgba(12,9,6,.5), rgba(12,9,6,0) 34%)}
+.sport__cap{position:absolute; z-index:1; right:18px; bottom:14px; margin:0; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1.2; color:var(--creme); text-shadow:0 1px 16px rgba(0,0,0,.7)}
+.sport__side{grid-area:side; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px}
+.mini{display:flex; align-items:center; gap:14px; margin:0}
+.mini img{width:112px; height:76px; object-fit:cover; object-position:50% 30%; border-radius:14px; box-shadow:0 0 0 1px rgba(244,239,230,.1)}
+.mini figcaption{font-family:var(--f-word); font-style:italic; font-size:18px; line-height:1.3; color:var(--muted)}
+@media (min-width:900px){
+  .sport__grid{grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-areas:"photo title" "photo side"; grid-template-rows:1fr auto; column-gap:clamp(48px,7vw,120px); row-gap:40px}
+  .sport__title{align-self:end}
+  .sport__photo{--rr:28px; margin:0; width:min(100%, calc(82vh * .8)); border-radius:28px}
+  .sport__side{align-self:start; justify-content:flex-start; gap:28px 40px}
+}
+
+/* =========================================================
+   C6 · Me suivre (lien en bio)
+   ========================================================= */
+.links{position:relative; isolation:isolate; overflow:hidden; padding-block:var(--sec)}
+.links__bg{position:absolute; inset:0; z-index:-1}
+.links__bg img{width:100%; height:100%; object-fit:cover; object-position:60% 60%; transform:scaleX(-1); filter:sepia(.1) saturate(1.1) brightness(.6)}
+.links__bg::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, var(--bg) 0%, rgba(22,17,12,.2) 24%, rgba(22,17,12,.25) 76%, var(--bg) 100%)}
+.bio{max-width:520px; margin-inline:auto; text-align:center}
+.bio__avatar{width:104px; height:104px; margin:0 auto 20px; padding:4px; border-radius:50%; object-fit:cover; object-position:50% 24%; background:rgba(28,27,26,.42); box-shadow:0 0 0 1px rgba(255,255,255,.18), 0 20px 50px -16px rgba(0,0,0,.7)}
+.bio__name{margin:0 auto}
+.bio .h2{font-size:clamp(54px,7vw,88px)}
+.bio__sub{margin:14px auto 0; max-width:30ch; font-size:16px; line-height:1.45; color:rgba(244,239,230,.92)}
+.bio__list{display:grid; gap:12px; margin:32px 0 0; padding:0; list-style:none}
+.bio__row{position:relative; display:flex; align-items:center; gap:14px; min-height:72px; padding:12px 12px 12px 12px; border-radius:24px; overflow:hidden; text-align:left; transition:transform .6s var(--expo)}
+.bio__row::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(100deg, transparent 30%, rgba(255,255,255,.09) 50%, transparent 70%); transform:translateX(-110%); transition:transform 1.1s var(--expo)}
+.bio__row:hover::after{transform:translateX(110%)}
+.bio__row:active{transform:scale(.985)}
+.bio__row:focus-visible{outline-offset:3px}
+.bio__glyph{flex:none; display:grid; place-items:center; width:40px; height:48px}
+.bio__glyph svg{width:24px; height:24px}
+.bio__txt{flex:1; display:grid; min-width:0; line-height:1.3}
+.bio__txt b{font-size:16px; font-weight:600}
+.bio__txt span{font-size:13.5px; color:rgba(244,239,230,.78); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bio__go{flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:rgba(244,239,230,.1); transition:transform .7s var(--expo)}
+.bio__go svg{width:14px; height:14px}
+.bio__row:hover .bio__go{transform:translate(2px,-1px) scale(1.06)}
+
+/* =========================================================
+   C7 · Marques
+   ========================================================= */
+.split{display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(36px,5vw,88px); align-items:start}
+.split__side{display:flex; flex-direction:column; gap:20px}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr; align-items:center} }
+.form{position:relative}
+.form__core{padding:clamp(20px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:8px; margin:0 0 18px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13px; font-weight:500; letter-spacing:.01em; color:var(--muted)}
+.field legend{margin-bottom:8px}
+.field small{font-weight:400; color:var(--faint)}
+.input{width:100%; min-height:56px; padding:15px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.26); box-shadow:inset 0 0 0 1px rgba(244,239,230,.14); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.42)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.26)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.62), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,182,109,.9)}
+textarea.input{min-height:120px; resize:vertical}
+.field__err{margin:0; font-size:13px; color:#F2B66D}
+.field__err:empty{display:none}
+.pills{display:flex; flex-wrap:wrap; gap:8px}
+.pill{position:relative}
+.pill input{position:absolute; opacity:0; width:1px; height:1px}
+.pill span{position:relative; display:inline-flex; align-items:center; height:44px; padding:0 16px; border-radius:999px; font-size:14px; font-weight:500; box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); cursor:pointer; isolation:isolate; transition:transform .5s var(--expo)}
+.pill span::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:var(--creme); opacity:0; transition:opacity .45s var(--expo)}
+.pill span::after{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.pill:hover span::after{opacity:1}
+.pill input:checked + span{color:var(--ink)}
+.pill input:checked + span::before{opacity:1}
+.pill input:focus-visible + span{outline:2px solid var(--creme); outline-offset:3px}
+.pill span:active{transform:scale(.97)}
+.form__foot{display:flex; justify-content:flex-end; margin-top:8px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px); opacity:0; transform:translateY(16px); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{display:grid; place-items:center; width:64px; height:64px; border-radius:50%; background:var(--creme); color:var(--ink); transform:scale(.6); opacity:0; transition:transform 1s var(--expo) .4s, opacity .6s var(--expo) .4s}
+.ok__check svg{width:26px; height:26px; clip-path:inset(0 100% 0 0); transition:clip-path .7s var(--hand) .85s}
+.form.is-sent .ok__check{transform:none; opacity:1}
+.form.is-sent .ok__check svg{clip-path:inset(0 0 0 0)}
+.form__ok h3{margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(36px,4vw,52px); line-height:1; outline:none}
+.form__ok p{margin:0; max-width:34ch; color:var(--muted)}
+.form__ok > *:not(.ok__check){opacity:0; filter:blur(5px); transition:opacity .8s var(--expo), filter .8s var(--expo)}
+.form.is-sent .form__ok > *:not(.ok__check){opacity:1; filter:none; transition-delay:.6s}
+
+/* =========================================================
+   C8 · Le sceau (rempli par shared/sceau.js) + pied de page
+   ========================================================= */
+.sceau:empty{display:grid; place-items:center; min-height:60vh; padding:96px 24px; text-align:center}
+.sceau:empty::before{content:"Il existe une autre version de moi."; max-width:20ch; font-size:clamp(22px,2.4vw,30px); font-weight:500; line-height:1.25; letter-spacing:-.02em; color:var(--muted)}
+.foot{padding:40px var(--gr) calc(40px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot p{margin:0}
+
+/* Écrans d'une seule idée : un chapitre ≈ un écran sur ordinateur */
+@media (min-width:900px) and (min-height:600px){
+  .ch--screen{min-height:100vh; display:flex; flex-direction:column; justify-content:center}
+  .ch--screen > .wrap{width:100%}
+}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-sweep],.js [data-reveal],.js [data-reveal] > img,.js .slit .num,
+  .js .hero__bgIn,.js .hero__stage,.js .ttl--main,.js .tk,.js .tk__art,.js .strike,.js .stop,.js .stop__line,
+  .js .route__track::before,.js .days li::before,.form__ok,.ok__check,.ok__check svg,.deck{transform:none !important; filter:none !important; clip-path:none !important}
+  .is-loaded .ttl--main,.is-loaded .ttl--ghost,.is-loaded .hero [data-anim]{animation-name:kzFade !important}
+  .ttl--ghost{display:none}
+  .nav__chT.in{animation-name:kzFade}
+  .js .tk .slit .num,.js .tk__art,.js .strike{opacity:0; transition:opacity .5s var(--expo)}
+  .js .tk.is-in .slit .num,.js .tk.is-in .tk__art,.js .tk--fin.is-in .strike{opacity:1; transition:opacity .9s var(--expo) .2s}
+  .play,.stop__media,.stop__media img,.bio__row,.poster__img{transition:none !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#derniere">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Objets dessinés du « vrai prix » -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="o-avion" viewBox="0 0 120 120">
+    <path d="M10 110 C18 102 26 94 34 86" style="stroke:var(--acc)" stroke-dasharray="2 7" vector-effect="non-scaling-stroke"/>
+    <path transform="rotate(45 64 56)" d="M64 14 C67.6 14 69.5 19 69.5 25 L69.5 43 L102.5 62 L102.5 69 L69.5 60 L69.5 80 L79.5 88 L79.5 93.5 L64 89.5 L48.5 93.5 L48.5 88 L58.5 80 L58.5 60 L25.5 69 L25.5 62 L58.5 43 L58.5 25 C58.5 19 60.4 14 64 14 Z" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-train" viewBox="0 0 120 120">
+    <path d="M36 30 C36 19 46 14 60 14 C74 14 84 19 84 30 L87 84 C87 91 82 96 75 96 L45 96 C38 96 33 91 33 84 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M42 31 C42 25 50 22 60 22 C70 22 78 25 78 31 L79 50 C79 53 77 55 74 55 L46 55 C43 55 41 53 41 50 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M35 67 H85" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <circle cx="45" cy="80" r="4" vector-effect="non-scaling-stroke"/>
+    <circle cx="75" cy="80" r="4" vector-effect="non-scaling-stroke"/>
+    <path d="M44 96 L30 112 M76 96 L90 112 M37 104 H83 M32 110 H88" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-lit" viewBox="0 0 120 120">
+    <path d="M62 46 C56 40 68 36 62 28 M76 42 C70 36 82 32 76 24 M90 46 C84 40 96 36 90 28" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M18 100 V54 C18 50 21 47 25 47 C29 47 32 50 32 54 V70" vector-effect="non-scaling-stroke"/>
+    <path d="M32 70 H98 C101.3 70 104 72.7 104 76 V86 H18" vector-effect="non-scaling-stroke"/>
+    <path d="M36 70 C36 63 39 60 45 60 H54 C58 60 60 63 60 70" vector-effect="non-scaling-stroke"/>
+    <path d="M22 86 V100 M100 86 V100" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-bol" viewBox="0 0 120 120">
+    <path d="M40 46 C34 40 46 36 40 28 M54 44 C48 38 60 34 54 26" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M66 52 L100 16 M74 55 L106 24" vector-effect="non-scaling-stroke"/>
+    <path d="M16 58 H104 C104 82 86 98 60 98 C34 98 16 82 16 58 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M24 64 C36 60 44 68 58 63 C72 58 82 66 96 63" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M46 98 L49 106 H71 L74 98" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-tenue" viewBox="0 0 120 120">
+    <path d="M60 24 V19 C60 14 66 12 67.5 16.5" vector-effect="non-scaling-stroke"/>
+    <path d="M60 24 L28 38 H92 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M44 38 L16 62 L24 72 L40 60 L36 106 H84 L80 60 L96 72 L104 62 L76 38" vector-effect="non-scaling-stroke"/>
+    <path d="M50 38 L60 54 L70 38" vector-effect="non-scaling-stroke"/>
+    <path d="M39 72 H81" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <circle cx="60" cy="89" r="6" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-tel" viewBox="0 0 120 120">
+    <rect x="36" y="10" width="48" height="100" rx="11" vector-effect="non-scaling-stroke"/>
+    <path d="M54 17 H66" vector-effect="non-scaling-stroke"/>
+    <path d="M53 103 H67" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+  </symbol>
+</svg>
+
+<!-- ========== Navigation ========== -->
+<header class="nav">
+  <nav class="story" aria-label="Chapitres">
+    <a href="#top"><i></i><span class="sr">Kenz en Asie</span></a>
+    <a href="#derniere"><i></i><span class="sr">La dernière vidéo</span></a>
+    <a href="#prix"><i></i><span class="sr">Le vrai prix</span></a>
+    <a href="#voyage"><i></i><span class="sr">Le voyage</span></a>
+    <a href="#guide"><i></i><span class="sr">Pour ton voyage</span></a>
+    <a href="#sport"><i></i><span class="sr">Entre deux voyages</span></a>
+    <a href="#suivre"><i></i><span class="sr">Me suivre</span></a>
+    <a href="#marques"><i></i><span class="sr">Marques</span></a>
+    <a href="#sceau"><i></i><span class="sr">Le sceau</span></a>
+  </nav>
+  <div class="nav__in">
+    <div class="brand">
+      <a class="brand__name" href="#top">Kenz</a><a class="brand__dot" href="#sceau" aria-label="Il existe une autre version de moi"><i></i><i></i></a>
+    </div>
+    <p class="nav__ch" aria-hidden="true"><span class="nav__chT" data-ch-label>Kenz en Asie</span></p>
+  </div>
+</header>
+
+<main>
+  <!-- ========== C0 · Hero ========== -->
+  <section class="hero" id="top" data-label="Kenz en Asie" aria-labelledby="t-hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bgIn">
+        <img class="hero__land" src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high">
+        <i class="hero__wash"></i>
+      </div>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="hero__layout">
+      <div class="hero__copy">
+        <h1 class="hero__title" id="t-hero"><span class="ttl ttl--main">Kenz</span><span class="ttl ttl--ghost" aria-hidden="true">Kenz</span></h1>
+        <p class="hero__line" data-words>Je voyage en Asie et je te raconte ce que ça coûte <em class="word glow">vraiment</em>.</p>
+        <div class="hero__cta" data-anim>
+          <a class="btn btn--light" href="#derniere">Voir la dernière vidéo<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+        </div>
+      </div>
+      <div class="hero__stage">
+        <i class="hero__glow" aria-hidden="true"></i>
+        <div class="hero__fig">
+          <img class="portrait" src="assets/img/kenz-moi.webp" alt="Kenz en t-shirt vert anis, le regard tourné vers l’horizon" width="1080" height="1920" fetchpriority="high">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C1 · La dernière vidéo ========== -->
+  <section class="ch ch--screen latest" id="derniere" data-label="La dernière vidéo" aria-labelledby="t-latest">
+    <div class="wrap latest__grid">
+      <div class="latest__head">
+        <h2 class="h2" id="t-latest" data-sweep>Dernière vidéo</h2>
+      </div>
+      <figure class="poster bezel" data-reveal="card">
+        <div class="bezel__core">
+          <a class="poster__link" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener" aria-label="Regarder « Premier voyage en Chine : itinéraire de 14 jours » sur YouTube">
+            <img class="poster__img" src="assets/img/video-chine-14-jours.jpg" alt="Miniature « 14 jours » : Kenz sur la Grande Muraille de Chine" width="960" height="540" loading="lazy" decoding="async">
+            <span class="play glass" aria-hidden="true">
+              <span class="play__ico"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4c0 .6.7 1 1.2.7l11.3-7.2a.8.8 0 0 0 0-1.4L8.2 4.1C7.7 3.8 7 4.2 7 4.8z" fill="currentColor"/></svg></span>
+              <span class="play__label">Regarder sur YouTube</span>
+            </span>
+          </a>
+        </div>
+      </figure>
+      <p class="latest__meta latest__title" data-reveal="fade" style="--d:2">Premier voyage en Chine&nbsp;: itinéraire de 14&nbsp;jours<span class="latest__date">Publiée le <time datetime="2026-10-31">31 octobre 2026</time></span></p>
+    </div>
+  </section>
+
+  <!-- ========== C2 · Le vrai prix ========== -->
+  <section class="ch prix" id="prix" data-label="Le vrai prix" aria-labelledby="t-prix">
+    <div class="prix__stage">
+      <div class="wrap prix__grid">
+        <header class="prix__head">
+          <h2 class="h2" id="t-prix" data-sweep>Le vrai prix</h2>
+          <p class="lead" data-words>En Chine, voilà ce que j’ai <em class="word glow">payé</em>.</p>
+        </header>
+        <ol class="deck" role="list" data-deck>
+          <li class="tk" style="--k:0">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-avion"/></svg></span>
+                <h3 class="tk__poste">Vol Pékin → Chongqing</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;100&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">≈&#8239;100&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-avion"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:1">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-train"/></svg></span>
+                <h3 class="tk__poste">Train Chongqing → Wulong</h3>
+                <span class="tk__mini" aria-hidden="true">&lt;&#8239;9&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__pre">moins de</span><span class="tk__price"><span class="slit"><span class="num">9&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-train"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:2">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-lit"/></svg></span>
+                <h3 class="tk__poste">24&nbsp;h dans un spa à volonté</h3>
+                <span class="tk__mini" aria-hidden="true">25&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__det">petit-déjeuner compris</span><span class="tk__price"><span class="slit"><span class="num">25&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-lit"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:3">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-bol"/></svg></span>
+                <h3 class="tk__poste">Un repas à Shanghai</h3>
+                <span class="tk__mini" aria-hidden="true">7–8&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">7–8&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-bol"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:4">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-tenue"/></svg></span>
+                <h3 class="tk__poste">Tenue d’empereur à la Grande Muraille</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;20&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">≈&#8239;20&nbsp;€</span></span></span><span class="tk__suf">la journée</span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-tenue"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk tk--fin" style="--k:5">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-tel"/></svg></span>
+                <h3 class="tk__poste">Réparation d’iPhone à Shenzhen</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;10&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val">
+                  <span class="tk__was"><s class="tk__old">200&nbsp;€<svg class="strike" viewBox="0 0 120 40" preserveAspectRatio="none" aria-hidden="true"><path d="M3 31 C 22 27, 40 24, 58 21 S 98 13, 117 8"/></svg></s><span class="tk__src">vu sur le site d’Apple France</span></span>
+                  <span class="tk__price"><span class="slit"><span class="num">≈&#8239;10&nbsp;€</span></span></span>
+                </p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true">
+                  <rect class="screen" x="40" y="14" width="40" height="92" rx="8"/>
+                  <rect x="36" y="10" width="48" height="100" rx="11" vector-effect="non-scaling-stroke"/>
+                  <path d="M54 17 H66" vector-effect="non-scaling-stroke"/>
+                  <path class="crack" d="M43 33 L55 46 L50 56 L63 66 L58 77 L75 93 M55 46 L68 42 M63 66 L74 63" vector-effect="non-scaling-stroke"/>
+                  <path class="acc" d="M53 103 H67" vector-effect="non-scaling-stroke"/>
+                </svg>
+              </div>
+            </div></article>
+          </li>
+        </ol>
+        <p class="prix__note" data-reveal="fade">Prix vécus, pas des tarifs garantis.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C3 · Le voyage ========== -->
+  <section class="ch voyage" id="voyage" data-label="Le voyage" aria-labelledby="t-voyage">
+    <div class="wrap voyage__head">
+      <h2 class="h2" id="t-voyage" data-sweep>Le voyage</h2>
+      <div class="voyage__ctrl">
+        <p class="voyage__hint" aria-hidden="true">Fais glisser<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></p>
+        <div class="voyage__btns">
+          <button class="round" type="button" data-route-step="-1" aria-label="Arrêt précédent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg></button>
+          <button class="round" type="button" data-route-step="1" aria-label="Arrêt suivant"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="route" data-route data-play tabindex="0" role="region" aria-label="La route, de la Chine à l’Islande">
+      <ol class="route__track" role="list">
+        <li class="stop" style="--i:0">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Chine</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Chine : voir mes vidéos sur YouTube">
+            <span class="stop__media"><img src="assets/img/video-chine.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a>
+        </li>
+        <li class="stop" style="--i:1">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Malaisie</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Malaisie, ma vidéo la plus vue : le budget. Voir sur YouTube">
+            <span class="stop__media"><img src="assets/img/video-malaisie.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__best"><span>Ma vidéo la plus vue&nbsp;: le <em class="word">budget</em>.</span></span>
+            <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a>
+        </li>
+        <li class="stop" style="--i:2">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Corée</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Corée : voir mes vidéos sur YouTube">
+            <span class="stop__media"><img src="assets/img/video-coree.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a>
+        </li>
+        <li class="stop" style="--i:3">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Japon</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Japon : voir mes vidéos sur YouTube">
+            <span class="stop__media"><img src="assets/img/video-japon.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a>
+        </li>
+        <li class="stop" style="--i:4">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Islande</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Islande : voir mes vidéos sur YouTube">
+            <span class="stop__media"><img src="assets/img/video-islande.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+          </a>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ========== C4 · Pour ton voyage ========== -->
+  <section class="ch ch--screen guide" id="guide" data-label="Pour ton voyage" aria-labelledby="t-guide">
+    <div class="wrap guide__wrap">
+      <h2 class="statement" id="t-guide" data-words>Tu pars en <em class="word glow">Chine</em>&nbsp;?</h2>
+      <article class="bezel gcard" data-reveal="card">
+        <div class="bezel__core gcard__core">
+          <div class="gcard__art" aria-hidden="true">
+            <ol class="days">
+              <li style="--i:0">1</li><li style="--i:1">2</li><li style="--i:2">3</li><li style="--i:3">4</li><li style="--i:4">5</li><li style="--i:5">6</li><li style="--i:6">7</li>
+              <li style="--i:7">8</li><li style="--i:8">9</li><li style="--i:9">10</li><li style="--i:10">11</li><li style="--i:11">12</li><li style="--i:12">13</li><li style="--i:13">14</li>
+            </ol>
+          </div>
+          <div class="gcard__body">
+            <h3 class="gcard__title">L’itinéraire de 14&nbsp;jours, jour par jour</h3>
+            <a class="btn btn--light" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener">Ouvrir l’itinéraire<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          </div>
+        </div>
+      </article>
+      <p class="guide__soon" data-reveal="fade">D’autres guides arrivent.</p>
+    </div>
+  </section>
+
+  <!-- ========== C5 · Entre deux voyages ========== -->
+  <section class="ch ch--screen sport" id="sport" data-label="Entre deux voyages" aria-labelledby="t-sport">
+    <div class="wrap sport__grid">
+      <h2 class="statement sport__title" id="t-sport" data-words>Et entre deux voyages, je <em class="word glow">m’entraîne</em>.</h2>
+      <figure class="sport__photo" data-reveal="img">
+        <img src="assets/img/hyrox-2.jpg" alt="Kenz pousse un traîneau lesté pendant une course HYROX, le regard droit devant" width="733" height="1100" loading="lazy" decoding="async">
+        <figcaption class="sport__cap">HYROX · mai 2025</figcaption>
+      </figure>
+      <div class="sport__side">
+        <figure class="mini" data-reveal="fade">
+          <img src="assets/img/spartan-2.jpg" alt="Kenz saute au-dessus d’un feu pendant une Spartan Race" width="768" height="511" loading="lazy" decoding="async">
+          <figcaption>Spartan Race</figcaption>
+        </figure>
+        <a class="btn btn--ghost" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener" data-reveal="fade" style="--d:1">La chaîne k15ze<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C6 · Me suivre ========== -->
+  <section class="links" id="suivre" data-label="Me suivre" aria-labelledby="t-links">
+    <div class="links__bg" aria-hidden="true"><img src="assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" loading="lazy" decoding="async"></div>
+    <div class="wrap">
+      <div class="bio">
+        <img class="bio__avatar" src="assets/img/kenz-carre.jpg" alt="Kenz en t-shirt vert devant les rizières de Malaisie" width="900" height="855" loading="lazy" decoding="async" data-reveal="fade">
+        <h2 class="h2 bio__name" id="t-links" data-sweep>Me suivre</h2>
+        <p class="bio__sub" data-reveal="fade" style="--d:1">≈&#8239;28&#8239;000 personnes me suivent sur TikTok.</p>
+        <ul class="bio__list" role="list">
+          <li><a class="bio__row glass" data-reveal="card" style="--d:1" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">
+            <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4.5"/><path d="M10 9.3v5.4l4.6-2.7z"/></svg></span>
+            <span class="bio__txt"><b>YouTube · Kenz in Asia</b><span>@7Kinze</span></span>
+            <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+          <li><a class="bio__row glass" data-reveal="card" style="--d:2" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">
+            <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14 3.5c.6 2.5 2.4 4.1 5 4.3"/></svg></span>
+            <span class="bio__txt"><b>TikTok · En Bien en Asie</b><span>@7kinze</span></span>
+            <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+          <li><a class="bio__row glass" data-reveal="card" style="--d:3" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">
+            <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.1" cy="6.9" r=".7" fill="currentColor" stroke="none"/></svg></span>
+            <span class="bio__txt"><b>Instagram</b><span>@kenzvoyage_enbien</span></span>
+            <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+          <li><a class="bio__row glass" data-reveal="card" style="--d:4" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">
+            <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3.5h4M17.6 7.4l1.2-1.2"/></svg></span>
+            <span class="bio__txt"><b>YouTube · k15ze</b><span>Entre deux voyages</span></span>
+            <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C7 · Marques ========== -->
+  <section class="ch ch--screen brands" id="marques" data-label="Marques" aria-labelledby="t-brands">
+    <div class="wrap split">
+      <div class="split__side">
+        <h2 class="statement" id="t-brands" data-words>Une marque, une destination, une <em class="word glow">idée</em>&nbsp;?</h2>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="t-brands">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="b-marque">Votre marque</label>
+              <input class="input" id="b-marque" name="marque" type="text" autocomplete="organization" placeholder="Le nom de votre marque" data-required data-min="2" data-msg="Indiquez le nom de votre marque." aria-describedby="b-marque-err">
+              <p class="field__err" id="b-marque-err" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="b-idee">Votre idée</label>
+              <textarea class="input" id="b-idee" name="idee" placeholder="Une destination, un format, une envie…" data-required data-min="10" data-msg="Décrivez votre idée en quelques mots (10 caractères au moins)." aria-describedby="b-idee-err"></textarea>
+              <p class="field__err" id="b-idee-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Ordre de budget <small>(facultatif)</small></legend>
+              <div class="pills">
+                <label class="pill"><input type="radio" name="budget" value="moins-1000"><span>Moins de 1&nbsp;000&nbsp;€</span></label>
+                <label class="pill"><input type="radio" name="budget" value="1000-5000"><span>1&nbsp;000 à 5&nbsp;000&nbsp;€</span></label>
+                <label class="pill"><input type="radio" name="budget" value="plus-5000"><span>Plus de 5&nbsp;000&nbsp;€</span></label>
+                <label class="pill"><input type="radio" name="budget" value="a-definir"><span>À définir</span></label>
+              </div>
+            </fieldset>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit"><span data-label>Envoyer</span><span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <span class="ok__check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ========== C8 · Le sceau (shared/sceau.js remplit la section) ========== -->
+  <section id="sceau" class="sceau" data-sceau data-vers="pro.html" data-symbole="lune" data-label="Le sceau" aria-label="Il existe une autre version de moi"></section>
+</main>
+
+<footer class="foot"><p>Kenz en Asie · 2026</p></footer>
+
+<script>
+(function () {
+  'use strict';
+  var d = document.documentElement;
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var PIN = window.matchMedia('(min-width: 900px) and (min-height: 600px)');
+  var hasIO = 'IntersectionObserver' in window;
+  var each = function (sel, fn, root) { Array.prototype.forEach.call((root || document).querySelectorAll(sel), fn); };
+
+  /* ---------- 1. Mot par mot ---------- */
+  function splitWords(el) {
+    var i = 0;
+    Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        n.textContent.split(/([ \t\r\n]+)/).forEach(function (p) {
+          if (!p) return;
+          if (/^[ \t\r\n]+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+          var s = document.createElement('span');
+          s.className = 'w'; s.style.setProperty('--i', i++); s.textContent = p;
+          frag.appendChild(s);
+        });
+        n.parentNode.replaceChild(frag, n);
+      } else if (n.nodeType === 1) {
+        n.classList.add('w'); n.style.setProperty('--i', i++);
+      }
+    });
+  }
+  each('[data-words]', splitWords);
+
+  /* ---------- 2. Apparitions à l'entrée (une seule fois) ---------- */
+  var io = hasIO ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var t = e.target;
+      if (t.__sweep) t.__sweep.forEach(function (s) { s.classList.add('is-in'); });
+      if (t.matches('[data-reveal],[data-words],[data-play]')) t.classList.add('is-in');
+      io.unobserve(t);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }) : null;
+  each('[data-reveal],[data-words],[data-play]', function (el) {
+    if (el.closest('.hero')) return;
+    if (io) io.observe(el); else el.classList.add('is-in');
+  });
+  /* Un titre en balayage est rogné à zéro (clip-path) : Chrome le croit invisible, on observe donc son parent. */
+  each('[data-sweep]', function (el) {
+    if (el.closest('.hero')) return;
+    if (!io) { el.classList.add('is-in'); return; }
+    var host = el.parentElement;
+    host.__sweep = (host.__sweep || []).concat(el);
+    io.observe(host);
+  });
+
+  /* ---------- 3. Entrée du hero (attend le sceau si on arrive par la porte) ---------- */
+  var heroPlayed = false;
+  function playHero() {
+    if (heroPlayed) return;
+    heroPlayed = true;
+    d.classList.add('is-loaded');
+    each('.hero [data-words]', function (el) { el.classList.add('is-in'); });
+  }
+  if (location.hash === '#porte') {
+    d.classList.add('is-porte');
+    document.addEventListener('sceau:arrivee', playHero, { once: true });
+    setTimeout(playHero, 2500);
+  } else {
+    var go = function () { requestAnimationFrame(function () { requestAnimationFrame(playHero); }); };
+    var t = setTimeout(go, 700);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { clearTimeout(t); go(); });
+  }
+
+  /* ---------- 4. Repère « stories », nom du chapitre, parallaxe, scène du vrai prix ---------- */
+  var nav = document.querySelector('.nav');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('main [data-label]'));
+  var segs = Array.prototype.slice.call(document.querySelectorAll('.story a'));
+  var fills = segs.map(function (a) { return a.querySelector('i'); });
+  var label = document.querySelector('[data-ch-label]');
+  var heroBg = document.querySelector('.hero__bg');
+  var prix = document.getElementById('prix');
+  var deck = prix.querySelector('[data-deck]');
+  var cards = Array.prototype.slice.call(prix.querySelectorAll('.tk'));
+  var vh = window.innerHeight, maxY = 1, tops = [], hs = [];
+  var pinned = false, step = -1, prixTop = 0, prixLen = 1, cardIO = null, current = -1, ticking = false;
+
+  function measure() {
+    vh = window.innerHeight;
+    maxY = Math.max(1, d.scrollHeight - vh);
+    var y = window.scrollY;
+    chapters.forEach(function (c, i) { var r = c.getBoundingClientRect(); tops[i] = r.top + y; hs[i] = Math.max(1, r.height); });
+    if (pinned) { var r = prix.getBoundingClientRect(); prixTop = r.top + y; prixLen = Math.max(1, r.height - vh); }
+  }
+
+  function swapLabel(text) {
+    if (!label || label.textContent === text) return;
+    label.classList.remove('in');
+    void label.offsetWidth;
+    label.textContent = text;
+    label.classList.add('in');
+  }
+
+  function setStep(s) {
+    if (s === step) return;
+    step = s;
+    cards.forEach(function (c, i) {
+      c.classList.toggle('is-in', i < s);
+      c.classList.toggle('is-under', i < s - 1);
+    });
+    deck.style.setProperty('--s', Math.max(0, s - 1));
+  }
+
+  function frame() {
+    ticking = false;
+    var y = window.scrollY;
+    var ref = y + vh * 0.35 * Math.min(1, y / (vh * 0.5));
+    var end = y >= maxY - 4;
+    var act = 0;
+    for (var i = 0; i < chapters.length; i++) {
+      var f = end ? 1 : Math.min(1, Math.max(0, (ref - tops[i]) / hs[i]));
+      if (fills[i]) fills[i].style.transform = 'scaleX(' + f.toFixed(4) + ')';
+      if (tops[i] <= ref + 1) act = i;
+    }
+    if (end) act = chapters.length - 1;
+    if (act !== current) {
+      current = act;
+      segs.forEach(function (a, j) { if (j === act) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
+      swapLabel(chapters[act].getAttribute('data-label'));
+    }
+    nav.classList.toggle('is-scrolled', y > 24);
+    if (heroBg && !RM.matches && y < vh * 1.3) heroBg.style.transform = 'translate3d(0,' + (y * 0.16).toFixed(1) + 'px,0)';
+    if (pinned) {
+      var p = (y - prixTop + vh * 0.2) / prixLen;
+      setStep(p < 0 ? 0 : Math.min(cards.length, Math.floor(p * 6.6) + 1));
+    }
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
+
+  function setupPrix() {
+    pinned = PIN.matches && !RM.matches;
+    prix.classList.toggle('is-pinned', pinned);
+    if (cardIO) { cardIO.disconnect(); cardIO = null; }
+    step = -1;
+    cards.forEach(function (c) { c.classList.remove('is-under'); });
+    if (pinned) {
+      cards.forEach(function (c) { c.classList.remove('is-in'); });
+    } else if (hasIO) {
+      deck.style.removeProperty('--s');
+      cardIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); cardIO.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.3 });
+      cards.forEach(function (c) { if (!c.classList.contains('is-in')) cardIO.observe(c); });
+    } else {
+      cards.forEach(function (c) { c.classList.add('is-in'); });
+    }
+    measure(); frame();
+  }
+
+  var rz;
+  function onResize() { clearTimeout(rz); rz = setTimeout(function () { measure(); frame(); }, 120); }
+  var onMQ = function () { setupPrix(); };
+  if (PIN.addEventListener) { PIN.addEventListener('change', onMQ); RM.addEventListener('change', onMQ); }
+  else if (PIN.addListener) { PIN.addListener(onMQ); RM.addListener(onMQ); }
+
+  setupPrix();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize);
+  window.addEventListener('load', function () { measure(); frame(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); frame(); });
+
+  /* ---------- 5. La route : flèches pour la souris sous 900 px ---------- */
+  var route = document.querySelector('[data-route]');
+  each('[data-route-step]', function (btn) {
+    btn.addEventListener('click', function () {
+      var item = route.querySelector('.stop');
+      var w = item ? item.getBoundingClientRect().width + 16 : 300;
+      route.scrollBy({ left: (+btn.getAttribute('data-route-step')) * w, behavior: RM.matches ? 'auto' : 'smooth' });
+    });
+  });
+
+  /* ---------- 6. Formulaire marques : validation douce, envoi simulé ---------- */
+  var form = document.querySelector('[data-form]');
+  if (form) {
+    var ok = form.querySelector('.form__ok');
+    var btn = form.querySelector('[type="submit"]');
+    var btnLabel = btn.querySelector('[data-label]');
+    var check = function (f) {
+      var bad = f.value.trim().length < (+f.getAttribute('data-min') || 1);
+      var err = document.getElementById(f.getAttribute('aria-describedby'));
+      f.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      if (err) err.textContent = bad ? f.getAttribute('data-msg') : '';
+      return !bad;
+    };
+    each('[data-required]', function (f) {
+      f.addEventListener('input', function () { if (f.getAttribute('aria-invalid') === 'true') check(f); });
+    }, form);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var first = null;
+      each('[data-required]', function (f) { if (!check(f) && !first) first = f; }, form);
+      if (first) { first.focus(); return; }
+      btn.disabled = true; btn.classList.add('is-busy'); btnLabel.textContent = 'Envoi…';
+      setTimeout(function () {
+        ok.hidden = false;
+        void ok.offsetWidth;
+        form.classList.add('is-sent');
+        var title = ok.querySelector('[data-ok-title]');
+        setTimeout(function () { title.focus({ preventScroll: true }); }, 300);
+      }, 650);
+    });
+    form.querySelector('[data-again]').addEventListener('click', function () {
+      form.reset();
+      each('[data-required]', function (f) { f.removeAttribute('aria-invalid'); }, form);
+      btn.disabled = false; btn.classList.remove('is-busy'); btnLabel.textContent = 'Envoyer';
+      form.classList.remove('is-sent');
+      setTimeout(function () { ok.hidden = true; form.querySelector('#b-marque').focus({ preventScroll: true }); }, 300);
+    });
+  }
+
+  /* ---------- Tout s'est bien chargé : on désarme le garde-fou ---------- */
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="shared/sceau.js" defer></script>
+
+<a href="index.html" class="kz-back" aria-label="Revenir à l'accueil des maquettes"><span aria-hidden="true">←</span><em>Accueil</em></a>
+<style>
+.kz-back{position:fixed;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:2147483000;display:inline-flex;align-items:center;height:34px;min-width:34px;padding:0 11px;border-radius:999px;font:500 13px/1 "Inter",system-ui,sans-serif;color:#F4EFE6;background:rgba(20,18,16,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 10px 30px -12px rgba(0,0,0,.45);text-decoration:none;opacity:.7;transition:opacity .3s,transform .5s cubic-bezier(.16,1,.3,1)}
+.kz-back em{font-style:normal;max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .5s cubic-bezier(.16,1,.3,1),opacity .3s,margin .5s cubic-bezier(.16,1,.3,1)}
+.kz-back:hover,.kz-back:focus-visible{opacity:1;transform:translateY(-2px)}
+.kz-back:hover em,.kz-back:focus-visible em{max-width:90px;opacity:1;margin-left:8px}
+.kz-back:focus-visible{outline:2px solid #F4EFE6;outline-offset:3px}
+html.sceau-arrivee .kz-back{opacity:0}
+</style>
+</body>
+</html>

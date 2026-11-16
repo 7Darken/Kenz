@@ -1,0 +1,1362 @@
+<!doctype html>
+<!--
+  Kenz — Agents IA pour votre équipe (V4, style « Le fil »)
+  L'Encre et la lumière Lagon. Une idée par écran : la question, sous une arche ouverte sur Kuala Lumpur à l'heure bleue
+  (la lentille y éclaircit la ville) → la démo (le visiteur valide) → la promesse → six besoins en questions dépliables
+  → comment on avance (ordinateur : épinglé, les trois temps glissent à l'horizontale le long du fil) → contact.
+  Le fil relie les chapitres : rail à gauche dès 1100 px, un trait qui descend dans chaque chapitre.
+  Mobile et mouvement réduit : aucun épinglage ni défilement horizontal.
+  Contrat V4 (section 3) : shared/passage.* et shared/cordon.* sont écrits à part ; la page fonctionne sans eux.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Agents IA</title>
+<meta name="description" content="Des agents IA qui travaillent pour votre équipe, et rien ne part sans votre validation.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#1A1918">
+<script>
+  (function () {
+    var d = document.documentElement, a = null;
+    d.classList.add('js');
+    if (location.hash.indexOf('porte') > -1) a = 'porte';
+    else {
+      try { var p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); if (p && Date.now() - p.t < 6000) a = 'passage'; } catch (e) {}
+    }
+    window.__kzArrivee = a;
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   Jetons (heure bleue)
+   ========================================================= */
+:root{
+  --bg:#1A1918;
+  --bg-2:#201E1D;
+  --creme:#F4EFE6;
+  --ink:#1A1918;
+  --red:#E8322B;
+  --ok:#A8E6BE;
+  --dusk:111 186 197;
+  --fil:120 196 206;
+  --cordon-lumiere:#E2B26A;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1180px;
+  --sec:clamp(88px,11vw,168px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button,input,textarea{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,h1,h2,h3{margin:0}
+h1,h2,h3{font-weight:500}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:90; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(46% 38% at 8% 0%, rgba(15,93,107,.28), transparent 72%), radial-gradient(40% 36% at 100% 72%, rgba(15,93,107,.14), transparent 72%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+main{overflow-x:clip}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:18px; line-height:1.3; letter-spacing:0; color:var(--faint)}
+.h2{width:fit-content; max-width:100%; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,7vw,112px); line-height:.92; letter-spacing:-.01em}
+.say{font-size:clamp(30px,4.4vw,64px); line-height:1.08; letter-spacing:-.03em; font-weight:500; text-wrap:balance}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0}
+.glow{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); box-shadow:inset 0 0 0 1px rgba(244,239,230,.075), 0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; height:100%; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#24221F,#1C1A19); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:54px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:40px; height:40px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--down:hover .btn__ico{transform:translateY(2px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(26,25,24,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.2)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link::after{content:""; position:absolute; left:2px; right:2px; bottom:10px; height:1px; background:currentColor; opacity:.5; transition:opacity .4s}
+.link:hover{color:var(--creme)}
+.link:hover::after{opacity:1}
+.link svg{width:13px; height:13px}
+
+/* Rejouer : discret, dans la démo */
+.replay{position:absolute; z-index:4; display:inline-flex; align-items:center; gap:7px; height:36px; padding:0 14px 0 11px; border-radius:999px; font-size:12.5px; font-weight:500; color:rgba(244,239,230,.86); background:rgba(26,25,24,.6); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-5px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo) var(--wd, 0s), filter 1.2s var(--expo) var(--wd, 0s)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transform:translateY(14px); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transform:none; transition:opacity 1s var(--expo), filter 1s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 80ms)}
+
+/* =========================================================
+   Navigation (markup commun V4 : .kz-logo + .kz-dot)
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,25,24,.86), rgba(26,25,24,.5)); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-block; margin-right:auto; padding:8px 2px; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--creme); border-radius:8px}
+.kz-dot{display:inline-block; width:7px; height:7px; margin:0 0 0 .07em; padding:0; border:0; border-radius:50%; background:var(--creme); vertical-align:baseline; cursor:inherit}
+.kz-dot:focus-visible{outline:2px solid var(--creme); outline-offset:4px}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(26,25,24,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.98)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:var(--creme); color:var(--ink); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .kz-logo{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+
+/* Repère : une petite barre de lecture */
+.prog{position:fixed; top:0; left:0; right:0; z-index:51; height:2px; pointer-events:none}
+.prog i{display:block; height:100%; background:linear-gradient(90deg, rgba(244,239,230,.85), rgb(var(--dusk))); transform-origin:left; transform:scaleX(0)}
+
+/* =========================================================
+   1. L'arrivée : la question, sous une arche ouverte sur Kuala Lumpur à l'heure bleue
+   ========================================================= */
+.hero{position:relative; display:flex; flex-direction:column; justify-content:flex-end; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__light{position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(64% 36% at 50% 30%, rgba(20,112,127,.42), transparent 76%), linear-gradient(180deg,#1B2325, var(--bg) 70%)}
+.hero__in{position:relative; width:100%; display:flex; flex-direction:column; padding-top:96px; padding-bottom:clamp(40px,8svh,96px)}
+.hero__arch{--arch-bg:#123138; align-self:center; flex:none; height:clamp(220px, 36vh, 380px); height:clamp(220px, 36svh, 380px); margin-bottom:clamp(26px,4svh,44px)}
+.arch__land{position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:58% 55%; filter:sepia(.85) hue-rotate(148deg) saturate(1.25) brightness(.58) contrast(1.08)}
+.lens .arch__land{filter:sepia(.4) hue-rotate(150deg) saturate(1.15) brightness(.9) contrast(1.04)}
+.hero__arch.is-lensing{cursor:none}
+.hero__q{max-width:19ch; margin:0 0 30px -.04em; font-size:clamp(33px,4.7vw,78px); line-height:1.04; letter-spacing:-.042em; font-weight:500; text-wrap:balance}
+.hero__q .word{font-size:1.12em}
+@media (min-width:900px){
+  .hero__in{flex-direction:row-reverse; align-items:flex-end; justify-content:space-between; gap:clamp(32px,5vw,96px); padding-top:110px; padding-bottom:0}
+  .hero__copy{padding-bottom:clamp(56px,12svh,128px)}
+  .hero__arch{align-self:flex-end; height:min(78vh, 740px, 56vw); height:min(78svh, 740px, 56vw); margin:0 clamp(0px,2vw,40px) 0 0}
+  .hero__light{background:radial-gradient(30% 56% at 74% 68%, rgba(20,112,127,.5), transparent 78%), linear-gradient(180deg,#1B2325, var(--bg) 72%)}
+}
+.js .hero__light{opacity:0}
+.hero-in .hero__light{opacity:1; transition:opacity 1.8s var(--expo)}
+.js .hero .arch__in{clip-path:inset(100% 0 0 0)}
+.hero-in .hero .arch__in{clip-path:inset(0 0 0 0); transition:clip-path 1.9s var(--expo) .35s}
+.js .hero .arch__land{transform:scale(1.18)}
+.hero-in .hero .arch__land{transform:none; transition:transform 2.8s var(--expo) .35s}
+.js .hero .arch__line path{stroke-dashoffset:1}
+.hero-in .hero .arch__line .arch__main{stroke-dashoffset:0; transition:stroke-dashoffset 2.6s var(--fil-io) .1s}
+.hero-in .hero .arch__line .arch__ghost{stroke-dashoffset:0; transition:stroke-dashoffset 3s var(--fil-io) .5s}
+.js .hero .arch__ground{transform:scaleX(0)}
+.hero-in .hero .arch__ground{transform:none; transition:transform 2s var(--expo) .1s}
+.js .hero [data-anim]{opacity:0; transform:translateY(16px)}
+.hero-in .hero [data-anim]{opacity:1; transform:none; transition:opacity 1s var(--expo) var(--ad, 1.3s), transform 1.2s var(--expo) var(--ad, 1.3s)}
+
+/* =========================================================
+   2. La démo : le visiteur valide
+   ========================================================= */
+.demo{position:relative; padding:clamp(96px,10vw,120px) 0 clamp(96px,9vw,120px); background:radial-gradient(60% 45% at 50% 58%, rgb(var(--dusk) / .08), transparent 72%)}
+.demo__q{max-width:21ch; margin:0 auto clamp(26px,3vw,38px); text-align:center; font-size:clamp(29px,3.5vw,52px); line-height:1.07; letter-spacing:-.035em; font-weight:500; text-wrap:balance}
+.demo__q .word{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+/* Le plateau (portrait par défaut, paysage dès 900 px) */
+.ag{position:relative; width:100%; max-width:540px; margin-inline:auto; aspect-ratio:100 / 128; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 60px 110px -50px rgba(0,0,0,.9)}
+.ag__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgb(var(--dusk) / .15), transparent 70%), linear-gradient(180deg,#22201E,#191817); box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ag__core::before{content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(rgba(244,239,230,.08) 1px, transparent 1.3px); background-size:4cqw 4cqw;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 45%, #000, transparent); mask-image:radial-gradient(70% 60% at 50% 45%, #000, transparent)}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.ag-wires path{fill:none; stroke:rgba(244,239,230,.34); stroke-width:1.2; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#2A2724;
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.13), 0 2cqw 5cqw -2cqw rgba(0,0,0,.6)}
+.ag-src > svg{flex:none; width:4.4cqw; height:4.4cqw; color:var(--muted); fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.ag-src > span{font-size:max(10.5px,3.3cqw); line-height:1.2; font-weight:500; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-dup{opacity:0; visibility:hidden; background:#2A2724}
+.ag-dup > em{position:absolute; top:1.5cqw; right:2.6cqw; font-family:var(--f-word); font-style:italic; font-size:max(11px,3.2cqw); line-height:1; color:var(--faint)}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:var(--ok); box-shadow:0 0 0 .7cqw #1E1C1A}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#1A1918; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
+
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2cqw; border-radius:99px; background:#24221F; box-shadow:inset 0 0 0 1px rgba(244,239,230,.15); font-size:max(11px,3.5cqw); line-height:1; font-weight:500; white-space:nowrap}
+.ag-node > svg{flex:none; width:4.2cqw; height:4.2cqw; color:var(--muted); fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1px rgba(126,198,208,.8), 0 0 6cqw rgba(94,158,168,.42); opacity:0; pointer-events:none}
+.ag-node--v{left:8cqw; top:30cqw; width:36cqw; height:10cqw}
+.ag-node--c{left:50cqw; top:30cqw; width:42cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(18px,5.8cqw); background:#0F3D45}
+.ag-node--h .ag-glow{opacity:1}
+
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:37cqw; transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:var(--creme); color:#1A1918; box-shadow:0 4cqw 10cqw -4cqw rgba(0,0,0,.8)}
+.ag-note__t{font-size:max(12.5px,4.3cqw); line-height:1.3; font-weight:600; letter-spacing:-.02em; margin-bottom:1.6cqw}
+.ag-line{display:flex; align-items:center; gap:2.4cqw; padding:2.3cqw 0; border-top:1px solid rgba(26,25,24,.1)}
+.ag-line i{flex:0 1 var(--w, 60%); height:1.6cqw; border-radius:1cqw; background:rgba(26,25,24,.16)}
+.ag-line span{margin-left:auto; font-size:max(10px,2.9cqw); line-height:1.2; font-weight:500; color:#4D4842; white-space:nowrap}
+.ag-line b{position:relative; flex:none; width:3.6cqw; height:3.6cqw; border-radius:50%; background:#1F7A4D}
+.ag-line b svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:var(--creme); stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
+
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:var(--ok); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-size:max(16px,4.8cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:108cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:var(--creme); font-size:max(19px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), 0 3cqw 8cqw -3cqw rgba(232,50,43,.7); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok::after{content:""; position:absolute; inset:-6px; border-radius:inherit}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--creme); outline-offset:4px}
+
+/* Après le clic */
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{left:50%; bottom:3.5%; translate:-50% 0}
+
+/* Le sous-titre de la démo : une ligne, qui change à chaque temps */
+.ag-caps{position:absolute; left:0; right:0; top:calc(100% + 18px); display:grid; justify-items:center; text-align:center; pointer-events:none}
+.ag-cap{grid-area:1 / 1; max-width:30ch; font-size:16px; line-height:1.35; color:var(--muted); opacity:0; filter:blur(6px); transform:translateY(6px); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.ag-cap b{font-weight:600; color:var(--creme)}
+.ag-cap.is-on{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo) .1s, filter .9s var(--expo) .1s, transform 1.1s var(--expo) .1s}
+
+@media (min-width:900px){
+  .demo{padding-bottom:clamp(72px,7vw,104px)}
+  .ag{aspect-ratio:16 / 9; max-width:none; width:min(100%, 1120px, max(720px, calc((100vh - 330px) * 1.7778))); border-radius:40px}
+  @supports (height:100svh){ .ag{width:min(100%, 1120px, max(720px, calc((100svh - 330px) * 1.7778)))} }
+  .ag__core{border-radius:34px}
+  .ag__core::before{background-size:2.2cqw 2.2cqw}
+  .ag-src{width:23cqw; height:8cqw; flex-direction:row; align-items:center; justify-content:flex-start; gap:1.1cqw; padding:0 1.8cqw; border-radius:1.9cqw; box-shadow:inset 0 0 0 1px rgba(244,239,230,.13), 0 1.2cqw 3cqw -1.2cqw rgba(0,0,0,.6)}
+  .ag-src > svg{width:2.2cqw; height:2.2cqw}
+  .ag-src > span{font-size:max(13px,1.45cqw)}
+  .ag-src--0,.ag-src--1,.ag-src--2{left:6cqw}
+  .ag-src--0{top:11cqw} .ag-src--1{top:23.5cqw} .ag-src--2{top:36cqw}
+  .ag-dup > em{top:50%; right:1.8cqw; transform:translateY(-50%); font-size:max(14px,1.5cqw)}
+  .ag-tick{top:-.9cqw; right:-.9cqw; width:2.6cqw; height:2.6cqw; box-shadow:0 0 0 .35cqw #1E1C1A}
+  .ag-node{gap:.9cqw; font-size:max(14px,1.6cqw)}
+  .ag-node > svg{width:2cqw; height:2cqw}
+  .ag-glow{box-shadow:0 0 0 1px rgba(126,198,208,.8), 0 0 3cqw rgba(94,158,168,.4)}
+  .ag-node--v{left:39cqw; top:11.75cqw; width:19cqw; height:6.5cqw}
+  .ag-node--c{left:39cqw; top:24.25cqw; width:19cqw; height:6.5cqw}
+  .ag-node--h{left:38cqw; top:36cqw; width:21cqw; height:8cqw; font-size:max(22px,2.7cqw)}
+  .ag-noteW{left:66.5cqw; right:auto; width:28cqw; top:9.5cqw; height:27cqw}
+  .ag-note{padding:2.3cqw 2.5cqw; border-radius:1.8cqw; box-shadow:0 2cqw 5cqw -2cqw rgba(0,0,0,.8)}
+  .ag-note__t{font-size:max(16px,1.9cqw); margin-bottom:1cqw}
+  .ag-line{gap:1.2cqw; padding:1.6cqw 0}
+  .ag-line i{height:.85cqw; border-radius:.5cqw}
+  .ag-line span{font-size:max(12px,1.25cqw)}
+  .ag-line b{width:1.8cqw; height:1.8cqw}
+  .ag-done{left:80.5cqw; top:13cqw; width:11cqw; height:11cqw; margin-left:-5.5cqw}
+  .ag-sent{left:66.5cqw; right:auto; width:28cqw; top:27cqw; font-size:max(17px,1.9cqw)}
+  .ag__okW{left:69cqw; right:auto; width:23cqw; top:39.5cqw}
+  .ag__ok{height:6.8cqw; font-size:max(18px,2cqw); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), 0 1.4cqw 4cqw -1.4cqw rgba(232,50,43,.7)}
+  .ag .replay{left:80%; bottom:5%}
+  .ag-caps{top:auto; bottom:4.6%; left:18%; right:18%}
+  .ag-cap{font-size:17px; max-width:none}
+}
+
+/* =========================================================
+   3. La promesse (les mots s'allument au défilement)
+   ========================================================= */
+.promise{padding:calc(var(--sec) * .55) 0 calc(var(--sec) * .5)}
+.promise .say{max-width:23ch; font-size:clamp(30px,4.2vw,62px)}
+
+/* =========================================================
+   4. Six besoins : des questions qui se déplient (une à la fois)
+   ========================================================= */
+.needs{padding:calc(var(--sec) * .5) 0 var(--sec)}
+.needs__t{margin-bottom:clamp(28px,4vw,56px)}
+.qs{border-top:1px solid var(--line)}
+.q{position:relative; border-bottom:1px solid var(--line); will-change:auto}
+.q__h{font:inherit}
+.q__btn{position:relative; display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; min-height:84px; padding:24px 0; text-align:left; color:rgba(244,239,230,.68); transition:color .5s var(--expo)}
+.q__btn::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:rgba(244,239,230,.7); transform:scaleX(0); transform-origin:left; transition:transform .24s var(--out)}
+.q__btn:hover::after{transform:scaleX(1); transition:transform .9s var(--expo)}
+.q__t{max-width:30ch; font-size:clamp(22px,2.9vw,42px); line-height:1.12; letter-spacing:-.032em; font-weight:500; text-wrap:balance}
+.q__t .word{transition:text-shadow .8s var(--expo)}
+.q__ico{position:relative; flex:none; width:46px; height:46px; border-radius:50%; color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.22); transition:background .5s var(--expo), color .5s var(--expo), transform .8s var(--expo)}
+.q__ico::before,.q__ico::after{content:""; position:absolute; left:50%; top:50%; width:14px; height:1.5px; margin:-.75px 0 0 -7px; border-radius:2px; background:currentColor}
+.q__ico::after{transform:rotate(90deg)}
+.q__btn:hover{color:var(--creme)}
+.q__btn:hover .q__ico{background:rgba(244,239,230,.08)}
+.q__btn:active .q__ico{transform:scale(.94)}
+.q.is-open .q__btn{color:var(--creme)}
+.q.is-open .q__ico{background:var(--creme); color:var(--ink); transform:rotate(135deg)}
+.q__btn:hover .word,.q.is-open .word{text-shadow:0 0 .5em rgb(var(--dusk) / .5), 0 0 1.4em rgb(var(--dusk) / .22)}
+
+.q__p{padding:2px 0 clamp(22px,3vw,40px)}
+.q__card{border-radius:28px; padding:6px; background:rgba(244,239,230,.035); box-shadow:inset 0 0 0 1px rgba(244,239,230,.075)}
+.q__core{display:grid; gap:26px; padding:clamp(22px,3vw,40px); border-radius:22px; background:linear-gradient(180deg,#24221F,#1C1A19); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.q__need{font-size:clamp(19px,1.8vw,26px); line-height:1.32; letter-spacing:-.022em; font-weight:500; text-wrap:pretty}
+.q__again{margin-top:10px}
+.q__lbl{margin-bottom:8px; font-size:18px}
+.q__list li{position:relative; padding:9px 0 9px 26px; font-size:15.5px; line-height:1.42; color:var(--muted); border-top:1px solid var(--line-2)}
+.q__list li:first-child{border-top:0; padding-top:2px}
+.q__list li::before{content:""; position:absolute; left:2px; top:calc(9px + .38em); width:10px; height:5px; border-left:1.5px solid var(--ok); border-bottom:1.5px solid var(--ok); transform:rotate(-45deg)}
+.q__list li:first-child::before{top:calc(2px + .38em)}
+.q__human{font-size:19px; line-height:1.36; letter-spacing:-.015em; font-weight:500}
+.q__val{margin-top:14px; padding-top:14px; border-top:1px solid var(--line-2); font-size:14.5px; line-height:1.55; color:var(--faint)}
+.q__val strong{font-weight:500; color:var(--muted)}
+@media (min-width:900px){
+  .q__btn{min-height:104px; padding:30px 0}
+  .q__ico{width:52px; height:52px}
+  .q__core{grid-template-columns:5fr 4fr 3.4fr; gap:clamp(28px,3.4vw,56px)}
+}
+.js .q__card{clip-path:inset(0 0 100% 0 round 28px)}
+.js .q.is-open .q__card{clip-path:inset(0 0 0 0 round 28px); transition:clip-path 1s var(--expo)}
+.js .q__core > *{opacity:0; filter:blur(6px); transform:translateY(16px)}
+.js .q.is-open .q__core > *{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.1s var(--expo); transition-delay:calc(.12s + var(--d, 0) * 90ms)}
+
+/* =========================================================
+   5. Comment on avance
+   ========================================================= */
+.steps{padding:var(--sec) 0}
+.steps__list{position:relative; display:grid; gap:44px; margin-top:clamp(40px,5vw,72px); padding-left:40px}
+.steps__line{position:absolute; left:6px; top:12px; bottom:12px; width:1px; background:var(--line)}
+.steps__line i{position:absolute; inset:0; background:linear-gradient(180deg, rgba(244,239,230,.9), rgb(var(--dusk))); transform-origin:top; transform:scaleY(var(--sp, 1))}
+.step{position:relative; max-width:16ch; font-size:clamp(26px,3vw,42px); line-height:1.12; letter-spacing:-.03em; font-weight:500; color:var(--creme); transition:color .8s var(--expo)}
+.step::before{content:""; position:absolute; left:-40px; top:.42em; width:13px; height:13px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.5); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.step.is-lit::before{background:var(--creme); box-shadow:0 0 0 5px rgb(var(--dusk) / .14), 0 0 18px rgb(var(--dusk) / .6)}
+.has-scrub .step:not(.is-lit){color:rgba(244,239,230,.32)}
+@media (min-width:900px){
+  .steps__list{grid-template-columns:repeat(3,1fr); gap:40px; padding:44px 0 0}
+  .steps__line{left:6px; right:6px; top:6px; bottom:auto; width:auto; height:1px}
+  .steps__line i{background:linear-gradient(90deg, rgba(244,239,230,.9), rgb(var(--dusk))); transform-origin:left; transform:scaleX(var(--sp, 1))}
+  .step::before{left:0; top:-44px}
+}
+
+/* =========================================================
+   6. Contact
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:13.5px; font-weight:500; color:var(--muted)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:rgba(0,0,0,.24); box-shadow:inset 0 0 0 1px rgba(244,239,230,.14); font-size:16px; line-height:1.4; color:var(--creme); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:rgba(244,239,230,.42)}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(244,239,230,.26)}
+.input:focus-visible{box-shadow:inset 0 0 0 1px rgba(244,239,230,.6), 0 0 0 4px rgba(244,239,230,.1)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1px rgba(242,180,90,.9)}
+textarea.input{min-height:132px; resize:vertical}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; color:var(--muted); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); transition:background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo)}
+.choice input:hover + span{color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.34)}
+.choice input:checked + span{background:var(--creme); color:var(--ink); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--creme); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1px rgba(242,180,90,.7)}
+.field__err{font-size:13px; color:#F2C48A}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 7px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:var(--creme); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{outline:none; font-size:clamp(28px,3vw,40px); line-height:1.1; letter-spacing:-.03em; font-weight:500}
+.form__ok p{max-width:34ch; color:var(--muted)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+/* =========================================================
+   Pied de page (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:40px var(--gr) calc(40px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot a{color:var(--muted)}
+.foot a:hover{color:var(--creme)}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js .hero .arch__in{clip-path:none !important}
+  .js .hero .arch__land,.js .hero .arch__ground{transform:none !important}
+  .js .hero .arch__line path{stroke-dashoffset:0 !important}
+  .js [data-words] .w,.js [data-reveal],.js .hero [data-anim],.js .q__core > *,.form__ok,.ag-sent,.ag-cap{transform:none !important; filter:none !important}
+  .js [data-sweep]{clip-path:none; filter:none; opacity:0; transition:opacity .4s}
+  .js [data-sweep].is-in{opacity:1; transition:opacity 1s var(--expo)}
+  .js .q__card,.js .q.is-open .q__card{clip-path:none}
+  .ag.is-sent .ag-noteW{transform:none}
+  .q.is-open .q__ico{transform:none}
+  .q.is-open .q__ico::after{opacity:0}
+  .btn,.btn__ico,.choice span,.replay svg,.q__ico,.ag__ok{transition-property:opacity,background,color,box-shadow}
+}
+/* =========================================================
+   LE FIL — couche commune aux quatre pages
+   Le fil lumineux relie les chapitres : un rail fixe à gauche (grand écran), un trait qui
+   descend dans chaque chapitre, les arches qu'il dessine autour des portraits, la lentille.
+   ========================================================= */
+:root{--fil-io:cubic-bezier(.65,0,.35,1)}
+
+/* ---------- Barre flottante : une pilule de verre, détachée du haut. Le point reste un simple point. ---------- */
+.nav{padding-top:max(10px, env(safe-area-inset-top))}
+.nav::before{display:none}
+.nav__in{width:min(1200px, calc(100% - 20px)); margin-inline:auto; height:60px; padding:0 6px 0 22px; border-radius:999px; isolation:isolate}
+.nav__in::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
+  background:rgba(26,25,24,.62); -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.09), inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -22px rgba(0,0,0,.7);
+  opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled .nav__in::before{opacity:1}
+@media (max-width:600px){ .nav__in{height:56px; padding-left:18px; padding-right:5px} }
+
+/* ---------- Le rail : le fil vertical, fixe, à gauche (grand écran, mouvement autorisé) ---------- */
+.fil-rail{display:none}
+@media (min-width:1100px){
+  .fil-on .fil-rail{display:block; position:fixed; z-index:40; left:26px; top:21vh; bottom:27vh; width:1px; pointer-events:none;
+    background:linear-gradient(180deg, rgba(244,239,230,0), rgba(244,239,230,.1) 10%, rgba(244,239,230,.1) 90%, rgba(244,239,230,0))}
+}
+.fil-rail__fill{position:absolute; inset:0; transform-origin:50% 0; transform:scaleY(var(--fp,0));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .85) 14%, rgb(var(--fil))); box-shadow:0 0 10px rgb(var(--fil) / .5)}
+.fil-rail__knots{position:absolute; inset:0}
+.fil-rail__k{position:absolute; left:-3px; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.36);
+  transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.fil-rail__k.is-lit{background:rgb(var(--fil)); box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 10px rgb(var(--fil) / .7)}
+.fil-rail__head{position:absolute; left:-4px; top:-4px; width:9px; height:9px; border-radius:50%; background:#FFF8EC;
+  box-shadow:0 0 0 3px rgb(var(--fil) / .22), 0 0 16px 3px rgb(var(--fil) / .75); transform:translateY(calc(var(--fp,0) * var(--rh,0px)))}
+
+/* ---------- Le fil de chapitre : un trait qui descend dans le chapitre, tracé au défilement ---------- */
+.fil-drop{position:absolute; z-index:1; top:0; left:var(--gl); width:7px; height:calc(var(--sec, 120px) * .6); margin-left:-3px; pointer-events:none; --dp:1}
+.fil-drop::before{content:""; position:absolute; left:3px; top:0; bottom:3px; width:1px; transform-origin:50% 0; transform:scaleY(var(--dp));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .9)); box-shadow:0 0 8px rgb(var(--fil) / .45)}
+.fil-drop::after{content:""; position:absolute; left:0; bottom:0; width:7px; height:7px; border-radius:50%; background:rgb(var(--fil));
+  box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 12px 2px rgb(var(--fil) / .6); opacity:clamp(0, calc(var(--dp) * 6 - 5), 1); transform:scale(clamp(.3, calc(var(--dp) * 4 - 3), 1))}
+.fil-drop--c{left:50%}
+
+/* ---------- L'arche : un portrait dans une arche, dessinée par le fil ---------- */
+.arch{position:relative; margin:0; aspect-ratio:5 / 7; isolation:isolate}
+.arch__in{position:absolute; inset:0; overflow:hidden; border-radius:999px 999px 0 0; background:var(--arch-bg, #201E1D)}
+.arch__in::after{content:""; position:absolute; left:0; right:0; bottom:0; height:24%; pointer-events:none; background:linear-gradient(180deg, rgba(26,25,24,0), var(--bg))}
+.arch__img{position:absolute; left:50%; top:var(--arch-top, 6%); height:var(--arch-h, 118%); width:auto; max-width:none; translate:-50% 0; -webkit-user-select:none; user-select:none; -webkit-user-drag:none}
+.arch__line{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none}
+.arch__line path{fill:none; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.arch__main{stroke:rgb(var(--fil)); stroke-width:2; filter:drop-shadow(0 0 5px rgb(var(--fil) / .75))}
+.arch__ghost{stroke:rgba(244,239,230,.16); stroke-width:1.6}
+.arch__ground{position:absolute; left:-34%; right:-34%; bottom:0; height:1px; pointer-events:none;
+  background:linear-gradient(90deg, rgb(var(--fil) / 0), rgb(var(--fil) / .7) 32%, rgb(var(--fil) / .7) 68%, rgb(var(--fil) / 0)); box-shadow:0 0 10px rgb(var(--fil) / .4)}
+
+/* ---------- La lentille (décorative) : une loupe qui suit la souris ---------- */
+.lens{position:fixed; inset:0; z-index:46; pointer-events:none; visibility:hidden; transition:visibility 0s .6s}
+.lens.is-on{visibility:visible; transition:none}
+.lens__body{position:absolute; left:0; top:0; width:var(--ls, 184px); height:var(--ls, 184px); will-change:transform}
+.lens__disc{position:absolute; inset:0; overflow:hidden; border-radius:50%; background:var(--lens-bg, var(--bg)); clip-path:circle(0% at 50% 50%); transition:clip-path .3s var(--out)}
+.lens.is-on .lens__disc{clip-path:circle(50% at 50% 50%); transition:clip-path .8s var(--expo)}
+.lens__in{position:absolute; inset:0}
+.lens__clone{position:absolute !important; left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; margin:0 !important; transform-origin:0 0; translate:none !important}
+.lens__img{position:absolute; left:-14%; top:-14%; width:128%; height:128%; max-width:none; object-fit:cover; object-position:50% 30%}
+.lens__ring{position:absolute; inset:0; border-radius:50%; opacity:0; transform:scale(.6);
+  box-shadow:inset 0 0 0 1.5px rgba(244,239,230,.88), 0 0 0 1px rgb(var(--fil) / .7), 0 0 34px rgb(var(--fil) / .45), 0 30px 60px -22px rgba(0,0,0,.8);
+  background:radial-gradient(circle at 32% 24%, rgba(255,255,255,.2), transparent 40%), radial-gradient(circle at 50% 50%, transparent 62%, rgba(26,25,24,.28));
+  transition:opacity .3s var(--out), transform .3s var(--out)}
+.lens.is-on .lens__ring{opacity:1; transform:none; transition:opacity .6s var(--expo), transform .9s var(--expo)}
+.lens__tether{position:absolute; left:0; top:0; width:100px; height:1px; margin-top:-.5px; transform-origin:0 50%; opacity:0;
+  background:linear-gradient(90deg, rgb(var(--fil) / .95), rgb(var(--fil) / .45)); box-shadow:0 0 6px rgb(var(--fil) / .6); transition:opacity .3s var(--out)}
+.lens.is-on.has-tether .lens__tether{opacity:1; transition:opacity .6s var(--expo) .1s}
+.is-lensing.lens-hide-cursor{cursor:none}
+
+/* ---------- Pied de page : le coin bas gauche reste libre pour l'outil de revue ---------- */
+.foot{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+
+@media (prefers-reduced-motion: reduce){
+  .fil-drop{--dp:1 !important}
+  .lens{display:none}
+}
+
+/* =========================================================
+   Agents : réglages Le fil
+   ========================================================= */
+.prog i{background:linear-gradient(90deg, rgb(var(--fil) / .2), rgb(var(--fil))); box-shadow:0 0 8px rgb(var(--fil) / .5)}
+@media (min-width:1100px){ .fil-on .prog{display:none} }
+.btn--light{box-shadow:0 16px 36px -20px rgb(var(--fil) / .6)}
+.nav__ctaIco{box-shadow:0 0 16px -4px rgb(var(--fil) / .7)}
+.demo,.needs,.steps,.promise,.contact{position:relative}
+/* La démo : des fils Lagon */
+.ag__core{background:radial-gradient(80% 50% at 50% 0%, rgba(15,93,107,.32), transparent 70%), linear-gradient(180deg,#22201E,#191817)}
+.ag-wires path{stroke:rgb(var(--fil) / .6); filter:drop-shadow(0 0 2px rgb(var(--fil) / .6))}
+/* Les besoins : la ligne de la question s'allume comme un fil */
+.q__btn::after{height:1px; background:linear-gradient(90deg, rgb(var(--fil)), rgb(var(--fil) / .4) 60%, rgb(var(--fil) / 0)); box-shadow:0 0 12px rgb(var(--fil) / .7)}
+.q.is-open .q__btn::after{transform:scaleX(1)}
+.q__card{box-shadow:inset 0 0 0 1px rgb(var(--fil) / .16)}
+/* Comment on avance (ordinateur) : épinglé, les trois temps glissent le long du fil */
+.steps.is-h{height:100vh; height:100svh; padding:0; overflow:hidden; display:flex; flex-direction:column; justify-content:center}
+.steps.is-h .wrap{max-width:none; width:100%; padding-right:0}
+.steps.is-h{-webkit-mask:linear-gradient(#000 0 0) top / 100% 44% no-repeat, linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent) bottom / 100% 56% no-repeat;
+  mask:linear-gradient(#000 0 0) top / 100% 44% no-repeat, linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent) bottom / 100% 56% no-repeat}
+.steps.is-h .steps__list{display:flex; width:max-content; gap:0; margin-top:clamp(48px,9vh,96px); padding:56px 34vw 0 0; will-change:transform}
+.steps.is-h .steps__line{left:0; right:34vw; top:6px}
+.steps.is-h .steps__line i{box-shadow:0 0 10px rgb(var(--fil) / .7)}
+.steps.is-h .step{flex:none; width:58vw; max-width:none; padding-right:10vw; font-size:clamp(46px,5.6vw,96px); line-height:1.02; letter-spacing:-.04em}
+.steps.is-h .step::before{top:-56px; width:15px; height:15px}
+.steps__line i{background:linear-gradient(90deg, rgba(244,239,230,.8), rgb(var(--fil)))}
+@media (max-width:899px){ .steps__line i{background:linear-gradient(180deg, rgba(244,239,230,.8), rgb(var(--fil))); box-shadow:0 0 8px rgb(var(--fil) / .6)} }
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+</head>
+<body>
+<a class="skip" href="#demo">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="prog" aria-hidden="true"><i></i></div>
+
+<!-- ========== Navigation (markup commun V4) ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== 1. L'arrivée ========== -->
+  <section class="hero" id="top" aria-labelledby="hero-q">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__light" aria-hidden="true"></div>
+    <div class="wrap hero__in">
+      <figure class="arch hero__arch" aria-hidden="true">
+        <div class="arch__in"><img class="arch__land" src="../assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high"></div>
+        <svg class="arch__line" viewBox="0 0 500 700"><path class="arch__ghost" pathLength="1" d="M-26 700V250A276 276 0 0 1 526 250V700"/><path class="arch__main" pathLength="1" d="M1 700V250A249 249 0 0 1 499 250V700"/></svg>
+        <i class="arch__ground"></i>
+      </figure>
+      <div class="hero__copy">
+      <h1 class="hero__q" id="hero-q" data-words data-hero-words>Et si des agents IA travaillaient pour vous, <em class="word glow">sans</em> jamais rien envoyer sans votre accord&nbsp;?</h1>
+      <a class="btn btn--light btn--down" href="#demo" data-anim>Voir comment<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 2. La démo : c'est le visiteur qui valide ========== -->
+  <section class="demo" id="demo" tabindex="-1" aria-labelledby="demo-q">
+    <span class="fil-drop fil-drop--c" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap">
+      <h2 class="demo__q" id="demo-q" data-words>Vous passez trop de temps à chercher et trier l’<em class="word">info</em>&nbsp;?</h2>
+      <div class="ag" data-agents>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Animation : trois sources arrivent, un site concurrent, un appel d’offres et un article, avec un doublon. Veille les trie et écarte le doublon, Vérification coche chaque source, puis Hermes les assemble en une note du lundi, avec une source par ligne.">
+            <svg class="ag-wires" aria-hidden="true" data-wires></svg>
+            <div class="ag-src ag-src--0" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2 ag-dup" data-dup aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><em>doublon</em></div>
+            <div class="ag-node ag-node--v" data-node><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/></svg>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c" data-node><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8.6 12.2l2.4 2.4 4.5-4.7"/></svg>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h" data-node>Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW" data-notew>
+              <div class="ag-note" data-note>
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line" style="--w:62%"><i></i><span>Site concurrent</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+                <div class="ag-line" style="--w:48%"><i></i><span>Appel d’offres</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+                <div class="ag-line" style="--w:56%"><i></i><span>Article</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW" data-okw><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <div class="ag-caps" aria-hidden="true">
+          <p class="ag-cap" data-cap>Les sources arrivent.</p>
+          <p class="ag-cap" data-cap><b>Veille</b> trie et écarte le doublon.</p>
+          <p class="ag-cap" data-cap><b>Vérification</b> coche chaque source.</p>
+          <p class="ag-cap" data-cap><b>Hermes</b> assemble la note du lundi.</p>
+          <p class="ag-cap is-on" data-cap>La note attend votre validation.</p>
+          <p class="ag-cap" data-cap>Validé. La note est partie.</p>
+        </div>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3. La promesse ========== -->
+  <section class="promise" aria-label="Ce que j’installe chez vous">
+    <div class="wrap">
+      <p class="say" data-scrub>J’installe une équipe d’agents IA chez vous. Chacun son rôle, une mémoire commune, et rien ne part sans votre <em class="word glow">validation</em>.</p>
+    </div>
+  </section>
+
+  <!-- ========== 4. Six besoins, dans les mots des clients ========== -->
+  <section class="needs" id="besoins" aria-labelledby="needs-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap">
+      <h2 class="h2 needs__t" id="needs-t" data-sweep>Et chez vous&nbsp;?</h2>
+      <div class="qs" data-qs>
+
+        <div class="q" data-q data-reveal="fade" style="--d:0">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-veille" aria-expanded="false" aria-controls="qp-veille"><span class="q__t">Vous passez trop de temps à chercher et trier l’<em class="word">info</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-veille" role="region" aria-labelledby="qb-veille" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Suivre des concurrents, des prix, des appels d’offres ou une réglementation, sans y passer ses journées.</p><a class="link q__again" href="#demo" data-redemo>Revoir la démo<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></a></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Une note datée où chaque ligne a sa source, sa date et son statut</li><li>Les critères écrits, modifiables</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Décider quoi faire de l’information.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Les critères au départ · Toute nouvelle source · Aucune action à l’extérieur</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:1">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-contenu" aria-expanded="false" aria-controls="qp-contenu"><span class="q__t">Vous voulez publier plus de contenu sans y passer vos <em class="word">soirées</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-contenu" role="region" aria-labelledby="qb-contenu" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Des vidéos courtes, des carrousels et des visuels de store réguliers, à votre charte.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Des gabarits vidéo à votre charte</li><li>Une bibliothèque de motions nommées</li><li>Le circuit documenté</li><li>Les vidéos</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">La voix, la validation et la publication.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Le script · L’aperçu · Le «&nbsp;go rendu&nbsp;» · La publication (par vous)</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:2">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-produit" aria-expanded="false" aria-controls="qp-produit"><span class="q__t">De l’IA dans votre produit, sans exploser les <em class="word">coûts</em> ni rien casser&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-produit" role="region" aria-labelledby="qb-produit" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Extraire, classer, générer ou analyser des images dans un produit existant.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un pipeline en production</li><li>Un fournisseur interchangeable</li><li>Des quotas par utilisateur</li><li>Un mode factice pour les tests</li><li>Un suivi des coûts</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Le choix du cas et l’allumage.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Le cas et son coût estimé · Le prototype · L’allumage de la fonction</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:3">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-code" aria-expanded="false" aria-controls="qp-code"><span class="q__t">Votre équipe veut des agents de code, sans perdre le <em class="word">contrôle</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-code" role="region" aria-labelledby="qb-code" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Aller plus vite avec des agents de code, sans dette ni mauvaise surprise en production.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un fichier de règles par dépôt</li><li>Un circuit de revue</li><li>Des tests et une CI comme arbitres</li><li>Un journal de session</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Le feu vert de mise en ligne.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Les règles du dépôt · Chaque mise en ligne</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:4">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-memoire" aria-expanded="false" aria-controls="qp-memoire"><span class="q__t">Personne ne sait où en est un <em class="word">dossier</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-memoire" role="region" aria-labelledby="qb-memoire" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Retrouver l’état d’un dossier en 30&nbsp;secondes, que l’on soit une personne ou un agent.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Des fiches «&nbsp;Où on en est&nbsp;»</li><li>Un journal des décisions</li><li>Un format de transmission</li><li>Une reprise en 30&nbsp;secondes</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Les décisions.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Chaque décision, datée</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:5">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-admin" aria-expanded="false" aria-controls="qp-admin"><span class="q__t">Votre back-office, c’est un <em class="word">tableur</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-admin" role="region" aria-labelledby="qb-admin" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Voir ce qui se passe vraiment, modifier des contenus sans code, allumer une fonction sans risque.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un admin lisible</li><li>Des interrupteurs de fonctions</li><li>Des tableaux de rétention J1/J7/J30</li><li>Des formulaires modifiables sans code</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Les décisions à partir des chiffres.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Chaque passage de la lecture à l’écriture</p></div>
+            </div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 5. Comment on avance ========== -->
+  <section class="steps" id="methode" aria-labelledby="steps-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap">
+      <h2 class="h2" id="steps-t" data-sweep>Comment on avance</h2>
+      <div class="steps__list" data-steps>
+        <span class="steps__line" aria-hidden="true"><i></i></span>
+        <p class="step">On en parle.</p>
+        <p class="step">Je vous montre un premier <em class="word">prototype</em>.</p>
+        <p class="step">Vous validez, je lance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 6. Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">équipe</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA" checked><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* =========================================================
+   LE FIL — module commun : le rail, les fils de chapitre, la lentille, le défilement horizontal.
+   Décoratif : tout est aria-hidden, et la page reste complète sans lui.
+   ========================================================= */
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = matchMedia('(hover: hover) and (pointer: fine)');
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  if (hasG) { G.registerPlugin(ST); if (!RM) d.classList.add('fil-on'); }
+
+  /* ---------- Le rail : un fil fixe à gauche qui s'allume au défilement, un nœud par chapitre ---------- */
+  function rail(getChapters) {
+    const none = { place() {}, kill() {} };
+    if (!hasG || RM) return none;
+    let el = $('.fil-rail');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'fil-rail';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<i class="fil-rail__fill"></i><span class="fil-rail__knots"></span><i class="fil-rail__head"></i>';
+      document.body.appendChild(el);
+    }
+    const box = $('.fil-rail__knots', el);
+    let ks = [], ps = [], p = 0;
+    const paint = () => {
+      el.style.setProperty('--fp', p.toFixed(4));
+      ks.forEach((k, i) => k.classList.toggle('is-lit', p >= ps[i] - .002));
+    };
+    const place = () => {
+      el.style.setProperty('--rh', el.offsetHeight + 'px');
+      const max = Math.max(1, ST.maxScroll(window));
+      box.textContent = '';
+      ps = getChapters().map(c => Math.min(1, Math.max(0, (c.getBoundingClientRect().top + scrollY - innerHeight * .5) / max)));
+      ks = ps.map(v => { const k = document.createElement('i'); k.className = 'fil-rail__k'; k.style.top = (v * 100).toFixed(3) + '%'; box.appendChild(k); return k; });
+      paint();
+    };
+    const st = ST.create({ start: 0, end: 'max', onUpdate: s => { p = s.progress; paint(); } });
+    ST.addEventListener('refresh', place);
+    place();
+    return { place, kill() { st.kill(); ST.removeEventListener('refresh', place); box.textContent = ''; ks = []; } };
+  }
+
+  /* ---------- Les fils de chapitre : chaque trait descend dans son chapitre au défilement ---------- */
+  function drops(root = document) {
+    const list = $$('[data-fil-drop]', root);
+    if (!hasG || RM) { list.forEach(x => x.style.setProperty('--dp', '1')); return () => {}; }
+    const tw = list.map(el => G.fromTo(el, { '--dp': 0 }, { '--dp': 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 94%', end: 'bottom 48%', scrub: .5 } }));
+    return () => tw.forEach(t => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+  }
+
+  /* ---------- La lentille : une loupe qui suit la souris (souris seulement, jamais en mouvement réduit) ---------- */
+  let L = null;
+  const lensEl = () => {
+    if (L) return L;
+    const el = document.createElement('div');
+    el.className = 'lens';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<i class="lens__tether"></i><div class="lens__body"><div class="lens__disc"><div class="lens__in"></div></div><span class="lens__ring"></span></div>';
+    document.body.appendChild(el);
+    L = { el, body: $('.lens__body', el), inner: $('.lens__in', el), tether: $('.lens__tether', el), owner: null };
+    return L;
+  };
+  function lens(host, o = {}) {
+    if (!host || RM || !FINE.matches) return () => {};
+    const S = o.scale || 1.4, off = o.offset || null;
+    let raf = 0, on = false, tx = 0, ty = 0, x = 0, y = 0, R = 92, node = null, src = null;
+    const fill = () => {
+      const l = lensEl();
+      l.owner = host;
+      l.inner.textContent = '';
+      if (o.bg) l.el.style.setProperty('--lens-bg', o.bg); else l.el.style.removeProperty('--lens-bg');
+      if (o.size) l.el.style.setProperty('--ls', o.size + 'px'); else l.el.style.removeProperty('--ls');
+      l.el.classList.toggle('has-tether', !!off);
+      if (o.src) {
+        const im = document.createElement('img');
+        im.className = 'lens__img'; im.alt = ''; im.decoding = 'async';
+        im.src = typeof o.src === 'function' ? o.src() : o.src;
+        l.inner.appendChild(im);
+        node = im; src = null;
+      } else {
+        src = (typeof o.clone === 'function' ? o.clone() : o.clone) || host;
+        node = src.cloneNode(true);
+        node.removeAttribute('id');
+        $$('[id]', node).forEach(n => n.removeAttribute('id'));
+        $$('img', node).forEach(im => { im.alt = ''; im.removeAttribute('fetchpriority'); im.loading = 'eager'; });
+        node.classList.add('lens__clone');
+        if (o.filter) node.style.filter = o.filter;
+        l.inner.appendChild(node);
+      }
+      R = (l.body.offsetWidth || 184) / 2;
+    };
+    const frame = () => {
+      raf = 0;
+      if (!L || L.owner !== host) return;
+      let ox = 0, oy = 0;
+      if (off) { ox = off[0]; oy = off[1]; if (tx + ox + R > innerWidth - 12) ox = -ox; if (ty + oy - R < 70) oy = Math.abs(oy); }
+      const gx = tx + ox, gy = ty + oy;
+      x += (gx - x) * .2; y += (gy - y) * .2;
+      L.body.style.transform = 'translate3d(' + (x - R).toFixed(1) + 'px,' + (y - R).toFixed(1) + 'px,0)';
+      if (off) {
+        const dx = x - tx, dy = y - ty, len = Math.max(0, Math.hypot(dx, dy) - R);
+        L.tether.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0) rotate(' + Math.atan2(dy, dx).toFixed(4) + 'rad) scaleX(' + (len / 100).toFixed(3) + ')';
+      }
+      if (src) {
+        const r = src.getBoundingClientRect();
+        node.style.width = r.width + 'px';
+        node.style.height = r.height + 'px';
+        node.style.transform = 'translate3d(' + (R - S * (x - r.left)).toFixed(1) + 'px,' + (R - S * (y - r.top)).toFixed(1) + 'px,0) scale(' + S + ')';
+      } else if (node) {
+        const r = host.getBoundingClientRect();
+        const px = (tx - r.left) / Math.max(1, r.width) - .5, py = (ty - r.top) / Math.max(1, r.height) - .5;
+        node.style.transform = 'translate3d(' + (-px * 18).toFixed(2) + '%,' + (-py * 12).toFixed(2) + '%,0)';
+      }
+      if (on || Math.abs(gx - x) > .4 || Math.abs(gy - y) > .4) raf = requestAnimationFrame(frame);
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const enter = e => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      fill();
+      tx = e.clientX; ty = e.clientY;
+      x = tx + (off ? off[0] : 0); y = ty + (off ? off[1] : 0);
+      on = true;
+      L.el.classList.add('is-on');
+      host.classList.add('is-lensing');
+      kick();
+    };
+    const move = e => { if (!on) return; tx = e.clientX; ty = e.clientY; kick(); };
+    const leave = () => {
+      if (!on) return;
+      on = false;
+      if (L && L.owner === host) L.el.classList.remove('is-on');
+      host.classList.remove('is-lensing');
+    };
+    const onScroll = () => { if (on) kick(); };
+    host.addEventListener('pointerenter', enter);
+    host.addEventListener('pointermove', move);
+    host.addEventListener('pointerleave', leave);
+    addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      leave();
+      host.removeEventListener('pointerenter', enter);
+      host.removeEventListener('pointermove', move);
+      host.removeEventListener('pointerleave', leave);
+      removeEventListener('scroll', onScroll);
+    };
+  }
+
+  /* ---------- Défilement horizontal épinglé : la piste glisse, le fil la traverse (ordinateur seulement) ---------- */
+  function hscroll(sec, track, o = {}) {
+    const dist = () => Math.max(0, track.scrollWidth - (o.viewport ? o.viewport.clientWidth : sec.clientWidth));
+    return G.to(track, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: {
+        trigger: sec, start: 'top top', end: () => '+=' + Math.max(dist() * (o.factor || 1), innerHeight * (o.min || 1)),
+        pin: true, scrub: o.scrub || .7, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: o.priority || 0,
+        onUpdate: o.onUpdate
+      }
+    });
+  }
+
+  window.KzFil = { rail, drops, lens, hscroll, hasG, RM };
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+  let replayDemo = null;
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  safe('split', () => $$('[data-words],[data-scrub]').forEach(splitWords));
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  /* Un élément masqué par clip-path ne « dépasse » jamais le seuil : on observe alors son parent */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      (en.target._rev || [en.target]).forEach(el => el.classList.add('is-in'));
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal],[data-sweep]').forEach(el => {
+    if (el.closest('.hero')) return;
+    if (el.matches('[data-sweep]') && el.parentElement) { const p = el.parentElement; (p._rev = p._rev || []).push(el); io.observe(p); }
+    else io.observe(el);
+  });
+
+  /* ---------- 1. Entrée de la question : après le passage ou la porte, sinon au chargement ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn);
+  document.addEventListener('porte:arrivee', heroIn);
+  if (window.__kzArrivee) {
+    setTimeout(heroIn, 2500);
+    /* shared/passage.js absent : rien ne viendra, on joue tout de suite */
+    if (window.__kzArrivee === 'passage') document.addEventListener('DOMContentLoaded', () => { if (!window.Passage) heroIn(); });
+  } else {
+    requestAnimationFrame(() => setTimeout(heroIn, 60));
+  }
+
+  /* ---------- Nav : fond au défilement ; repère : barre de lecture ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+  safe('prog', () => {
+    const bar = $('.prog i');
+    let raf = 0;
+    const upd = () => {
+      raf = 0;
+      const m = d.scrollHeight - innerHeight;
+      bar.style.transform = 'scaleX(' + (m > 0 ? Math.min(1, Math.max(0, scrollY / m)) : 0).toFixed(4) + ')';
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener('resize', upd);
+    upd();
+  });
+
+  /* ---------- Ancres internes ---------- */
+  function goTo(t) {
+    const y = t.id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY;
+    window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  }
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    goTo(t);
+    if (l.hasAttribute('data-redemo') && replayDemo) setTimeout(replayDemo, RM ? 0 : 750);
+  });
+
+  /* =========================================================
+     2. La démo : les sources tombent, Veille trie, Vérification coche,
+        Hermes assemble. C'est le visiteur qui clique « Valider ».
+     État final = CSS par défaut ; GSAP pose le départ et joue vers lui.
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const art = $('.ag__art', ag), svg = $('[data-wires]', ag);
+    const srcs = $$('[data-src]', ag), dup = $('[data-dup]', ag), ticks = $$('[data-tick]', ag);
+    const nodes = $$('[data-node]', ag), glows = nodes.map(n => $('.ag-glow', n));
+    const noteW = $('[data-notew]', ag), note = $('[data-note]', ag), title = $('.ag-note__t', ag), lines = $$('.ag-line', ag);
+    const okW = $('[data-okw]', ag), ok = $('[data-ok]', ag), rb = $('[data-replay]', ag);
+    const caps = $$('[data-cap]', ag), live = $('[data-ag-live]', ag);
+    const setCap = i => caps.forEach((c, k) => c.classList.toggle('is-on', k === i));
+
+    /* Les fils : calculés depuis la position de repos des éléments (offset*, sans les transformations) */
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = () => { const p = document.createElementNS(NS, 'path'); p.setAttribute('pathLength', '1'); svg.appendChild(p); return p; };
+    const W = { src: srcs.map(mk), vc: mk(), ch: mk(), hn: mk() };
+    const box = el => ({ l: el.offsetLeft, t: el.offsetTop, r: el.offsetLeft + el.offsetWidth, b: el.offsetTop + el.offsetHeight, cx: el.offsetLeft + el.offsetWidth / 2, cy: el.offsetTop + el.offsetHeight / 2 });
+    const link = (a, b) => {
+      const A = box(a), B = box(b);
+      if (B.l >= A.r - 2) { const mx = (A.r + B.l) / 2; return 'M' + A.r + ' ' + A.cy + 'C' + mx + ' ' + A.cy + ' ' + mx + ' ' + B.cy + ' ' + B.l + ' ' + B.cy; }
+      const my = (A.b + B.t) / 2;
+      return 'M' + A.cx + ' ' + A.b + 'C' + A.cx + ' ' + my + ' ' + B.cx + ' ' + my + ' ' + B.cx + ' ' + B.t;
+    };
+    const drawWires = () => {
+      svg.setAttribute('viewBox', '0 0 ' + art.clientWidth + ' ' + art.clientHeight);
+      srcs.forEach((s, i) => W.src[i].setAttribute('d', link(s, nodes[0])));
+      W.vc.setAttribute('d', link(nodes[0], nodes[1]));
+      W.ch.setAttribute('d', link(nodes[1], nodes[2]));
+      W.hn.setAttribute('d', link(nodes[2], noteW));
+    };
+    drawWires();
+
+    const land = () => matchMedia('(min-width: 900px)').matches;
+    /* Le désordre de départ, en « places » le long de la colonne (s), en travers (p, %) et en rotation (r) */
+    const MESSY = [{ s: 1, p: 14, r: -6 }, { s: 2, p: -10, r: 5 }, { s: 0, p: 12, r: -4 }];
+    const DUP = { s: 1.6, p: 32, r: 7 }, DUP_PORTRAIT = { s: 1.45, p: 92, r: 6 };
+    let tl = null, mode = null, started = false, seen = false;
+
+    const ready = () => {
+      seen = true;
+      setCap(4);
+      live.textContent = 'La note du lundi est prête. Elle attend votre validation.';
+    };
+
+    function build() {
+      if (tl) tl.kill();
+      mode = land();
+      const all = [...srcs, dup];
+      const h = srcs[0].offsetHeight, w = srcs[0].offsetWidth;
+      const step = mode ? (srcs[1].offsetTop - srcs[0].offsetTop) / h * 100 : (srcs[1].offsetLeft - srcs[0].offsetLeft) / w * 100;
+      const at = (o, i) => mode ? { x: o.p, y: (o.s - i) * step } : { x: (o.s - i) * step, y: o.p };
+      const cfg = [...MESSY.map((o, i) => ({ ...at(o, i), r: o.r })), { ...at(mode ? DUP : DUP_PORTRAIT, 2), r: (mode ? DUP : DUP_PORTRAIT).r }];
+      all.forEach((el, i) => {
+        const c = cfg[i];
+        /* au départ, chaque carte est juste au-dessus du cadre : elle tombe */
+        const topPx = el.offsetTop + c.y / 100 * el.offsetHeight;
+        c.y0 = c.y - (topPx + el.offsetHeight * 1.15) / el.offsetHeight * 100;
+        el._c = c;
+      });
+      const rad = getComputedStyle(note).borderTopLeftRadius || '14px';
+      G.set(all, { xPercent: (i, el) => el._c.x, yPercent: (i, el) => el._c.y0, rotation: (i, el) => el._c.r * 1.8, opacity: 0, scale: 1, filter: 'blur(0px)', visibility: 'visible' });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set([...W.src, W.vc, W.ch, W.hn], { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .35 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0% round ' + rad + ')' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { autoAlpha: 0, y: 12, scale: .965 });
+      setCap(-1);
+      tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' }, onComplete: ready })
+        .call(setCap, [0], 0)
+        .to(all, { opacity: 1, yPercent: (i, el) => el._c.y, rotation: (i, el) => el._c.r, duration: 1, stagger: .14 }, .1)
+        .call(setCap, [1], 1.3)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.3)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.35)
+        .to(dup, { autoAlpha: 0, scale: .8, filter: 'blur(6px)', duration: .55, ease: 'power2.in' }, 1.6)
+        .to(srcs, { xPercent: 0, yPercent: 0, rotation: 0, duration: .75, ease: 'power3.inOut', stagger: .06 }, 1.65)
+        .to(W.src, { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, 2.25)
+        .to(W.vc, { strokeDashoffset: 0, duration: .35, ease: 'power2.out' }, 2.6)
+        .call(setCap, [2], 2.75)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.75)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.75)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.75)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .16 }, 2.9)
+        .to(W.ch, { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 3.45)
+        .call(setCap, [3], 3.7)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 3.7)
+        .to(glows[1], { opacity: 0, duration: .4 }, 3.7)
+        .to(glows[2], { opacity: 1, duration: .5 }, 3.7)
+        .to(W.hn, { strokeDashoffset: 0, duration: .35, ease: 'power2.out' }, 3.9)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round ' + rad + ')', duration: 1 }, 4.05)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 4.2)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 4.35)
+        .call(setCap, [4], 5)
+        .to(okW, { autoAlpha: 1, y: 0, scale: 1, duration: 1.1 }, 5);
+    }
+
+    const animated = hasG && !RM;
+    if (animated) build(); else ready();
+
+    const playNow = () => { if (!tl) return; started = true; seen = false; setCap(0); tl.restart(); };
+
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      setCap(5);
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => {
+        rb.classList.add('is-on');
+        if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true });
+      }, RM ? 300 : 1900);
+    });
+
+    replayDemo = () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (animated) playNow(); else ready();
+    };
+    rb.addEventListener('click', replayDemo);
+
+    if (animated) {
+      const o = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        if (!started) setTimeout(playNow, 200);
+      }, { threshold: .4 });
+      o.observe(ag);
+    }
+
+    /* Redimensionnement : fils recalculés ; changement portrait ↔ paysage : on reconstruit */
+    let rt = 0;
+    new ResizeObserver(() => {
+      cancelAnimationFrame(rt);
+      rt = requestAnimationFrame(() => {
+        drawWires();
+        if (!animated || land() === mode) return;
+        build();
+        if (started) { tl.progress(1, true); ready(); if (ag.classList.contains('is-sent')) setCap(5); }
+      });
+    }).observe(art);
+  });
+
+  /* ---------- 3. La promesse : les mots s'allument au défilement ---------- */
+  safe('scrub', () => {
+    if (!hasG || RM) return;
+    const el = $('[data-scrub]');
+    G.fromTo(el.querySelectorAll('.w'), { opacity: .14 }, { opacity: 1, ease: 'none', stagger: .1, scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 48%', scrub: .6 } });
+  });
+
+  /* ---------- 4. Les besoins : une seule réponse ouverte à la fois ---------- */
+  safe('questions', () => {
+    const head = $('#needs-t');
+    const items = $$('[data-q]').map(el => ({ el, btn: $('.q__btn', el), panel: $('.q__p', el) }));
+    let open = null, rf = 0;
+    const set = (it, on) => {
+      it.btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      if (on) { it.panel.hidden = false; void it.panel.offsetWidth; it.el.classList.add('is-open'); }
+      else { it.el.classList.remove('is-open'); it.panel.hidden = true; }
+    };
+    /* FLIP : la mise en page change d'un coup, les lignes glissent depuis leur ancienne place (transform seulement) */
+    const toggle = it => {
+      const els = [head, ...items.map(x => x.el)];
+      const before = els.map(e => e.getBoundingClientRect().top);
+      const anchor = it.btn.getBoundingClientRect().top;
+      if (open === it) { set(it, false); open = null; }
+      else { if (open) set(open, false); set(it, true); open = it; }
+      const diff = it.btn.getBoundingClientRect().top - anchor;
+      if (Math.abs(diff) > 1) window.scrollBy(0, diff);
+      if (!RM) {
+        els.forEach((e, k) => {
+          const dy = before[k] - e.getBoundingClientRect().top;
+          if (Math.abs(dy) < 1) return;
+          e.style.transition = 'none';
+          e.style.transform = 'translateY(' + dy + 'px)';
+          void e.offsetWidth;
+          e.style.transition = 'transform .9s cubic-bezier(.16,1,.3,1)';
+          e.style.transform = '';
+        });
+        setTimeout(() => els.forEach(e => { e.style.transition = ''; }), 950);
+      }
+      if (hasG) { clearTimeout(rf); rf = setTimeout(() => ST.refresh(), RM ? 0 : 950); }
+    };
+    items.forEach(it => it.btn.addEventListener('click', () => toggle(it)));
+  });
+
+  /* ---------- 5. Comment on avance : la ligne se trace au défilement ---------- */
+  safe('steps', () => {
+    const sec = $('#methode'), box = $('[data-steps]'), items = $$('.step', box);
+    if (!hasG || RM) { items.forEach(x => x.classList.add('is-lit')); return; }
+    box.classList.add('has-scrub');
+    box.style.setProperty('--sp', '0');
+    const light = (p, th) => { box.style.setProperty('--sp', p.toFixed(3)); items.forEach((it, i) => it.classList.toggle('is-lit', p >= th[i])); };
+    G.matchMedia().add({ h: '(min-width: 900px) and (min-height: 600px)', v: '(max-width: 899px), (max-height: 599px)' }, ctx => {
+      /* Ordinateur : la section est épinglée, les trois temps glissent à l'horizontale le long du fil */
+      if (ctx.conditions.h && window.KzFil) {
+        sec.classList.add('is-h');
+        window.KzFil.hscroll(sec, box, { factor: 1.25, min: 1.5, onUpdate: s => light(s.progress, [.01, .3, .72]) });
+        return () => { sec.classList.remove('is-h'); box.style.setProperty('--sp', '0'); };
+      }
+      ST.create({ trigger: box, start: 'top 78%', end: 'bottom 52%', scrub: .5, onUpdate: self => light(self.progress, [.01, .45, .9]) });
+    });
+  });
+
+  /* ---------- 6. Contact : envoi simulé ---------- */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script>
+/* Le fil, sur la page agents : le rail, les fils de chapitre, la lentille sur l'arche */
+(() => {
+  'use strict';
+  const F = window.KzFil;
+  if (!F) return;
+  try {
+    F.rail(() => Array.from(document.querySelectorAll('main > section')));
+    F.drops();
+    const arch = document.querySelector('.hero__arch');
+    F.lens(arch, { clone: arch && arch.querySelector('.arch__in'), scale: 1.6, bg: '#123138' });
+    if (F.hasG && !F.RM) window.gsap.matchMedia().add('(min-width: 900px)', () => {
+      window.gsap.to('.hero__arch', { yPercent: -8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: .6 } });
+    });
+  } catch (e) { console.error('[kz] le fil : ' + e.message); }
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

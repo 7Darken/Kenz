@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- Page de test du module victoire (V5), thème clair. Ne fait pas partie du site. -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Test — Victoire clair</title>
+<meta name="color-scheme" content="light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="stylesheet" href="../shared/victoire.css">
+<style>
+:root{
+  --kz-bg:#F7F5F1;
+  --kz-surface:#FFFFFF;
+  --kz-ink:#1A1918;
+  --kz-muted:#55514C;
+  --kz-line:rgba(26,25,24,.09);
+  --kz-accent:#0F5D6B;
+  --kz-radius:34px;
+  --kz-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --kz-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --kz-word:"Instrument Serif",Georgia,serif;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--kz-bg)}
+body{margin:0; color:var(--kz-ink); font:400 17px/1.5 var(--kz-text); overflow-x:clip}
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center; height:64px; padding:0 clamp(16px,4vw,56px); font-family:var(--kz-title); font-weight:600; font-size:28px; color:var(--kz-ink); pointer-events:none}
+.bloc{display:grid; place-items:center; min-height:60vh; padding:0 24px; font-family:var(--kz-word); font-style:italic; font-size:22px; color:var(--kz-muted)}
+.y{position:absolute; left:0; width:1px; height:1px}
+</style>
+</head>
+<body>
+<header class="nav">Kenz·</header>
+<main>
+  <section class="bloc"><p>Avant : les apps.</p></section>
+  <section id="victoire" class="kz-victoire" data-kz-victoire data-theme="light" aria-label="Startup Weekend"></section>
+  <section class="bloc"><p>Après : les agents IA.</p></section>
+</main>
+<i class="y" id="y540" style="top:540px"></i>
+<i class="y" id="y2840" style="top:2840px"></i>
+<i class="y" id="y3400" style="top:3400px"></i>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="../shared/victoire.js"></script>
+</body>
+</html>

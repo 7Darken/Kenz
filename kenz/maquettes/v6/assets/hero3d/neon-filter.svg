@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none;overflow:hidden">
+  <!-- Inline this SVG once in the HTML document. It extracts the blue Lagon parts at render time. -->
+  <defs>
+    <filter id="hero3d-lagon-neon" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.88  0 0 0 0 0.96  -5 2.5 2.5 0 -0.8" result="blue-selection"/>
+      <feComposite in="blue-selection" in2="SourceAlpha" operator="in" result="blue-parts"/>
+      <feGaussianBlur in="blue-parts" stdDeviation="5" result="wide-glow"/>
+      <feGaussianBlur in="blue-parts" stdDeviation="1.5" result="close-glow"/>
+      <feMerge>
+        <feMergeNode in="wide-glow"/>
+        <feMergeNode in="close-glow"/>
+        <feMergeNode in="blue-parts"/>
+      </feMerge>
+    </filter>
+  </defs>
+</svg>

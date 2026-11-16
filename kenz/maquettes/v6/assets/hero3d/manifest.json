@@ -1,0 +1,89 @@
+{
+  "generator": "built-in image_gen",
+  "status": "delivered",
+  "style": "HYROX miniature matte",
+  "masterSize": 1024,
+  "copySize": 512,
+  "format": "webp",
+  "pngAlsoIncluded": true,
+  "neon": {
+    "bakedIntoImages": false,
+    "css": "neon.css",
+    "inlineSvg": "neon-filter.svg",
+    "defaultStrength": 0.4
+  },
+  "assets": [
+    {
+      "id": "pro-telephone",
+      "label": "Téléphone",
+      "series": "pro",
+      "master": "pro/pro-telephone.webp",
+      "small": "pro/512/pro-telephone.webp",
+      "png": "pro/pro-telephone.png",
+      "prompt": "pro/pro-telephone.txt"
+    },
+    {
+      "id": "pro-noyau-ia",
+      "label": "Agents IA",
+      "series": "pro",
+      "master": "pro/pro-noyau-ia.webp",
+      "small": "pro/512/pro-noyau-ia.webp",
+      "png": "pro/pro-noyau-ia.png",
+      "prompt": "pro/pro-noyau-ia.txt"
+    },
+    {
+      "id": "pro-trophee",
+      "label": "Trophée",
+      "series": "pro",
+      "master": "pro/pro-trophee.webp",
+      "small": "pro/512/pro-trophee.webp",
+      "png": "pro/pro-trophee.png",
+      "prompt": "pro/pro-trophee.txt"
+    },
+    {
+      "id": "pro-satellite",
+      "label": "Satellite",
+      "series": "pro",
+      "master": "pro/pro-satellite.webp",
+      "small": "pro/512/pro-satellite.webp",
+      "png": "pro/pro-satellite.png",
+      "prompt": "pro/pro-satellite.txt"
+    },
+    {
+      "id": "createur-passeport",
+      "label": "Passeport",
+      "series": "createur",
+      "master": "createur/createur-passeport.webp",
+      "small": "createur/512/createur-passeport.webp",
+      "png": "createur/createur-passeport.png",
+      "prompt": "createur/createur-passeport.txt"
+    },
+    {
+      "id": "createur-avion",
+      "label": "Avion",
+      "series": "createur",
+      "master": "createur/createur-avion.webp",
+      "small": "createur/512/createur-avion.webp",
+      "png": "createur/createur-avion.png",
+      "prompt": "createur/createur-avion.txt"
+    },
+    {
+      "id": "createur-appareil",
+      "label": "Appareil photo",
+      "series": "createur",
+      "master": "createur/createur-appareil.webp",
+      "small": "createur/512/createur-appareil.webp",
+      "png": "createur/createur-appareil.png",
+      "prompt": "createur/createur-appareil.txt"
+    },
+    {
+      "id": "createur-etiquette",
+      "label": "Étiquette de bagage",
+      "series": "createur",
+      "master": "createur/createur-etiquette.webp",
+      "small": "createur/512/createur-etiquette.webp",
+      "png": "createur/createur-etiquette.png",
+      "prompt": "createur/createur-etiquette.txt"
+    }
+  ]
+}

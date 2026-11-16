@@ -1,0 +1,10 @@
+Use case: precise-object-edit.
+Asset type: creator-universe version of an already approved personal KZ monogram, transparent 3D logo.
+Input image 1: EDIT TARGET. This exact approved KZ logo is the identity to preserve, not just inspiration.
+Primary request: change ONLY the material and color of the graphite outer shell/extruded sides into warm rich cognac-brown, while keeping the ivory front letter faces and the single Lagon cyan diagonal inlay exactly as they are.
+Preserve invariants: the same precise uppercase K and Z glyph shapes, their positions and proportions, the narrow gap and negative spaces, the interlocking geometry, outer silhouette, chunky rounded bevels, depth, camera angle, front-on orientation, scale and centered composition. Keep the exact same KZ design; do not redesign, add strokes, shift letters or make the Z smaller.
+Materials: replace the graphite shell with refined matte cognac #8E5738, soft-touch leather-like microtexture, no seams, no stitching, no grain pattern visible from afar. Ivory front faces remain satin warm ivory, clean and smooth. Keep the original cyan inset #3FB0C2 in the identical position on the right diagonal side of the Z, with no extra cyan details.
+Lighting: preserve the soft studio lighting and subtle dimensional shading of the original; a very gentle warmer fill suits the creator/travel universe. No strong orange cast on the ivory faces.
+Scene/backdrop: preserve actual transparent alpha background with clean edges and transparent gaps inside the letters. No floor, no base, no plaque, no cast shadow outside the object, no haze, no halo, no background color. Do not bake neon glow into the image; it will be added in CSS.
+Text (verbatim): "KZ". No captions, no extra words, no icons, no objects, no decorative symbols.
+Output: one complete centered logo cutout, square canvas, same framing as the input.

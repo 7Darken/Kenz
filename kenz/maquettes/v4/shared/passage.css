@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Le passage : la transition entre l'accueil et un projet (puis le projet suivant)
+   Piloté par shared/passage.js. Contrat : BRIEF-V4.md, section 3.
+
+   Départ : le rectangle de l'élément source grandit jusqu'à l'écran entier, dans la couleur
+   donnée (≈ 700 ms expo.out, léger flou au départ). Arrivée : un voile de cette couleur
+   couvre l'écran, puis se retire en se contractant vers le centre (≈ 800 ms).
+   ========================================================================== */
+
+/* Le contenant porte le flou ; l'intérieur porte la découpe (le flou s'applique après la découpe). */
+.kz-passage {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483560;
+  pointer-events: auto;
+}
+.kz-passage__in {
+  position: absolute;
+  inset: 0;
+  background: var(--kz-passage, #0E1220);
+  will-change: clip-path;
+}
+/* Une très légère lumière, identique au départ et à l'arrivée, donne de la matière à l'aplat. */
+.kz-passage__in::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 70% at 50% 42%, rgb(255 255 255 / .07), transparent 70%),
+    linear-gradient(180deg, transparent 55%, rgb(0 0 0 / .14));
+}
+.kz-passage-arrivee .kz-back { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kz-passage__in { will-change: auto; }
+}

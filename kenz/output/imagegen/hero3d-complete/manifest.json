@@ -1,0 +1,52 @@
+{
+  "status": "generated",
+  "generator": "built-in image_gen",
+  "styleReference": "maquettes/v6/assets/sport3d/planches/sombre-160.webp",
+  "assets": [
+    {
+      "id": "pro-telephone",
+      "label": "Téléphone",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-3f8f3cee-974a-4b0e-b2a6-989d8ba8de8b.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    },
+    {
+      "id": "pro-trophee",
+      "label": "Trophée",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-d3ea73fc-fdb5-41f2-8f86-a0f873157066.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    },
+    {
+      "id": "pro-satellite",
+      "label": "Satellite",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-db42268e-0574-4009-896b-5e3fc0e6d46f.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png",
+      "reference": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-aaf9e496-1d05-4ba1-be3a-5fe46204616f.png"
+    },
+    {
+      "id": "createur-avion",
+      "label": "Avion",
+      "series": "createur",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-974de570-6692-4067-b5eb-9db6fa66edce.png",
+      "background": "output/hero-horizon-valide/02-horizon-createur.png",
+      "reference": "/Users/kenz15/Documents/Dev/Kenz/kenz/maquettes/v6/assets/sport3d/planches/sombre-160.webp"
+    },
+    {
+      "id": "createur-appareil",
+      "label": "Appareil photo",
+      "series": "createur",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-8df25de9-a7ac-4579-8097-140c65469b69.png",
+      "background": "output/hero-horizon-valide/02-horizon-createur.png"
+    },
+    {
+      "id": "createur-etiquette",
+      "label": "Étiquette de bagage",
+      "series": "createur",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-8fc1ce6d-d803-4083-a8fa-2910b7386b7e.png",
+      "background": "output/hero-horizon-valide/02-horizon-createur.png",
+      "reference": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-6d004ad8-1c0f-44ca-8978-fc04748832b8.png"
+    }
+  ]
+}

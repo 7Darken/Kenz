@@ -1,0 +1,161 @@
+<title>Kenz, l'histoire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<style>
+  /* Layout : deux portes côte à côte (heure bleue / heure dorée), une ligne d'explication au-dessus. Univers sombre assumé, couleurs explicites. */
+  :root {
+    --bg: #0D0F15;
+    --ink: #F4EFE6;
+    --muted: #A9A398;
+    --line: rgba(244, 239, 230, .12);
+    --blue: #9DB8FF;
+    --gold: #F2B45A;
+    --f-title: "Melodrama", "Instrument Serif", Georgia, serif;
+    --f-text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-word: "Instrument Serif", Georgia, serif;
+    --ease: cubic-bezier(.16, 1, .3, 1);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-text); font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-block: clamp(36px, 7vw, 84px) 56px; display: grid; gap: clamp(28px, 4vw, 48px); }
+  header { display: grid; gap: 14px; max-width: 640px; }
+  .brand { font-family: var(--f-title); font-weight: 600; font-size: clamp(54px, 10vw, 112px); line-height: .9; margin: 0; letter-spacing: -.01em; }
+  .lede { margin: 0; color: var(--muted); font-size: clamp(17px, 2vw, 20px); text-wrap: balance; }
+  .lede em { font-family: var(--f-word); font-style: italic; font-size: 1.15em; color: var(--ink); }
+
+  .doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+  @media (max-width: 720px) { .doors { grid-template-columns: 1fr; } }
+  .door {
+    position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; text-decoration: none; color: var(--ink);
+    box-shadow: 0 0 0 1px var(--line) inset, 0 30px 80px -40px rgba(0,0,0,.8);
+    transition: transform .7s var(--ease), box-shadow .7s var(--ease);
+    isolation: isolate;
+  }
+  @media (max-width: 720px) { .door { aspect-ratio: 4 / 4.4; } }
+  .door .land { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; transition: transform 1.4s var(--ease), filter 1.2s var(--ease); }
+  .door.pro .land { filter: sepia(.2) hue-rotate(185deg) saturate(.75) brightness(.5); }
+  .door.cre .land { filter: saturate(1.1) brightness(.72); }
+  .door .veil { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(13,15,21,0) 30%, rgba(13,15,21,.88) 100%); }
+  .door .me { position: absolute; left: 50%; bottom: -6%; height: 92%; width: auto; max-width: none; transform: translateX(-50%); z-index: -1; transition: transform 1s var(--ease); }
+  .door.pro .me { clip-path: inset(0 0 4% 0); }
+  .door .copy { position: absolute; left: 0; right: 0; bottom: 0; padding: clamp(18px, 3vw, 30px); display: grid; gap: 6px; }
+  .door h2 { margin: 0; font-family: var(--f-title); font-weight: 600; font-size: clamp(38px, 5vw, 60px); line-height: 1; }
+  .door p { margin: 0; color: rgba(244,239,230,.82); max-width: 34ch; }
+  .door .go { justify-self: start; margin-top: 10px; display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px 0 18px; border-radius: 999px; font-weight: 600; font-size: 15px; color: #11131a; background: var(--ink); }
+  .door .go i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; color: var(--ink); background: #11131a; transition: transform .5s var(--ease); }
+  .door.pro .go i { background: #1b2a4a; }
+  .door.cre .go i { background: #5a3a12; }
+  .door:hover { transform: translateY(-6px); box-shadow: 0 0 0 1px rgba(244,239,230,.22) inset, 0 40px 90px -40px rgba(0,0,0,.9); }
+  .door:hover .land { transform: scale(1.04); }
+  .door:hover .me { transform: translateX(-50%) translateY(-6px); }
+  .door:hover .go i { transform: translateX(3px); }
+  .door:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .door.pro::after, .door.cre::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; z-index: 1; }
+  .door.pro::after { box-shadow: 0 0 0 1px rgba(157,184,255,.18) inset; }
+  .door.cre::after { box-shadow: 0 0 0 1px rgba(242,180,90,.2) inset; }
+
+  .styles { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .styles legend { float: left; margin-right: 8px; color: var(--muted); font-size: 14px; }
+  .styles label { position: relative; }
+  .styles input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .styles span { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 16px 0 12px; border-radius: 999px; font-size: 15px; color: var(--muted); box-shadow: 0 0 0 1px var(--line) inset; transition: color .3s, background .3s, box-shadow .3s; }
+  .styles i { width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,.3) inset; }
+  .styles input:checked + span { color: var(--ink); background: rgba(244,239,230,.08); box-shadow: 0 0 0 1px rgba(244,239,230,.4) inset; }
+  .styles input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 3px; }
+  .styles label:hover span { color: var(--ink); }
+  .note { color: var(--muted); font-size: 14px; display: grid; gap: 6px; max-width: 72ch; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .secret summary { cursor: pointer; color: var(--ink); font-weight: 600; list-style: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+  .secret summary::-webkit-details-marker { display: none; }
+  .secret summary::after { content: "+"; font-weight: 400; transition: transform .4s var(--ease); }
+  .secret[open] summary::after { transform: rotate(45deg); }
+  .secret p { margin: 0 0 8px; }
+  .older { color: var(--muted); font-size: 14px; }
+  .older a { color: var(--ink); }
+
+  .js .brand, .js .lede, .js .door { opacity: 0; filter: blur(10px); transform: translateY(24px) scale(.975); }
+  .js .in { opacity: 1 !important; filter: none !important; transform: none !important; transition: opacity 1s var(--ease), filter 1s var(--ease), transform 1.2s var(--ease); }
+  .js .door.in:hover { transform: translateY(-6px) !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .js .brand, .js .lede, .js .door { opacity: 1; filter: none; transform: none; }
+    .door, .door * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 class="brand">Kenz</h1>
+    <p class="lede">Deux adresses, deux récits. Personne ne voit le passage entre les deux, sauf ceux qui connaissent le <em>secret</em>.</p>
+  </header>
+
+  <fieldset class="styles">
+    <legend>Style</legend>
+    <label><input type="radio" name="style" value="golden" checked><span><i style="background:linear-gradient(135deg,#0E1220 50%,#E3A25A 50%)"></i>Golden hour</span></label>
+    <label><input type="radio" name="style" value="studio"><span><i style="background:linear-gradient(135deg,#F1EFEA 50%,#1A1918 50%)"></i>Studio</span></label>
+    <label><input type="radio" name="style" value="portraits"><span><i style="background:linear-gradient(135deg,#F7F5F1 50%,#0F5D6B 50%)"></i>Deux portraits</span></label>
+    <label><input type="radio" name="style" value="fil"><span><i style="background:linear-gradient(135deg,#1A1918 50%,#2A8C9C 50%)"></i>Le fil</span></label>
+  </fieldset>
+
+  <main class="doors">
+    <a class="door pro" href="golden/pro.html" data-page="pro.html">
+      <img class="land" src="assets/img/paysage-kuala-lumpur.jpg" alt="">
+      <div class="veil"></div>
+      <img class="me" src="assets/img/kenz-pro.webp" alt="">
+      <div class="copy">
+        <h2>Pro</h2>
+        <p>Pour un futur client ou un recruteur : une histoire pour commencer, la victoire, puis une page par projet.</p>
+        <span class="go">Entrer <i>→</i></span>
+      </div>
+    </a>
+    <a class="door cre" href="golden/createur.html" data-page="createur.html">
+      <img class="land" src="assets/img/paysage-kuala-lumpur.jpg" alt="">
+      <div class="veil"></div>
+      <img class="me" src="assets/img/kenz-moi.webp" alt="">
+      <div class="copy">
+        <h2>Créateur</h2>
+        <p>Pour un abonné qui arrive de TikTok : l'Asie, ce que ça coûte vraiment, et tout pour me suivre.</p>
+        <span class="go">Entrer <i>→</i></span>
+      </div>
+    </a>
+  </main>
+
+  <div class="note">
+    <details class="secret"><summary>Le secret, pour toi seulement</summary><p>Sur n'importe quelle page, attrape le point de « Kenz· » en haut à gauche et <b>tire-le vers le bas</b>, comme le cordon d'une lampe. Au cran, lâche : la porte se referme et t'emmène de l'autre côté. Un simple clic ne fait rien de spécial.</p></details>
+    <p>Maquettes interactives : textes et chiffres tirés de tes notes, formulaires simulés (rien n'est envoyé).</p>
+  </div>
+</div>
+
+<script>
+  const reveal = (el, d) => setTimeout(() => el && el.classList.add('in'), d);
+  requestAnimationFrame(() => {
+    reveal(document.querySelector('.brand'), 60);
+    reveal(document.querySelector('.lede'), 240);
+    document.querySelectorAll('.door').forEach((el, i) => reveal(el, 420 + i * 120));
+  });
+  setTimeout(() => document.querySelectorAll('.brand,.lede,.door').forEach((el) => el.classList.add('in')), 2500);
+
+  (function () {
+    const radios = document.querySelectorAll('.styles input');
+    const doors = document.querySelectorAll('.door[data-page]');
+    const apply = (v) => doors.forEach((d) => { d.href = v + '/' + d.dataset.page; });
+    let saved = null; try { saved = localStorage.getItem('kz-style'); } catch (e) {}
+    radios.forEach((r) => {
+      if (saved && r.value === saved) r.checked = true;
+      r.addEventListener('change', () => { apply(r.value); try { localStorage.setItem('kz-style', r.value); } catch (e) {} });
+    });
+    const cur = document.querySelector('.styles input:checked');
+    apply(cur ? cur.value : 'golden');
+  })();
+
+</script>

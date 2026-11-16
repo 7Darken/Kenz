@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr" data-mode="pro" data-direction="horizon">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1019">
+  <title>Kenz — Horizon · Études de hero</title>
+  <meta name="description" content="Trois directions de hero, deux univers et un aperçu du parallaxe au défilement.">
+  <link rel="stylesheet" href="../assets/melodrama.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="scene.js" defer></script>
+</head>
+<body class="scene-page">
+  <a class="skip" href="#suite">Passer le hero</a>
+  <main>
+    <section class="hero-scroll" aria-labelledby="hero-title">
+      <div class="hero">
+        <div class="world world--pro" aria-hidden="true">
+          <img class="landscape" id="land-pro" src="assets/horizon-pro.png" alt="" fetchpriority="high">
+          <div class="atmosphere"></div>
+          <div class="stardust"></div>
+        </div>
+        <div class="world world--createur" aria-hidden="true">
+          <img class="landscape" id="land-createur" src="assets/horizon-createur.png" alt="">
+          <div class="atmosphere"></div>
+        </div>
+        <div class="shade" aria-hidden="true"></div>
+
+        <header class="site-header">
+          <a class="brand" href="index.html" aria-label="Kenz — Comparer les propositions">Kenz<span>.</span></a>
+          <p class="direction-label"><span id="direction-number">01</span><span class="short-line"></span><span id="direction-name">Horizon</span></p>
+          <a class="contact-link" id="header-link" href="../pro.html#contact"><span>Me contacter</span><span class="round-arrow">↗</span></a>
+        </header>
+
+        <div class="portrait-stage" aria-hidden="true">
+          <div class="portrait-light"></div>
+          <img class="portrait portrait--pro" src="../assets/img/kenz-pro.webp" alt="" width="1080" height="1920" fetchpriority="high">
+          <img class="portrait portrait--createur" src="../assets/img/kenz-moi.webp" alt="" width="1080" height="1920">
+        </div>
+
+        <div class="hero-copy">
+          <p class="eyebrow" id="hero-eyebrow">De l’idée à la réalité</p>
+          <h1 id="hero-title">Kenz<span>.</span></h1>
+          <p class="hero-line" id="hero-line">Je construis des apps<br>où l’IA fait le <em>vrai</em> travail.</p>
+          <a class="hero-next" href="#suite"><span class="down-arrow">↓</span><span id="next-label">Voir ce que je construis</span></a>
+        </div>
+
+        <div class="foreground" aria-hidden="true"></div>
+        <div class="grain" aria-hidden="true"></div>
+        <div class="scroll-track" aria-hidden="true"><span></span></div>
+        <p class="scene-caption" id="scene-caption">La nuit s’ouvre sur les idées.</p>
+      </div>
+    </section>
+
+    <section class="continuation" id="suite" aria-labelledby="suite-title">
+      <div class="continuation-intro">
+        <p class="eyebrow" id="suite-eyebrow">Des idées devenues réelles</p>
+        <h2 id="suite-title">Mes apps<span>.</span></h2>
+        <p id="suite-line">Je les imagine, je les code, je les <em>publie.</em></p>
+      </div>
+      <div class="constellation" id="apps">
+        <svg viewBox="0 0 1200 350" preserveAspectRatio="none" aria-hidden="true"><path d="M100 100L300 270L500 75L700 250L900 110L1100 265"/></svg>
+        <a style="--x:8.3%;--y:28%;--glow:230,87,74" href="../app.html#oshii"><img src="../assets/apps/oshii-icone.jpg" alt=""><strong>Oshii</strong><span>Cuisine</span></a>
+        <a style="--x:25%;--y:77%;--glow:118,199,170" href="../app.html#wado"><img src="../assets/apps/wado-icone.jpg" alt=""><strong>Wado</strong><span>Sport & nutrition</span></a>
+        <a style="--x:41.7%;--y:21%;--glow:155,129,239" href="../app.html#sago"><img src="../assets/apps/sago-icone.jpg" alt=""><strong>Sago</strong><span>Japonais</span></a>
+        <a style="--x:58.3%;--y:71%;--glow:176,159,233" href="../app.html#croc"><img src="../assets/apps/croc-icone.jpg" alt=""><strong>Croc</strong><span>Bonnes habitudes</span></a>
+        <a style="--x:75%;--y:31%;--glow:131,155,230" href="../app.html#miru"><img src="../assets/apps/miru-icone.jpg" alt=""><strong>Miru</strong><span>Jeux entre amis</span></a>
+        <a style="--x:91.7%;--y:76%;--glow:211,178,123" href="../app.html#zenko"><img src="../assets/apps/zenko-icone.jpg" alt=""><strong>Zenko</strong><span>Idées de journée</span></a>
+      </div>
+      <div class="travel" id="travel" hidden>
+        <a href="../voyage.html"><img src="../assets/img/video-japon.jpg" alt="Aperçu des voyages au Japon"><span>01 / Japon <i>↗</i></span></a>
+        <a href="../voyage.html"><img src="../assets/img/video-malaisie.jpg" alt="Aperçu des voyages en Malaisie"><span>02 / Malaisie <i>↗</i></span></a>
+        <a href="../voyage.html"><img src="../assets/img/video-islande.jpg" alt="Aperçu des voyages en Islande"><span>03 / Islande <i>↗</i></span></a>
+      </div>
+      <a class="return-top" href="#">Revoir le hero ↑</a>
+    </section>
+  </main>
+
+  <nav class="preview-dock" aria-label="Choisir une proposition">
+    <a class="compare-link" href="index.html" aria-label="Comparer les six propositions">⊞ <span>Comparer</span></a>
+    <div class="dock-divider"></div>
+    <div class="direction-switch" role="group" aria-label="Direction artistique">
+      <button type="button" data-direction="horizon" aria-pressed="true"><small>01</small> Horizon</button>
+      <button type="button" data-direction="passage" aria-pressed="false"><small>02</small> Passage</button>
+      <button type="button" data-direction="atlas" aria-pressed="false"><small>03</small> Atlas</button>
+    </div>
+    <div class="dock-divider"></div>
+    <div class="mode-switch" role="group" aria-label="Univers">
+      <button type="button" data-mode="pro" aria-pressed="true">Pro</button>
+      <button type="button" data-mode="createur" aria-pressed="false">Créateur</button>
+    </div>
+    <button class="motion-button" id="motion-toggle" type="button" aria-pressed="true" aria-label="Désactiver le parallaxe">◉</button>
+  </nav>
+  <p class="sr-only" role="status" id="status"></p>
+  <noscript><p class="noscript">Active JavaScript pour comparer les trois directions et les deux univers.</p></noscript>
+</body>
+</html>

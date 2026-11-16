@@ -1,0 +1,1851 @@
+<!doctype html>
+<!--
+  Kenz — page projet (V4, style « Le fil »). Un seul gabarit, rempli selon le hash : #oshii #sago #wado #croc #miru #zenko (sans hash : Oshii).
+  Le récit en 7 temps : arrivée dans la couleur de l'app, sous une arche de lumière que le fil dessine → le problème
+  → comment ça marche → l'IA en clair (+ « Sous le capot ») → en vrai (la lentille grossit les captures) → l'action → l'histoire suivante.
+  Le fil prend la lumière de l'app : rail à gauche (≥ 1100 px), un trait qui descend dans chaque chapitre.
+  Ordinateur (≥ 900 × 600, sans mouvement réduit) : « Comment ça marche » est épinglé ; les trois temps défilent à l'horizontale
+  le long du fil, et chaque nœud qui passe fait avancer l'animation.
+  Mobile et mouvement réduit : aucun épinglage ni défilement horizontal, l'animation se joue à l'entrée à l'écran.
+  Changement d'histoire : tous les ScrollTrigger de l'histoire sont tués (matchMedia.revert) puis recréés.
+  Transitions : shared/passage.* et shared/cordon.* (contrat de la section 3 du brief V4). La page marche sans eux.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<title>Kenz — Oshii</title>
+<meta name="description" content="Une app de Kenz racontée en entier : le problème, comment ça marche, ce que fait l'IA, et l'app en vrai.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#1A1918">
+<script>
+  /* Avant le premier rendu : la teinte de l'app choisie par le hash (pas de flash), et un garde-fou si le JS échoue */
+  (function () {
+    var d = document.documentElement, h = (location.hash || '').toLowerCase(), s = 'oshii';
+    var T = { oshii: ['#E5483B', '229 72 59', '#FF9384', 'Oshii', '255 147 132'], sago: ['#5B4BC4', '91 75 196', '#B3A8FF', 'Sago', '179 168 255'], wado: ['#2F7A55', '47 122 85', '#8ADBAE', 'Wado', '138 219 174'],
+      croc: ['#8E7CF0', '142 124 240', '#CBC1FF', 'Croc', '203 193 255'], miru: ['#4B5FD6', '75 95 214', '#A7B3FF', 'Miru', '167 179 255'], zenko: ['#A0613A', '160 97 58', '#EDB78E', 'Zenko', '237 183 142'] };
+    for (var k in T) { if (h.indexOf(k) > -1) { s = k; break; } }
+    d.classList.add('js');
+    d.setAttribute('data-app', s);
+    d.style.setProperty('--teinte', T[s][0]);
+    d.style.setProperty('--teinte-rgb', T[s][1]);
+    d.style.setProperty('--lumiere', T[s][2]);
+    d.style.setProperty('--fil', T[s][4]);
+    document.title = 'Kenz — ' + T[s][3];
+    try { history.scrollRestoration = 'manual'; } catch (e) {}
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('is-arrived'); }, 5000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<style>
+/* =========================================================
+   Jetons (heure bleue ; la teinte de l'app colore l'arrivée, les accents et la lumière)
+   ========================================================= */
+:root{
+  --bg:#1A1918;
+  --bg-2:#201E1D;
+  --creme:#F4EFE6;
+  --ink:#1A1918;
+  --red:#E8322B;
+  --teinte:#E5483B;
+  --teinte-rgb:229 72 59;
+  --lumiere:#FF9384;
+  --fil:255 147 132;
+  --cordon-lumiere:#E2B26A;
+  --nx-rgb:91 75 196;
+  --nx-l:#B3A8FF;
+  --muted:rgba(244,239,230,.74);
+  --faint:rgba(244,239,230,.62);
+  --line:rgba(244,239,230,.12);
+  --line-2:rgba(244,239,230,.07);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.76,0,.24,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(96px,12vw,176px);
+  --r-xl:32px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  color-scheme:dark;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--creme);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none}
+button{font:inherit; color:inherit; cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,figure{margin:0}
+::selection{background:rgba(244,239,230,.88); color:var(--ink)}
+:focus-visible{outline:2px solid var(--creme); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.skip{position:fixed; left:16px; top:12px; z-index:95; padding:10px 16px; border-radius:999px; background:var(--creme); color:var(--ink); font-weight:600; font-size:14px; transform:translateY(-160%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+.top-sentinel{position:absolute; top:0; left:0; width:1px; height:80px; pointer-events:none}
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(55% 45% at 90% 0%, rgb(var(--teinte-rgb) / .09), transparent 70%), radial-gradient(45% 40% at 0% 100%, rgba(15,93,107,.12), transparent 70%)}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+main,.foot{position:relative; z-index:1}
+main{overflow-x:clip}
+
+/* La couleur de l'app qui remplit l'écran à l'arrivée, puis se rétracte dans l'icône */
+.flood{position:fixed; inset:0; z-index:80; display:none; background:var(--flood, var(--teinte)); pointer-events:none}
+.js .flood{display:block}
+.js .flood.is-off,[data-porte-arrivee] .flood{display:none}
+
+/* =========================================================
+   Typo & briques
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:19px; line-height:1.35; letter-spacing:0; color:var(--faint)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,6.4vw,100px); line-height:.92; letter-spacing:-.01em}
+.say{margin:0; font-size:clamp(32px,4.6vw,68px); line-height:1.06; letter-spacing:-.035em; font-weight:500; text-wrap:balance}
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:0;
+  text-shadow:0 0 .5em rgb(var(--teinte-rgb) / .55), 0 0 1.4em rgb(var(--teinte-rgb) / .22)}
+
+/* Contenant « double biseau » */
+.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(244,239,230,.035); border:1px solid rgba(244,239,230,.075); box-shadow:0 1px 1px rgba(0,0,0,.25), 0 30px 70px -36px rgba(0,0,0,.7)}
+.bezel__core{position:relative; overflow:hidden; border-radius:calc(var(--r-xl) - 7px); background:linear-gradient(180deg,#24221F,#1C1A19); box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* Boutons (bouton dans le bouton) */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15.5px; font-weight:500; letter-spacing:.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1}
+.btn:active{transform:scale(.98)}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--creme); color:var(--ink)}
+.btn--light::before{background:rgba(26,25,24,.07)}
+.btn--light .btn__ico{background:var(--ink); color:var(--creme)}
+.btn--ghost{background:rgba(244,239,230,.04); color:var(--creme); box-shadow:inset 0 0 0 1px rgba(244,239,230,.22)}
+.btn--ghost::before{background:rgba(244,239,230,.07)}
+.btn--ghost .btn__ico{background:rgba(244,239,230,.1)}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--muted); transition:color .4s var(--expo)}
+.link::after{content:""; position:absolute; left:2px; right:2px; bottom:10px; height:1px; background:currentColor; opacity:.5; transition:opacity .4s}
+.link:hover{color:var(--creme)}
+.link:hover::after{opacity:1}
+
+/* Rejouer : discret, dans le coin de l'animation (mobile) */
+.replay{position:absolute; z-index:4; bottom:14px; right:14px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:500; color:rgba(244,239,230,.86); background:rgba(26,25,24,.55); box-shadow:inset 0 0 0 1px rgba(244,239,230,.16); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+.js [data-words].is-scrub .w{filter:none; transform:none; transition:none}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo) var(--wd, 0s), filter 1.2s var(--expo) var(--wd, 0s)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+
+/* =========================================================
+   Navigation (le logo mène à l'accueil ; son point est le cordon)
+   ========================================================= */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(26,25,24,.86), rgba(26,25,24,.5)); -webkit-backdrop-filter:blur(18px) saturate(1.2); backdrop-filter:blur(18px) saturate(1.2); box-shadow:inset 0 -1px 0 var(--line-2); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-flex; align-items:baseline; padding:8px 0; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--creme)}
+.kz-dot{display:inline-block; flex:none; width:7px; height:7px; margin-left:2px; padding:0; border-radius:50%; background:var(--creme); cursor:grab}
+.nav__app{position:relative; display:inline-flex; align-items:center; gap:10px; height:44px; padding:0 18px 0 6px; border-radius:999px; font-size:14px; font-weight:500; white-space:nowrap; background:rgba(26,25,24,.4); box-shadow:inset 0 0 0 1px rgba(244,239,230,.18); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); isolation:isolate; transition:transform .5s var(--expo)}
+.nav__app::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(244,239,230,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__app:hover::before{opacity:1}
+.nav__app:active{transform:scale(.98)}
+.nav__app img{width:32px; height:32px; border-radius:9px; box-shadow:0 0 0 1px rgba(255,255,255,.1); transition:transform .7s var(--expo)}
+.nav__app:hover img{transform:scale(1.06)}
+.nav__prog{position:absolute; left:0; right:0; bottom:0; height:1px; overflow:hidden; opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled .nav__prog{opacity:1}
+.nav__prog i{display:block; height:100%; background:linear-gradient(90deg, rgba(244,239,230,.15), rgba(244,239,230,.75)); transform-origin:left; transform:scaleX(var(--np, 0))}
+.js .nav__in{opacity:0}
+.is-arrived .nav__in{opacity:1; transition:opacity 1.2s var(--expo) 1.4s}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .kz-logo{font-size:25px}
+  .nav__app{height:44px; padding-right:16px; font-size:13.5px}
+}
+
+/* =========================================================
+   1. L'arrivée : la couleur se rétracte dans l'icône, puis le nom et une phrase
+   ========================================================= */
+.arr{position:relative; display:grid; place-items:center; min-height:100vh; min-height:100svh; overflow:hidden; isolation:isolate; padding:calc(env(safe-area-inset-top) + 88px) var(--gr) 112px var(--gl); text-align:center}
+.arr__light{position:absolute; inset:0; z-index:-1;
+  background:radial-gradient(38% 34% at 50% 30%, rgb(var(--teinte-rgb) / .42), transparent 72%), radial-gradient(75% 46% at 50% 112%, rgb(var(--teinte-rgb) / .34), transparent 70%), linear-gradient(180deg, #141312, var(--bg) 70%)}
+.arr__in{display:flex; flex-direction:column; align-items:center; gap:clamp(18px,2.6vh,30px)}
+.arr__ico{width:clamp(96px,11vw,150px); aspect-ratio:1; border-radius:23%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 34px 70px -26px rgb(var(--teinte-rgb) / .85), 0 14px 26px -12px rgba(0,0,0,.6)}
+.arr__nom{position:relative; margin:0; font-family:var(--f-title); font-weight:600; font-size:min(28vw, 290px, 32vh); line-height:.84; letter-spacing:-.02em; color:var(--creme)}
+.ttl{display:block}
+.ttl--ghost{position:absolute; inset:0; filter:blur(14px); opacity:0; pointer-events:none}
+.arr__line{max-width:31ch; font-size:clamp(18px,1.6vw,23px); line-height:1.45; color:rgba(244,239,230,.94); text-wrap:balance; --wd:1.3s}
+.arr__cue{position:absolute; left:50%; bottom:calc(26px + env(safe-area-inset-bottom)); translate:-50% 0; display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:rgba(244,239,230,.04); box-shadow:inset 0 0 0 1px rgba(244,239,230,.22); transition:background .4s var(--expo)}
+.arr__cue:hover{background:rgba(244,239,230,.1)}
+.arr__cue svg{width:16px; height:16px}
+@keyframes kzFade{from{opacity:0} to{opacity:1}}
+@keyframes ttlMain{0%{clip-path:inset(-25% 100% -30% -8%); filter:blur(10px)} 100%{clip-path:inset(-25% -8% -30% -8%); filter:none}}
+@keyframes ttlGhost{0%{clip-path:inset(-25% 100% -30% -8%); opacity:.9} 65%{clip-path:inset(-25% -8% -30% -8%); opacity:.45} 100%{clip-path:inset(-25% -8% -30% -8%); opacity:0}}
+.js .arr__light{opacity:0}
+.is-arrived .arr__light{opacity:1; transition:opacity 1.6s var(--expo) .15s}
+.js .arr__ico{opacity:0; transform:scale(1.04)}
+.is-arrived .arr__ico{opacity:1; transform:none; transition:opacity .3s linear .82s, transform 1.3s var(--expo) 1.05s}
+.js .ttl--main{clip-path:inset(-25% 100% -30% -8%)}
+.is-arrived .ttl--main{animation:ttlMain 1.6s var(--expo) 1s both}
+.is-arrived .ttl--ghost{animation:ttlGhost 1.4s var(--expo) .86s both}
+.js .arr__cue{opacity:0}
+.is-arrived .arr__cue{opacity:1; transition:opacity 1s var(--expo) 2.2s, background .4s var(--expo)}
+
+/* =========================================================
+   2. Le problème : une phrase, un écran
+   ========================================================= */
+.pbm{position:relative; display:flex; align-items:center; min-height:100vh; min-height:100svh; padding:var(--sec) 0}
+.pbm__t{max-width:21ch; margin:0; font-size:clamp(38px,6vw,100px); line-height:1.02; letter-spacing:-.045em; font-weight:500; text-wrap:balance}
+.pbm__cap{margin-top:clamp(26px,3vw,40px); max-width:40ch}
+
+/* =========================================================
+   3. Comment ça marche : la grande animation, en 3 temps légendés
+   ========================================================= */
+.how{position:relative; padding:var(--sec) 0; background:radial-gradient(48% 42% at 68% 52%, rgb(var(--teinte-rgb) / .1), transparent 72%)}
+.how__in{display:grid; grid-template-areas:"t" "s" "l"; gap:clamp(28px,5vw,44px); align-items:center}
+.how__t{grid-area:t; font-size:clamp(44px,5vw,84px)}
+.how__stage{grid-area:s; min-width:0}
+.temps{grid-area:l; display:grid; gap:clamp(12px,1.6vw,22px)}
+.temps li{position:relative; padding-left:30px; font-size:clamp(20px,2.1vw,32px); line-height:1.2; letter-spacing:-.025em; font-weight:500; color:var(--creme); transition:color .6s var(--expo)}
+.temps li::before{content:""; position:absolute; left:0; top:.6em; width:10px; height:10px; margin-top:-5px; border-radius:50%; background:var(--creme); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.temps.is-driven li{color:rgba(244,239,230,.3)}
+.temps.is-driven li::before{background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.45)}
+.temps.is-driven li.is-on{color:var(--creme)}
+.temps.is-driven li.is-on::before{background:var(--lumiere); box-shadow:0 0 0 5px rgb(var(--teinte-rgb) / .2), 0 0 18px var(--lumiere)}
+@media (min-width:900px){
+  .how__in{grid-template-columns:minmax(0,5fr) minmax(0,7fr); grid-template-areas:"t s" "l s"; column-gap:clamp(40px,5vw,96px); row-gap:0}
+  .how__t{align-self:end}
+  .temps{align-self:start; margin-top:clamp(28px,3.4vw,48px)}
+}
+.is-pin .how{height:100vh; padding:0}
+.is-pin .how__in{height:100%; padding-top:76px; padding-bottom:20px}
+.is-pin .how .replay{display:none}
+</style>
+<style>
+/* =========================================================
+   Scènes : le code des animations de la V3 (unités cqw, état final par défaut)
+   ========================================================= */
+/* =========================================================
+   Scènes (animations des apps) — unités cqw, état final par défaut
+   ========================================================= */
+.sc{position:relative; width:min(100%, 440px); margin-inline:auto}
+.sc__view{position:relative; aspect-ratio:4 / 5; border-radius:34px; background:rgba(244,239,230,.04);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.08), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -46px rgba(0,0,0,.9)}
+.sc__core{position:absolute; inset:6px; border-radius:28px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(90% 60% at 50% 0%, rgb(var(--tint) / .22), transparent 70%), linear-gradient(180deg, var(--sc-a, #161D30), var(--sc-b, #0F1424));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.sc__ex{position:absolute; left:5.5cqw; bottom:4cqw; z-index:5; font-size:max(11px,2.9cqw); color:rgba(244,239,230,.6); letter-spacing:.01em}
+.js .beat--sc .sc{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .beat--sc .sc.is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo)}
+
+/* --- Oshii : la vidéo devient une recette --- */
+.sc--oshii{--tint:236 104 84; --sc-a:#2A1715; --sc-b:#160E0D}
+.sc--oshii .sc__ex{top:4.4cqw; bottom:auto}
+.os-video{position:absolute; left:28cqw; top:7cqw; width:44cqw; height:78cqw; border-radius:5cqw; overflow:hidden; opacity:0; transform-origin:-35% 125%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.1), 0 4cqw 10cqw -3cqw rgba(0,0,0,.7)}
+.os-food{position:absolute; inset:0; width:100%; height:100%}
+.os-video::after{content:""; position:absolute; inset:0; background:linear-gradient(0deg, rgba(0,0,0,.55), rgba(0,0,0,0) 34%); pointer-events:none}
+.os-rail{position:absolute; right:2.6cqw; bottom:17cqw; z-index:1; display:grid; gap:3.6cqw}
+.os-rail svg{width:5.4cqw; height:5.4cqw; color:#fff; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5))}
+.os-cap{position:absolute; left:3.2cqw; right:10cqw; bottom:6.4cqw; z-index:1; font-size:max(10px,3cqw); font-weight:600; line-height:1.25; color:#fff; text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.os-bar{position:absolute; left:3.2cqw; right:3.2cqw; bottom:3.4cqw; z-index:1; height:.7cqw; border-radius:1cqw; background:rgba(255,255,255,.3); overflow:hidden}
+.os-bar i{position:absolute; inset:0; background:#fff; transform-origin:left; transform:scaleX(.72)}
+.os-sheet{position:absolute; left:0; right:0; bottom:0; height:40cqw; padding:4.6cqw 6cqw 0; border-radius:6cqw 6cqw 0 0; background:#201C21; transform:translateY(105%);
+  box-shadow:0 -1px 0 rgba(255,255,255,.08), 0 -6cqw 14cqw -6cqw rgba(0,0,0,.6)}
+.os-sheet::before{content:""; position:absolute; top:1.8cqw; left:50%; width:9cqw; height:1cqw; margin-left:-4.5cqw; border-radius:1cqw; background:rgba(255,255,255,.22)}
+.os-sheet__t{font-size:max(10px,3.2cqw); line-height:1.3; font-weight:600; color:rgba(244,239,230,.82)}
+.os-row{display:flex; gap:7.2cqw; margin-top:3.6cqw}
+.os-app{position:relative; display:grid; justify-items:center; gap:1.6cqw; font-size:max(9px,2.6cqw); line-height:1.2; color:rgba(244,239,230,.8)}
+.os-app > i{display:block; width:13cqw; height:13cqw; border-radius:3.4cqw; background:rgba(255,255,255,.1)}
+.os-app > b{display:block; width:9cqw; height:1.6cqw; margin-top:.6cqw; border-radius:1cqw; background:rgba(255,255,255,.1)}
+.os-app img{width:13cqw; height:13cqw; border-radius:3.4cqw}
+.os-tap{position:absolute; left:50%; top:6.5cqw; width:17cqw; height:17cqw; margin:-8.5cqw 0 0 -8.5cqw; border-radius:50%; border:.5cqw solid rgba(255,255,255,.85); opacity:0; pointer-events:none}
+.os-recipe{position:absolute; left:9cqw; right:9cqw; top:12cqw; padding:5.4cqw 6cqw 4.6cqw; border-radius:5.4cqw; background:var(--creme); color:#1A1918; box-shadow:0 5cqw 12cqw -5cqw rgba(0,0,0,.85)}
+.os-recipe__head{display:flex; align-items:center; gap:3cqw}
+.os-recipe__head img{flex:none; width:9cqw; height:9cqw; border-radius:2.4cqw}
+.os-recipe__t{font-size:max(13px,4.8cqw); font-weight:600; letter-spacing:-.02em; line-height:1.15}
+.os-ing{margin-top:4cqw}
+.os-ing li{display:flex; align-items:baseline; justify-content:space-between; gap:2cqw; padding:2.2cqw 0; border-top:1px solid rgba(26,25,24,.1); font-size:max(11px,3.7cqw); line-height:1.3}
+.os-ing b{font-weight:600; font-variant-numeric:tabular-nums}
+.os-steps{display:flex; align-items:center; justify-content:space-between; margin-top:1cqw; padding-top:3cqw; border-top:1px solid rgba(26,25,24,.1); font-size:max(11px,3.7cqw); font-weight:600}
+.os-steps svg{width:4cqw; height:4cqw}
+
+/* --- Sago : le japonais devient lisible --- */
+.sc--sago{--tint:150 128 255; --sc-a:#1E1736; --sc-b:#110D21}
+.sg-line{position:absolute; left:0; right:0; top:52cqw; display:flex; justify-content:center; align-items:flex-end; gap:3.4cqw; margin:0; font-family:var(--f-ja); font-weight:600; font-size:13.5cqw; line-height:1; letter-spacing:.02em}
+.sg-w{position:relative; display:inline-block}
+.sg-k{display:inline-block}
+.sg-draw{position:absolute; left:50%; bottom:calc(100% + 3.4cqw); width:24cqw; height:auto; translate:-50% 0; overflow:visible}
+.sg-draw path,.sg-draw circle{fill:none; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round}
+.sg-cat path{stroke:var(--creme)}
+.sg-heart path{stroke:#C2B3FF}
+.sg-fr{position:absolute; left:6cqw; right:6cqw; top:84cqw; text-align:center; font-size:max(17px,6.6cqw); font-weight:500; letter-spacing:-.02em; line-height:1.2}
+.sg-fw{display:inline-block}
+.sg-rule{position:absolute; left:20cqw; right:20cqw; top:76cqw; height:1px; background:linear-gradient(90deg, transparent, rgba(244,239,230,.25), transparent)}
+
+/* --- Wado : la photo devient des macros --- */
+.sc--wado{--tint:84 196 128; --sc-a:#10261C; --sc-b:#0A1812}
+.wd-plate{position:absolute; left:22cqw; top:8cqw; width:56cqw; aspect-ratio:1}
+.wd-food{position:absolute; inset:0; width:100%; height:100%}
+.wd-scan{position:absolute; inset:-3cqw; overflow:hidden; border-radius:3cqw; pointer-events:none}
+.wd-sweep{position:absolute; left:0; right:0; top:0; height:100%; opacity:0; transform:translateY(-100%);
+  background:linear-gradient(180deg, rgba(140,236,176,0), rgba(140,236,176,.18)); border-bottom:.5cqw solid #B4F3CC; box-shadow:0 1.2cqw 4cqw -1cqw rgba(140,240,180,.7)}
+.wd-br{position:absolute; width:8cqw; height:8cqw; border:0 solid rgba(244,239,230,.9)}
+.wd-br--a{left:-4cqw; top:-4cqw; border-width:.6cqw 0 0 .6cqw; border-radius:2.6cqw 0 0 0}
+.wd-br--b{right:-4cqw; top:-4cqw; border-width:.6cqw .6cqw 0 0; border-radius:0 2.6cqw 0 0}
+.wd-br--c{left:-4cqw; bottom:-4cqw; border-width:0 0 .6cqw .6cqw; border-radius:0 0 0 2.6cqw}
+.wd-br--d{right:-4cqw; bottom:-4cqw; border-width:0 .6cqw .6cqw 0; border-radius:0 0 2.6cqw 0}
+.wd-pills{position:absolute; left:6cqw; top:73cqw; width:60cqw; display:grid; grid-template-columns:1fr 1fr; gap:2.4cqw}
+.wd-pills li{padding:2.4cqw 3cqw; border-radius:3.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.wd-pills span{display:block; font-size:max(10px,2.9cqw); line-height:1.3; color:var(--muted)}
+.wd-pills b{display:block; font-size:max(13px,4.7cqw); line-height:1.25; font-weight:600; white-space:nowrap}
+.wd-pills .slit{display:block}
+.wd-pills small{font-size:.66em; font-weight:500; letter-spacing:0}
+.wd-pills .wd-k{display:flex; align-items:center}
+.wd-ring{position:absolute; right:6cqw; top:73cqw; width:25cqw; display:grid; justify-items:center; gap:1.6cqw}
+.wd-ring svg{width:21cqw; height:21cqw; transform:rotate(-90deg)}
+.wd-ring circle{fill:none; stroke-width:4.6}
+.wd-ring__bg{stroke:rgba(244,239,230,.12)}
+.wd-ring__fg{stroke:#93E6B2; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:.24}
+.wd-ring span{font-size:max(10px,3cqw); line-height:1.2; color:var(--muted); text-align:center}
+
+/* --- Croc : le pacte du matin, validé le soir --- */
+.sc--croc{--tint:178 160 255; --sc-a:#221D3A; --sc-b:#141127}
+.cr-top{position:absolute; left:7cqw; right:7cqw; top:8cqw; display:flex; align-items:center; gap:4.4cqw}
+.cr-mascot{flex:none; width:19cqw; height:19cqw; overflow:visible}
+.cr-streak{display:grid; gap:1cqw}
+.cr-streak__l{font-size:max(10px,3.2cqw); color:var(--muted)}
+.cr-streak__v{display:flex; align-items:baseline; gap:2cqw; font-size:max(26px,11.5cqw); font-weight:600; letter-spacing:-.04em; line-height:1}
+.roll-w{display:inline-block; height:1.04em; overflow:hidden; vertical-align:top}
+.roll{display:flex; flex-direction:column}
+.roll b{display:block; height:1.04em; line-height:1.04em; font-weight:inherit; text-align:right; font-variant-numeric:tabular-nums}
+.cr-roll{transform:translateY(-87.5%)}
+.cr-streak__u{font-size:max(13px,4.6cqw); font-weight:500; letter-spacing:-.01em; color:var(--muted)}
+.cr-pact{position:absolute; left:7cqw; right:7cqw; top:38cqw; display:grid; grid-template-columns:1fr 1fr; gap:3cqw}
+.cr-pill{display:flex; align-items:center; gap:2.6cqw; padding:3.2cqw; border-radius:4.4cqw; background:rgba(244,239,230,.06); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.cr-pill small{display:block; font-size:max(9px,2.8cqw); line-height:1.25; color:var(--muted)}
+.cr-pill span{display:block; font-size:max(11px,3.6cqw); line-height:1.25; font-weight:600; white-space:nowrap}
+.chk{position:relative; flex:none; display:block; width:8cqw; height:8cqw; border-radius:50%; box-shadow:inset 0 0 0 .5cqw rgba(244,239,230,.28)}
+.chk > i{position:absolute; inset:0; border-radius:50%; background:#B9A5FF}
+.chk svg{position:absolute; inset:0; width:100%; height:100%}
+.chk path{fill:none; stroke:#15122A; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:0}
+.cr-week{position:absolute; left:7cqw; right:7cqw; top:66cqw; display:flex; justify-content:space-between}
+.cr-week li{display:grid; justify-items:center; gap:2cqw; font-size:max(10px,3cqw); line-height:1; color:var(--muted)}
+.cr-week .chk{width:9.6cqw; height:9.6cqw}
+.cr-week .chk > i{background:#9C88F6}
+.cr-bravo{position:absolute; left:0; right:0; top:90cqw; text-align:center; font-size:max(14px,4.4cqw); font-weight:500; letter-spacing:-.01em; line-height:1.2; color:#D9CFFF}
+
+/* --- Miru : un thème, un jeu, un téléphone qui tourne --- */
+.sc--miru{--tint:120 128 255; --sc-a:#1C1B4A; --sc-b:#111130}
+.mr-field{position:absolute; left:7cqw; right:7cqw; top:6cqw; height:15cqw; display:flex; flex-direction:column; justify-content:center; gap:.6cqw; padding:0 4.4cqw; border-radius:4.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.15)}
+.mr-field__l{font-size:max(9px,2.7cqw); line-height:1.2; color:var(--muted)}
+.mr-type{font-size:max(12px,4.4cqw); line-height:1.25; font-weight:500; white-space:nowrap}
+.mr-caret{display:inline-block; width:.5cqw; height:1.1em; margin-left:.4cqw; vertical-align:-.2em; background:#B4BAFF; opacity:0}
+.mr-av{position:absolute; z-index:2; width:14cqw; height:14cqw; border-radius:50%; box-shadow:0 0 0 .7cqw #15153A}
+.mr-av svg{display:block; width:100%; height:100%}
+.mr-av .mr-hi{position:absolute; inset:-1.4cqw; border-radius:50%; box-shadow:0 0 0 .5cqw rgba(244,239,230,.85), 0 0 5cqw rgba(180,186,255,.5); opacity:0}
+.mr-av--0{left:43cqw; top:31cqw} .mr-av--1{left:75.3cqw; top:54.5cqw} .mr-av--2{left:63cqw; top:92.5cqw} .mr-av--3{left:23cqw; top:92.5cqw} .mr-av--4{left:10.7cqw; top:54.5cqw}
+.mr-av--2 .mr-hi{opacity:1}
+.mr-card{position:absolute; z-index:1; left:44cqw; top:64cqw; width:12cqw; height:16cqw; border-radius:2cqw; background:var(--creme); box-shadow:0 1.4cqw 3cqw -1cqw rgba(0,0,0,.6)}
+.mr-card::before{content:""; position:absolute; left:2.2cqw; right:2.2cqw; top:5cqw; height:1.6cqw; border-radius:1cqw; background:#3B3FB8; box-shadow:0 3.2cqw 0 -.3cqw rgba(59,63,184,.35)}
+.mr-card::after{content:""; position:absolute; right:2cqw; bottom:2cqw; width:2.2cqw; height:2.2cqw; border-radius:50%; background:#FFB86B}
+.mr-card--0{transform:translate(0%,-250.75%) rotate(-6deg) scale(.75)}
+.mr-card--1{transform:translate(318%,-77.5%) rotate(10deg) scale(.75)}
+.mr-card--2{transform:translate(196.5%,202.8%) rotate(14deg) scale(.75)}
+.mr-card--3{transform:translate(-196.5%,202.8%) rotate(-12deg) scale(.75)}
+.mr-card--4{transform:translate(-318%,-77.5%) rotate(-9deg) scale(.75)}
+.mr-phone{position:absolute; z-index:3; left:45.5cqw; top:64cqw; width:9cqw; height:16cqw; border-radius:2.2cqw; background:#0C0C22; box-shadow:inset 0 0 0 .5cqw #CDD1FF, 0 2cqw 4cqw -1cqw rgba(0,0,0,.7); transform:translate(122.1%,94.5%)}
+.mr-phone i{position:absolute; inset:1.3cqw; border-radius:1.2cqw; background:linear-gradient(160deg,#8A90FF,#3B3FB8)}
+
+/* --- Zenko : un budget, une journée qui se recompose --- */
+.sc--zenko{--tint:214 146 88; --sc-a:#2C1D12; --sc-b:#1A110B}
+.zk-budget{position:absolute; left:7cqw; right:7cqw; top:8cqw}
+.zk-head{display:flex; align-items:baseline; justify-content:space-between}
+.zk-l{font-size:max(11px,3.4cqw); color:var(--muted)}
+.zk-v{display:flex; align-items:baseline; gap:1.2cqw; font-size:max(26px,11cqw); font-weight:600; letter-spacing:-.04em; line-height:1}
+.zk-v small{font-size:.56em; font-weight:500; color:var(--muted)}
+.zk-roll{transform:translateY(-93.75%)}
+.zk-track{position:relative; height:2cqw; margin-top:6cqw; border-radius:2cqw; background:rgba(244,239,230,.12)}
+.zk-fill{position:absolute; inset:0; border-radius:inherit; background:linear-gradient(90deg,#B97A47,#F0B987); transform-origin:left; transform:scaleX(.5)}
+.zk-knobwrap{position:absolute; left:0; top:50%; width:100%; height:0; transform:translateX(50%)}
+.zk-knob{position:absolute; left:0; top:0; width:7.4cqw; height:7.4cqw; margin:-3.7cqw 0 0 -3.7cqw; border-radius:50%; background:var(--creme); box-shadow:0 1cqw 3cqw rgba(0,0,0,.5), 0 0 0 1.4cqw rgba(240,185,135,.2)}
+.zk-ends{display:flex; justify-content:space-between; margin-top:3.4cqw; font-size:max(9px,2.7cqw); color:var(--faint)}
+.zk-day{position:absolute; left:7cqw; right:7cqw; top:45cqw; display:grid; gap:3cqw}
+.zk-card{display:flex; align-items:center; gap:4cqw; height:18cqw; padding:0 4cqw; border-radius:4.4cqw; background:rgba(244,239,230,.07); box-shadow:inset 0 0 0 1px rgba(244,239,230,.1)}
+.zk-act{position:relative; flex:none; width:11cqw; height:11cqw; border-radius:3cqw; background:rgba(240,185,135,.16)}
+.zk-a{position:absolute; left:2.2cqw; top:2.2cqw; width:6.6cqw; height:6.6cqw; color:#F3C79C; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; backface-visibility:hidden}
+.zk-a--1{opacity:0}
+.zk-txt{display:grid; gap:2cqw; flex:1}
+.zk-when{font-size:max(12px,4cqw); line-height:1.1; font-weight:600}
+.zk-cost{position:relative; height:1.2cqw; border-radius:1cqw; background:rgba(244,239,230,.1); overflow:hidden}
+.zk-cost i{position:absolute; inset:0; background:#E2A877; transform-origin:left; transform:scaleX(var(--c2))}
+</style>
+<style>
+/* Les scènes en plus grand */
+.how .sc{width:min(100%, 560px)}
+.is-pin .how .sc{width:min(100%, calc((100vh - 130px) * .8))}
+
+/* =========================================================
+   4. L'IA, en clair (+ « Sous le capot »)
+   ========================================================= */
+.ia{position:relative; padding:var(--sec) 0 calc(var(--sec) * .5)}
+.ia .h2{margin-bottom:clamp(40px,5vw,76px)}
+.chain{position:relative; display:grid; gap:34px; padding-left:44px; --cp:1}
+.chain::before,.chain::after{content:""; position:absolute; left:16px; top:12px; bottom:12px; width:1px}
+.chain::before{background:var(--line)}
+.chain::after{background:linear-gradient(180deg, var(--creme), var(--lumiere)); transform-origin:top; transform:scaleY(var(--cp))}
+.chain__st{position:relative}
+.chain__st p{max-width:22ch; font-size:clamp(21px,2vw,30px); line-height:1.22; letter-spacing:-.025em; font-weight:500; transition:opacity .7s var(--expo), color .7s var(--expo)}
+.chain__node{position:absolute; left:-44px; top:-2px; display:grid; place-items:center; width:33px; height:33px; border-radius:50%; transition:opacity .7s var(--expo)}
+.chain__node::before{content:""; width:11px; height:11px; border-radius:50%; background:var(--creme); box-shadow:0 0 0 5px rgba(244,239,230,.07); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.chain__st.is-ia .chain__node{background:rgb(var(--teinte-rgb) / .2); box-shadow:inset 0 0 0 1px rgb(var(--teinte-rgb) / .7), 0 0 26px rgb(var(--teinte-rgb) / .5)}
+.chain__st.is-ia .chain__node::before{display:none}
+.chain__node svg{width:16px; height:16px; color:var(--lumiere)}
+.chain__st.is-ia p{color:var(--lumiere)}
+.chain.is-driven .chain__st:not(.is-lit) p{opacity:.3}
+.chain.is-driven .chain__st:not(.is-lit) .chain__node{opacity:.45}
+.chain.is-driven .chain__st:not(.is-lit) .chain__node::before{background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.5)}
+@media (min-width:900px){
+  .chain{grid-template-columns:repeat(var(--n),minmax(0,1fr)); gap:clamp(24px,3vw,48px); padding:60px 0 0}
+  .chain::before,.chain::after{left:16px; right:0; top:16px; bottom:auto; width:auto; height:1px}
+  .chain::after{transform-origin:left; transform:scaleX(var(--cp)); background:linear-gradient(90deg, var(--creme), var(--lumiere))}
+  .chain__node{left:0; top:-60px}
+  .chain__st p{max-width:15ch}
+}
+.ia__say{max-width:17ch}
+.ia__sub{margin-top:24px; max-width:36ch; font-size:clamp(18px,1.6vw,22px); line-height:1.45; color:var(--muted)}
+
+.capot{margin-top:clamp(56px,7vw,104px)}
+.capot__sum{display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; list-style:none; cursor:pointer; font-size:15.5px; font-weight:500; background:rgba(244,239,230,.04); box-shadow:inset 0 0 0 1px rgba(244,239,230,.22); transition:background .4s var(--expo), transform .5s var(--expo)}
+.capot__sum::-webkit-details-marker{display:none}
+.capot__sum::marker{content:""}
+.capot__sum:hover{background:rgba(244,239,230,.08)}
+.capot__sum:active{transform:scale(.98)}
+.capot__plus{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:rgba(244,239,230,.1)}
+.capot__plus svg{width:15px; height:15px; transition:transform .7s var(--expo)}
+.capot[open] .capot__plus svg{transform:rotate(135deg)}
+.capot__body{margin-top:16px}
+.capot[open] .capot__body{animation:capIn .9s var(--expo) both}
+@keyframes capIn{from{opacity:0; transform:translateY(18px); filter:blur(6px)} to{opacity:1; transform:none; filter:none}}
+.capot__core{display:grid; gap:34px; padding:clamp(22px,3.2vw,44px)}
+@media (min-width:900px){
+  .capot__core{grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(40px,5vw,72px)}
+  .capot__core > :only-child{grid-column:1 / -1}
+}
+.capot__l{margin:0 0 10px; font-family:var(--f-word); font-style:italic; font-size:19px; line-height:1.3; color:var(--faint)}
+.capot__l:not(:first-child){margin-top:30px}
+.capot__rows li{position:relative; padding:12px 0 12px 24px; border-top:1px solid var(--line-2); font-size:15.5px; line-height:1.5; color:rgba(244,239,230,.88)}
+.capot__rows li::before{content:""; position:absolute; left:3px; top:21px; width:7px; height:7px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(244,239,230,.5)}
+.capot__p{max-width:54ch; font-size:16px; line-height:1.6; color:rgba(244,239,230,.88)}
+
+/* =========================================================
+   5. En vrai : les captures, la version, la date
+   ========================================================= */
+.vrai{position:relative; padding:var(--sec) 0 calc(var(--sec) * .55); overflow:clip}
+.vrai__grid{display:grid; gap:clamp(48px,6vw,88px); align-items:center}
+.vrai__txt{display:flex; flex-direction:column; gap:16px}
+.vrai__txt .h2{margin-bottom:12px}
+.vrai__line{max-width:30ch; font-size:clamp(18px,1.5vw,21px); line-height:1.5; color:var(--muted)}
+.vrai__line time{color:var(--creme)}
+.vrai__media{position:relative; display:flex; justify-content:center; align-items:flex-start}
+.vrai__media::before{content:""; position:absolute; left:50%; top:50%; width:130%; aspect-ratio:1.3; translate:-50% -50%; border-radius:50%; background:radial-gradient(closest-side, rgb(var(--teinte-rgb) / .22), transparent); pointer-events:none}
+.frame{position:relative; padding:6px; border-radius:34px; background:rgba(244,239,230,.045); translate:0 var(--py, 0px);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.09), 0 1px 1px rgba(0,0,0,.25), 0 50px 90px -40px rgba(0,0,0,.9), 0 12px 24px -12px rgba(0,0,0,.5)}
+.frame__core{overflow:hidden; border-radius:28px; background:#111}
+.frame img{width:100%}
+.vrai--duo .frame{width:min(47%, 300px)}
+.vrai--duo .frame--1{margin-left:-5%; margin-top:14%}
+.vrai--solo .frame{width:min(78%, 330px)}
+.vrai--land .vrai__media{display:block}
+.vrai--land .frame{width:100%; border-radius:26px}
+.vrai--land .frame__core{border-radius:20px}
+.vrai--land .frame--1{z-index:1; width:70%; margin:-20% 0 0 auto}
+@media (min-width:900px){
+  .vrai__grid{grid-template-columns:minmax(0,4fr) minmax(0,8fr)}
+  .vrai--duo .frame,.vrai--solo .frame{width:auto}
+  .vrai--duo .frame img{width:auto; height:min(68vh, 620px)}
+  .vrai--solo .frame img{width:auto; height:min(74vh, 680px)}
+  .vrai--land .frame--0{width:88%}
+  .vrai--land .frame--1{width:58%; margin-top:-24%}
+}
+
+/* =========================================================
+   6. L'action
+   ========================================================= */
+.act{position:relative; display:flex; flex-direction:column; align-items:center; gap:26px; padding:calc(var(--sec) * .55) var(--gr) var(--sec) var(--gl); text-align:center; isolation:isolate}
+.act::before{content:""; position:absolute; left:50%; top:46%; z-index:-1; width:min(1100px,150vw); aspect-ratio:1.7; translate:-50% -50%; border-radius:50%; background:radial-gradient(closest-side, rgb(var(--teinte-rgb) / .2), transparent); pointer-events:none}
+.act__ico{width:clamp(76px,7vw,100px); aspect-ratio:1; border-radius:23%; box-shadow:0 0 0 1px rgba(255,255,255,.1), 0 26px 50px -22px rgb(var(--teinte-rgb) / .8)}
+.act__btns{display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:6px}
+
+/* =========================================================
+   7. L'histoire suivante
+   ========================================================= */
+.next{position:relative; padding:clamp(84px,10vw,150px) 0 clamp(96px,11vw,160px); overflow:clip; isolation:isolate}
+.next::before{content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(60% 70% at 28% 52%, rgb(var(--nx-rgb) / .26), transparent 72%); opacity:0; transition:opacity .9s var(--expo)}
+.next::after{content:""; position:absolute; top:0; left:var(--gl); right:var(--gr); height:1px; background:var(--line)}
+.next:hover::before,.next.is-hot::before{opacity:1}
+.next__q{display:block; width:fit-content; max-width:min(100%, 17ch); font-size:clamp(44px,7.4vw,124px); line-height:1.02; letter-spacing:-.045em; font-weight:500; text-wrap:balance; transition:color .7s var(--expo)}
+.next__q .word{text-shadow:0 0 .5em rgb(var(--nx-rgb) / .55), 0 0 1.4em rgb(var(--nx-rgb) / .22)}
+.next__q:hover,.next.is-hot .next__q,.next__q:focus-visible{color:var(--nx-l)}
+.next__q:focus-visible{outline-offset:8px; border-radius:8px}
+.next__ico{display:inline-block; width:.82em; height:.82em; margin-left:.16em; vertical-align:-.08em; border-radius:23%; box-shadow:0 0 0 1px rgba(255,255,255,.12), 0 18px 34px -14px rgb(var(--nx-rgb) / .9); transform:scale(0) rotate(-10deg); transition:transform .24s var(--out)}
+.next__q:hover .next__ico,.next.is-hot .next__ico,.next__q:focus-visible .next__ico{transform:none; transition:transform 1s var(--expo)}
+.next__cap{display:flex; align-items:center; gap:10px; margin-top:30px; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1.3; color:var(--muted)}
+.next__cap svg{width:16px; height:16px; transition:transform .7s var(--expo)}
+.next:hover .next__cap svg,.next.is-hot .next__cap svg{transform:translateX(6px)}
+
+/* =========================================================
+   Pied de page (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:34px var(--gr) calc(40px + env(safe-area-inset-bottom)) var(--gl); text-align:center; font-size:13px; color:var(--faint)}
+.foot .link{font-size:13px; min-height:44px}
+@media (max-width:600px){ .foot{padding-left:84px; padding-right:84px} }
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal],.js .arr__ico,.capot[open] .capot__body{transform:none !important; filter:none !important}
+  .js [data-sweep]{clip-path:none; filter:none; opacity:0; transition:opacity .4s}
+  .js [data-sweep].is-in{opacity:1; transition:opacity 1s var(--expo)}
+  .js .ttl--main{clip-path:none; opacity:0}
+  .is-arrived .ttl--main{animation:kzFade 1s var(--expo) .3s both}
+  .ttl--ghost{display:none}
+  .is-arrived .arr__ico{transition:opacity .6s var(--expo) .1s}
+  .capot[open] .capot__body{animation-name:kzFade}
+  .next__ico{transform:none; opacity:0; transition:opacity .4s}
+  .next__q:hover .next__ico,.next.is-hot .next__ico,.next__q:focus-visible .next__ico{opacity:1}
+  .btn,.btn__ico,.capot__sum,.capot__plus svg,.replay svg,.next__cap svg{transition-property:opacity,background,color,box-shadow}
+}
+/* =========================================================
+   LE FIL — couche commune aux quatre pages
+   Le fil lumineux relie les chapitres : un rail fixe à gauche (grand écran), un trait qui
+   descend dans chaque chapitre, les arches qu'il dessine autour des portraits, la lentille.
+   ========================================================= */
+:root{--fil-io:cubic-bezier(.65,0,.35,1)}
+
+/* ---------- Barre flottante : une pilule de verre, détachée du haut. Le point reste un simple point. ---------- */
+.nav{padding-top:max(10px, env(safe-area-inset-top))}
+.nav::before{display:none}
+.nav__in{width:min(1200px, calc(100% - 20px)); margin-inline:auto; height:60px; padding:0 6px 0 22px; border-radius:999px; isolation:isolate}
+.nav__in::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; pointer-events:none;
+  background:rgba(26,25,24,.62); -webkit-backdrop-filter:blur(20px) saturate(140%); backdrop-filter:blur(20px) saturate(140%);
+  box-shadow:inset 0 0 0 1px rgba(244,239,230,.09), inset 0 1px 0 rgba(255,255,255,.05), 0 18px 40px -22px rgba(0,0,0,.7);
+  opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled .nav__in::before{opacity:1}
+@media (max-width:600px){ .nav__in{height:56px; padding-left:18px; padding-right:5px} }
+
+/* ---------- Le rail : le fil vertical, fixe, à gauche (grand écran, mouvement autorisé) ---------- */
+.fil-rail{display:none}
+@media (min-width:1100px){
+  .fil-on .fil-rail{display:block; position:fixed; z-index:40; left:26px; top:21vh; bottom:27vh; width:1px; pointer-events:none;
+    background:linear-gradient(180deg, rgba(244,239,230,0), rgba(244,239,230,.1) 10%, rgba(244,239,230,.1) 90%, rgba(244,239,230,0))}
+}
+.fil-rail__fill{position:absolute; inset:0; transform-origin:50% 0; transform:scaleY(var(--fp,0));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .85) 14%, rgb(var(--fil))); box-shadow:0 0 10px rgb(var(--fil) / .5)}
+.fil-rail__knots{position:absolute; inset:0}
+.fil-rail__k{position:absolute; left:-3px; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.36);
+  transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.fil-rail__k.is-lit{background:rgb(var(--fil)); box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 10px rgb(var(--fil) / .7)}
+.fil-rail__head{position:absolute; left:-4px; top:-4px; width:9px; height:9px; border-radius:50%; background:#FFF8EC;
+  box-shadow:0 0 0 3px rgb(var(--fil) / .22), 0 0 16px 3px rgb(var(--fil) / .75); transform:translateY(calc(var(--fp,0) * var(--rh,0px)))}
+
+/* ---------- Le fil de chapitre : un trait qui descend dans le chapitre, tracé au défilement ---------- */
+.fil-drop{position:absolute; z-index:1; top:0; left:var(--gl); width:7px; height:calc(var(--sec, 120px) * .6); margin-left:-3px; pointer-events:none; --dp:1}
+.fil-drop::before{content:""; position:absolute; left:3px; top:0; bottom:3px; width:1px; transform-origin:50% 0; transform:scaleY(var(--dp));
+  background:linear-gradient(180deg, rgb(var(--fil) / 0), rgb(var(--fil) / .9)); box-shadow:0 0 8px rgb(var(--fil) / .45)}
+.fil-drop::after{content:""; position:absolute; left:0; bottom:0; width:7px; height:7px; border-radius:50%; background:rgb(var(--fil));
+  box-shadow:0 0 0 3px rgb(var(--fil) / .14), 0 0 12px 2px rgb(var(--fil) / .6); opacity:clamp(0, calc(var(--dp) * 6 - 5), 1); transform:scale(clamp(.3, calc(var(--dp) * 4 - 3), 1))}
+.fil-drop--c{left:50%}
+
+/* ---------- L'arche : un portrait dans une arche, dessinée par le fil ---------- */
+.arch{position:relative; margin:0; aspect-ratio:5 / 7; isolation:isolate}
+.arch__in{position:absolute; inset:0; overflow:hidden; border-radius:999px 999px 0 0; background:var(--arch-bg, #201E1D)}
+.arch__in::after{content:""; position:absolute; left:0; right:0; bottom:0; height:24%; pointer-events:none; background:linear-gradient(180deg, rgba(26,25,24,0), var(--bg))}
+.arch__img{position:absolute; left:50%; top:var(--arch-top, 6%); height:var(--arch-h, 118%); width:auto; max-width:none; translate:-50% 0; -webkit-user-select:none; user-select:none; -webkit-user-drag:none}
+.arch__line{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none}
+.arch__line path{fill:none; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.arch__main{stroke:rgb(var(--fil)); stroke-width:2; filter:drop-shadow(0 0 5px rgb(var(--fil) / .75))}
+.arch__ghost{stroke:rgba(244,239,230,.16); stroke-width:1.6}
+.arch__ground{position:absolute; left:-34%; right:-34%; bottom:0; height:1px; pointer-events:none;
+  background:linear-gradient(90deg, rgb(var(--fil) / 0), rgb(var(--fil) / .7) 32%, rgb(var(--fil) / .7) 68%, rgb(var(--fil) / 0)); box-shadow:0 0 10px rgb(var(--fil) / .4)}
+
+/* ---------- La lentille (décorative) : une loupe qui suit la souris ---------- */
+.lens{position:fixed; inset:0; z-index:46; pointer-events:none; visibility:hidden; transition:visibility 0s .6s}
+.lens.is-on{visibility:visible; transition:none}
+.lens__body{position:absolute; left:0; top:0; width:var(--ls, 184px); height:var(--ls, 184px); will-change:transform}
+.lens__disc{position:absolute; inset:0; overflow:hidden; border-radius:50%; background:var(--lens-bg, var(--bg)); clip-path:circle(0% at 50% 50%); transition:clip-path .3s var(--out)}
+.lens.is-on .lens__disc{clip-path:circle(50% at 50% 50%); transition:clip-path .8s var(--expo)}
+.lens__in{position:absolute; inset:0}
+.lens__clone{position:absolute !important; left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; margin:0 !important; transform-origin:0 0; translate:none !important}
+.lens__img{position:absolute; left:-14%; top:-14%; width:128%; height:128%; max-width:none; object-fit:cover; object-position:50% 30%}
+.lens__ring{position:absolute; inset:0; border-radius:50%; opacity:0; transform:scale(.6);
+  box-shadow:inset 0 0 0 1.5px rgba(244,239,230,.88), 0 0 0 1px rgb(var(--fil) / .7), 0 0 34px rgb(var(--fil) / .45), 0 30px 60px -22px rgba(0,0,0,.8);
+  background:radial-gradient(circle at 32% 24%, rgba(255,255,255,.2), transparent 40%), radial-gradient(circle at 50% 50%, transparent 62%, rgba(26,25,24,.28));
+  transition:opacity .3s var(--out), transform .3s var(--out)}
+.lens.is-on .lens__ring{opacity:1; transform:none; transition:opacity .6s var(--expo), transform .9s var(--expo)}
+.lens__tether{position:absolute; left:0; top:0; width:100px; height:1px; margin-top:-.5px; transform-origin:0 50%; opacity:0;
+  background:linear-gradient(90deg, rgb(var(--fil) / .95), rgb(var(--fil) / .45)); box-shadow:0 0 6px rgb(var(--fil) / .6); transition:opacity .3s var(--out)}
+.lens.is-on.has-tether .lens__tether{opacity:1; transition:opacity .6s var(--expo) .1s}
+.is-lensing.lens-hide-cursor{cursor:none}
+
+/* ---------- Pied de page : le coin bas gauche reste libre pour l'outil de revue ---------- */
+.foot{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+
+@media (prefers-reduced-motion: reduce){
+  .fil-drop{--dp:1 !important}
+  .lens{display:none}
+}
+
+/* =========================================================
+   Page projet : réglages Le fil
+   ========================================================= */
+.word{text-shadow:0 0 .5em rgb(var(--fil) / .45), 0 0 1.4em rgb(var(--teinte-rgb) / .22)}
+.nav__prog i{background:linear-gradient(90deg, rgb(var(--fil) / .2), rgb(var(--fil))); box-shadow:0 0 8px rgb(var(--fil) / .6)}
+.nav__prog{left:24px; right:24px; border-radius:1px}
+@media (min-width:1100px){ .fil-on .nav__prog{display:none} }
+.btn--light{box-shadow:0 16px 36px -20px rgb(var(--fil) / .7)}
+
+/* 1. L'arrivée : une arche de lumière, dessinée par le fil */
+.arr__arch{position:absolute; left:50%; bottom:0; z-index:-1; height:min(82vh, 760px, 128vw); height:min(82svh, 760px, 128vw); aspect-ratio:5 / 7; translate:-50% 0; pointer-events:none}
+.arr__archLight{position:absolute; inset:0; border-radius:999px 999px 0 0;
+  background:radial-gradient(70% 52% at 50% 34%, rgb(var(--teinte-rgb) / .5), rgb(var(--teinte-rgb) / .14) 60%, rgb(var(--teinte-rgb) / 0) 86%);
+  -webkit-mask-image:linear-gradient(180deg, #000 52%, transparent); mask-image:linear-gradient(180deg, #000 52%, transparent)}
+.arr__arch .arch__main{stroke:rgb(var(--fil))}
+.js .arr__arch .arch__line path{stroke-dashoffset:1}
+.is-arrived .arr__arch .arch__line .arch__main{stroke-dashoffset:0; transition:stroke-dashoffset 2.6s var(--fil-io) .95s}
+.is-arrived .arr__arch .arch__line .arch__ghost{stroke-dashoffset:0; transition:stroke-dashoffset 3s var(--fil-io) 1.25s}
+.js .arr__archLight{opacity:0; transform:scaleY(.55); transform-origin:50% 100%}
+.is-arrived .arr__archLight{opacity:1; transform:none; transition:opacity 1.6s var(--expo) .75s, transform 2.2s var(--expo) .75s}
+.arr__cue{box-shadow:inset 0 0 0 1px rgb(var(--fil) / .5), 0 0 22px -6px rgb(var(--fil) / .8)}
+
+/* 3. Comment ça marche : par défaut (mobile, mouvement réduit), le gabarit Golden */
+.how__win,.how__track{display:contents}
+.temps__k{display:none}
+/* Ordinateur : la piste glisse à l'horizontale le long du fil ; la scène reste à droite */
+.is-pin .how .fil-drop{display:none}
+.is-pin .how__in{display:grid; grid-template-columns:minmax(0,1fr) auto; grid-template-rows:auto auto; grid-template-areas:"t s" "w s"; column-gap:clamp(36px,4vw,80px); row-gap:clamp(20px,4vh,44px); align-content:center; align-items:end; height:100%; padding-top:84px; padding-bottom:24px}
+.is-pin .how__t{grid-area:t; align-self:end; font-size:clamp(56px,5.8vw,100px)}
+.is-pin .how__win{display:block; grid-area:w; align-self:start; position:relative; height:clamp(220px, 36vh, 340px); overflow:hidden; container-type:inline-size;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 5%, #000 78%, transparent); mask-image:linear-gradient(90deg, transparent 0, #000 5%, #000 78%, transparent)}
+.is-pin .how__track{display:flex; position:relative; height:100%; width:max-content; padding:0 40cqw 0 3cqw; will-change:transform}
+.is-pin .how__track::before,.is-pin .how__track::after{content:""; position:absolute; left:0; right:0; top:28%; height:1px; pointer-events:none}
+.is-pin .how__track::before{background:linear-gradient(90deg, rgba(244,239,230,.16), rgba(244,239,230,.16) 70%, rgba(244,239,230,0))}
+.is-pin .how__track::after{background:linear-gradient(90deg, rgb(var(--fil) / .3), rgb(var(--fil)) 20%); box-shadow:0 0 10px rgb(var(--fil) / .6); transform-origin:left; transform:scaleX(var(--hp, 0))}
+.is-pin .temps{display:flex; flex:none; margin:0; gap:0; align-self:stretch}
+.is-pin .temps li{position:relative; flex:none; width:60cqw; height:100%; padding:0; font-size:clamp(30px,3vw,50px); line-height:1.1; letter-spacing:-.03em}
+.is-pin .temps li::before{display:none}
+.is-pin .temps__k{display:block; position:absolute; left:0; top:28%; width:13px; height:13px; margin:-6.5px 0 0 -6px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(244,239,230,.5); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.is-pin .temps li.is-on .temps__k{background:rgb(var(--fil)); box-shadow:0 0 0 6px rgb(var(--fil) / .16), 0 0 22px rgb(var(--fil))}
+.is-pin .temps__t{position:absolute; left:0; right:12cqw; top:calc(28% + 30px); text-wrap:balance}
+.is-pin .how .sc{width:min(40vw, calc((100vh - 150px) * .8), 540px)}
+.is-pin .how__stage{grid-area:s; align-self:center}
+
+/* 4. L'IA en clair : la chaîne devient un fil lumineux */
+.chain::after{box-shadow:0 0 10px rgb(var(--fil) / .55)}
+.chain__node::before{box-shadow:0 0 0 5px rgb(var(--fil) / .1), 0 0 14px rgb(var(--fil) / .5)}
+.capot__sum{box-shadow:inset 0 0 0 1px rgb(var(--fil) / .4)}
+
+/* 5. En vrai : la lentille grossit la capture */
+.frame.is-lensing{cursor:none}
+
+/* 7. L'histoire suivante : le fil continue vers l'app suivante */
+.next::after{height:1px; background:linear-gradient(90deg, rgb(var(--nx-rgb) / 0), rgb(var(--nx-rgb) / .9) 30%, rgb(var(--nx-rgb) / 0)); box-shadow:0 0 12px rgb(var(--nx-rgb) / .6)}
+
+@media (prefers-reduced-motion: reduce){
+  .js .arr__arch .arch__line path{stroke-dashoffset:0 !important}
+  .js .arr__archLight{transform:none !important}
+}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+</head>
+<body>
+<a class="skip" href="#histoire">Aller au contenu</a>
+<span class="top-sentinel" aria-hidden="true"></span>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="flood" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__app" href="#action" data-nav-app aria-label="Essayer Oshii"><img src="../assets/apps/oshii-icone.jpg" alt="" width="320" height="320"><span>Essayer</span></a>
+  </div>
+  <div class="nav__prog" aria-hidden="true"><i></i></div>
+</header>
+
+<main id="histoire" tabindex="-1" data-histoire></main>
+
+<footer class="foot">
+  <p>© 2026 Kenz · <a class="link" href="pro.html#contact">Parlons de votre idée</a></p>
+</footer>
+
+<!-- Les six animations (markup de la V3), clonées dans « Comment ça marche » -->
+<template id="tpl-oshii">
+        <div class="sc sc--oshii" data-scene="oshii">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : une vidéo de recette, « pâtes crémeuses au citron », est partagée à Oshii. Elle se replie dans l’icône et devient une fiche pesée : pâtes 200 g, parmesan 40 g, citron 1, crème 10 cl, 4 étapes.">
+              <div class="os-video">
+                <svg class="os-food" viewBox="0 0 90 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="osT" cx="50%" cy="40%" r="72%"><stop offset="0" stop-color="#6A4E3A"/><stop offset="1" stop-color="#1F1712"/></radialGradient>
+                    <radialGradient id="osS" cx="42%" cy="38%" r="70%"><stop offset="0" stop-color="#FCEBC0"/><stop offset="1" stop-color="#E4BC6E"/></radialGradient>
+                  </defs>
+                  <rect width="90" height="160" fill="url(#osT)"/>
+                  <ellipse cx="46" cy="71" rx="40" ry="37" fill="#140F0B" opacity=".45"/>
+                  <circle cx="45" cy="66" r="37" fill="#EDE5D8"/>
+                  <circle cx="45" cy="66" r="29" fill="#F8F3EB"/>
+                  <circle cx="45" cy="66" r="24" fill="url(#osS)"/>
+                  <g fill="none" stroke="#F7DC94" stroke-width="2.4" stroke-linecap="round">
+                    <path d="M28 60c6-8 16-8 20 0s12 10 18 2"/>
+                    <path d="M26 70c8-6 14 4 22-2s14-8 18 0"/>
+                    <path d="M32 78c6-4 12 4 18-1s10-5 14 1"/>
+                    <path d="M34 52c4-4 10-4 14 0s10 4 12 1"/>
+                  </g>
+                  <g fill="none" stroke="#D8AA58" stroke-width="1.3" stroke-linecap="round" opacity=".85">
+                    <path d="M30 65c5-5 11 3 17-1s11-4 15 1"/>
+                    <path d="M33 74c5-3 9 2 14 0"/>
+                  </g>
+                  <g transform="translate(60 53)"><circle r="8.5" fill="#F2CF3A"/><circle r="7" fill="#FBE68A"/><path d="M0 0V-7M0 0L6-3.5M0 0L6 3.5M0 0V7M0 0L-6 3.5M0 0L-6-3.5" stroke="#F2CF3A" stroke-width=".9"/></g>
+                  <ellipse cx="33" cy="58" rx="5.4" ry="2.6" fill="#5C8F45" transform="rotate(-35 33 58)"/>
+                  <ellipse cx="38" cy="54.5" rx="4.4" ry="2.2" fill="#76A85A" transform="rotate(20 38 54.5)"/>
+                  <g fill="#FFF8E6"><circle cx="44" cy="64" r=".9"/><circle cx="50" cy="70" r=".8"/><circle cx="40" cy="72" r=".8"/><circle cx="52" cy="60" r=".9"/><circle cx="47" cy="77" r=".7"/></g>
+                  <path d="M80 98L66 132" stroke="#B9B2A6" stroke-width="2.6" stroke-linecap="round"/>
+                </svg>
+                <span class="os-rail" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4c4.7 0 8 2.9 8 6.6s-3.3 6.6-8 6.6c-.9 0-1.8-.1-2.6-.3L5 19l1-3.6C4.8 14.2 4 12.5 4 10.6 4 6.9 7.3 4 12 4z"/></svg>
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 5l7 6.5-7 6.5v-4c-4.5 0-7 1.3-9 4.5.5-5 3-8.5 9-9.3V5z"/></svg>
+                </span>
+                <p class="os-cap">pâtes crémeuses au citron</p>
+                <span class="os-bar"><i></i></span>
+              </div>
+              <div class="os-sheet">
+                <p class="os-sheet__t">Partager vers</p>
+                <div class="os-row">
+                  <span class="os-app os-app--oshii"><img src="../assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><span>Oshii</span><span class="os-tap"></span></span>
+                  <span class="os-app"><i></i><b></b></span>
+                  <span class="os-app"><i></i><b></b></span>
+                  <span class="os-app"><i></i><b></b></span>
+                </div>
+              </div>
+              <div class="os-recipe">
+                <div class="os-recipe__head"><img src="../assets/apps/oshii-icone.jpg" alt="" width="320" height="320" loading="lazy" decoding="async"><p class="os-recipe__t">Pâtes crémeuses au citron</p></div>
+                <ul class="os-ing">
+                  <li><span>Pâtes</span><b class="slit"><span class="num">200 g</span></b></li>
+                  <li><span>Parmesan</span><b class="slit"><span class="num">40 g</span></b></li>
+                  <li><span>Citron</span><b class="slit"><span class="num">1</span></b></li>
+                  <li><span>Crème</span><b class="slit"><span class="num">10 cl</span></b></li>
+                </ul>
+                <p class="os-steps"><span>4 étapes</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></p>
+              </div>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+<template id="tpl-sago">
+        <div class="sc sc--sago" data-scene="sago">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : la phrase japonaise « ねこ が すき », d’abord floue. Un chat se dessine au-dessus de ねこ, un cœur au-dessus de すき, les mots deviennent nets et la traduction apparaît : « J’aime les chats. »">
+              <p class="sg-line" lang="ja">
+                <span class="sg-w"><svg class="sg-draw sg-cat" viewBox="0 0 80 64" aria-hidden="true"><path pathLength="1" d="M14 56C8 44 10 30 16 22L14 6l14 10c7-3 17-3 24 0L66 6l-2 16c6 8 8 22 2 34-10 6-42 6-52 0z"/><path pathLength="1" d="M30 35v4M50 35v4"/><path pathLength="1" d="M37 44l3 2.4 3-2.4"/><path pathLength="1" d="M5 41l17 2.5M5 48l17-1M75 41l-17 2.5M75 48l-17-1"/></svg><span class="sg-k">ねこ</span></span>
+                <span class="sg-w"><span class="sg-k">が</span></span>
+                <span class="sg-w"><svg class="sg-draw sg-heart" viewBox="0 0 80 64" aria-hidden="true"><path pathLength="1" d="M40 58C18 44 8 34 8 22 8 13 15 7 23 7c8 0 14 5 17 11 3-6 9-11 17-11 8 0 15 6 15 15 0 12-10 22-32 36z"/></svg><span class="sg-k">すき</span></span>
+              </p>
+              <span class="sg-rule"></span>
+              <p class="sg-fr"><span class="sg-fw">J’aime</span> <span class="sg-fw">les</span> <span class="sg-fw">chats.</span></p>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+<template id="tpl-wado">
+        <div class="sc sc--wado" data-scene="wado">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : une assiette est scannée. Les macros apparaissent : protéines 38 g, glucides 62 g, lipides 14 g, environ 520 kcal, puis l’anneau « Ta journée » se remplit. Données d’exemple.">
+              <div class="wd-plate">
+                <svg class="wd-food" viewBox="0 0 200 200" aria-hidden="true">
+                  <circle cx="100" cy="106" r="95" fill="#04100A" opacity=".5"/>
+                  <circle cx="100" cy="100" r="94" fill="#E6E0D2"/>
+                  <circle cx="100" cy="100" r="78" fill="#F4F0E6"/>
+                  <path d="M44 104C40 80 62 64 84 68c20 4 26 26 18 44-8 18-50 18-58-8z" fill="#FFFDF7"/>
+                  <g fill="#E8E1D0"><ellipse cx="62" cy="88" rx="3" ry="1.4" transform="rotate(-20 62 88)"/><ellipse cx="74" cy="96" rx="3" ry="1.4" transform="rotate(30 74 96)"/><ellipse cx="58" cy="104" rx="3" ry="1.4" transform="rotate(10 58 104)"/><ellipse cx="84" cy="84" rx="3" ry="1.4" transform="rotate(-40 84 84)"/><ellipse cx="70" cy="112" rx="3" ry="1.4" transform="rotate(-10 70 112)"/></g>
+                  <g transform="rotate(-14 134 84)"><rect x="104" y="68" width="60" height="34" rx="15" fill="#F28E6C"/><path d="M118 72c4 8 4 18 0 26M132 70c4 9 4 21 0 30M146 71c4 9 4 20 0 29" stroke="#FFC4AA" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/></g>
+                  <circle cx="122" cy="132" r="15" fill="#4E9C5C"/><circle cx="142" cy="124" r="12" fill="#68B46C"/><circle cx="134" cy="147" r="11" fill="#3F8A4E"/><circle cx="153" cy="141" r="9" fill="#5BAA60"/>
+                  <g transform="rotate(-24 80 146)"><ellipse cx="80" cy="146" rx="22" ry="12" fill="#BFD776"/><ellipse cx="80" cy="146" rx="15" ry="7.5" fill="#E7EFAE"/></g>
+                  <g fill="#2B2B2B" opacity=".5"><ellipse cx="122" cy="80" rx="1.6" ry=".8"/><ellipse cx="138" cy="86" rx="1.6" ry=".8" transform="rotate(30 138 86)"/><ellipse cx="150" cy="78" rx="1.6" ry=".8"/></g>
+                </svg>
+                <span class="wd-scan" aria-hidden="true"><span class="wd-sweep"></span></span>
+                <i class="wd-br wd-br--a"></i><i class="wd-br wd-br--b"></i><i class="wd-br wd-br--c"></i><i class="wd-br wd-br--d"></i>
+              </div>
+              <ul class="wd-pills">
+                <li><span>Protéines</span><b class="slit"><span class="num">38 g</span></b></li>
+                <li><span>Glucides</span><b class="slit"><span class="num">62 g</span></b></li>
+                <li><span>Lipides</span><b class="slit"><span class="num">14 g</span></b></li>
+                <li class="wd-k"><b class="slit"><span class="num">≈ 520 <small>kcal</small></span></b></li>
+              </ul>
+              <div class="wd-ring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="wd-ring__bg" cx="22" cy="22" r="18"/><circle class="wd-ring__fg" cx="22" cy="22" r="18" pathLength="1"/></svg><span>Ta journée</span></div>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+<template id="tpl-croc">
+        <div class="sc sc--croc" data-scene="croc">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le matin, « Je m’engage » se coche ; le soir, « Tenu ». Les jours de la semaine se cochent un à un et la série monte jusqu’à 12 jours. « Cette série tient. Bravo. » Données d’exemple.">
+              <div class="cr-top">
+                <svg class="cr-mascot" viewBox="0 0 60 60" aria-hidden="true">
+                  <defs><radialGradient id="crG" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="#CDBFFF"/><stop offset="1" stop-color="#7F69E6"/></radialGradient></defs>
+                  <path d="M30 6C40 6 46 16 49 28c4 14 1 26-19 26S7 42 11 28C14 16 20 6 30 6z" fill="url(#crG)"/>
+                  <ellipse cx="19.5" cy="38.5" rx="2.8" ry="1.5" fill="#F4A6C8" opacity=".55"/><ellipse cx="40.5" cy="38.5" rx="2.8" ry="1.5" fill="#F4A6C8" opacity=".55"/>
+                  <circle cx="24" cy="33" r="2" fill="#1C1733"/><circle cx="36" cy="33" r="2" fill="#1C1733"/>
+                  <path class="cr-m1" d="M27 40.5h6" stroke="#1C1733" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0"/>
+                  <path class="cr-m2" d="M26 39.5q4 4 8 0" stroke="#1C1733" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                </svg>
+                <div class="cr-streak">
+                  <span class="cr-streak__l">Série</span>
+                  <span class="cr-streak__v"><span class="roll-w"><span class="roll cr-roll"><b>5</b><b>6</b><b>7</b><b>8</b><b>9</b><b>10</b><b>11</b><b>12</b></span></span><span class="cr-streak__u">jours</span></span>
+                </div>
+              </div>
+              <div class="cr-pact">
+                <div class="cr-pill"><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span><div><small>Matin</small><span>Je m’engage</span></div></div>
+                <div class="cr-pill"><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span><div><small>Soir</small><span>Tenu</span></div></div>
+              </div>
+              <ol class="cr-week">
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>L</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>M</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>M</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>J</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>V</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>S</li>
+                <li><span class="chk"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M7 12.5l3.2 3.2L17 9"/></svg></span>D</li>
+              </ol>
+              <p class="cr-bravo">Cette série tient. Bravo.</p>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+<template id="tpl-miru">
+        <div class="sc sc--miru" data-scene="miru">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le thème « Les films des années 2000 » s’écrit. Des cartes se battent puis se distribuent à cinq joueurs en cercle, et un téléphone passe de main en main.">
+              <div class="mr-field"><span class="mr-field__l">Thème</span><span class="mr-type"><span class="mr-txt">Les films des années 2000</span><i class="mr-caret"></i></span></div>
+              <span class="mr-card mr-card--0"></span><span class="mr-card mr-card--1"></span><span class="mr-card mr-card--2"></span><span class="mr-card mr-card--3"></span><span class="mr-card mr-card--4"></span>
+              <span class="mr-av mr-av--0"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFB86B"/><path d="M5 17c2-8 8-13 15-13s13 5 15 13c-5-3-9-4-15-4S10 14 5 17z" fill="#7A4A1E" opacity=".55"/><circle cx="15" cy="21" r="1.8" fill="#2A1C3D"/><circle cx="25" cy="21" r="1.8" fill="#2A1C3D"/><path d="M15.5 27q4.5 3.5 9 0" stroke="#2A1C3D" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--1"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#7FD1C7"/><path d="M6 15c3-7 8-11 14-11 7 0 12 5 14 12-6-4-10-1-14-5-4 4-9 2-14 4z" fill="#1F4F4A" opacity=".55"/><circle cx="15" cy="21" r="1.8" fill="#16302E"/><circle cx="25" cy="21" r="1.8" fill="#16302E"/><path d="M16 27h8" stroke="#16302E" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--2"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#B9A5FF"/><path d="M4 22c0-11 7-18 16-18s16 7 16 18c-3-5-8-8-16-8S7 17 4 22z" fill="#3B2A7A" opacity=".5"/><circle cx="15" cy="22" r="1.8" fill="#221A45"/><circle cx="25" cy="22" r="1.8" fill="#221A45"/><path d="M15.5 28q4.5 3.5 9 0" stroke="#221A45" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--3"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#FFA493"/><path d="M8 13c3-6 7-9 12-9s9 3 12 9c-4-2-8-2-12-2s-8 0-12 2z" fill="#6B2A22" opacity=".5"/><circle cx="15" cy="21" r="1.8" fill="#3A1A16"/><circle cx="25" cy="21" r="1.8" fill="#3A1A16"/><path d="M15.5 26.5q4.5 4 9 0" stroke="#3A1A16" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-av mr-av--4"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#8EC5FF"/><path d="M5 18c1-9 7-14 15-14s14 5 15 14c-4-4-8-6-15-6S9 14 5 18z" fill="#1E3F66" opacity=".5"/><circle cx="15" cy="21" r="1.8" fill="#14263D"/><circle cx="25" cy="21" r="1.8" fill="#14263D"/><path d="M15.5 27q4.5 3 9 0" stroke="#14263D" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><i class="mr-hi"></i></span>
+              <span class="mr-phone"><i></i></span>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+<template id="tpl-zenko">
+        <div class="sc sc--zenko" data-scene="zenko">
+          <div class="sc__view">
+            <div class="sc__core" role="img" aria-label="Animation : le curseur du budget glisse de 40 € à 25 €, et les trois moments de la journée, matin, après-midi et soir, se recomposent avec des activités moins chères. Données d’exemple.">
+              <div class="zk-budget">
+                <div class="zk-head"><span class="zk-l">Budget</span><span class="zk-v"><span class="roll-w"><span class="roll zk-roll"><b>40</b><b>39</b><b>38</b><b>37</b><b>36</b><b>35</b><b>34</b><b>33</b><b>32</b><b>31</b><b>30</b><b>29</b><b>28</b><b>27</b><b>26</b><b>25</b></span></span><small>€</small></span></div>
+                <div class="zk-track"><i class="zk-fill"></i><span class="zk-knobwrap"><i class="zk-knob"></i></span></div>
+                <div class="zk-ends"><span>0 €</span><span>50 €</span></div>
+              </div>
+              <ol class="zk-day">
+                <li class="zk-card" style="--c1:.86; --c2:.42"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16.5h14M4.5 16.5v-3.2l1.8-4.6a2 2 0 0 1 1.9-1.2h7.6a2 2 0 0 1 1.9 1.2l1.8 4.6v3.2M7 16.5v2M17 16.5v2M7.5 13h.01M16.5 13h.01"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4.5c1.6 0 2.5 1.6 2.5 3.6S10 12 8.5 12 6 10.1 6 8.1s.9-3.6 2.5-3.6zM7.8 14.5h1.6M15.5 9.5c1.6 0 2.5 1.6 2.5 3.6S17 17 15.5 17 13 15.1 13 13.1s.9-3.6 2.5-3.6zM14.8 19.5h1.6"/></svg></span><span class="zk-txt"><span class="zk-when">Matin</span><span class="zk-cost"><i></i></span></span></li>
+                <li class="zk-card" style="--c1:.74; --c2:.36"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9 12 4.5 20.5 9M5.5 9.5v7M10 9.5v7M14 9.5v7M18.5 9.5v7M3.5 19.5h17"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5V15M12 15c-3.6 0-5.5-2.3-5.5-5S8.9 4 12 4s5.5 3.3 5.5 6-1.9 5-5.5 5z"/></svg></span><span class="zk-txt"><span class="zk-when">Après-midi</span><span class="zk-cost"><i></i></span></span></li>
+                <li class="zk-card" style="--c1:.92; --c2:.5"><span class="zk-act"><svg class="zk-a zk-a--1" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16.5h16M5.5 16.5a6.5 6.5 0 0 1 13 0M12 10V8M10.5 8h3M3.5 19.5h17"/></svg><svg class="zk-a zk-a--2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5h16a8 8 0 0 1-16 0zM13.5 4l-3 6.5M18 5l-5 5.5"/></svg></span><span class="zk-txt"><span class="zk-when">Soir</span><span class="zk-cost"><i></i></span></span></li>
+              </ol>
+              <span class="sc__ex">exemple</span>
+            </div>
+          </div>
+          <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        </div>
+</template>
+
+<script>
+/* =========================================================
+   Le contenu (faits de ../_shared/content.js et textes des briefs) et le rendu du gabarit.
+   Sans GSAP : tout s'affiche quand même.
+   ========================================================= */
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const AS = 'https://apps.apple.com/';
+  const D = {
+    oshii: {
+      nom: 'Oshii', teinte: '#E5483B', rgb: '229 72 59', lumiere: '#FF9384',
+      question: 'Et si tes recettes TikTok devenaient de <em class="word">vraies</em> recettes&nbsp;?',
+      accroche: 'Partage la vidéo à Oshii&nbsp;: elle devient une recette pesée, prête à <em class="word">cuisiner</em>.',
+      probleme: 'Tu enregistres des recettes sur TikTok. Tu ne les refais <em class="word">jamais</em>.',
+      pourQui: 'Pour qui sauvegarde des recettes sur les réseaux.',
+      temps: [[0, 'Une recette passe sur TikTok.'], [1.15, 'Tu la partages à Oshii.'], [2.25, 'Elle devient une fiche pesée.']],
+      etapes: [['Tu partages une vidéo.'], ['J’en extrais le son.'], ['Je le transcris.'], ['Un modèle d’IA en tire la recette, pesée.', 1]],
+      capot: {
+        chaine: ['Partage depuis TikTok, Instagram ou YouTube Shorts', 'Détection de la plateforme et métadonnées', 'Extraction de l’audio', 'Transcription (Whisper)', 'Analyse par un LLM (OpenAI ou Gemini)', 'Fiche recette pesée et rangée'],
+        repli: 'Pour YouTube, Gemini analyse directement la vidéo&nbsp;; si ça échoue, Whisper prend le relais.',
+        retenir: 'Le fournisseur de modèle se change par une variable&nbsp;: je ne réécris pas l’app quand un modèle change.',
+        defis: ['Partage entrant natif depuis TikTok, Instagram et YouTube.', 'Miniatures TikTok cassées par l’oEmbed le 16/10&nbsp;: repli yt-dlp avec garde SSRF et rattrapage.', 'Liste de courses hors ligne&nbsp;: file d’actions et identifiants créés sur le téléphone.']
+      },
+      captures: ['duo', [
+        ['oshii-ecran-1.jpg', 462, 1000, 'Écran App Store d’Oshii : « Transforme tes recettes », une marmite rouge entourée des logos TikTok, YouTube et Instagram.'],
+        ['oshii-ecran-2.jpg', 462, 1000, 'Écran d’Oshii : la fiche « Cheese Nans &amp; Kefta », avec calories, glucides, protéines et lipides.']]],
+      sortie: '2025-11-06', version: '2.0.2', maj: '2026-11-04', aussi: 'Aussi sur Android.',
+      liens: [['App Store', AS + 'fr/app/oshii-recettes-des-r%C3%A9seaux/id6754848905'], ['Google Play', 'https://play.google.com/store/apps/details?id=com.x7kenz.Oshii']],
+      site: 'https://www.oshii.fr/'
+    },
+    sago: {
+      nom: 'Sago', teinte: '#5B4BC4', rgb: '91 75 196', lumiere: '#B3A8FF',
+      question: 'Le japonais, ça a l’air <em class="word">impossible</em>&nbsp;?',
+      accroche: 'Là, tu ne comprends rien. 15&nbsp;minutes plus tard&nbsp;: maintenant, tu <em class="word">comprends</em>.',
+      probleme: 'Des flashcards, encore des flashcards. Et tu finis par <em class="word">lâcher</em>.',
+      pourQui: 'Pour qui débute, surtout après un premier abandon. Et pour les fans d’animés.',
+      temps: [[0, 'Une phrase que tu ne sais pas lire.'], [0.15, 'Chaque mot prend une image.'], [2.3, 'Et la phrase prend son sens.']],
+      etapes: [['J’écris les épisodes avec des agents IA.', 1], ['Je relis, je compile, je valide.'], ['Je publie, et je peux revenir en arrière.'], ['Dans l’app, aucune IA&nbsp;: tout est déjà relu.']],
+      capot: {
+        chaine: ['Écriture (agents + auteur)', 'Compilation', 'Validation', 'Publication', 'Activation', 'Retour arrière par version'],
+        repli: 'Chaque version de contenu peut être réactivée&nbsp;; un correctif peut partir côté contenu sans nouvelle version de l’app.',
+        retenir: 'L’IA travaille avant, pas devant l’utilisateur&nbsp;: le contenu est écrit, relu, compilé et réversible.',
+        defis: ['Un compilateur qui refuse un arc incomplet.', 'Ordre de mise en prod imposé&nbsp;: migration → serveur → contenu → build.', 'Correctif « bloqué au rebondissement » livré côté contenu, sans attendre une version de l’app.']
+      },
+      captures: ['duo', [
+        ['sago-ecran-1.jpg', 460, 1000, 'Écran App Store de Sago : « Sago apprend le japonais », une scène d’anime avec des phrases en japonais et leur lecture.'],
+        ['sago-ecran-2.jpg', 460, 1000, 'Écran de Sago : l’épisode « Un matin sans voix », à travers des histoires anime.']]],
+      sortie: '2026-04-08', version: '2.0.1', maj: '2026-10-30', aussi: 'Aussi sur iPad.',
+      liens: [['App Store', AS + 'fr/app/sago-apprendre-le-japonais/id6759610780']],
+      site: 'https://sago-landing.vercel.app'
+    },
+    wado: {
+      nom: 'Wado', teinte: '#2F7A55', rgb: '47 122 85', lumiere: '#8ADBAE',
+      question: 'Compter ses calories&nbsp;? Personne n’a le <em class="word">temps</em>.',
+      accroche: 'Une photo de ton plat. Wado compte, et ajuste ton <em class="word">plan</em>.',
+      probleme: 'Peser, noter, additionner&nbsp;: compter ses calories, c’est <em class="word">pénible</em>.',
+      pourQui: 'Pour qui s’entraîne en salle.',
+      temps: [[0, 'Tu prends ton plat en photo.'], [1.65, 'Wado reconnaît, et compte.'], [2.3, 'Ta journée se met à jour.']],
+      etapes: [['Tu prends ton plat en photo.'], ['Un modèle d’IA reconnaît les aliments.', 1], ['Je calcule les macros.'], ['Tout s’ajoute à ta journée.']],
+      capot: {
+        chaine: ['Photo du plat', 'Reconnaissance des aliments (Gemini vision)', 'Calcul des macros', 'Ajout au journal du jour'],
+        repli: 'Provider « mock » hors ligne pour développer et tester&nbsp;; paywall doux au moment de la limite quotidienne.',
+        retenir: 'Un mode factice d’abord&nbsp;: je teste tout le parcours sans payer un seul appel.',
+        defis: ['Moteur de programmes qui donne la charge exacte (« 42 kg × 8 »).', '14 widgets iOS (accueil et écran verrouillé).', 'Plan repas de 7 jours sur un catalogue de 120 recettes, liste de courses et meal prep.']
+      },
+      captures: ['land', [
+        ['wado-ecran-1.jpg', 1000, 703, 'Écran de Wado sur tablette : « Muscu et calories, un seul plan », la journée avec le déjeuner à scanner et la séance du jour.'],
+        ['wado-ecran-2.jpg', 1000, 703, 'Écran de Wado sur tablette : « Ton repas en photo, calories comptées », un plat de saumon, riz et brocoli, 665 kcal et ses macros.']]],
+      sortie: '2026-10-10', version: '1.1.1', maj: '2026-11-04', aussi: '',
+      liens: [['App Store', AS + 'us/app/wado-calories-ia-muscu/id6813179120']],
+      site: 'https://wado-lilac.vercel.app'
+    },
+    croc: {
+      nom: 'Croc', teinte: '#8E7CF0', rgb: '142 124 240', lumiere: '#CBC1FF',
+      question: 'Tu te ronges les ongles depuis <em class="word">toujours</em>&nbsp;?',
+      accroche: 'Un petit pacte le matin, validé le soir. Croc t’accompagne, sans te <em class="word">juger</em>.',
+      probleme: 'Tu le fais sans y penser. Et les rappels ne <em class="word">tiennent</em> pas.',
+      pourQui: 'Pour qui veut arrêter de se ronger les ongles, avec bienveillance.',
+      temps: [[0, 'Le matin, tu t’engages.'], [0.8, 'Le soir, tu valides.'], [1.3, 'Jour après jour, ta série grandit.']],
+      sansIA: ['Pas d’IA ici, et c’est un <em class="word">choix</em>.', 'Une logique simple et testée suffit.'],
+      capot: {
+        titre: 'Comment c’est fait',
+        chaine: ['« Rien de calculable ne vit dans un composant »&nbsp;: logique pure et testée.', 'Mode hors ligne après connexion, synchro où le serveur fusionne.', 'Analytics produit maison&nbsp;: actifs, rétention J1/J7/J30, tunnel onboarding → premier pacte.', 'Rappels dégressifs&nbsp;; journal photo avant/après.', 'Six widgets iOS, six sons de bois et un seul ressort d’animation.']
+      },
+      captures: ['land', [
+        ['croc-ecran-1.jpg', 1000, 687, 'Écran de Croc sur tablette : « Arrête de te ronger les ongles », une série de 12 jours et la promesse du matin.'],
+        ['croc-ecran-2.jpg', 1000, 687, 'Écran de Croc sur tablette : « Vois tes ongles changer », les deux mains en photo, avant et après (images d’illustration).']]],
+      sortie: '2026-09-23', version: '1.2.1', maj: '2026-10-19', aussi: '',
+      liens: [['App Store', AS + 'app/croc-stop-ongles-rong%C3%A9s/id6801541157']],
+      site: 'https://croc-snowy.vercel.app'
+    },
+    miru: {
+      nom: 'Miru', teinte: '#4B5FD6', rgb: '75 95 214', lumiere: '#A7B3FF',
+      question: 'Ce soir, on joue à <em class="word">quoi</em>&nbsp;?',
+      accroche: 'Tu choisis un thème, Miru crée le jeu en <em class="word">direct</em>.',
+      probleme: 'Pas de cartes, rien de prêt, et tout le monde <em class="word">attend</em>.',
+      pourQui: 'Pour les groupes d’amis et les familles, de 3 à 12 personnes.',
+      temps: [[0, 'Tu choisis un thème.'], [1.05, 'Miru crée les cartes et les distribue.'], [2.55, 'Un seul téléphone passe de main en main.']],
+      etapes: [['Le groupe choisit un thème.'], ['Un modèle d’IA écrit le jeu.', 1], ['Tu le vois se construire en direct.'], ['La partie démarre.']],
+      capot: {
+        chaine: ['Le groupe choisit un thème', 'File BullMQ avec quota', 'Génération (OpenAI ou Gemini)', 'Thème reçu en streaming (SSE)', 'La partie démarre'],
+        retenir: 'La génération passe par une file avec quota et arrive en streaming&nbsp;: on voit le thème se construire.',
+        defis: ['Temps réel multi-appareils&nbsp;: salons, chronos pausables, reprise après fermeture de l’app.', 'Mode TV appairé par code&nbsp;; invité qui joue depuis le navigateur.', 'Rôles et révélations par glissement.']
+      },
+      captures: ['solo', [
+        ['miru-ecran-1.jpg', 462, 1000, 'Écran de Miru : « Tout le monde avec son téléphone », le salon de jeu avec le code de la partie et les joueurs.']]],
+      sortie: '2026-04-17', version: '2.0', maj: '2026-10-30', aussi: 'Aussi dans le navigateur, pour les invités et la télé.',
+      liens: [['App Store', AS + 'us/app/miru-jeux-entre-amis/id6761622088']],
+      site: 'https://v0-miru-website.vercel.app'
+    },
+    zenko: {
+      nom: 'Zenko', teinte: '#A0613A', rgb: '160 97 58', lumiere: '#EDB78E',
+      question: 'Une journée à remplir, un budget à <em class="word">tenir</em>&nbsp;?',
+      accroche: 'Zenko compose ta journée selon tes envies et ton <em class="word">budget</em>.',
+      probleme: 'En voyage, organiser chaque journée entre tes envies et ton budget, c’est un <em class="word">casse-tête</em>.',
+      pourQui: 'Pour qui voyage avec des envies, et un budget.',
+      temps: [[0, 'Tu as 40&nbsp;€ pour la journée.'], [0.2, 'Ton budget passe à 25&nbsp;€.'], [1.7, 'Zenko recompose ta journée.']],
+      etapes: [['Tu donnes tes envies et ton budget.'], ['Un modèle d’IA compose ta journée.', 1], ['Je vérifie sa réponse, et je la répare.'], ['Ta journée est prête&nbsp;: matin, midi, après-midi, soir.']],
+      capot: {
+        chaine: ['Envies et budget', 'GPT-4o-mini (sortie JSON)', 'Extraction et réparation du JSON', 'Plan enregistré en base'],
+        repli: 'Réparation du JSON renvoyé par le modèle.',
+        retenir: 'Un modèle ne renvoie pas toujours un JSON propre&nbsp;: je l’extrais et je le répare avant de l’enregistrer.',
+        defis: ['Fiabiliser une sortie JSON de modèle avant de la persister en relationnel.']
+      },
+      captures: ['solo', [
+        ['zenko-ecran-1.jpg', 462, 1000, 'Écran de Zenko : les dernières journées, comme « Ma journée à George Town », et les voyages.']]],
+      sortie: '2025-10-20', version: '1.0', maj: '2025-10-20', aussi: '', premiere: true,
+      liens: [['App Store', AS + 'ch/app/zenko/id6753706200']],
+      site: ''
+    }
+  };
+  const ORDRE = ['oshii', 'sago', 'wado', 'croc', 'miru', 'zenko'];
+  const slugDe = h => { h = String(h || '').toLowerCase(); return ORDRE.find(s => h.indexOf(s) > -1) || null; };
+  const suivant = s => ORDRE[(ORDRE.indexOf(s) + 1) % ORDRE.length];
+
+  /* La version et la date, dites en mots (relevées le 11/11/2026) */
+  const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const jour = iso => { const p = iso.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); };
+  const moisAn = iso => { const t = jour(iso); return MOIS[t.getMonth()] + ' ' + t.getFullYear(); };
+  const dateLongue = iso => { const t = jour(iso); return (t.getDate() === 1 ? '1er' : t.getDate()) + ' ' + MOIS[t.getMonth()] + ' ' + t.getFullYear(); };
+  const RELEVE = jour('2026-11-11');
+  const relatif = iso => {
+    const n0 = new Date(), auj = new Date(n0.getFullYear(), n0.getMonth(), n0.getDate());
+    if ((auj - RELEVE) / 864e5 > 60) return 'le ' + dateLongue(iso);
+    const n = Math.round((auj - jour(iso)) / 864e5);
+    if (n <= 0) return 'aujourd’hui';
+    if (n === 1) return 'hier';
+    if (n < 45) return 'il y a ' + n + ' jours';
+    return 'il y a ' + Math.round(n / 30) + ' mois';
+  };
+
+  const SVG_DOWN = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg>';
+  const SVG_OUT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg>';
+  const SVG_RIGHT = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg>';
+  const SVG_PLUS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>';
+  const SVG_SPARK = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.2c.4 3.2 1.6 4.4 4.8 4.8-3.2.4-4.4 1.6-4.8 4.8-.4-3.2-1.6-4.4-4.8-4.8C6.4 5.6 7.6 4.4 8 1.2zM12.6 10.4c.2 1.4.7 1.9 2.1 2.1-1.4.2-1.9.7-2.1 2.1-.2-1.4-.7-1.9-2.1-2.1 1.4-.2 1.9-.7 2.1-2.1z"/></svg>';
+  const ico = s => '../assets/apps/' + s + '-icone.jpg';
+  const rows = list => '<ul class="capot__rows">' + list.map(x => '<li>' + x + '</li>').join('') + '</ul>';
+
+  const S = {
+    arrivee: (a, s) => `
+  <section class="arr" aria-labelledby="arr-nom">
+    <div class="arr__light" aria-hidden="true"></div>
+    <div class="arr__arch" aria-hidden="true"><i class="arr__archLight"></i><svg class="arch__line" viewBox="0 0 500 700"><path class="arch__ghost" pathLength="1" d="M-26 700V250A276 276 0 0 1 526 250V700"/><path class="arch__main" pathLength="1" d="M1 700V250A249 249 0 0 1 499 250V700"/></svg></div>
+    <div class="arr__in">
+      <img class="arr__ico" src="${ico(s)}" alt="Icône de ${a.nom}" width="320" height="320" fetchpriority="high">
+      <h1 class="arr__nom" id="arr-nom" tabindex="-1"><span class="ttl ttl--main">${a.nom}</span><span class="ttl ttl--ghost" aria-hidden="true">${a.nom}</span></h1>
+      <p class="arr__line" data-words>${a.accroche}</p>
+    </div>
+    <a class="arr__cue" href="#probleme" aria-label="Descendre dans l’histoire">${SVG_DOWN}</a>
+  </section>`,
+    probleme: a => `
+  <section class="pbm" id="probleme" aria-labelledby="pbm-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap">
+      <h2 class="pbm__t" id="pbm-t" data-words>${a.probleme}</h2>
+      <p class="cap pbm__cap" data-reveal="fade" style="--d:3">${a.pourQui}</p>
+    </div>
+  </section>`,
+    comment: a => `
+  <section class="how" id="comment" aria-labelledby="how-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap how__in">
+      <h2 class="h2 how__t" id="how-t" data-sweep>Comment ça marche</h2>
+      <div class="how__win">
+        <div class="how__track">
+          <ol class="temps" data-temps>${a.temps.map(t => '<li><span class="temps__k" aria-hidden="true"></span><span class="temps__t">' + t[1] + '</span></li>').join('')}</ol>
+        </div>
+      </div>
+      <div class="how__stage" data-stage data-reveal="card"></div>
+    </div>
+  </section>`,
+    ia: a => {
+      const c = a.capot;
+      const col1 = c.chaine ? `<div><p class="capot__l">${c.titre || 'La chaîne'}</p>${rows(c.chaine)}</div>` : '';
+      const col2 = (c.repli || c.retenir || c.defis) ? `<div>${c.repli ? `<p class="capot__l">Si ça coince</p><p class="capot__p">${c.repli}</p>` : ''}${c.retenir ? `<p class="capot__l">Ce que j’en retiens</p><p class="capot__p">${c.retenir}</p>` : ''}${c.defis ? `<p class="capot__l">Les défis</p>${rows(c.defis)}` : ''}</div>` : '';
+      const corps = a.sansIA
+        ? `<p class="say ia__say" data-words>${a.sansIA[0]}</p><p class="ia__sub" data-reveal="fade" style="--d:4">${a.sansIA[1]}</p>`
+        : `<ol class="chain" style="--n:${a.etapes.length}" data-chain>${a.etapes.map(e => `<li class="chain__st${e[1] ? ' is-ia' : ''}"><span class="chain__node" aria-hidden="true">${e[1] ? SVG_SPARK : ''}</span><p>${e[0]}</p></li>`).join('')}</ol>`;
+      return `
+  <section class="ia" id="ia" aria-labelledby="ia-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap">
+      <h2 class="h2" id="ia-t" data-sweep>L’IA, en clair</h2>
+      ${corps}
+      <details class="capot" data-reveal="fade">
+        <summary class="capot__sum"><span>Sous le capot</span><span class="capot__plus" aria-hidden="true">${SVG_PLUS}</span></summary>
+        <div class="capot__body bezel"><div class="bezel__core capot__core">${col1}${col2}</div></div>
+      </details>
+    </div>
+  </section>`;
+    },
+    vrai: a => {
+      const t = a.captures[0], imgs = a.captures[1];
+      const l1 = a.premiere ? `Sur l’App Store depuis ${moisAn(a.sortie)}&nbsp;: c’est ma première app.` : `Sur l’App Store depuis ${moisAn(a.sortie)}.${a.aussi ? ' ' + a.aussi : ''}`;
+      const l2 = a.premiere ? `Version ${a.version}.` : `Version ${a.version}, mise à jour <time datetime="${a.maj}" title="${dateLongue(a.maj)}">${relatif(a.maj)}</time>.`;
+      return `
+  <section class="vrai vrai--${t}" aria-labelledby="vrai-t">
+    <span class="fil-drop" data-fil-drop aria-hidden="true"></span>
+    <div class="wrap vrai__grid">
+      <div class="vrai__txt">
+        <h2 class="h2" id="vrai-t" data-sweep>En vrai</h2>
+        <p class="vrai__line" data-reveal="fade" style="--d:3">${l1}</p>
+        <p class="vrai__line" data-reveal="fade" style="--d:4">${l2}</p>
+      </div>
+      <div class="vrai__media">${imgs.map((m, i) => `<figure class="frame frame--${i}" data-reveal="card" style="--d:${i * 2}"><div class="frame__core"><img src="../assets/apps/${m[0]}" alt="${m[3]}" width="${m[1]}" height="${m[2]}" loading="lazy" decoding="async"></div></figure>`).join('')}</div>
+    </div>
+  </section>`;
+    },
+    action: (a, s) => `
+  <section class="act" id="action" aria-labelledby="act-t">
+    <span class="fil-drop fil-drop--c" data-fil-drop aria-hidden="true"></span>
+    <img class="act__ico" src="${ico(s)}" alt="" width="320" height="320" loading="lazy" decoding="async" data-reveal="card">
+    <h2 class="say" id="act-t" data-words>À toi d’<em class="word">essayer</em>.</h2>
+    <div class="act__btns" data-reveal="fade" style="--d:4">${a.liens.map((l, i) => `<a class="btn ${i ? 'btn--ghost' : 'btn--light'}" href="${l[1]}" target="_blank" rel="noopener">${l[0]}<span class="btn__ico" aria-hidden="true">${SVG_OUT}</span></a>`).join('')}</div>
+    ${a.site ? `<a class="link" href="${a.site}" target="_blank" rel="noopener" data-reveal="fade" style="--d:5">Le site de ${a.nom}</a>` : ''}
+  </section>`,
+    suite: (nx, n) => `
+  <section class="next" aria-label="L’histoire suivante">
+    <div class="wrap">
+      <a class="next__q" href="app.html#${nx}" data-next="${nx}" aria-describedby="next-cap">${n.question}&#8288;<img class="next__ico" src="${ico(nx)}" alt="" width="320" height="320" loading="lazy" decoding="async"></a>
+      <p class="next__cap" id="next-cap">L’histoire suivante&nbsp;: ${n.nom} ${SVG_RIGHT}</p>
+    </div>
+  </section>`
+  };
+
+  function render(s) {
+    const a = D[s], nx = suivant(s), n = D[nx];
+    d.setAttribute('data-app', s);
+    d.style.setProperty('--teinte', a.teinte);
+    d.style.setProperty('--teinte-rgb', a.rgb);
+    d.style.setProperty('--lumiere', a.lumiere);
+    d.style.setProperty('--fil', [1, 3, 5].map(i => parseInt(a.lumiere.slice(i, i + 2), 16)).join(' '));
+    d.style.setProperty('--nx-rgb', n.rgb);
+    d.style.setProperty('--nx-l', n.lumiere);
+    document.title = 'Kenz — ' + a.nom;
+    const na = document.querySelector('[data-nav-app]');
+    if (na) { na.querySelector('img').src = ico(s); na.setAttribute('aria-label', 'Essayer ' + a.nom); }
+    const main = document.querySelector('[data-histoire]');
+    main.innerHTML = S.arrivee(a, s) + S.probleme(a) + S.comment(a) + S.ia(a) + S.vrai(a) + S.action(a, s) + S.suite(nx, n);
+    const tpl = document.getElementById('tpl-' + s), stage = main.querySelector('[data-stage]');
+    if (tpl && stage) stage.appendChild(tpl.content.cloneNode(true));
+  }
+
+  /* Une transition « passage » vient-elle d'avoir lieu ? (lu avant que shared/passage.js n'efface la clé) */
+  const passageFrais = (ms) => { try { const p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); return !!(p && Date.now() - p.t < ms); } catch (e) { return false; } };
+
+  const first = slugDe(location.hash) || 'oshii';
+  try { render(first); } catch (e) { console.error('[kz] rendu : ' + e.message); }
+  window.__kz = { D, ORDRE, slugDe, suivant, render, cur: first, passage: passageFrais(6000), passageFrais };
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/* =========================================================
+   LE FIL — module commun : le rail, les fils de chapitre, la lentille, le défilement horizontal.
+   Décoratif : tout est aria-hidden, et la page reste complète sans lui.
+   ========================================================= */
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = matchMedia('(hover: hover) and (pointer: fine)');
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  if (hasG) { G.registerPlugin(ST); if (!RM) d.classList.add('fil-on'); }
+
+  /* ---------- Le rail : un fil fixe à gauche qui s'allume au défilement, un nœud par chapitre ---------- */
+  function rail(getChapters) {
+    const none = { place() {}, kill() {} };
+    if (!hasG || RM) return none;
+    let el = $('.fil-rail');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'fil-rail';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = '<i class="fil-rail__fill"></i><span class="fil-rail__knots"></span><i class="fil-rail__head"></i>';
+      document.body.appendChild(el);
+    }
+    const box = $('.fil-rail__knots', el);
+    let ks = [], ps = [], p = 0;
+    const paint = () => {
+      el.style.setProperty('--fp', p.toFixed(4));
+      ks.forEach((k, i) => k.classList.toggle('is-lit', p >= ps[i] - .002));
+    };
+    const place = () => {
+      el.style.setProperty('--rh', el.offsetHeight + 'px');
+      const max = Math.max(1, ST.maxScroll(window));
+      box.textContent = '';
+      ps = getChapters().map(c => Math.min(1, Math.max(0, (c.getBoundingClientRect().top + scrollY - innerHeight * .5) / max)));
+      ks = ps.map(v => { const k = document.createElement('i'); k.className = 'fil-rail__k'; k.style.top = (v * 100).toFixed(3) + '%'; box.appendChild(k); return k; });
+      paint();
+    };
+    const st = ST.create({ start: 0, end: 'max', onUpdate: s => { p = s.progress; paint(); } });
+    ST.addEventListener('refresh', place);
+    place();
+    return { place, kill() { st.kill(); ST.removeEventListener('refresh', place); box.textContent = ''; ks = []; } };
+  }
+
+  /* ---------- Les fils de chapitre : chaque trait descend dans son chapitre au défilement ---------- */
+  function drops(root = document) {
+    const list = $$('[data-fil-drop]', root);
+    if (!hasG || RM) { list.forEach(x => x.style.setProperty('--dp', '1')); return () => {}; }
+    const tw = list.map(el => G.fromTo(el, { '--dp': 0 }, { '--dp': 1, ease: 'none', scrollTrigger: { trigger: el, start: 'top 94%', end: 'bottom 48%', scrub: .5 } }));
+    return () => tw.forEach(t => { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+  }
+
+  /* ---------- La lentille : une loupe qui suit la souris (souris seulement, jamais en mouvement réduit) ---------- */
+  let L = null;
+  const lensEl = () => {
+    if (L) return L;
+    const el = document.createElement('div');
+    el.className = 'lens';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<i class="lens__tether"></i><div class="lens__body"><div class="lens__disc"><div class="lens__in"></div></div><span class="lens__ring"></span></div>';
+    document.body.appendChild(el);
+    L = { el, body: $('.lens__body', el), inner: $('.lens__in', el), tether: $('.lens__tether', el), owner: null };
+    return L;
+  };
+  function lens(host, o = {}) {
+    if (!host || RM || !FINE.matches) return () => {};
+    const S = o.scale || 1.4, off = o.offset || null;
+    let raf = 0, on = false, tx = 0, ty = 0, x = 0, y = 0, R = 92, node = null, src = null;
+    const fill = () => {
+      const l = lensEl();
+      l.owner = host;
+      l.inner.textContent = '';
+      if (o.bg) l.el.style.setProperty('--lens-bg', o.bg); else l.el.style.removeProperty('--lens-bg');
+      if (o.size) l.el.style.setProperty('--ls', o.size + 'px'); else l.el.style.removeProperty('--ls');
+      l.el.classList.toggle('has-tether', !!off);
+      if (o.src) {
+        const im = document.createElement('img');
+        im.className = 'lens__img'; im.alt = ''; im.decoding = 'async';
+        im.src = typeof o.src === 'function' ? o.src() : o.src;
+        l.inner.appendChild(im);
+        node = im; src = null;
+      } else {
+        src = (typeof o.clone === 'function' ? o.clone() : o.clone) || host;
+        node = src.cloneNode(true);
+        node.removeAttribute('id');
+        $$('[id]', node).forEach(n => n.removeAttribute('id'));
+        $$('img', node).forEach(im => { im.alt = ''; im.removeAttribute('fetchpriority'); im.loading = 'eager'; });
+        node.classList.add('lens__clone');
+        if (o.filter) node.style.filter = o.filter;
+        l.inner.appendChild(node);
+      }
+      R = (l.body.offsetWidth || 184) / 2;
+    };
+    const frame = () => {
+      raf = 0;
+      if (!L || L.owner !== host) return;
+      let ox = 0, oy = 0;
+      if (off) { ox = off[0]; oy = off[1]; if (tx + ox + R > innerWidth - 12) ox = -ox; if (ty + oy - R < 70) oy = Math.abs(oy); }
+      const gx = tx + ox, gy = ty + oy;
+      x += (gx - x) * .2; y += (gy - y) * .2;
+      L.body.style.transform = 'translate3d(' + (x - R).toFixed(1) + 'px,' + (y - R).toFixed(1) + 'px,0)';
+      if (off) {
+        const dx = x - tx, dy = y - ty, len = Math.max(0, Math.hypot(dx, dy) - R);
+        L.tether.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px,0) rotate(' + Math.atan2(dy, dx).toFixed(4) + 'rad) scaleX(' + (len / 100).toFixed(3) + ')';
+      }
+      if (src) {
+        const r = src.getBoundingClientRect();
+        node.style.width = r.width + 'px';
+        node.style.height = r.height + 'px';
+        node.style.transform = 'translate3d(' + (R - S * (x - r.left)).toFixed(1) + 'px,' + (R - S * (y - r.top)).toFixed(1) + 'px,0) scale(' + S + ')';
+      } else if (node) {
+        const r = host.getBoundingClientRect();
+        const px = (tx - r.left) / Math.max(1, r.width) - .5, py = (ty - r.top) / Math.max(1, r.height) - .5;
+        node.style.transform = 'translate3d(' + (-px * 18).toFixed(2) + '%,' + (-py * 12).toFixed(2) + '%,0)';
+      }
+      if (on || Math.abs(gx - x) > .4 || Math.abs(gy - y) > .4) raf = requestAnimationFrame(frame);
+    };
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    const enter = e => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      fill();
+      tx = e.clientX; ty = e.clientY;
+      x = tx + (off ? off[0] : 0); y = ty + (off ? off[1] : 0);
+      on = true;
+      L.el.classList.add('is-on');
+      host.classList.add('is-lensing');
+      kick();
+    };
+    const move = e => { if (!on) return; tx = e.clientX; ty = e.clientY; kick(); };
+    const leave = () => {
+      if (!on) return;
+      on = false;
+      if (L && L.owner === host) L.el.classList.remove('is-on');
+      host.classList.remove('is-lensing');
+    };
+    const onScroll = () => { if (on) kick(); };
+    host.addEventListener('pointerenter', enter);
+    host.addEventListener('pointermove', move);
+    host.addEventListener('pointerleave', leave);
+    addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      leave();
+      host.removeEventListener('pointerenter', enter);
+      host.removeEventListener('pointermove', move);
+      host.removeEventListener('pointerleave', leave);
+      removeEventListener('scroll', onScroll);
+    };
+  }
+
+  /* ---------- Défilement horizontal épinglé : la piste glisse, le fil la traverse (ordinateur seulement) ---------- */
+  function hscroll(sec, track, o = {}) {
+    const dist = () => Math.max(0, track.scrollWidth - (o.viewport ? o.viewport.clientWidth : sec.clientWidth));
+    return G.to(track, {
+      x: () => -dist(), ease: 'none',
+      scrollTrigger: {
+        trigger: sec, start: 'top top', end: () => '+=' + Math.max(dist() * (o.factor || 1), innerHeight * (o.min || 1)),
+        pin: true, scrub: o.scrub || .7, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: o.priority || 0,
+        onUpdate: o.onUpdate
+      }
+    });
+  }
+
+  window.KzFil = { rail, drops, lens, hscroll, hasG, RM };
+})();
+</script>
+<script>
+/* =========================================================
+   Le mouvement : arrivée, scènes, défilement, histoire suivante
+   ========================================================= */
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const K = window.__kz;
+  if (!K) { d.classList.remove('js'); d.classList.add('is-arrived'); clearTimeout(window.__kzFallback); return; }
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+  const Q_PIN = '(min-width: 900px) and (min-height: 600px) and (prefers-reduced-motion: no-preference)';
+  const Q_RM = '(prefers-reduced-motion: reduce)';
+  const flood = $('.flood');
+  let cur = K.cur, mm = null, obs = [], lenis = null, arrived = false, lensOff = [];
+  const F = window.KzFil;
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur2 = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur2().appendChild(document.createTextNode(p));
+        });
+      } else cur2().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+
+  /* =========================================================
+     Les six animations de la V3 (2 à 4 s). État final = CSS par défaut ;
+     GSAP pose l'état de départ et joue vers l'état final.
+     ========================================================= */
+  const B = {
+    oshii(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const v = q1('.os-video'), bar = q1('.os-bar i'), sheet = q1('.os-sheet'), tap = q1('.os-tap'), ico = q1('.os-app--oshii img');
+      const rec = q1('.os-recipe'), head = q1('.os-recipe__head'), lis = q('.os-ing li'), nums = q('.os-ing .num'), steps = q1('.os-steps');
+      G.set(v, { opacity: 1, scale: 1, filter: 'blur(0px)' });
+      G.set(bar, { scaleX: 0 });
+      G.set(sheet, { y: 0, yPercent: 105 });
+      G.set(tap, { opacity: 0, scale: .5 });
+      G.set(rec, { opacity: 0, y: 26, scale: .94, clipPath: 'inset(0% 0% 100% 0% round 18px)' });
+      G.set([head, ...lis, steps], { opacity: 0, y: 10, filter: 'blur(4px)' });
+      G.set(nums, { yPercent: 110 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(bar, { scaleX: .62, duration: 1.3, ease: 'none' }, 0)
+        .to(sheet, { yPercent: 0, duration: .8 }, .45)
+        .to(tap, { opacity: .9, scale: 1, duration: .25, ease: 'power2.out' }, 1.2)
+        .to(ico, { scale: .9, duration: .12, ease: 'power2.out' }, 1.2)
+        .to(ico, { scale: 1, duration: .5 }, 1.32)
+        .to(tap, { opacity: 0, scale: 1.3, duration: .4, ease: 'power2.out' }, 1.45)
+        .to(v, { scale: .08, opacity: 0, filter: 'blur(8px)', duration: .6, ease: 'power3.in' }, 1.5)
+        .to(sheet, { yPercent: 105, duration: .3, ease: 'power2.in' }, 2.15)
+        .to(rec, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round 18px)', duration: 1 }, 2.3)
+        .to(head, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 2.45)
+        .to(lis, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7, stagger: .16 }, 2.6)
+        .to(nums, { yPercent: 0, duration: .9, stagger: .16 }, 2.68)
+        .to(steps, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .7 }, 3.3);
+    },
+    sago(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const ks = q('.sg-k'), cat = q('.sg-cat path'), heart = q('.sg-heart path'), fw = q('.sg-fw'), rule = q1('.sg-rule');
+      G.set(ks, { opacity: .3, filter: 'blur(9px)' });
+      G.set([...cat, ...heart], { strokeDasharray: 1, strokeDashoffset: 1 });
+      G.set(fw, { opacity: 0, filter: 'blur(8px)', y: 6 });
+      G.set(rule, { scaleX: 0 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(cat[0], { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, .2)
+        .to([cat[1], cat[2]], { strokeDashoffset: 0, duration: .35, ease: 'power2.out', stagger: .1 }, 1.05)
+        .to(cat[3], { strokeDashoffset: 0, duration: .5, ease: 'power2.out' }, 1.25)
+        .to(ks[0], { opacity: 1, filter: 'blur(0px)', duration: .9 }, .95)
+        .to(heart, { strokeDashoffset: 0, duration: .9, ease: 'power2.inOut' }, 1.45)
+        .to(ks[2], { opacity: 1, filter: 'blur(0px)', duration: .9 }, 2.05)
+        .to(ks[1], { opacity: 1, filter: 'blur(0px)', duration: .9 }, 2.2)
+        .to(rule, { scaleX: 1, duration: .9 }, 2.35)
+        .to(fw, { opacity: 1, filter: 'blur(0px)', y: 0, duration: .8, stagger: .07 }, 2.5);
+    },
+    wado(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const br = q('.wd-br'), sw = q1('.wd-sweep'), pills = q('.wd-pills li'), nums = q('.wd-pills .num'), fg = q1('.wd-ring__fg');
+      G.set(br, { opacity: 0, xPercent: i => [-45, 45, -45, 45][i], yPercent: i => [-45, -45, 45, 45][i] });
+      G.set(sw, { y: 0, yPercent: -100, opacity: 1 });
+      G.set(pills, { opacity: 0, y: 14, scale: .965 });
+      G.set(nums, { yPercent: 110 });
+      G.set(fg, { strokeDashoffset: .66 });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(br, { opacity: 1, xPercent: 0, yPercent: 0, duration: .8, stagger: .04 }, .1)
+        .to(sw, { yPercent: 0, duration: 1.1, ease: 'power2.inOut' }, .55)
+        .to(sw, { opacity: 0, duration: .35, ease: 'power2.out' }, 1.65)
+        .to(br, { opacity: .35, duration: .5 }, 1.7)
+        .to(pills, { opacity: 1, y: 0, scale: 1, duration: .9, stagger: .12 }, 1.7)
+        .to(nums, { yPercent: 0, duration: 1, stagger: .12 }, 1.8)
+        .to(fg, { strokeDashoffset: .24, duration: 1.3, ease: 'power2.out' }, 2.35);
+    },
+    croc(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const pills = q('.cr-pact .chk'), days = q('.cr-week .chk'), roll = q1('.cr-roll'), m1 = q1('.cr-m1'), m2 = q1('.cr-m2'), bravo = q1('.cr-bravo');
+      const all = [...pills, ...days];
+      const fill = c => c.querySelector('i'), mark = c => c.querySelector('path');
+      G.set(all.map(fill), { scale: 0, opacity: 0 });
+      G.set(all.map(mark), { strokeDashoffset: 1 });
+      G.set(roll, { y: 0, yPercent: 0 });
+      G.set(m1, { opacity: 1 });
+      G.set(m2, { opacity: 0 });
+      G.set(bravo, { opacity: 0, y: 10, filter: 'blur(6px)' });
+      const tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' } });
+      const check = (c, t, dur = .6) => {
+        tl.to(fill(c), { scale: 1, opacity: 1, duration: dur }, t)
+          .to(mark(c), { strokeDashoffset: 0, duration: dur * .8, ease: 'power2.out' }, t + .12);
+      };
+      check(pills[0], .3);
+      check(pills[1], .85);
+      check(days[0], 1.3);
+      tl.to(roll, { yPercent: -12.5, duration: .5 }, 1.35);
+      for (let k = 1; k < 7; k++) {
+        const t = 1.55 + k * .2;
+        check(days[k], t, .45);
+        tl.to(roll, { yPercent: -12.5 * (k + 1), duration: .45 }, t + .05);
+      }
+      tl.to(m1, { opacity: 0, duration: .2 }, 3)
+        .to(m2, { opacity: 1, duration: .3 }, 3)
+        .to(bravo, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .9 }, 3.05);
+      return tl;
+    },
+    miru(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const txt = q1('.mr-txt');
+      if (!txt.dataset.split) {
+        const t = txt.textContent;
+        txt.textContent = '';
+        txt.dataset.split = '1';
+        Array.from(t).forEach(ch => { const s = document.createElement('span'); s.className = 'mr-ch'; s.textContent = ch; txt.appendChild(s); });
+      }
+      const chs = q('.mr-ch'), caret = q1('.mr-caret'), cards = q('.mr-card'), avs = q('.mr-av'), his = q('.mr-hi'), phone = q1('.mr-phone');
+      const T = [[0, -250.75, -6], [318, -77.5, 10], [196.5, 202.8, 14], [-196.5, 202.8, -12], [-318, -77.5, -9]];
+      const P = [[0, -116.9], [197.6, -36.1], [122.1, 94.5]];
+      G.set(chs, { display: 'none' });
+      G.set(caret, { opacity: 1 });
+      G.set(cards, { x: 0, y: 0, xPercent: 0, yPercent: 0, rotation: 0, scale: 1, opacity: 0 });
+      G.set(avs, { opacity: .35, scale: .9 });
+      G.set(his, { opacity: 0 });
+      G.set(phone, { x: 0, y: 0, xPercent: 0, yPercent: 0, opacity: 0, scale: .8 });
+      const tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(chs, { display: 'inline', duration: 0, stagger: .034 }, .15)
+        .to(avs, { opacity: 1, scale: 1, duration: .8, stagger: .06 }, .25)
+        .to(caret, { opacity: 0, duration: .2 }, 1.1)
+        .to(cards, { opacity: 1, duration: .3, stagger: .03 }, 1.1)
+        .to(cards, { xPercent: i => (i % 2 ? 58 : -58), rotation: i => (i % 2 ? 8 : -8), duration: .28, ease: 'power2.out' }, 1.3)
+        .to(cards, { xPercent: 0, rotation: i => (i - 2) * 2, yPercent: i => -i * 4, duration: .32, ease: 'power3.inOut', stagger: .03 }, 1.6)
+        .to(cards, { xPercent: i => T[i][0], yPercent: i => T[i][1], rotation: i => T[i][2], scale: .75, duration: .7, stagger: .09 }, 2.0)
+        .to(phone, { opacity: 1, scale: 1, duration: .5 }, 2.6);
+      P.forEach((p, k) => {
+        const t = 2.85 + k * .36;
+        tl.to(phone, { xPercent: p[0], yPercent: p[1], duration: .4, ease: 'power3.inOut' }, t)
+          .to(his[k], { opacity: 1, duration: .3 }, t + .28);
+        if (k > 0) tl.to(his[k - 1], { opacity: 0, duration: .2 }, t + .1);
+      });
+      return tl;
+    },
+    zenko(el) {
+      const q = s => el.querySelectorAll(s), q1 = s => el.querySelector(s);
+      const roll = q1('.zk-roll'), fill = q1('.zk-fill'), kw = q1('.zk-knobwrap'), knob = q1('.zk-knob');
+      const cards = q('.zk-card'), a1 = q('.zk-a--1'), a2 = q('.zk-a--2'), costs = q('.zk-cost i');
+      const cv = (i, k) => parseFloat(getComputedStyle(cards[i]).getPropertyValue(k)) || .6;
+      G.set(roll, { y: 0, yPercent: 0 });
+      G.set(fill, { scaleX: .8 });
+      G.set(kw, { x: 0, xPercent: 80 });
+      G.set([...a1, ...a2], { transformPerspective: 240 });
+      G.set(a1, { opacity: 1, rotationX: 0 });
+      G.set(a2, { opacity: 0, rotationX: -90 });
+      G.set(costs, { scaleX: i => cv(i, '--c1') });
+      G.set(cards, { xPercent: i => [-3, 4, -2][i], rotation: i => [-1.4, 1.1, -.7][i] });
+      return G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+        .to(knob, { scale: 1.15, duration: .25, ease: 'power2.out' }, .2)
+        .to(kw, { xPercent: 50, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(fill, { scaleX: .5, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(roll, { yPercent: -93.75, duration: 1.4, ease: 'power2.inOut' }, .35)
+        .to(knob, { scale: 1, duration: .4 }, 1.75)
+        .to(cards, { xPercent: 0, rotation: 0, duration: .9, stagger: .12 }, 1.7)
+        .to(a1, { rotationX: 90, opacity: 0, duration: .24, ease: 'power2.in', stagger: .14 }, 1.75)
+        .to(a2, { rotationX: 0, opacity: 1, duration: .8, stagger: .14 }, 2)
+        .to(costs, { scaleX: i => cv(i, '--c2'), duration: 1, stagger: .14 }, 1.9);
+    },
+  };
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  function reveals() {
+    const io = new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      (en.target._rev || [en.target]).forEach(el => el.classList.add('is-in'));
+      io.unobserve(en.target);
+    }), { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+    obs.push(io);
+    $$('main [data-words], main [data-reveal], main [data-sweep]').forEach(el => {
+      if (el.closest('.arr') || el.classList.contains('is-scrub')) return;
+      /* un élément masqué par clip-path ne « dépasse » jamais le seuil : on observe son parent */
+      if (el.matches('[data-sweep]') && el.parentElement) { let p = el.parentElement; while (p.parentElement && getComputedStyle(p).display === 'contents') p = p.parentElement; (p._rev = p._rev || []).push(el); io.observe(p); }
+      else io.observe(el);
+    });
+  }
+
+  /* =========================================================
+     1. L'arrivée : la couleur remplit l'écran, se rétracte dans l'icône, puis le nom et la phrase
+     ========================================================= */
+  const cancelFlood = () => { if (flood.getAnimations) flood.getAnimations().forEach(a => a.cancel()); };
+  const floodOff = () => { cancelFlood(); flood.classList.add('is-off'); flood.style.removeProperty('--flood'); };
+  const floodShown = () => !flood.classList.contains('is-off') && getComputedStyle(flood).display !== 'none';
+  const rectInset = (r, rad) => {
+    const W = innerWidth, H = innerHeight, c = v => Math.max(0, Math.round(v));
+    return `inset(${c(r.top)}px ${c(W - r.right)}px ${c(H - r.bottom)}px ${c(r.left)}px round ${rad}px)`;
+  };
+  function contract(r) {
+    if (!floodShown()) { floodOff(); return; }
+    cancelFlood();
+    if (RM || !flood.animate || !r) {
+      if (!flood.animate) { floodOff(); return; }
+      flood.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, fill: 'forwards' }).onfinish = floodOff;
+      return;
+    }
+    const a = flood.animate([{ clipPath: 'inset(0px 0px 0px 0px round 0px)' }, { clipPath: rectInset(r, Math.round(r.width * .23)) }],
+      { duration: 1050, easing: 'cubic-bezier(.76,0,.24,1)', fill: 'forwards' });
+    a.onfinish = () => { flood.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }).onfinish = floodOff; };
+  }
+  function arrive() {
+    if (arrived) return;
+    arrived = true;
+    clearTimeout(window.__kzFallback);
+    const go = () => {
+      const ic = $('.arr__ico');
+      const r = ic ? ic.getBoundingClientRect() : null;
+      d.classList.add('is-arrived');
+      $$('.arr [data-words]').forEach(el => el.classList.add('is-in'));
+      contract(r && r.width ? r : null);
+    };
+    /* La position de l'icône dépend de la police du nom : on l'attend un instant */
+    const f = document.fonts && document.fonts.ready;
+    if (f) Promise.race([f, new Promise(res => setTimeout(res, 700))]).then(go, go);
+    else go();
+  }
+  function waitArrival() {
+    if (!d.classList.contains('js')) { arrived = true; floodOff(); return; } /* le garde-fou est déjà passé */
+    let done = false;
+    const go = () => { if (done) return; done = true; arrive(); };
+    if (d.hasAttribute('data-porte-arrivee')) floodOff(); /* les battants du cordon s'ouvrent directement sur l'arrivée */
+    if (d.hasAttribute('data-porte-arrivee') || K.passage) {
+      document.addEventListener('passage:arrivee', go, { once: true });
+      document.addEventListener('porte:arrivee', go, { once: true });
+      setTimeout(go, 2500);
+    } else requestAnimationFrame(() => setTimeout(go, 140));
+  }
+  /* Repli de « passage » (et retour arrière) : la couleur de l'app suivante remplit l'écran */
+  function cover(color, fromEl, cb) {
+    cancelFlood();
+    flood.style.setProperty('--flood', color);
+    flood.classList.remove('is-off');
+    if (!flood.animate) { cb(); return; }
+    if (RM) { flood.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, fill: 'forwards' }).onfinish = cb; return; }
+    const from = fromEl ? rectInset(fromEl.getBoundingClientRect(), 28) : 'inset(50% 50% 50% 50% round 48px)';
+    flood.animate([{ clipPath: from, filter: 'blur(4px)' }, { clipPath: 'inset(0px 0px 0px 0px round 0px)', filter: 'blur(0px)' }],
+      { duration: 700, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }).onfinish = cb;
+  }
+
+  /* =========================================================
+     3. La scène : épinglée et avancée par le défilement (ordinateur), ou jouée à l'entrée (mobile)
+     ========================================================= */
+  function sceneMotion(pin, rm, local) {
+    const sc = $('.how .sc'), list = $('[data-temps]');
+    if (!sc || !list || !B[cur]) return;
+    const caps = $$('li', list), rb = $('[data-replay]', sc);
+    const T = K.D[cur].temps.map(t => t[0]);
+    const tl = B[cur](sc);
+    const setCap = k => caps.forEach((li, i) => li.classList.toggle('is-on', i === k));
+    if (rm) { tl.progress(1, true); list.classList.remove('is-driven'); return; }
+    list.classList.add('is-driven');
+    sc.classList.add('has-tl');
+    setCap(0);
+    if (pin) {
+      d.classList.add('is-pin');
+      let seg = -1, tw = null;
+      const go = k => {
+        if (k === seg) return;
+        const back = k < seg, jump = Math.max(1, Math.abs(k - seg));
+        seg = k;
+        setCap(Math.max(0, k));
+        const target = k < 0 ? 0 : k >= T.length - 1 ? tl.duration() : T[k + 1];
+        if (tw) tw.kill();
+        const dist = Math.abs(tl.time() - target);
+        if (dist < .01) return;
+        tw = tl.tweenTo(target, { duration: back ? Math.min(.8, dist * .45) : dist / jump, ease: 'none' });
+      };
+      const how = $('.how'), win = $('.how__win'), track = $('.how__track');
+      if (F && win && track) {
+        /* Les trois temps glissent le long du fil ; chaque nœud qui passe sous la scène fait avancer l'animation */
+        F.hscroll(how, track, { viewport: win, factor: 1.45, min: 1.7, priority: 1, onUpdate: s => {
+          track.style.setProperty('--hp', s.progress.toFixed(4));
+          go(s.progress < .28 ? 0 : s.progress < .72 ? 1 : 2);
+        } });
+      } else {
+        ST.create({ trigger: '.how', start: 'top top', end: '+=170%', pin: true, anticipatePin: 1,
+          onUpdate: s => go(s.progress < .3 ? 0 : s.progress < .64 ? 1 : 2) });
+      }
+      ST.create({ trigger: '.how', start: 'top 55%', onEnter: () => { if (seg < 0) go(0); }, onLeaveBack: () => go(-1) });
+    } else {
+      tl.eventCallback('onUpdate', () => { const t = tl.time(); let k = 0; T.forEach((s, i) => { if (t >= s - .001) k = i; }); setCap(k); });
+      tl.eventCallback('onComplete', () => { if (rb) rb.classList.add('is-on'); });
+      const o = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        G.delayedCall(.8, () => tl.play(0));
+      }, { threshold: .5 });
+      o.observe(sc);
+      local.push(o);
+      if (rb) rb.onclick = () => { rb.classList.remove('is-on'); tl.pause(0); setCap(0); G.delayedCall(.5, () => tl.play(0)); };
+    }
+  }
+
+  /* 4. La chaîne de l'IA se trace au défilement */
+  function chainMotion() {
+    const ch = $('[data-chain]');
+    if (!ch) return;
+    const st = $$('.chain__st', ch), n = st.length;
+    ch.classList.add('is-driven');
+    const upd = s => {
+      const p = s.progress;
+      ch.style.setProperty('--cp', p.toFixed(3));
+      st.forEach((x, i) => x.classList.toggle('is-lit', p >= .04 + (i / Math.max(1, n - 1)) * .88));
+    };
+    ch.style.setProperty('--cp', '0');
+    ST.create({ trigger: ch, start: 'top 78%', end: 'bottom 52%', scrub: .5, onUpdate: upd, onRefresh: upd });
+  }
+
+  /* 5. Les captures : la seconde glisse un peu plus vite (profondeur) */
+  function framesMotion() {
+    $$('.frame--1').forEach(f => G.fromTo(f, { '--py': '70px' }, { '--py': '-40px', ease: 'none', scrollTrigger: { trigger: f, start: 'top bottom', end: 'bottom top', scrub: .6 } }));
+  }
+
+  function motion(c) {
+    const pin = !!c.pin, rm = !!c.rm, local = [];
+    safe('scène', () => sceneMotion(pin, rm, local));
+    if (!rm) {
+      safe('problème', () => {
+        const ws = $$('.pbm__t.is-scrub .w');
+        if (ws.length) G.fromTo(ws, { opacity: .12 }, { opacity: 1, ease: 'none', stagger: .1, scrollTrigger: { trigger: '.pbm__t', start: 'top 80%', end: 'bottom 42%', scrub: .6 } });
+      });
+      safe('arrivée au défilement', () => G.to('.arr__in', { yPercent: -9, opacity: .2, ease: 'none', scrollTrigger: { trigger: '.arr', start: 'top top', end: 'bottom top', scrub: true } }));
+      safe('chaîne', chainMotion);
+      safe('captures', framesMotion);
+      safe('fils', () => { if (F) F.drops($('main')); });
+    }
+    return () => { local.forEach(o => o.disconnect()); d.classList.remove('is-pin'); };
+  }
+
+  /* 7. L'histoire suivante s'allume quand elle passe au centre de l'écran (tactile) */
+  function nextHot() {
+    const nx = $('.next'), q = $('.next__q');
+    if (!nx || !q || matchMedia('(hover: hover)').matches) return;
+    const o = new IntersectionObserver(([e]) => nx.classList.toggle('is-hot', e.isIntersecting), { rootMargin: '-36% 0px -36% 0px' });
+    o.observe(q);
+    obs.push(o);
+  }
+
+  /* ---------- Monter / démonter une histoire ---------- */
+  function mount() {
+    $$('main [data-words]').forEach(splitWords);
+    const pt = $('.pbm__t');
+    if (hasG && !RM && pt) pt.classList.add('is-in', 'is-scrub');
+    reveals();
+    safe('suivante', nextHot);
+    /* La lentille : une loupe sur les vraies captures */
+    safe('lentille', () => { if (F) $$('.vrai .frame').forEach(f => lensOff.push(F.lens(f, { clone: () => f.querySelector('img'), scale: 1.9, size: 212 }))); });
+    /* Le dépliant change la hauteur de la page : les déclencheurs plus bas se recalent */
+    $$('details.capot').forEach(x => x.addEventListener('toggle', () => { if (hasG) ST.refresh(); }));
+    if (!hasG) return; /* sans GSAP : état final des scènes, légendes et chaîne allumées */
+    mm = G.matchMedia();
+    mm.add({ tout: 'all', pin: Q_PIN, rm: Q_RM }, ctx => motion(ctx.conditions));
+    ST.refresh();
+  }
+  function teardown() {
+    lensOff.forEach(off => off());
+    lensOff = [];
+    obs.forEach(o => o.disconnect());
+    obs = [];
+    if (mm) { mm.revert(); mm = null; }
+    d.classList.remove('is-pin');
+  }
+  /* Changement d'histoire sans recharger : le contenu se remplace, le scroll revient en haut, l'arrivée se rejoue */
+  function swap(s) {
+    const run = () => {
+      safe('démontage', teardown);
+      d.classList.remove('is-arrived');
+      arrived = false;
+      K.render(s);
+      K.cur = cur = s;
+      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+      window.scrollTo(0, 0);
+      safe('montage', mount);
+      requestAnimationFrame(() => setTimeout(() => { arrive(); const h = $('#arr-nom'); if (h) h.focus({ preventScroll: true }); }, 160));
+    };
+    if (floodShown()) run(); else cover(K.D[s].teinte, null, run);
+  }
+
+  /* ---------- Défilement doux (ordinateur) ---------- */
+  safe('lenis', () => {
+    if (!window.Lenis || RM || !matchMedia('(pointer: fine)').matches) return;
+    lenis = new window.Lenis({ lerp: .1 });
+    if (hasG) {
+      lenis.on('scroll', ST.update);
+      G.ticker.add(t => lenis.raf(t * 1000));
+      G.ticker.lagSmoothing(0);
+    } else {
+      const raf = t => { lenis.raf(t); requestAnimationFrame(raf); };
+      requestAnimationFrame(raf);
+    }
+  });
+
+  /* ---------- Nav : fond au défilement et repère de progression ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), bar = $('.nav__prog i');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe($('.top-sentinel'));
+    if (hasG) ST.create({ start: 0, end: 'max', onUpdate: s => bar.style.setProperty('--np', s.progress.toFixed(4)) });
+    else {
+      let q = false;
+      addEventListener('scroll', () => {
+        if (q) return;
+        q = true;
+        requestAnimationFrame(() => { q = false; const m = d.scrollHeight - innerHeight; bar.style.setProperty('--np', m > 0 ? (scrollY / m).toFixed(4) : '0'); });
+      }, { passive: true });
+    }
+  });
+
+  /* ---------- Clics : histoire suivante (passage) et ancres internes (sans toucher au hash) ---------- */
+  document.addEventListener('click', e => {
+    const nl = e.target.closest('[data-next]');
+    if (nl) {
+      e.preventDefault();
+      const nx = nl.dataset.next, couleur = K.D[nx].teinte, url = 'app.html#' + nx;
+      if (window.Passage && typeof window.Passage.ouvrir === 'function') {
+        try { window.Passage.ouvrir(nl, url, { couleur }); return; } catch (err) { console.error('[kz] passage : ' + err.message); }
+      }
+      cover(couleur, nl, () => { location.hash = nx; });
+      return;
+    }
+    const l = e.target.closest('a[href^="#"]');
+    if (!l) return;
+    const t = document.getElementById(l.getAttribute('href').slice(1));
+    if (!t) return;
+    e.preventDefault();
+    const y = t.getBoundingClientRect().top + scrollY;
+    if (lenis) lenis.scrollTo(y, { duration: 1.4 });
+    else window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  });
+
+  /* ---------- Le hash change : passage tout juste lancé → vraie navigation ; sinon, remplacement sur place ---------- */
+  addEventListener('hashchange', () => {
+    const s = K.slugDe(location.hash);
+    if (!s || s === cur) return;
+    if (K.passageFrais(4000)) { location.reload(); return; }
+    swap(s);
+  });
+
+  safe('montage', mount);
+  safe('rail', () => { if (F) F.rail(() => $$('main > section')); });
+  waitArrival();
+  addEventListener('load', () => { if (hasG) ST.refresh(); });
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

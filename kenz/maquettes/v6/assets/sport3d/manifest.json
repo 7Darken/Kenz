@@ -1,0 +1,158 @@
+{
+  "generator": "built-in image_gen",
+  "date": "2026-11-15",
+  "format": "webp",
+  "masterSize": 1024,
+  "copySize": 256,
+  "masterEncoding": "lossless",
+  "copyEncoding": {
+    "quality": 90,
+    "alphaQuality": 100
+  },
+  "assets": [
+    {
+      "id": "hyrox-01-skierg",
+      "label": "SkiErg",
+      "series": "HYROX",
+      "master": "hyrox-01-skierg.webp",
+      "small": "256/hyrox-01-skierg.webp",
+      "prompt": "hyrox-01-skierg.txt"
+    },
+    {
+      "id": "hyrox-02-sled-push",
+      "label": "Traîneau poussé",
+      "series": "HYROX",
+      "master": "hyrox-02-sled-push.webp",
+      "small": "256/hyrox-02-sled-push.webp",
+      "prompt": "hyrox-02-sled-push.txt"
+    },
+    {
+      "id": "hyrox-03-sled-pull",
+      "label": "Traîneau tiré",
+      "series": "HYROX",
+      "master": "hyrox-03-sled-pull.webp",
+      "small": "256/hyrox-03-sled-pull.webp",
+      "prompt": "hyrox-03-sled-pull.txt"
+    },
+    {
+      "id": "hyrox-04-burpee-broad-jump",
+      "label": "Burpees broad jumps",
+      "series": "HYROX",
+      "master": "hyrox-04-burpee-broad-jump.webp",
+      "small": "256/hyrox-04-burpee-broad-jump.webp",
+      "prompt": "hyrox-04-burpee-broad-jump.txt"
+    },
+    {
+      "id": "hyrox-05-row",
+      "label": "Rameur",
+      "series": "HYROX",
+      "master": "hyrox-05-row.webp",
+      "small": "256/hyrox-05-row.webp",
+      "prompt": "hyrox-05-row.txt"
+    },
+    {
+      "id": "hyrox-06-farmers-carry",
+      "label": "Farmers carry",
+      "series": "HYROX",
+      "master": "hyrox-06-farmers-carry.webp",
+      "small": "256/hyrox-06-farmers-carry.webp",
+      "prompt": "hyrox-06-farmers-carry.txt"
+    },
+    {
+      "id": "hyrox-07-sandbag-lunges",
+      "label": "Sandbag lunges",
+      "series": "HYROX",
+      "master": "hyrox-07-sandbag-lunges.webp",
+      "small": "256/hyrox-07-sandbag-lunges.webp",
+      "prompt": "hyrox-07-sandbag-lunges.txt"
+    },
+    {
+      "id": "hyrox-08-wall-balls",
+      "label": "Wall balls",
+      "series": "HYROX",
+      "master": "hyrox-08-wall-balls.webp",
+      "small": "256/hyrox-08-wall-balls.webp",
+      "prompt": "hyrox-08-wall-balls.txt"
+    },
+    {
+      "id": "hyrox-run",
+      "label": "Course · 1 km",
+      "series": "HYROX",
+      "master": "hyrox-run.webp",
+      "small": "256/hyrox-run.webp",
+      "prompt": "hyrox-run.txt"
+    },
+    {
+      "id": "hyrox-finish",
+      "label": "Arrivée",
+      "series": "HYROX",
+      "master": "hyrox-finish.webp",
+      "small": "256/hyrox-finish.webp",
+      "prompt": "hyrox-finish.txt"
+    },
+    {
+      "id": "spartan-mur",
+      "label": "Mur",
+      "series": "SPARTAN",
+      "master": "spartan-mur.webp",
+      "small": "256/spartan-mur.webp",
+      "prompt": "spartan-mur.txt"
+    },
+    {
+      "id": "spartan-boue",
+      "label": "Boue et barbelés",
+      "series": "SPARTAN",
+      "master": "spartan-boue.webp",
+      "small": "256/spartan-boue.webp",
+      "prompt": "spartan-boue.txt"
+    },
+    {
+      "id": "spartan-portes",
+      "label": "Atlas stone",
+      "series": "SPARTAN",
+      "master": "spartan-portes.webp",
+      "small": "256/spartan-portes.webp",
+      "prompt": "spartan-portes.txt"
+    },
+    {
+      "id": "spartan-filet",
+      "label": "Filet cargo",
+      "series": "SPARTAN",
+      "master": "spartan-filet.webp",
+      "small": "256/spartan-filet.webp",
+      "prompt": "spartan-filet.txt"
+    },
+    {
+      "id": "spartan-saut",
+      "label": "Saut de feu",
+      "series": "SPARTAN",
+      "master": "spartan-saut.webp",
+      "small": "256/spartan-saut.webp",
+      "prompt": "spartan-saut.txt"
+    },
+    {
+      "id": "boxe-gants",
+      "label": "Gants de boxe",
+      "series": "BOXE",
+      "master": "boxe-gants.webp",
+      "small": "256/boxe-gants.webp",
+      "prompt": "boxe-gants.txt"
+    },
+    {
+      "id": "boxe-sac",
+      "label": "Sac de frappe",
+      "series": "BOXE",
+      "master": "boxe-sac.webp",
+      "small": "256/boxe-sac.webp",
+      "prompt": "boxe-sac.txt"
+    },
+    {
+      "id": "boxe-bandes",
+      "label": "Bandes de boxe",
+      "series": "BOXE",
+      "master": "boxe-bandes.webp",
+      "small": "256/boxe-bandes.webp",
+      "prompt": "boxe-bandes.txt"
+    }
+  ]
+}

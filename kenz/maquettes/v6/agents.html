@@ -1,0 +1,388 @@
+<!doctype html>
+<!--
+  Kenz — L'IA qui fait le travail (V6, maquette unique). Univers Pro, en mode sombre (heure bleue) et en mode clair (fond Studio).
+  Brief : maquettes/v6/BRIEF-V6-IA.md. Base commune : shared/theme.css + theme.js (jetons, bouton de mode, aura, fil).
+  Le récit : une phrase forte → la machine tout de suite (shared/ia.*, mode complet : quatre vrais cas, le visiteur valide)
+  → « Et chez vous ? » (dans le module) → comment on avance → contact.
+  Chaque chapitre porte data-chapitre (un nœud sur le rail du fil) et data-aura. Aucun mot technique dans les titres.
+  Contrat V4 (section 3) : shared/passage.* et shared/cordon.* sont écrits à part ; la page fonctionne sans eux.
+-->
+<html lang="fr" data-univers="pro">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — L’IA au travail</title>
+<meta name="description" content="Je construis des systèmes qui font le travail, et vous gardez la main.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1220">
+<script>
+  (function () {
+    var d = document.documentElement, a = null;
+    d.classList.add('js');
+    if (location.hash.indexOf('porte') > -1) a = 'porte';
+    else {
+      try { var p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); if (p && Date.now() - p.t < 6000) a = 'passage'; } catch (e) {}
+    }
+    window.__kzArrivee = a;
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="assets/melodrama.css">
+<link rel="stylesheet" href="shared/theme.css">
+<script src="shared/theme.js"></script>
+<style>
+/* =========================================================
+   Typo propre à la page (les briques communes viennent du thème)
+   ========================================================= */
+h1,h2,h3{font-weight:500}
+.h2{width:fit-content; max-width:100%; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,7vw,112px); line-height:.92; letter-spacing:-.01em}
+.link::after{content:""; position:absolute; left:2px; right:2px; bottom:10px; height:1px; background:currentColor; opacity:.5; transition:opacity .4s}
+.link:hover::after{opacity:1}
+main{overflow-x:clip}
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo) var(--wd, 0s), filter 1.2s var(--expo) var(--wd, 0s)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+
+/* =========================================================
+   1. Une phrase forte, et la machine tout de suite dessous
+   ========================================================= */
+.hero{position:relative; padding:calc(env(safe-area-inset-top) + 104px) 0 clamp(18px,2.4vw,30px); isolation:isolate}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__light{position:absolute; left:0; right:0; top:-10%; height:160%; z-index:-1; pointer-events:none; background:radial-gradient(46% 52% at 72% 34%, rgb(var(--lum) / .14), transparent 72%)}
+html[data-theme="light"] .hero__light{background:radial-gradient(46% 52% at 72% 34%, rgba(255,251,244,.95), rgba(255,251,244,0) 72%)}
+.hero__t{max-width:26ch; font-size:clamp(32px,4.1vw,62px); line-height:1.05; letter-spacing:-.042em; text-wrap:balance}
+.hero__t .hero__a{color:var(--muted)}
+.hero__t .word{font-size:1.12em}
+.hero__sub{margin-top:clamp(14px,1.6vw,22px); max-width:30ch; font-size:clamp(18px,1.45vw,21px); line-height:1.4; color:var(--muted)}
+@media (min-width:1100px){
+  .hero__in{display:flex; align-items:flex-end; justify-content:space-between; gap:56px}
+  .hero__sub{margin:0 0 .45em; max-width:20ch; text-align:right; text-wrap:balance}
+}
+.js .hero__light{opacity:0}
+.hero-in .hero__light{opacity:1; transition:opacity 1.8s var(--expo)}
+.js .hero [data-anim]{opacity:0; transform:translateY(14px)}
+.hero-in .hero [data-anim]{opacity:1; transform:none; transition:opacity 1s var(--expo) var(--ad, 1.2s), transform 1.2s var(--expo) var(--ad, 1.2s)}
+/* La machine entre avec la phrase */
+.js .kz-ia--complet > .kz-ia__w{opacity:0; transform:translateY(24px)}
+.hero-in .kz-ia--complet > .kz-ia__w{opacity:1; transform:none; transition:opacity 1.1s var(--expo) .55s, transform 1.4s var(--expo) .55s}
+
+/* =========================================================
+   3. Comment on avance : la ligne se trace au défilement, du même fil que le rail
+   ========================================================= */
+.steps{padding:calc(var(--sec) * .7) 0 var(--sec)}
+.steps__list{position:relative; display:grid; gap:44px; margin-top:clamp(40px,5vw,72px); padding-left:40px}
+.steps__line{position:absolute; left:6px; top:12px; bottom:12px; width:1px; background:var(--line)}
+.steps__line i{position:absolute; inset:0; background:linear-gradient(180deg, rgb(var(--fg-rgb) / .8), rgb(var(--lum))); box-shadow:0 0 8px rgb(var(--lum) / .5); transform-origin:top; transform:scaleY(var(--sp, 1))}
+.step{position:relative; max-width:16ch; font-size:clamp(26px,3vw,42px); line-height:1.12; letter-spacing:-.03em; font-weight:500; color:var(--fg); transition:color .8s var(--expo)}
+.step::before{content:""; position:absolute; left:-40px; top:.42em; width:13px; height:13px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgb(var(--fg-rgb) / .5); transition:background-color .6s var(--expo), box-shadow .6s var(--expo)}
+.step.is-lit::before{background:rgb(var(--lum)); box-shadow:0 0 0 5px rgb(var(--lum) / .14), 0 0 18px rgb(var(--lum) / .7)}
+html[data-theme="light"] .step.is-lit::before{box-shadow:0 0 0 4px #fff, 0 0 0 5px rgb(var(--lum) / .25), 0 4px 12px rgb(var(--lum) / .35)}
+.has-scrub .step:not(.is-lit){color:rgb(var(--fg-rgb) / .32)}
+@media (min-width:900px){
+  .steps__list{grid-template-columns:repeat(3,1fr); gap:40px; padding:44px 0 0}
+  .steps__line{left:6px; right:6px; top:6px; bottom:auto; width:auto; height:1px}
+  .steps__line i{background:linear-gradient(90deg, rgb(var(--fg-rgb) / .8), rgb(var(--lum))); transform-origin:left; transform:scaleX(var(--sp, 1))}
+  .step::before{left:0; top:-44px}
+}
+
+/* =========================================================
+   4. Contact (champs, choix et boutons : briques du thème)
+   ========================================================= */
+.contact{padding:var(--sec) 0}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(40px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 6px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:rgb(var(--lum)); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{outline:none; font-size:clamp(28px,3vw,40px); line-height:1.1; letter-spacing:-.03em; font-weight:500}
+.form__ok p{max-width:34ch; color:var(--muted)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js .hero [data-anim],.js .kz-ia--complet > .kz-ia__w,.form__ok{transform:none !important; filter:none !important}
+  .js [data-sweep]{clip-path:none; filter:none; opacity:0; transition:opacity .4s}
+  .js [data-sweep].is-in{opacity:1; transition:opacity 1s var(--expo)}
+}
+</style>
+<link rel="stylesheet" href="shared/passage.css"><link rel="stylesheet" href="shared/cordon.css">
+<link rel="stylesheet" href="shared/ia.css">
+<link rel="stylesheet" href="shared/footer.css">
+</head>
+<body>
+<a class="skip" href="#machine">Aller au contenu</a>
+
+<!-- ========== Navigation (markup commun V4) + le bouton soleil / lune ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<span class="kz-dot" aria-hidden="true"></span></a>
+    <button class="kz-mode" type="button" data-kz-mode></button>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== 1. Une phrase forte ========== -->
+  <section class="hero" id="top" aria-labelledby="hero-t">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__light" aria-hidden="true"></div>
+    <div class="wrap hero__in">
+      <h1 class="hero__t" id="hero-t" data-words data-hero-words><span class="hero__a">Je ne me contente pas de parler à l’IA.</span> Je construis des systèmes qui font le <em class="word glow">travail</em>.</h1>
+      <p class="hero__sub" data-anim>Et c’est vous qui gardez la main. Choisissez un cas&nbsp;:</p>
+    </div>
+  </section>
+
+  <!-- ========== 2. La machine, puis « Et chez vous ? » (module partagé, shared/ia.*) ========== -->
+  <section class="kz-ia" id="machine" tabindex="-1" data-kz-ia="complet" data-cas="recette" data-contact="#contact" data-chapitre data-aura="droite" aria-label="La machine, sur quatre vrais cas"></section>
+
+  <!-- ========== 3. Comment on avance ========== -->
+  <section class="steps" id="methode" aria-labelledby="steps-t" data-chapitre data-aura="calme">
+    <div class="wrap">
+      <h2 class="h2" id="steps-t" data-sweep>Comment on avance</h2>
+      <div class="steps__list" data-steps>
+        <span class="steps__line" aria-hidden="true"><i></i></span>
+        <p class="step">On en parle.</p>
+        <p class="step">Je vous montre un premier <em class="word">prototype</em>.</p>
+        <p class="step">Vous validez, je lance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 4. Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t" data-chapitre data-aura="bas">
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">process</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA" checked><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Quelle tâche aimeriez-vous ne plus faire à la main&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer data-kz-footer="pro"></footer>
+<script src="shared/footer.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation et balises gardées) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    let i = 0;
+    const walk = node => {
+      const frag = document.createDocumentFragment();
+      let word = null;
+      const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+      const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+      Array.from(node.childNodes).forEach(n => {
+        if (n.nodeType === 3) {
+          n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+            if (!p) return;
+            if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+            else cur().appendChild(document.createTextNode(p));
+          });
+        } else if (n.nodeType === 1 && n.tagName === 'SPAN' && !n.classList.contains('w')) {
+          /* un groupe (ex. la première phrase en retrait) : ses mots s'animent un par un, le groupe garde sa couleur */
+          flush();
+          const inner = walk(n);
+          n.textContent = '';
+          n.appendChild(inner);
+          frag.appendChild(n);
+        } else cur().appendChild(n);
+      });
+      flush();
+      return frag;
+    };
+    const f = walk(el);
+    el.textContent = '';
+    el.appendChild(f);
+  }
+  safe('split', () => $$('[data-words]').forEach(splitWords));
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  /* Un élément masqué par clip-path ne « dépasse » jamais le seuil : on observe alors son parent */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      (en.target._rev || [en.target]).forEach(el => el.classList.add('is-in'));
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal],[data-sweep]').forEach(el => {
+    if (el.closest('.hero')) return;
+    if (el.matches('[data-sweep]') && el.parentElement) { const p = el.parentElement; (p._rev = p._rev || []).push(el); io.observe(p); }
+    else io.observe(el);
+  });
+
+  /* ---------- 1. Entrée de la phrase : après le passage ou la porte, sinon au chargement ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn);
+  document.addEventListener('porte:arrivee', heroIn);
+  if (window.__kzArrivee) {
+    setTimeout(heroIn, 2500);
+    /* shared/passage.js absent : rien ne viendra, on joue tout de suite */
+    if (window.__kzArrivee === 'passage') document.addEventListener('DOMContentLoaded', () => { if (!window.Passage) heroIn(); });
+  } else {
+    requestAnimationFrame(() => setTimeout(heroIn, 60));
+  }
+
+  /* ---------- Nav : fond au défilement (le repère de lecture est le fil commun : rail ou filet) ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+
+  /* ---------- Ancres internes (dont « Parlons de votre process », rendu par le module) ---------- */
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l || e.defaultPrevented) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    window.scrollTo({ top: id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY, behavior: RM ? 'auto' : 'smooth' });
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  });
+
+  /* ---------- 3. Comment on avance : la ligne se trace au défilement ---------- */
+  safe('steps', () => {
+    const box = $('[data-steps]'), items = $$('.step', box);
+    if (!hasG || RM) { items.forEach(x => x.classList.add('is-lit')); return; }
+    box.classList.add('has-scrub');
+    ST.create({
+      trigger: box, start: 'top 78%', end: 'bottom 52%', scrub: .5,
+      onUpdate: self => {
+        const p = self.progress;
+        box.style.setProperty('--sp', p.toFixed(3));
+        const th = innerWidth >= 900 ? [.01, .35, .69] : [.01, .45, .9];
+        items.forEach((it, i) => it.classList.toggle('is-lit', p >= th[i]));
+      }
+    });
+    box.style.setProperty('--sp', '0');
+  });
+
+  /* ---------- 4. Contact : envoi simulé ---------- */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="shared/ia.js" defer></script>
+<script src="shared/passage.js" defer></script><script src="shared/cordon.js" defer></script>
+<script src="shared/revue.js" defer></script>
+</body>
+</html>

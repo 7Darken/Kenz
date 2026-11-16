@@ -1,0 +1,1096 @@
+<!doctype html>
+<!--
+  Kenz — Agents IA pour votre équipe (V4), style Studio.
+  Brume froide, cartes « double bord » ; la démo sur un plateau clair. Une idée par écran : la question → la démo (le visiteur valide) → la promesse
+  → six besoins en questions dépliables (une seule ouverte) → comment on avance → contact.
+  Contrat V4 (section 3) : shared/passage.* et shared/cordon.* sont écrits à part ; la page fonctionne sans eux.
+  Démo : paysage sur ordinateur (≥ 900 px), portrait sur mobile ; le mouvement est calculé depuis le DOM.
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Agents IA</title>
+<meta name="description" content="Des agents IA qui travaillent pour votre équipe, et rien ne part sans votre validation.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F5F3EF">
+<script>
+  (function () {
+    var d = document.documentElement, a = null;
+    d.classList.add('js');
+    if (location.hash.indexOf('porte') > -1) a = 'porte';
+    else {
+      try { var p = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); if (p && Date.now() - p.t < 6000) a = 'passage'; } catch (e) {}
+    }
+    window.__kzArrivee = a;
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/paysage-kuala-lumpur.jpg">
+<style>
+/* =========================================================
+   STUDIO — jetons communs
+   Surfaces claires et chaudes, grain léger, encre, un mot italique en Lagon foncé.
+   Cartes « double bord » : une coque (verre blanc) et un cœur (papier), grands rayons, ombres en couches.
+   ========================================================= */
+:root{
+  --paper:#F5F3EF;
+  --bg:#F5F3EF;
+  --ink:#1A1918;
+  --ink-2:#4B4743;
+  --ink-3:#69645E;
+  --creme:#F4EFE6;
+  --red:#E8322B;
+  --lagon:#0F5D6B;
+  --muted:#4B4743;
+  --faint:#69645E;
+  --line:rgba(26,25,24,.08);
+  --line-2:rgba(26,25,24,.14);
+  --mist-1:#EEF2F4; --mist-2:#D3DCE2; --mist-3:#B9C6CF;
+  --sand-1:#F6ECDD; --sand-2:#E9D5BC; --sand-3:#D9BE9C;
+  --sh-1:0 0 0 1px rgba(26,25,24,.05),0 1px 1px rgba(26,25,24,.03),0 3px 6px -2px rgba(26,25,24,.04),0 12px 24px -10px rgba(26,25,24,.07),0 32px 64px -24px rgba(26,25,24,.10);
+  --sh-2:0 2px 4px -1px rgba(26,25,24,.05),0 22px 44px -14px rgba(26,25,24,.13),0 60px 120px -34px rgba(26,25,24,.22);
+  --sh-obj:0 0 0 1px rgba(26,25,24,.06),0 2px 4px rgba(26,25,24,.05),0 18px 36px -16px rgba(26,25,24,.32);
+  --expo:cubic-bezier(.16,1,.3,1);
+  --out:cubic-bezier(.55,0,.75,.2);
+  --io:cubic-bezier(.65,0,.35,1);
+  --gutter:clamp(16px,4vw,56px);
+  --gl:max(var(--gutter), env(safe-area-inset-left));
+  --gr:max(var(--gutter), env(safe-area-inset-right));
+  --maxw:1240px;
+  --sec:clamp(88px,11vw,160px);
+  --r-xl:34px;
+  --f-title:"Melodrama","Instrument Serif",Georgia,serif;
+  --f-text:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-word:"Instrument Serif",Georgia,serif;
+  --f-ja:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .09 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme:light;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none !important}
+html{background:var(--bg); -webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--f-text); font-size:17px; line-height:1.6; font-weight:400;
+  font-optical-sizing:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+@supports (overflow:clip){ body{overflow-x:clip} }
+img{display:block; max-width:100%; height:auto}
+a{color:inherit; text-decoration:none; -webkit-tap-highlight-color:transparent}
+button,input,textarea,select{font:inherit; color:inherit}
+button{cursor:pointer; background:none; border:0; padding:0}
+ul,ol{margin:0; padding:0; list-style:none}
+p,h1,h2,h3,figure{margin:0}
+::selection{background:rgba(15,93,107,.18); color:var(--ink)}
+:focus-visible{outline:2px solid var(--lagon); outline-offset:3px}
+[tabindex="-1"]:focus{outline:none}
+.sr{position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+.skip{position:fixed; left:16px; top:12px; z-index:95; padding:10px 16px; border-radius:999px; background:var(--ink); color:var(--creme); font-weight:600; font-size:14px; transform:translateY(-200%); transition:transform .5s var(--expo)}
+.skip:focus{transform:none}
+
+html.lenis, html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto !important}
+.lenis.lenis-stopped{overflow:hidden}
+
+/* Ambiance fixe + grain papier (jamais sur un conteneur qui défile) */
+.ambient{position:fixed; inset:0; z-index:0; pointer-events:none}
+.grain{position:fixed; inset:0; z-index:60; pointer-events:none; opacity:.04; background-image:var(--noise); background-size:180px 180px}
+main,.foot{position:relative; z-index:1}
+
+/* =========================================================
+   Typo
+   ========================================================= */
+.wrap{max-width:calc(var(--maxw) + 2 * var(--gutter)); margin-inline:auto; padding-left:var(--gl); padding-right:var(--gr)}
+/* Contexte : petite légende en Instrument Serif italique, sans bordure, sans fond, sans point, sans capitales */
+.cap{margin:0; font-family:var(--f-word); font-style:italic; font-weight:400; font-size:clamp(18px,1.4vw,21px); line-height:1.3; letter-spacing:0; color:var(--ink-3)}
+.h2{width:fit-content; max-width:100%; margin:0; font-family:var(--f-title); font-weight:600; font-size:clamp(46px,6.4vw,100px); line-height:.92; letter-spacing:-.014em; color:var(--ink)}
+/* Le mot en Instrument Serif italique : Lagon foncé (≈ 6,8:1 sur le papier) */
+.word{font-family:var(--f-word); font-style:italic; font-weight:400; font-size:1.14em; line-height:.9; letter-spacing:-.005em; color:var(--lagon)}
+.glow{text-shadow:0 0 .9em rgba(15,93,107,.14)}
+/* Verre de la charte : seulement posé sur une image */
+.glass{background:rgba(28,27,26,.42); -webkit-backdrop-filter:blur(26px) saturate(1.15); backdrop-filter:blur(26px) saturate(1.15); box-shadow:inset 0 0 0 1px rgba(255,255,255,.16); color:var(--creme)}
+
+/* =========================================================
+   La carte « double bord » : coque + cœur
+   ========================================================= */
+.shell,.bezel{position:relative; padding:6px; border-radius:var(--r-xl); background:rgba(255,255,255,.52); box-shadow:var(--sh-1), inset 0 1px 0 rgba(255,255,255,.9); isolation:isolate; transition:translate .9s var(--expo)}
+.shell::after,.bezel::after{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; box-shadow:var(--sh-2); opacity:0; pointer-events:none; transition:opacity .6s var(--expo)}
+.core,.bezel__core{position:relative; height:100%; overflow:hidden; isolation:isolate; border-radius:calc(var(--r-xl) - 6px); background:linear-gradient(180deg,#FFFFFF 0%,#FBFAF8 100%)}
+.core::after,.bezel__core::after{content:""; position:absolute; inset:0; z-index:6; border-radius:inherit; pointer-events:none; box-shadow:inset 0 0 0 1px rgba(26,25,24,.05), inset 0 1px 0 rgba(255,255,255,.75)}
+@media (hover:hover){
+  .lift:hover{translate:0 -6px}
+  .lift:hover::after{opacity:1}
+}
+
+/* =========================================================
+   Boutons : pilule, l'icône dans sa propre pastille
+   ========================================================= */
+.btn{position:relative; display:inline-flex; align-items:center; gap:14px; height:56px; padding:0 7px 0 24px; border-radius:999px; font-size:15px; font-weight:550; letter-spacing:-.005em; white-space:nowrap; isolation:isolate; transition:transform .5s var(--expo)}
+.btn::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; opacity:0; transition:opacity .45s var(--expo)}
+.btn:hover::before{opacity:1; transition-duration:.6s}
+.btn:active{transform:scale(.975); transition-duration:.12s}
+.btn__ico{display:grid; place-items:center; width:42px; height:42px; border-radius:50%; transition:transform .7s var(--expo)}
+.btn__ico svg{width:15px; height:15px}
+.btn:hover .btn__ico{transform:translate(2px,-1px) scale(1.06)}
+.btn--light{background:var(--ink); color:var(--creme); box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 10px 24px -10px rgba(26,25,24,.55)}
+.btn--light::before{background:rgba(255,255,255,.08)}
+.btn--light .btn__ico{background:rgba(244,239,230,.14); color:var(--creme)}
+.btn--ghost{background:rgba(255,255,255,.66); color:var(--ink); box-shadow:inset 0 0 0 1px var(--line-2), 0 1px 2px rgba(26,25,24,.04)}
+.btn--ghost::before{background:#fff}
+.btn--ghost .btn__ico{background:rgba(26,25,24,.06)}
+.btn--sm{height:46px; padding:0 5px 0 18px; font-size:14px; gap:10px}
+.btn--sm .btn__ico{width:36px; height:36px}
+.btn:focus-visible{outline-offset:4px}
+.link{position:relative; display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 2px; font-size:15px; font-weight:500; color:var(--ink-2); transition:color .4s var(--expo)}
+.link::after{content:""; position:absolute; left:2px; right:2px; bottom:10px; height:1px; background:currentColor; opacity:.4; transition:opacity .4s}
+.link:hover{color:var(--ink)}
+.link:hover::after{opacity:1}
+.link svg{width:13px; height:13px}
+
+/* Rejouer : discret, dans le coin de l'animation */
+.replay{position:absolute; z-index:7; bottom:16px; right:16px; display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 13px 0 10px; border-radius:999px; font-size:12.5px; font-weight:550; color:var(--ink-2); background:rgba(255,255,255,.86); box-shadow:inset 0 0 0 1px var(--line-2), 0 6px 16px -8px rgba(26,25,24,.32); opacity:0; visibility:hidden; transition:opacity .24s var(--out), visibility 0s .24s, transform .5s var(--expo)}
+.replay::after{content:""; position:absolute; inset:-6px}
+.replay svg{width:13px; height:13px; transition:transform .8s var(--expo)}
+.replay:hover svg{transform:rotate(-200deg)}
+.replay:active{transform:scale(.97)}
+.has-tl .replay.is-on,.replay.is-on{opacity:1; visibility:visible; transition:opacity .8s var(--expo), visibility 0s}
+
+/* =========================================================
+   Gestes d'apparition (classe .js uniquement)
+   ========================================================= */
+[data-words] .w{display:inline-block}
+.js [data-words] .w{opacity:0; filter:blur(10px); transform:scale(1.06); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-words].is-in .w{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--i, 0) * 70ms)}
+.js [data-words].is-scrub .w{filter:none; transform:none; transition:none}
+
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo) var(--wd, 0s), filter 1.2s var(--expo) var(--wd, 0s)}
+
+.js [data-reveal="card"]{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out), translate .9s var(--expo)}
+.js [data-reveal="card"].is-in{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo), translate .9s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms), calc(var(--wd, 0s) + var(--d, 0) * 90ms), 0s}
+
+.js [data-reveal="fade"]{opacity:0; filter:blur(6px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.js [data-reveal="fade"].is-in{opacity:1; filter:none; transition:opacity 1s var(--expo), filter 1s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 90ms)}
+
+.slit{display:inline-block; overflow:hidden; vertical-align:top; padding:0 .05em .08em; margin:0 -.05em -.08em}
+.slit .num{display:inline-block}
+
+/* =========================================================
+   Le point-cordon et son fil, sur fond clair (shared/cordon.css n'est pas modifié)
+   ========================================================= */
+.kz-logo .kz-dot{background:var(--ink)}
+.kz-logo .kz-dot:focus-visible{outline-color:var(--lagon)}
+.cd-fil .cd-fil__chaine{stroke:rgb(26 25 24 / .5)}
+
+/* =========================================================
+   Formulaires (cœur blanc, champs blancs à filet)
+   ========================================================= */
+.form{position:relative}
+.form__core{padding:clamp(22px,3vw,40px)}
+.form__body{transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__body{opacity:0; filter:blur(6px); pointer-events:none}
+.field{display:grid; gap:10px; margin:0 0 20px; padding:0; border:0; min-width:0}
+.field label,.field legend{padding:0; font-size:14px; font-weight:550; color:var(--ink)}
+.field small{font-weight:400; color:var(--ink-3)}
+.input{width:100%; min-height:54px; padding:14px 16px; border-radius:16px; border:0; outline:none; background:#fff; box-shadow:inset 0 0 0 1px var(--line-2), 0 1px 2px rgba(26,25,24,.04); font-size:16px; line-height:1.4; color:var(--ink); transition:box-shadow .4s var(--expo)}
+.input::placeholder{color:#76716B}
+.input:hover{box-shadow:inset 0 0 0 1px rgba(26,25,24,.26), 0 1px 2px rgba(26,25,24,.04)}
+.input:focus-visible{box-shadow:inset 0 0 0 1.5px var(--lagon), 0 0 0 4px rgba(15,93,107,.12)}
+.input[aria-invalid="true"]{box-shadow:inset 0 0 0 1.5px #A3352A, 0 0 0 4px rgba(163,53,42,.08)}
+textarea.input{min-height:132px; resize:vertical}
+.field__err{margin:0; font-size:13px; color:#A3352A}
+.field__err:empty{display:none}
+.form__foot{display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:16px; margin-top:6px}
+
+/* =========================================================
+   Pied de page : la grande signature (le coin bas gauche reste libre)
+   ========================================================= */
+.foot{padding:clamp(16px,3vw,40px) 0 calc(76px + env(safe-area-inset-bottom))}
+.foot__core{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:22px 40px; padding:clamp(26px,4.4vw,60px)}
+.foot__word{font-family:var(--f-title); font-weight:600; font-size:clamp(84px,16vw,232px); line-height:.78; letter-spacing:-.045em; color:var(--ink)}
+.foot__row{margin-left:auto; padding-bottom:6px; font-size:14px; color:var(--ink-3); text-align:right}
+.foot__row .link{font-size:14px; min-height:40px}
+
+
+/* =========================================================
+   AGENTS — brume froide
+   ========================================================= */
+:root{--maxw:1180px; --cordon-lumiere:#E39A45}
+.ambient{background:radial-gradient(55% 45% at 88% 2%, rgba(214,226,233,.85), rgba(214,226,233,0) 70%), radial-gradient(42% 40% at 0% 92%, rgba(226,232,234,.7), rgba(226,232,234,0) 70%)}
+main{overflow-x:clip}
+h1,h2,h3{font-weight:500}
+.say{font-size:clamp(30px,4.4vw,64px); line-height:1.08; letter-spacing:-.03em; font-weight:500; color:var(--ink); text-wrap:balance}
+.h2{font-size:clamp(46px,7vw,112px)}
+.btn--down:hover .btn__ico{transform:translateY(2px) scale(1.06)}
+
+/* Navigation */
+.nav{position:fixed; top:0; left:0; right:0; z-index:50; padding-top:env(safe-area-inset-top); pointer-events:none}
+.nav::before{content:""; position:absolute; left:0; right:0; top:0; bottom:-18px; background:rgba(245,243,239,.74); -webkit-backdrop-filter:blur(14px) saturate(1.3); backdrop-filter:blur(14px) saturate(1.3);
+  -webkit-mask-image:linear-gradient(#000 72%, transparent); mask-image:linear-gradient(#000 72%, transparent); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.nav__in{position:relative; display:flex; align-items:center; gap:10px; height:72px; padding-left:var(--gl); padding-right:var(--gr)}
+.nav__in > *{pointer-events:auto}
+.kz-logo{display:inline-block; margin-right:auto; padding:8px 2px; font-family:var(--f-title); font-weight:600; font-size:28px; line-height:1; letter-spacing:-.01em; color:var(--ink); border-radius:8px}
+.nav__cta{position:relative; display:inline-flex; align-items:center; gap:12px; height:46px; padding:0 4px 0 18px; border-radius:999px; font-size:14px; font-weight:550; white-space:nowrap; background:var(--ink); color:var(--creme); isolation:isolate;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 10px 24px -10px rgba(26,25,24,.55); transition:transform .5s var(--expo)}
+.nav__cta::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:rgba(255,255,255,.08); opacity:0; transition:opacity .4s var(--expo)}
+.nav__cta:hover::before{opacity:1}
+.nav__cta:active{transform:scale(.975)}
+.nav__ctaIco{display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:rgba(244,239,230,.14); transition:transform .7s var(--expo)}
+.nav__ctaIco svg{width:14px; height:14px}
+.nav__cta:hover .nav__ctaIco{transform:translate(2px,-1px) scale(1.06)}
+.js .nav__in{opacity:0}
+.hero-in .nav__in{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+@media (max-width:600px){
+  .nav__in{height:64px}
+  .kz-logo{font-size:25px}
+  .nav__cta{height:44px; gap:10px; padding-left:16px; font-size:13.5px}
+  .nav__ctaIco{width:36px; height:36px}
+}
+.prog{position:fixed; top:0; left:0; right:0; z-index:51; height:2px; pointer-events:none}
+.prog i{display:block; height:100%; background:linear-gradient(90deg, rgba(26,25,24,.2), var(--lagon)); transform-origin:left; transform:scaleX(0)}
+
+/* =========================================================
+   1. L'arrivée : la question, dans une grande carte en brume (Kuala Lumpur, pâle)
+   ========================================================= */
+.hero{position:relative; padding:calc(env(safe-area-inset-top) + 74px) var(--gr) 14px var(--gl)}
+.hero__sentinel{position:absolute; top:0; left:0; width:1px; height:60px; pointer-events:none}
+.hero__card{display:grid; max-width:1480px; margin-inline:auto; min-height:calc(100vh - 88px); min-height:calc(100svh - 88px - env(safe-area-inset-top)); padding:6px; border-radius:40px; background:rgba(255,255,255,.52); box-shadow:var(--sh-1), inset 0 1px 0 rgba(255,255,255,.9)}
+.hero__core{position:relative; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden; isolation:isolate; border-radius:34px; background:#E4E9EC}
+.hero__core::after{content:""; position:absolute; inset:0; z-index:6; border-radius:inherit; pointer-events:none; box-shadow:inset 0 0 0 1px rgba(26,25,24,.05), inset 0 1px 0 rgba(255,255,255,.8)}
+.hero__bg{position:absolute; inset:0; z-index:-2}
+.hero__bgIn{position:absolute; inset:0}
+.hero__land{width:100%; height:100%; object-fit:cover; object-position:58% 50%; filter:grayscale(.8) brightness(1.2) contrast(.72); opacity:.7}
+.hero__wash{position:absolute; inset:0; background:radial-gradient(70% 60% at 80% 10%, rgba(243,246,247,.7), transparent 70%), linear-gradient(180deg, rgba(228,234,238,.35), rgba(213,222,228,.45))}
+.hero__shade{position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(0deg, rgba(245,243,239,.97) 0%, rgba(245,243,239,.9) 40%, rgba(245,243,239,.35) 66%, rgba(245,243,239,0) 84%)}
+.hero__grain{position:absolute; inset:0; z-index:-1; opacity:.07; background-image:var(--noise); background-size:180px 180px; pointer-events:none}
+.hero__in{position:relative; width:100%; padding:120px clamp(22px,5vw,72px) clamp(32px,7vh,80px)}
+.hero__q{max-width:19ch; margin:0 0 34px -.04em; font-size:clamp(34px,5.2vw,84px); line-height:1.03; letter-spacing:-.042em; font-weight:500; color:var(--ink); text-wrap:balance}
+.hero__q .word{font-size:1.12em}
+@media (min-width:900px){
+  .hero__shade{background:linear-gradient(90deg, rgba(245,243,239,.96) 0%, rgba(245,243,239,.86) 38%, rgba(245,243,239,.3) 62%, rgba(245,243,239,0) 80%), linear-gradient(0deg, rgba(245,243,239,.6) 0%, rgba(245,243,239,0) 40%)}
+}
+.js .hero__bgIn{opacity:0; transform:scale(1.07)}
+.hero-in .hero__bgIn{opacity:1; transform:none; transition:opacity 1.6s var(--expo), transform 2.6s var(--expo)}
+.js .hero [data-anim]{opacity:0; transform:translateY(16px)}
+.hero-in .hero [data-anim]{opacity:1; transform:none; transition:opacity 1s var(--expo) var(--ad, 1.3s), transform 1.2s var(--expo) var(--ad, 1.3s)}
+
+/* =========================================================
+   2. La démo : le plateau clair, c'est le visiteur qui valide
+   ========================================================= */
+.demo{position:relative; padding:clamp(88px,10vw,120px) 0 clamp(96px,9vw,120px)}
+.demo__q{max-width:21ch; margin:0 auto clamp(26px,3vw,38px); text-align:center; font-size:clamp(29px,3.5vw,52px); line-height:1.07; letter-spacing:-.035em; font-weight:500; color:var(--ink); text-wrap:balance}
+
+.ag{position:relative; width:100%; max-width:540px; margin-inline:auto; aspect-ratio:100 / 128; border-radius:36px; background:rgba(255,255,255,.55);
+  box-shadow:var(--sh-1), 0 40px 90px -50px rgba(26,25,24,.35), inset 0 1px 0 rgba(255,255,255,.95)}
+.ag__core{position:absolute; inset:6px; border-radius:30px; overflow:hidden; container-type:inline-size;
+  background:radial-gradient(80% 50% at 50% 0%, rgba(214,226,233,.75), transparent 70%), linear-gradient(180deg,#FFFFFF,#F3F5F6); box-shadow:inset 0 0 0 1px rgba(26,25,24,.05)}
+.ag__core::before{content:""; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(rgba(26,25,24,.1) 1px, transparent 1.3px); background-size:4cqw 4cqw;
+  -webkit-mask-image:radial-gradient(70% 60% at 50% 45%, #000, transparent); mask-image:radial-gradient(70% 60% at 50% 45%, #000, transparent)}
+.ag__art{position:absolute; inset:0}
+.ag-wires{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.ag-wires path{fill:none; stroke:rgba(26,25,24,.3); stroke-width:1.2; stroke-linecap:round; stroke-dasharray:1; stroke-dashoffset:0}
+.ag-src{position:absolute; top:7cqw; width:29cqw; height:13cqw; display:flex; flex-direction:column; justify-content:center; gap:1.2cqw; padding:0 3cqw; border-radius:3.4cqw; background:#fff; color:var(--ink);
+  box-shadow:0 0 0 1px rgba(26,25,24,.07), 0 2cqw 5cqw -2cqw rgba(26,25,24,.32)}
+.ag-src > svg{flex:none; width:4.4cqw; height:4.4cqw; color:var(--ink-3); fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.ag-src > span{font-size:max(10.5px,3.3cqw); line-height:1.2; font-weight:550; white-space:nowrap}
+.ag-src--0{left:3.5cqw} .ag-src--1{left:35.5cqw} .ag-src--2{left:67.5cqw}
+.ag-dup{opacity:0; visibility:hidden; background:#F4F2EF}
+.ag-dup > em{position:absolute; top:1.5cqw; right:2.6cqw; font-family:var(--f-word); font-style:italic; font-size:max(11px,3.2cqw); line-height:1; color:#A3352A}
+.ag-tick{position:absolute; top:-1.6cqw; right:-1.6cqw; width:5.6cqw; height:5.6cqw; border-radius:50%; background:var(--lagon); box-shadow:0 0 0 .7cqw #fff}
+.ag-tick svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#fff; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-node{position:absolute; display:flex; align-items:center; justify-content:center; gap:2cqw; border-radius:99px; background:#fff; color:var(--ink); box-shadow:inset 0 0 0 1px var(--line-2), 0 1.4cqw 3cqw -1.4cqw rgba(26,25,24,.3); font-size:max(11px,3.5cqw); line-height:1; font-weight:550; white-space:nowrap}
+.ag-node > svg{flex:none; width:4.2cqw; height:4.2cqw; color:var(--ink-3); fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round}
+.ag-glow{position:absolute; inset:-1px; border-radius:inherit; box-shadow:0 0 0 1.5px rgba(15,93,107,.75), 0 0 6cqw rgba(15,93,107,.22); opacity:0; pointer-events:none}
+.ag-node--v{left:8cqw; top:30cqw; width:36cqw; height:10cqw}
+.ag-node--c{left:50cqw; top:30cqw; width:42cqw; height:10cqw}
+.ag-node--h{left:31cqw; top:47cqw; width:38cqw; height:12cqw; font-family:var(--f-title); font-weight:600; font-size:max(18px,5.8cqw); background:var(--ink); color:var(--creme); box-shadow:0 2cqw 5cqw -2cqw rgba(26,25,24,.6)}
+.ag-node--h .ag-glow{opacity:1}
+.ag-noteW{position:absolute; left:10cqw; right:10cqw; top:66cqw; height:37cqw; transition:opacity .45s var(--out), transform .55s var(--out)}
+.ag-note{position:absolute; inset:0; padding:3.6cqw 5cqw; border-radius:4cqw; background:#fff; color:var(--ink); box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 4cqw 10cqw -4cqw rgba(26,25,24,.45)}
+.ag-note__t{font-size:max(12.5px,4.3cqw); line-height:1.3; font-weight:600; letter-spacing:-.02em; margin-bottom:1.6cqw}
+.ag-line{display:flex; align-items:center; gap:2.4cqw; padding:2.3cqw 0; border-top:1px solid var(--line)}
+.ag-line i{flex:0 1 var(--w, 60%); height:1.6cqw; border-radius:1cqw; background:rgba(26,25,24,.1)}
+.ag-line span{margin-left:auto; font-size:max(10px,2.9cqw); line-height:1.2; font-weight:500; color:var(--ink-2); white-space:nowrap}
+.ag-line b{position:relative; flex:none; width:3.6cqw; height:3.6cqw; border-radius:50%; background:var(--lagon)}
+.ag-line b svg{position:absolute; inset:0; width:100%; height:100%; fill:none; stroke:#fff; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
+.ag-done{position:absolute; left:50%; top:70cqw; width:24cqw; height:24cqw; margin-left:-12cqw; opacity:0; pointer-events:none}
+.ag-done svg{width:100%; height:100%; overflow:visible}
+.ag-done circle,.ag-done path{fill:none; stroke:var(--lagon); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; transition:stroke-dashoffset .24s var(--out)}
+.ag-done path{stroke-width:2.2}
+.ag-sent{position:absolute; left:0; right:0; top:98cqw; text-align:center; font-size:max(16px,4.8cqw); font-weight:550; letter-spacing:-.01em; line-height:1.2; color:var(--ink); opacity:0; transform:translateY(10px); transition:opacity .24s var(--out), transform .24s var(--out)}
+.ag__okW{position:absolute; left:20cqw; right:20cqw; top:108cqw}
+.ag__ok{position:relative; display:flex; align-items:center; justify-content:center; width:100%; min-height:48px; height:13cqw; border-radius:99px; background:var(--red); color:#FFF8F2; font-size:max(19px,5.2cqw); font-weight:700; letter-spacing:-.01em;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.25), 0 3cqw 8cqw -3cqw rgba(232,50,43,.65); transition:transform .5s var(--expo), opacity .24s var(--out)}
+.ag__ok::after{content:""; position:absolute; inset:-6px; border-radius:inherit}
+.ag__ok:hover{transform:translateY(-2px)}
+.ag__ok:active{transform:scale(.97)}
+.ag__ok:focus-visible{outline:2px solid var(--ink); outline-offset:4px}
+.ag.is-sent .ag-noteW{opacity:0; transform:translate(14cqw,-22cqw) rotate(5deg) scale(.55)}
+.ag.is-sent .ag-done{opacity:1}
+.ag.is-sent .ag-done circle{stroke-dashoffset:0; transition:stroke-dashoffset .9s var(--expo) .35s}
+.ag.is-sent .ag-done path{stroke-dashoffset:0; transition:stroke-dashoffset .7s var(--expo) .85s}
+.ag.is-sent .ag-sent{opacity:1; transform:none; transition:opacity 1s var(--expo) 1.1s, transform 1.2s var(--expo) 1.1s}
+.ag.is-sent .ag__ok{opacity:0; transform:translateY(8px) scale(.97); pointer-events:none}
+.ag .replay{left:50%; right:auto; bottom:3.5%; translate:-50% 0}
+.ag-caps{position:absolute; left:0; right:0; top:calc(100% + 18px); display:grid; justify-items:center; text-align:center; pointer-events:none}
+.ag-cap{grid-area:1 / 1; max-width:30ch; font-size:16px; line-height:1.35; color:var(--ink-2); opacity:0; filter:blur(6px); transform:translateY(6px); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.ag-cap b{font-weight:600; color:var(--ink)}
+.ag-cap.is-on{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo) .1s, filter .9s var(--expo) .1s, transform 1.1s var(--expo) .1s}
+@media (min-width:900px){
+  .demo{padding-bottom:clamp(72px,7vw,104px)}
+  .ag{aspect-ratio:16 / 9; max-width:none; width:min(100%, 1120px, max(720px, calc((100vh - 330px) * 1.7778))); border-radius:42px}
+  @supports (height:100svh){ .ag{width:min(100%, 1120px, max(720px, calc((100svh - 330px) * 1.7778)))} }
+  .ag__core{border-radius:36px}
+  .ag__core::before{background-size:2.2cqw 2.2cqw}
+  .ag-src{width:23cqw; height:8cqw; flex-direction:row; align-items:center; justify-content:flex-start; gap:1.1cqw; padding:0 1.8cqw; border-radius:1.9cqw; box-shadow:0 0 0 1px rgba(26,25,24,.07), 0 1.2cqw 3cqw -1.2cqw rgba(26,25,24,.32)}
+  .ag-src > svg{width:2.2cqw; height:2.2cqw}
+  .ag-src > span{font-size:max(13px,1.45cqw)}
+  .ag-src--0,.ag-src--1,.ag-src--2{left:6cqw}
+  .ag-src--0{top:11cqw} .ag-src--1{top:23.5cqw} .ag-src--2{top:36cqw}
+  .ag-dup > em{top:50%; right:1.8cqw; transform:translateY(-50%); font-size:max(14px,1.5cqw)}
+  .ag-tick{top:-.9cqw; right:-.9cqw; width:2.6cqw; height:2.6cqw; box-shadow:0 0 0 .35cqw #fff}
+  .ag-node{gap:.9cqw; font-size:max(14px,1.6cqw)}
+  .ag-node > svg{width:2cqw; height:2cqw}
+  .ag-glow{box-shadow:0 0 0 1.5px rgba(15,93,107,.75), 0 0 3cqw rgba(15,93,107,.22)}
+  .ag-node--v{left:39cqw; top:11.75cqw; width:19cqw; height:6.5cqw}
+  .ag-node--c{left:39cqw; top:24.25cqw; width:19cqw; height:6.5cqw}
+  .ag-node--h{left:38cqw; top:36cqw; width:21cqw; height:8cqw; font-size:max(22px,2.7cqw)}
+  .ag-noteW{left:66.5cqw; right:auto; width:28cqw; top:9.5cqw; height:27cqw}
+  .ag-note{padding:2.3cqw 2.5cqw; border-radius:1.8cqw; box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 2cqw 5cqw -2cqw rgba(26,25,24,.45)}
+  .ag-note__t{font-size:max(16px,1.9cqw); margin-bottom:1cqw}
+  .ag-line{gap:1.2cqw; padding:1.6cqw 0}
+  .ag-line i{height:.85cqw; border-radius:.5cqw}
+  .ag-line span{font-size:max(12px,1.25cqw)}
+  .ag-line b{width:1.8cqw; height:1.8cqw}
+  .ag-done{left:80.5cqw; top:13cqw; width:11cqw; height:11cqw; margin-left:-5.5cqw}
+  .ag-sent{left:66.5cqw; right:auto; width:28cqw; top:27cqw; font-size:max(17px,1.9cqw)}
+  .ag__okW{left:69cqw; right:auto; width:23cqw; top:39.5cqw}
+  .ag__ok{height:6.8cqw; font-size:max(19px,2cqw); box-shadow:inset 0 0 0 1px rgba(255,255,255,.14), inset 0 1px 0 rgba(255,255,255,.25), 0 1.4cqw 4cqw -1.4cqw rgba(232,50,43,.65)}
+  .ag .replay{left:80%; bottom:5%}
+  .ag-caps{top:auto; bottom:4.6%; left:18%; right:18%}
+  .ag-cap{font-size:17px; max-width:none}
+}
+
+/* =========================================================
+   3. La promesse (les mots s'allument au défilement)
+   ========================================================= */
+.promise{padding:calc(var(--sec) * .55) 0 calc(var(--sec) * .5)}
+.promise .say{max-width:23ch; font-size:clamp(30px,4.2vw,62px)}
+
+/* =========================================================
+   4. Six besoins : chaque question dans sa carte ; la réponse se pose dans la même coque
+   ========================================================= */
+.needs{padding:calc(var(--sec) * .5) 0 var(--sec)}
+.needs__t{margin-bottom:clamp(28px,4vw,52px)}
+.qs{display:grid; gap:12px}
+.q{position:relative; padding:6px; border-radius:32px; background:rgba(255,255,255,.52); box-shadow:var(--sh-1), inset 0 1px 0 rgba(255,255,255,.9); isolation:isolate}
+.q::after{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; box-shadow:var(--sh-2); opacity:0; pointer-events:none; transition:opacity .6s var(--expo)}
+.q.is-open::after{opacity:1}
+.q__h{font:inherit}
+.q__btn{position:relative; display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; min-height:84px; padding:22px 18px 22px 24px; border-radius:26px; text-align:left; color:var(--ink-2);
+  background:linear-gradient(180deg,#FFFFFF 0%,#FBFAF8 100%); box-shadow:inset 0 0 0 1px rgba(26,25,24,.05); transition:color .5s var(--expo)}
+.q__t{max-width:30ch; font-size:clamp(22px,2.8vw,40px); line-height:1.12; letter-spacing:-.032em; font-weight:500; text-wrap:balance}
+.q__ico{position:relative; flex:none; width:46px; height:46px; border-radius:50%; color:var(--ink); background:rgba(26,25,24,.05); box-shadow:inset 0 0 0 1px var(--line); transition:background .5s var(--expo), color .5s var(--expo), transform .8s var(--expo)}
+.q__ico::before,.q__ico::after{content:""; position:absolute; left:50%; top:50%; width:14px; height:1.5px; margin:-.75px 0 0 -7px; border-radius:2px; background:currentColor}
+.q__ico::after{transform:rotate(90deg)}
+.q__btn:hover{color:var(--ink)}
+.q__btn:hover .q__ico{background:rgba(26,25,24,.09)}
+.q__btn:active .q__ico{transform:scale(.94)}
+.q.is-open .q__btn{color:var(--ink)}
+.q.is-open .q__ico{background:var(--ink); color:var(--creme); transform:rotate(135deg)}
+.q__p{padding:6px 0 0}
+.q__card{border-radius:26px}
+.q__core{display:grid; gap:26px; padding:clamp(22px,3vw,40px); border-radius:26px; background:radial-gradient(70% 100% at 100% 0%, rgba(214,226,233,.85), transparent 70%), linear-gradient(180deg,#F9FAFA,#F1F4F5); box-shadow:inset 0 0 0 1px rgba(26,25,24,.05)}
+.q__need{font-size:clamp(19px,1.8vw,26px); line-height:1.32; letter-spacing:-.022em; font-weight:500; color:var(--ink); text-wrap:pretty}
+.q__again{margin-top:10px}
+.q__lbl{margin-bottom:8px; font-size:18px}
+.q__list li{position:relative; padding:9px 0 9px 26px; font-size:15.5px; line-height:1.42; color:var(--ink-2); border-top:1px solid var(--line)}
+.q__list li:first-child{border-top:0; padding-top:2px}
+.q__list li::before{content:""; position:absolute; left:2px; top:calc(9px + .38em); width:10px; height:5px; border-left:1.5px solid var(--lagon); border-bottom:1.5px solid var(--lagon); transform:rotate(-45deg)}
+.q__list li:first-child::before{top:calc(2px + .38em)}
+.q__human{font-size:19px; line-height:1.36; letter-spacing:-.015em; font-weight:500; color:var(--ink)}
+.q__val{margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:14.5px; line-height:1.55; color:var(--ink-3)}
+.q__val strong{font-weight:600; color:var(--ink-2)}
+@media (min-width:900px){
+  .q__btn{min-height:104px; padding:28px 26px 28px 34px}
+  .q__ico{width:52px; height:52px}
+  .q__core{grid-template-columns:5fr 4fr 3.4fr; gap:clamp(28px,3.4vw,56px)}
+}
+.js .q__card{clip-path:inset(0 0 100% 0 round 26px)}
+.js .q.is-open .q__card{clip-path:inset(0 0 0 0 round 26px); transition:clip-path 1s var(--expo)}
+.js .q__core > *{opacity:0; filter:blur(6px); transform:translateY(16px)}
+.js .q.is-open .q__core > *{opacity:1; filter:none; transform:none; transition:opacity .9s var(--expo), filter .9s var(--expo), transform 1.1s var(--expo); transition-delay:calc(.12s + var(--d, 0) * 90ms)}
+.js [data-reveal="fade"]{transform:translateY(14px); transition:opacity .24s var(--out), filter .24s var(--out), transform .24s var(--out)}
+.js [data-reveal="fade"].is-in{transform:none; transition:opacity 1s var(--expo), filter 1s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--wd, 0s) + var(--d, 0) * 80ms)}
+
+/* =========================================================
+   5. Comment on avance : trois cartes sur une ligne qui se trace
+   ========================================================= */
+.steps{padding:calc(var(--sec) * .6) 0 calc(var(--sec) * .7)}
+.steps__list{position:relative; display:grid; gap:14px; margin-top:clamp(40px,5vw,64px); padding-left:40px}
+.steps__line{position:absolute; left:6px; top:30px; bottom:30px; width:1px; background:var(--line-2)}
+.steps__line i{position:absolute; inset:0; background:linear-gradient(180deg, var(--ink), var(--lagon)); transform-origin:top; transform:scaleY(var(--sp, 1))}
+.step{position:relative; padding:24px 26px 28px; border-radius:28px; background:linear-gradient(180deg,#FFFFFF,#FBFAF8); box-shadow:var(--sh-1), inset 0 1px 0 #fff;
+  font-size:clamp(24px,2.6vw,38px); line-height:1.12; letter-spacing:-.03em; font-weight:500; color:var(--ink); transition:color .8s var(--expo)}
+.step::before{content:""; position:absolute; left:-40px; top:32px; width:13px; height:13px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(26,25,24,.45); transition:background .6s var(--expo), box-shadow .6s var(--expo)}
+.step.is-lit::before{background:var(--lagon); box-shadow:0 0 0 5px rgba(15,93,107,.14)}
+.has-scrub .step:not(.is-lit){color:rgba(26,25,24,.3)}
+@media (min-width:900px){
+  .steps__list{grid-template-columns:repeat(3,1fr); gap:16px; padding:44px 0 0}
+  .steps__line{left:6px; right:6px; top:6px; bottom:auto; width:auto; height:1px}
+  .steps__line i{background:linear-gradient(90deg, var(--ink), var(--lagon)); transform-origin:left; transform:scaleX(var(--sp, 1))}
+  .step{min-height:190px}
+  .step::before{left:0; top:-44px}
+}
+
+/* =========================================================
+   6. Contact
+   ========================================================= */
+.contact{padding:calc(var(--sec) * .45) 0 calc(var(--sec) * .5)}
+.split{display:grid; grid-template-columns:1fr; gap:clamp(36px,6vw,96px); align-items:start}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr; align-items:center} }
+.contact__side{display:flex; flex-direction:column; gap:28px}
+.contact__say{max-width:11ch; font-size:clamp(42px,5.6vw,86px); line-height:1; letter-spacing:-.04em; font-weight:500; color:var(--ink)}
+.contact__links{display:flex; flex-wrap:wrap; gap:10px}
+.choices{display:flex; flex-wrap:wrap; gap:8px; margin-top:2px}
+.choice{position:relative}
+.choice input{position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer}
+.choice span{display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border-radius:999px; font-size:15px; line-height:1.2; font-weight:500; color:var(--ink); background:#fff; box-shadow:inset 0 0 0 1px var(--line-2); transition:background .4s var(--expo), color .4s var(--expo), box-shadow .4s var(--expo), transform .5s var(--expo)}
+.choice input:hover + span{box-shadow:inset 0 0 0 1px rgba(26,25,24,.28)}
+.choice input:checked + span{background:var(--ink); color:var(--creme); box-shadow:none}
+.choice input:focus-visible + span{outline:2px solid var(--lagon); outline-offset:3px}
+.choice input:active + span{transform:scale(.97)}
+.choices[aria-invalid="true"] .choice span{box-shadow:inset 0 0 0 1.5px #A3352A}
+.form__ok{position:absolute; inset:6px; z-index:2; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:16px; padding:clamp(24px,4vw,56px); border-radius:calc(var(--r-xl) - 6px);
+  opacity:0; transform:translateY(34px) scale(.965); pointer-events:none; transition:opacity .24s var(--out), transform .24s var(--out)}
+.form.is-sent .form__ok{opacity:1; transform:none; pointer-events:auto; transition:opacity .9s var(--expo) .18s, transform 1.2s var(--expo) .18s}
+.ok__check{width:68px; height:68px}
+.ok__check circle,.ok__check path{fill:none; stroke:var(--lagon); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1}
+.ok__check path{stroke-width:2.2}
+.form.is-sent .ok__check circle{stroke-dashoffset:0; transition:stroke-dashoffset 1s var(--expo) .35s}
+.form.is-sent .ok__check path{stroke-dashoffset:0; transition:stroke-dashoffset .8s var(--expo) .85s}
+.form__ok h3{outline:none; font-family:var(--f-title); font-weight:600; font-size:clamp(36px,3.6vw,52px); line-height:1; letter-spacing:-.02em}
+.form__ok p{max-width:34ch; color:var(--ink-2)}
+.form__ok > :not(svg){opacity:0; filter:blur(5px); transition:opacity .24s var(--out), filter .24s var(--out)}
+.form.is-sent .form__ok > :not(svg){opacity:1; filter:none; transition:opacity .8s var(--expo) .7s, filter .8s var(--expo) .7s}
+
+.foot__core{background:radial-gradient(60% 90% at 100% 0%, rgba(214,226,233,.85), transparent 70%), linear-gradient(180deg,#FFFFFF 0%,#F7F8F8 100%)}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-words] .w,.js [data-reveal],.js .hero__bgIn,.js .hero [data-anim],.js .q__core > *,.form__ok,.ag-sent,.ag-cap{transform:none !important; filter:none !important}
+  .js [data-sweep]{clip-path:none; filter:none; opacity:0; transition:opacity .4s}
+  .js [data-sweep].is-in{opacity:1; transition:opacity 1s var(--expo)}
+  .js .q__card,.js .q.is-open .q__card{clip-path:none}
+  .ag.is-sent .ag-noteW{transform:none}
+  .q.is-open .q__ico{transform:none}
+  .q.is-open .q__ico::after{opacity:0}
+  .lift,.shell{transition:none !important; translate:none !important}
+  .btn,.btn__ico,.choice span,.replay svg,.q__ico,.ag__ok{transition-property:opacity,background,color,box-shadow}
+}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+</head>
+<body>
+<a class="skip" href="#demo">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="prog" aria-hidden="true"><i></i></div>
+
+<!-- ========== Navigation (markup commun V4) ========== -->
+<header class="nav">
+  <div class="nav__in">
+    <a class="kz-logo" href="pro.html">Kenz<button class="kz-dot" type="button" data-cordon data-vers="createur.html" data-symbole="soleil" aria-label="Kenz"></button></a>
+    <a class="nav__cta" href="#contact"><span>Me contacter</span><span class="nav__ctaIco" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+  </div>
+</header>
+
+<main>
+  <!-- ========== 1. L'arrivée ========== -->
+  <section class="hero" id="top" aria-labelledby="hero-q">
+    <span class="hero__sentinel" aria-hidden="true"></span>
+    <div class="hero__card"><div class="hero__core">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bgIn">
+        <img class="hero__land" src="../assets/img/paysage-kuala-lumpur.jpg" alt="" width="1600" height="900" fetchpriority="high">
+        <i class="hero__wash"></i>
+      </div>
+    </div>
+    <div class="hero__shade" aria-hidden="true"></div>
+    <i class="hero__grain" aria-hidden="true"></i>
+    <div class="hero__in">
+      <h1 class="hero__q" id="hero-q" data-words data-hero-words>Et si des agents IA travaillaient pour vous, <em class="word glow">sans</em> jamais rien envoyer sans votre accord&nbsp;?</h1>
+      <a class="btn btn--light btn--down" href="#demo" data-anim>Voir comment<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+    </div>
+    </div></div>
+  </section>
+
+  <!-- ========== 2. La démo : c'est le visiteur qui valide ========== -->
+  <section class="demo" id="demo" tabindex="-1" aria-labelledby="demo-q">
+    <div class="wrap">
+      <h2 class="demo__q" id="demo-q" data-words>Vous passez trop de temps à chercher et trier l’<em class="word">info</em>&nbsp;?</h2>
+      <div class="ag" data-agents>
+        <div class="ag__core">
+          <div class="ag__art" role="img" aria-label="Animation : trois sources arrivent, un site concurrent, un appel d’offres et un article, avec un doublon. Veille les trie et écarte le doublon, Vérification coche chaque source, puis Hermes les assemble en une note du lundi, avec une source par ligne.">
+            <svg class="ag-wires" aria-hidden="true" data-wires></svg>
+            <div class="ag-src ag-src--0" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM3.5 12h17M12 3.5c2.4 2.6 3.5 5.4 3.5 8.5s-1.1 5.9-3.5 8.5c-2.4-2.6-3.5-5.4-3.5-8.5s1.1-5.9 3.5-8.5z"/></svg><span>Site concurrent</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--1" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6"/></svg><span>Appel d’offres</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2" data-src><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><span class="ag-tick" data-tick><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></span></div>
+            <div class="ag-src ag-src--2 ag-dup" data-dup aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 5.5h12v13h-10a2 2 0 0 1-2-2zM16.5 9.5h3v7a2 2 0 0 1-2 2M7.5 9h6M7.5 12h6M7.5 15h4"/></svg><span>Article</span><em>doublon</em></div>
+            <div class="ag-node ag-node--v" data-node><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l4.5 4.5"/></svg>Veille<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--c" data-node><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M8.6 12.2l2.4 2.4 4.5-4.7"/></svg>Vérification<span class="ag-glow"></span></div>
+            <div class="ag-node ag-node--h" data-node>Hermes<span class="ag-glow"></span></div>
+            <div class="ag-noteW" data-notew>
+              <div class="ag-note" data-note>
+                <p class="ag-note__t">Note du lundi</p>
+                <div class="ag-line" style="--w:62%"><i></i><span>Site concurrent</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+                <div class="ag-line" style="--w:48%"><i></i><span>Appel d’offres</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+                <div class="ag-line" style="--w:56%"><i></i><span>Article</span><b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3.2 3.2L17 9"/></svg></b></div>
+              </div>
+            </div>
+            <div class="ag-done"><svg viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg></div>
+            <p class="ag-sent">Note envoyée.</p>
+          </div>
+          <div class="ag__okW" data-okw><button class="ag__ok" type="button" data-ok>Valider</button></div>
+        </div>
+        <button class="replay" type="button" data-replay><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.6 8a5.4 5.4 0 1 0 1.7-3.9"/><path d="M2.6 2.6v3h3"/></svg>Rejouer</button>
+        <div class="ag-caps" aria-hidden="true">
+          <p class="ag-cap" data-cap>Les sources arrivent.</p>
+          <p class="ag-cap" data-cap><b>Veille</b> trie et écarte le doublon.</p>
+          <p class="ag-cap" data-cap><b>Vérification</b> coche chaque source.</p>
+          <p class="ag-cap" data-cap><b>Hermes</b> assemble la note du lundi.</p>
+          <p class="ag-cap is-on" data-cap>La note attend votre validation.</p>
+          <p class="ag-cap" data-cap>Validé. La note est partie.</p>
+        </div>
+        <p class="sr" aria-live="polite" data-ag-live></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 3. La promesse ========== -->
+  <section class="promise" aria-label="Ce que j’installe chez vous">
+    <div class="wrap">
+      <p class="say" data-scrub>J’installe une équipe d’agents IA chez vous. Chacun son rôle, une mémoire commune, et rien ne part sans votre <em class="word glow">validation</em>.</p>
+    </div>
+  </section>
+
+  <!-- ========== 4. Six besoins, dans les mots des clients ========== -->
+  <section class="needs" id="besoins" aria-labelledby="needs-t">
+    <div class="wrap">
+      <h2 class="h2 needs__t" id="needs-t" data-sweep>Et chez vous&nbsp;?</h2>
+      <div class="qs" data-qs>
+
+        <div class="q" data-q data-reveal="fade" style="--d:0">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-veille" aria-expanded="false" aria-controls="qp-veille"><span class="q__t">Vous passez trop de temps à chercher et trier l’<em class="word">info</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-veille" role="region" aria-labelledby="qb-veille" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Suivre des concurrents, des prix, des appels d’offres ou une réglementation, sans y passer ses journées.</p><a class="link q__again" href="#demo" data-redemo>Revoir la démo<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3.5 7.5L8 3l4.5 4.5"/></svg></a></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Une note datée où chaque ligne a sa source, sa date et son statut</li><li>Les critères écrits, modifiables</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Décider quoi faire de l’information.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Les critères au départ · Toute nouvelle source · Aucune action à l’extérieur</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:1">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-contenu" aria-expanded="false" aria-controls="qp-contenu"><span class="q__t">Vous voulez publier plus de contenu sans y passer vos <em class="word">soirées</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-contenu" role="region" aria-labelledby="qb-contenu" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Des vidéos courtes, des carrousels et des visuels de store réguliers, à votre charte.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Des gabarits vidéo à votre charte</li><li>Une bibliothèque de motions nommées</li><li>Le circuit documenté</li><li>Les vidéos</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">La voix, la validation et la publication.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Le script · L’aperçu · Le «&nbsp;go rendu&nbsp;» · La publication (par vous)</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:2">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-produit" aria-expanded="false" aria-controls="qp-produit"><span class="q__t">De l’IA dans votre produit, sans exploser les <em class="word">coûts</em> ni rien casser&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-produit" role="region" aria-labelledby="qb-produit" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Extraire, classer, générer ou analyser des images dans un produit existant.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un pipeline en production</li><li>Un fournisseur interchangeable</li><li>Des quotas par utilisateur</li><li>Un mode factice pour les tests</li><li>Un suivi des coûts</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Le choix du cas et l’allumage.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Le cas et son coût estimé · Le prototype · L’allumage de la fonction</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:3">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-code" aria-expanded="false" aria-controls="qp-code"><span class="q__t">Votre équipe veut des agents de code, sans perdre le <em class="word">contrôle</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-code" role="region" aria-labelledby="qb-code" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Aller plus vite avec des agents de code, sans dette ni mauvaise surprise en production.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un fichier de règles par dépôt</li><li>Un circuit de revue</li><li>Des tests et une CI comme arbitres</li><li>Un journal de session</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Le feu vert de mise en ligne.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Les règles du dépôt · Chaque mise en ligne</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:4">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-memoire" aria-expanded="false" aria-controls="qp-memoire"><span class="q__t">Personne ne sait où en est un <em class="word">dossier</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-memoire" role="region" aria-labelledby="qb-memoire" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Retrouver l’état d’un dossier en 30&nbsp;secondes, que l’on soit une personne ou un agent.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Des fiches «&nbsp;Où on en est&nbsp;»</li><li>Un journal des décisions</li><li>Un format de transmission</li><li>Une reprise en 30&nbsp;secondes</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Les décisions.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Chaque décision, datée</p></div>
+            </div></div>
+          </div>
+        </div>
+
+        <div class="q" data-q data-reveal="fade" style="--d:5">
+          <h3 class="q__h"><button class="q__btn" type="button" id="qb-admin" aria-expanded="false" aria-controls="qp-admin"><span class="q__t">Votre back-office, c’est un <em class="word">tableur</em>&nbsp;?</span><span class="q__ico" aria-hidden="true"></span></button></h3>
+          <div class="q__p" id="qp-admin" role="region" aria-labelledby="qb-admin" hidden>
+            <div class="q__card"><div class="q__core">
+              <div style="--d:0"><p class="q__need">Voir ce qui se passe vraiment, modifier des contenus sans code, allumer une fonction sans risque.</p></div>
+              <div style="--d:1"><p class="cap q__lbl">Vous recevez</p><ul class="q__list"><li>Un admin lisible</li><li>Des interrupteurs de fonctions</li><li>Des tableaux de rétention J1/J7/J30</li><li>Des formulaires modifiables sans code</li></ul></div>
+              <div style="--d:2"><p class="cap q__lbl">Ce qui reste humain</p><p class="q__human">Les décisions à partir des chiffres.</p><p class="q__val"><strong>Vous validez&nbsp;:</strong> Chaque passage de la lecture à l’écriture</p></div>
+            </div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 5. Comment on avance ========== -->
+  <section class="steps" id="methode" aria-labelledby="steps-t">
+    <div class="wrap">
+      <h2 class="h2" id="steps-t" data-sweep>Comment on avance</h2>
+      <div class="steps__list" data-steps>
+        <span class="steps__line" aria-hidden="true"><i></i></span>
+        <p class="step">On en parle.</p>
+        <p class="step">Je vous montre un premier <em class="word">prototype</em>.</p>
+        <p class="step">Vous validez, je lance.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 6. Contact ========== -->
+  <section class="contact" id="contact" tabindex="-1" aria-labelledby="contact-t">
+    <div class="wrap split">
+      <div class="contact__side">
+        <h2 class="contact__say" id="contact-t" data-words>Parlons de votre <em class="word glow">équipe</em>.</h2>
+        <div class="contact__links" data-reveal="fade">
+          <a class="btn btn--ghost btn--sm" href="https://github.com/7Darken" target="_blank" rel="noopener">GitHub<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          <a class="btn btn--ghost btn--sm" href="https://www.linkedin.com/in/kenz-narainen/" target="_blank" rel="noopener">LinkedIn<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+        </div>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="contact-t">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="c-nom">Votre nom</label>
+              <input class="input" id="c-nom" name="nom" type="text" autocomplete="name" placeholder="Prénom et nom" data-min="2" data-msg="Indiquez votre nom." aria-describedby="c-nom-err">
+              <p class="field__err" id="c-nom-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Votre besoin</legend>
+              <div class="choices" data-choices aria-describedby="c-besoin-err">
+                <label class="choice"><input type="radio" name="besoin" value="Une app"><span>Une app</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="De l’IA dans mon produit"><span>De l’IA dans mon produit</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Des agents IA" checked><span>Des agents IA</span></label>
+                <label class="choice"><input type="radio" name="besoin" value="Autre"><span>Autre</span></label>
+              </div>
+              <p class="field__err" id="c-besoin-err" aria-live="polite"></p>
+            </fieldset>
+            <div class="field">
+              <label for="c-msg">Votre message</label>
+              <textarea class="input" id="c-msg" name="message" placeholder="Où en êtes-vous, et qu’aimeriez-vous changer&nbsp;?" data-min="10" data-msg="Quelques mots de plus (10 caractères au moins)." aria-describedby="c-msg-err"></textarea>
+              <p class="field__err" id="c-msg-err" aria-live="polite"></p>
+            </div>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit">Envoyer<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap"><div class="shell"><div class="core foot__core">
+    <p class="foot__word" aria-hidden="true">Kenz</p>
+    <p class="foot__row">© 2026 Kenz · <a class="link" href="#top">Revenir en haut</a></p>
+  </div></div></div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const d = document.documentElement;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const G = window.gsap, ST = window.ScrollTrigger;
+  const hasG = !!(G && ST);
+  if (hasG) G.registerPlugin(ST);
+  const safe = (name, fn) => { try { fn(); } catch (e) { console.error('[kz] ' + name + ' : ' + e.message); } };
+  let replayDemo = null;
+
+  /* ---------- Mots : chaque mot devient une unité animable (ponctuation collée) ---------- */
+  function splitWords(el) {
+    if (el.dataset.split) return;
+    el.dataset.split = '1';
+    const frag = document.createDocumentFragment();
+    let word = null, i = 0;
+    const flush = () => { if (word) { frag.appendChild(word); word = null; } };
+    const cur = () => { if (!word) { word = document.createElement('span'); word.className = 'w'; word.style.setProperty('--i', i++); } return word; };
+    Array.from(el.childNodes).forEach(n => {
+      if (n.nodeType === 3) {
+        n.textContent.split(/([ \t\n\r]+)/).forEach(p => {
+          if (!p) return;
+          if (/^[ \t\n\r]+$/.test(p)) { flush(); frag.appendChild(document.createTextNode(' ')); }
+          else cur().appendChild(document.createTextNode(p));
+        });
+      } else cur().appendChild(n);
+    });
+    flush();
+    el.textContent = '';
+    el.appendChild(frag);
+  }
+  safe('split', () => $$('[data-words],[data-scrub]').forEach(splitWords));
+
+  /* ---------- Apparitions à l'entrée à l'écran ---------- */
+  /* Un élément masqué par clip-path ne « dépasse » jamais le seuil : on observe alors son parent */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      (en.target._rev || [en.target]).forEach(el => el.classList.add('is-in'));
+      io.unobserve(en.target);
+    });
+  }, { threshold: .16, rootMargin: '0px 0px -6% 0px' });
+  $$('[data-words],[data-reveal],[data-sweep]').forEach(el => {
+    if (el.closest('.hero')) return;
+    if (el.matches('[data-sweep]') && el.parentElement) { const p = el.parentElement; (p._rev = p._rev || []).push(el); io.observe(p); }
+    else io.observe(el);
+  });
+
+  /* ---------- 1. Entrée de la question : après le passage ou la porte, sinon au chargement ---------- */
+  let heroDone = false;
+  const heroIn = () => {
+    if (heroDone) return;
+    heroDone = true;
+    d.classList.add('hero-in');
+    const hw = $('[data-hero-words]');
+    if (hw) hw.classList.add('is-in');
+  };
+  document.addEventListener('passage:arrivee', heroIn);
+  document.addEventListener('porte:arrivee', heroIn);
+  if (window.__kzArrivee) {
+    setTimeout(heroIn, 2500);
+    /* shared/passage.js absent : rien ne viendra, on joue tout de suite */
+    if (window.__kzArrivee === 'passage') document.addEventListener('DOMContentLoaded', () => { if (!window.Passage) heroIn(); });
+  } else {
+    requestAnimationFrame(() => setTimeout(heroIn, 60));
+  }
+
+  /* ---------- Nav : fond au défilement ; repère : barre de lecture ---------- */
+  safe('nav', () => {
+    const nav = $('.nav'), sen = $('.hero__sentinel');
+    new IntersectionObserver(([e]) => nav.classList.toggle('is-scrolled', !e.isIntersecting)).observe(sen);
+  });
+  safe('prog', () => {
+    const bar = $('.prog i');
+    let raf = 0;
+    const upd = () => {
+      raf = 0;
+      const m = d.scrollHeight - innerHeight;
+      bar.style.transform = 'scaleX(' + (m > 0 ? Math.min(1, Math.max(0, scrollY / m)) : 0).toFixed(4) + ')';
+    };
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(upd); }, { passive: true });
+    addEventListener('resize', upd);
+    upd();
+  });
+
+  /* ---------- Ancres internes ---------- */
+  function goTo(t) {
+    const y = t.id === 'top' ? 0 : t.getBoundingClientRect().top + scrollY;
+    window.scrollTo({ top: y, behavior: RM ? 'auto' : 'smooth' });
+    if (t.hasAttribute('tabindex')) setTimeout(() => t.focus({ preventScroll: true }), RM ? 0 : 900);
+  }
+  document.addEventListener('click', e => {
+    const l = e.target.closest('a[href^="#"]');
+    if (!l) return;
+    const id = l.getAttribute('href').slice(1);
+    const t = id && document.getElementById(id);
+    if (!t) return;
+    e.preventDefault();
+    goTo(t);
+    if (l.hasAttribute('data-redemo') && replayDemo) setTimeout(replayDemo, RM ? 0 : 750);
+  });
+
+  /* =========================================================
+     2. La démo : les sources tombent, Veille trie, Vérification coche,
+        Hermes assemble. C'est le visiteur qui clique « Valider ».
+     État final = CSS par défaut ; GSAP pose le départ et joue vers lui.
+     ========================================================= */
+  safe('agents', () => {
+    const ag = $('[data-agents]');
+    const art = $('.ag__art', ag), svg = $('[data-wires]', ag);
+    const srcs = $$('[data-src]', ag), dup = $('[data-dup]', ag), ticks = $$('[data-tick]', ag);
+    const nodes = $$('[data-node]', ag), glows = nodes.map(n => $('.ag-glow', n));
+    const noteW = $('[data-notew]', ag), note = $('[data-note]', ag), title = $('.ag-note__t', ag), lines = $$('.ag-line', ag);
+    const okW = $('[data-okw]', ag), ok = $('[data-ok]', ag), rb = $('[data-replay]', ag);
+    const caps = $$('[data-cap]', ag), live = $('[data-ag-live]', ag);
+    const setCap = i => caps.forEach((c, k) => c.classList.toggle('is-on', k === i));
+
+    /* Les fils : calculés depuis la position de repos des éléments (offset*, sans les transformations) */
+    const NS = 'http://www.w3.org/2000/svg';
+    const mk = () => { const p = document.createElementNS(NS, 'path'); p.setAttribute('pathLength', '1'); svg.appendChild(p); return p; };
+    const W = { src: srcs.map(mk), vc: mk(), ch: mk(), hn: mk() };
+    const box = el => ({ l: el.offsetLeft, t: el.offsetTop, r: el.offsetLeft + el.offsetWidth, b: el.offsetTop + el.offsetHeight, cx: el.offsetLeft + el.offsetWidth / 2, cy: el.offsetTop + el.offsetHeight / 2 });
+    const link = (a, b) => {
+      const A = box(a), B = box(b);
+      if (B.l >= A.r - 2) { const mx = (A.r + B.l) / 2; return 'M' + A.r + ' ' + A.cy + 'C' + mx + ' ' + A.cy + ' ' + mx + ' ' + B.cy + ' ' + B.l + ' ' + B.cy; }
+      const my = (A.b + B.t) / 2;
+      return 'M' + A.cx + ' ' + A.b + 'C' + A.cx + ' ' + my + ' ' + B.cx + ' ' + my + ' ' + B.cx + ' ' + B.t;
+    };
+    const drawWires = () => {
+      svg.setAttribute('viewBox', '0 0 ' + art.clientWidth + ' ' + art.clientHeight);
+      srcs.forEach((s, i) => W.src[i].setAttribute('d', link(s, nodes[0])));
+      W.vc.setAttribute('d', link(nodes[0], nodes[1]));
+      W.ch.setAttribute('d', link(nodes[1], nodes[2]));
+      W.hn.setAttribute('d', link(nodes[2], noteW));
+    };
+    drawWires();
+
+    const land = () => matchMedia('(min-width: 900px)').matches;
+    /* Le désordre de départ, en « places » le long de la colonne (s), en travers (p, %) et en rotation (r) */
+    const MESSY = [{ s: 1, p: 14, r: -6 }, { s: 2, p: -10, r: 5 }, { s: 0, p: 12, r: -4 }];
+    const DUP = { s: 1.6, p: 32, r: 7 }, DUP_PORTRAIT = { s: 1.45, p: 92, r: 6 };
+    let tl = null, mode = null, started = false, seen = false;
+
+    const ready = () => {
+      seen = true;
+      setCap(4);
+      live.textContent = 'La note du lundi est prête. Elle attend votre validation.';
+    };
+
+    function build() {
+      if (tl) tl.kill();
+      mode = land();
+      const all = [...srcs, dup];
+      const h = srcs[0].offsetHeight, w = srcs[0].offsetWidth;
+      const step = mode ? (srcs[1].offsetTop - srcs[0].offsetTop) / h * 100 : (srcs[1].offsetLeft - srcs[0].offsetLeft) / w * 100;
+      const at = (o, i) => mode ? { x: o.p, y: (o.s - i) * step } : { x: (o.s - i) * step, y: o.p };
+      const cfg = [...MESSY.map((o, i) => ({ ...at(o, i), r: o.r })), { ...at(mode ? DUP : DUP_PORTRAIT, 2), r: (mode ? DUP : DUP_PORTRAIT).r }];
+      all.forEach((el, i) => {
+        const c = cfg[i];
+        /* au départ, chaque carte est juste au-dessus du cadre : elle tombe */
+        const topPx = el.offsetTop + c.y / 100 * el.offsetHeight;
+        c.y0 = c.y - (topPx + el.offsetHeight * 1.15) / el.offsetHeight * 100;
+        el._c = c;
+      });
+      const rad = getComputedStyle(note).borderTopLeftRadius || '14px';
+      G.set(all, { xPercent: (i, el) => el._c.x, yPercent: (i, el) => el._c.y0, rotation: (i, el) => el._c.r * 1.8, opacity: 0, scale: 1, filter: 'blur(0px)', visibility: 'visible' });
+      G.set(ticks, { opacity: 0, scale: .4 });
+      G.set([...W.src, W.vc, W.ch, W.hn], { strokeDashoffset: 1 });
+      G.set(glows, { opacity: 0 });
+      G.set(nodes, { opacity: .35 });
+      G.set(note, { opacity: 0, y: 20, scale: .96, clipPath: 'inset(0% 0% 100% 0% round ' + rad + ')' });
+      G.set([title, ...lines], { opacity: 0, y: 8 });
+      G.set(okW, { autoAlpha: 0, y: 12, scale: .965 });
+      setCap(-1);
+      tl = G.timeline({ paused: true, defaults: { ease: 'expo.out' }, onComplete: ready })
+        .call(setCap, [0], 0)
+        .to(all, { opacity: 1, yPercent: (i, el) => el._c.y, rotation: (i, el) => el._c.r, duration: 1, stagger: .14 }, .1)
+        .call(setCap, [1], 1.3)
+        .to(nodes[0], { opacity: 1, duration: .4 }, 1.3)
+        .to(glows[0], { opacity: 1, duration: .5 }, 1.35)
+        .to(dup, { autoAlpha: 0, scale: .8, filter: 'blur(6px)', duration: .55, ease: 'power2.in' }, 1.6)
+        .to(srcs, { xPercent: 0, yPercent: 0, rotation: 0, duration: .75, ease: 'power3.inOut', stagger: .06 }, 1.65)
+        .to(W.src, { strokeDashoffset: 0, duration: .5, ease: 'power2.inOut', stagger: .06 }, 2.25)
+        .to(W.vc, { strokeDashoffset: 0, duration: .35, ease: 'power2.out' }, 2.6)
+        .call(setCap, [2], 2.75)
+        .to(nodes[1], { opacity: 1, duration: .4 }, 2.75)
+        .to(glows[0], { opacity: 0, duration: .4 }, 2.75)
+        .to(glows[1], { opacity: 1, duration: .5 }, 2.75)
+        .to(ticks, { opacity: 1, scale: 1, duration: .5, stagger: .16 }, 2.9)
+        .to(W.ch, { strokeDashoffset: 0, duration: .4, ease: 'power2.inOut' }, 3.45)
+        .call(setCap, [3], 3.7)
+        .to(nodes[2], { opacity: 1, duration: .4 }, 3.7)
+        .to(glows[1], { opacity: 0, duration: .4 }, 3.7)
+        .to(glows[2], { opacity: 1, duration: .5 }, 3.7)
+        .to(W.hn, { strokeDashoffset: 0, duration: .35, ease: 'power2.out' }, 3.9)
+        .to(note, { opacity: 1, y: 0, scale: 1, clipPath: 'inset(0% 0% 0% 0% round ' + rad + ')', duration: 1 }, 4.05)
+        .to(title, { opacity: 1, y: 0, duration: .6 }, 4.2)
+        .to(lines, { opacity: 1, y: 0, duration: .6, stagger: .18 }, 4.35)
+        .call(setCap, [4], 5)
+        .to(okW, { autoAlpha: 1, y: 0, scale: 1, duration: 1.1 }, 5);
+    }
+
+    const animated = hasG && !RM;
+    if (animated) build(); else ready();
+
+    const playNow = () => { if (!tl) return; started = true; seen = false; setCap(0); tl.restart(); };
+
+    ok.addEventListener('click', () => {
+      if (ag.classList.contains('is-sent')) return;
+      ag.classList.add('is-sent');
+      setCap(5);
+      live.textContent = 'Validé. La note est partie.';
+      setTimeout(() => {
+        rb.classList.add('is-on');
+        if (document.activeElement === ok || document.activeElement === document.body) rb.focus({ preventScroll: true });
+      }, RM ? 300 : 1900);
+    });
+
+    replayDemo = () => {
+      rb.classList.remove('is-on');
+      ag.classList.remove('is-sent');
+      live.textContent = '';
+      if (animated) playNow(); else ready();
+    };
+    rb.addEventListener('click', replayDemo);
+
+    if (animated) {
+      const o = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        o.disconnect();
+        if (!started) setTimeout(playNow, 200);
+      }, { threshold: .4 });
+      o.observe(ag);
+    }
+
+    /* Redimensionnement : fils recalculés ; changement portrait ↔ paysage : on reconstruit */
+    let rt = 0;
+    new ResizeObserver(() => {
+      cancelAnimationFrame(rt);
+      rt = requestAnimationFrame(() => {
+        drawWires();
+        if (!animated || land() === mode) return;
+        build();
+        if (started) { tl.progress(1, true); ready(); if (ag.classList.contains('is-sent')) setCap(5); }
+      });
+    }).observe(art);
+  });
+
+  /* ---------- 3. La promesse : les mots s'allument au défilement ---------- */
+  safe('scrub', () => {
+    if (!hasG || RM) return;
+    const el = $('[data-scrub]');
+    G.fromTo(el.querySelectorAll('.w'), { opacity: .14 }, { opacity: 1, ease: 'none', stagger: .1, scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 48%', scrub: .6 } });
+  });
+
+  /* ---------- 4. Les besoins : une seule réponse ouverte à la fois ---------- */
+  safe('questions', () => {
+    const head = $('#needs-t');
+    const items = $$('[data-q]').map(el => ({ el, btn: $('.q__btn', el), panel: $('.q__p', el) }));
+    let open = null, rf = 0;
+    const set = (it, on) => {
+      it.btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+      if (on) { it.panel.hidden = false; void it.panel.offsetWidth; it.el.classList.add('is-open'); }
+      else { it.el.classList.remove('is-open'); it.panel.hidden = true; }
+    };
+    /* FLIP : la mise en page change d'un coup, les lignes glissent depuis leur ancienne place (transform seulement) */
+    const toggle = it => {
+      const els = [head, ...items.map(x => x.el)];
+      const before = els.map(e => e.getBoundingClientRect().top);
+      const anchor = it.btn.getBoundingClientRect().top;
+      if (open === it) { set(it, false); open = null; }
+      else { if (open) set(open, false); set(it, true); open = it; }
+      const diff = it.btn.getBoundingClientRect().top - anchor;
+      if (Math.abs(diff) > 1) window.scrollBy(0, diff);
+      if (!RM) {
+        els.forEach((e, k) => {
+          const dy = before[k] - e.getBoundingClientRect().top;
+          if (Math.abs(dy) < 1) return;
+          e.style.transition = 'none';
+          e.style.transform = 'translateY(' + dy + 'px)';
+          void e.offsetWidth;
+          e.style.transition = 'transform .9s cubic-bezier(.16,1,.3,1)';
+          e.style.transform = '';
+        });
+        setTimeout(() => els.forEach(e => { e.style.transition = ''; }), 950);
+      }
+      if (hasG) { clearTimeout(rf); rf = setTimeout(() => ST.refresh(), RM ? 0 : 950); }
+    };
+    items.forEach(it => it.btn.addEventListener('click', () => toggle(it)));
+  });
+
+  /* ---------- 5. Comment on avance : la ligne se trace au défilement ---------- */
+  safe('steps', () => {
+    const box = $('[data-steps]'), items = $$('.step', box);
+    if (!hasG || RM) { items.forEach(x => x.classList.add('is-lit')); return; }
+    box.classList.add('has-scrub');
+    ST.create({
+      trigger: box, start: 'top 78%', end: 'bottom 52%', scrub: .5,
+      onUpdate: self => {
+        const p = self.progress;
+        box.style.setProperty('--sp', p.toFixed(3));
+        const th = innerWidth >= 900 ? [.01, .35, .69] : [.01, .45, .9];
+        items.forEach((it, i) => it.classList.toggle('is-lit', p >= th[i]));
+      }
+    });
+    box.style.setProperty('--sp', '0');
+  });
+
+  /* ---------- 6. Contact : envoi simulé ---------- */
+  safe('form', () => {
+    const form = $('[data-form]');
+    const nom = $('#c-nom', form), msg = $('#c-msg', form), choices = $('[data-choices]', form), errB = $('#c-besoin-err', form);
+    const okEl = $('.form__ok', form);
+    const check = inp => {
+      const good = inp.value.trim().length >= +inp.dataset.min;
+      inp.setAttribute('aria-invalid', good ? 'false' : 'true');
+      $('#' + inp.getAttribute('aria-describedby'), form).textContent = good ? '' : inp.dataset.msg;
+      return good;
+    };
+    const checkB = () => {
+      const r = form.querySelector('input[name="besoin"]:checked');
+      choices.setAttribute('aria-invalid', r ? 'false' : 'true');
+      errB.textContent = r ? '' : 'Choisissez ce qui vous amène.';
+      return !!r;
+    };
+    [nom, msg].forEach(inp => inp.addEventListener('input', () => { if (inp.getAttribute('aria-invalid') === 'true') check(inp); }));
+    form.addEventListener('change', e => { if (e.target.name === 'besoin' && choices.getAttribute('aria-invalid') === 'true') checkB(); });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const a = check(nom), b = checkB(), c = check(msg);
+      if (!a) { nom.focus(); return; }
+      if (!b) { form.querySelector('input[name="besoin"]').focus(); return; }
+      if (!c) { msg.focus(); return; }
+      okEl.hidden = false;
+      void okEl.offsetWidth;
+      form.classList.add('is-sent');
+      setTimeout(() => $('[data-ok-title]', okEl).focus({ preventScroll: true }), RM ? 50 : 700);
+    });
+    $('[data-again]', okEl).addEventListener('click', () => {
+      form.classList.remove('is-sent');
+      form.reset();
+      [nom, msg].forEach(i => i.removeAttribute('aria-invalid'));
+      choices.removeAttribute('aria-invalid');
+      setTimeout(() => { okEl.hidden = true; nom.focus(); }, RM ? 0 : 320);
+    });
+  });
+
+  if (hasG) addEventListener('load', () => ST.refresh());
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

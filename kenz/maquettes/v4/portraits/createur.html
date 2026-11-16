@@ -1,0 +1,1015 @@
+<!doctype html>
+<!--
+  Kenz — Créateur (V4), style « Deux portraits », côté sable
+  Clair et éditorial, beaucoup d'air. Base commune : portraits.css (même dossier).
+  Signatures : le « Kenz. » géant derrière le portrait en t-shirt (son point porte aussi le cordon),
+  l'iris qui s'ouvre sur la dernière vidéo et sur la photo HYROX, les grandes cartes blanches
+  (vrai prix, étagère du voyage, guide, lien en bio, formulaire), une typographie magazine.
+  C0 hero · C1 dernière vidéo · C2 le vrai prix (le cœur) · C3 le voyage · C4 l'itinéraire
+  C5 l'entraînement · C6 me suivre · C7 marques.
+  Passages entre les pages : shared/passage.js et shared/cordon.js (contrat : BRIEF-V4.md, section 3).
+  Repère : une barre façon « stories » en haut, un segment par chapitre, + le nom du chapitre en cours.
+  Le vrai prix : sur ordinateur (≥ 900 × 600), la scène est épinglée et les cartes s'empilent au scroll ;
+  sur mobile et en mouvement réduit, chaque carte se joue à son entrée à l'écran.
+  Sans JS ni CDN : tout est visible (classe .js + garde-fou). Aucune dépendance externe hors polices.
+-->
+<html lang="fr" data-cote="createur">
+<head>
+<meta charset="utf-8">
+<script>location.hash.indexOf('porte')>-1&&document.documentElement.setAttribute('data-porte-arrivee','1')</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kenz — Créateur</title>
+<meta name="description" content="Kenz voyage en Asie et raconte ce que ça coûte vraiment.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F7F0E5">
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add('js');
+    window.__kzFallback = setTimeout(function () { d.classList.remove('js'); d.classList.add('is-loaded', 'hero-in'); }, 4000);
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="../assets/melodrama.css">
+<link rel="preload" as="image" href="../assets/img/kenz-moi.webp">
+<link rel="stylesheet" href="portraits.css">
+<style>
+/* =========================================================
+   Deux portraits · Créateur (sable). La base commune est dans portraits.css.
+   ========================================================= */
+:root{--nav-h:88px; --hand:cubic-bezier(.62,.04,.32,1); --amb:201 153 70}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+
+.ch{position:relative; padding-block:var(--sec)}
+@media (min-width:900px) and (min-height:600px){
+  .ch--screen{min-height:100vh; display:flex; flex-direction:column; justify-content:center}
+  .ch--screen > .wrap{width:100%}
+}
+.t-title{width:fit-content; max-width:100%}
+.statement{max-width:18ch; font-size:clamp(34px,5vw,72px); line-height:1.06; letter-spacing:-.04em; font-weight:500; color:var(--ink); text-wrap:balance}
+
+/* Titre en balayage doux avec flou (la page observe son parent) */
+.js [data-sweep]{clip-path:inset(-15% 100% -25% -3%); filter:blur(12px); transition:clip-path .24s var(--out), filter .24s var(--out)}
+.js [data-sweep].is-in{clip-path:inset(-15% -3% -25% -3%); filter:none; transition:clip-path 1.4s var(--expo), filter 1.2s var(--expo)}
+
+/* =========================================================
+   Navigation : l'île (logo + nom du chapitre) et les repères « stories », en clair
+   ========================================================= */
+.nav{padding-top:calc(env(safe-area-inset-top) + 4px)}
+/* Un voile de sable derrière les repères, une fois la page défilée */
+.nav::before{content:""; position:absolute; left:0; right:0; top:0; height:calc(env(safe-area-inset-top) + 30px); pointer-events:none; background:linear-gradient(180deg, rgba(247,240,229,.94) 45%, rgba(247,240,229,0)); opacity:0; transition:opacity .6s var(--expo)}
+.nav.is-scrolled::before{opacity:1}
+.story{position:relative; display:flex; gap:4px; max-width:calc(var(--maxw) + 24px); height:18px; margin:0 auto 4px; padding:0 22px; pointer-events:auto}
+.story a{position:relative; flex:1 1 0; height:18px; border-radius:4px}
+.story a::before,.story a i{content:""; position:absolute; left:0; right:0; top:8px; height:2px; border-radius:2px}
+.story a::before{background:rgba(26,25,24,.1); transition:background .4s var(--expo)}
+.story a i{background:rgba(26,25,24,.46); transform:scaleX(0); transform-origin:left}
+.story a:hover::before{background:rgba(26,25,24,.2)}
+.story a:focus-visible{outline-offset:1px}
+.nav__in{padding-right:22px}
+.brand{display:flex; align-items:center; margin-right:auto}
+.nav__ch{display:flex; align-items:center; margin:0; height:30px; overflow:hidden; font-family:var(--f-word); font-style:italic; font-size:19px; line-height:1.3; color:var(--ink-2)}
+.nav__chT{display:block; white-space:nowrap}
+.nav__chT.in{animation:chIn .8s var(--expo) both}
+@keyframes chIn{from{transform:translateY(110%); filter:blur(4px); opacity:0} to{transform:none; filter:none; opacity:1}}
+.js .story{opacity:0}
+.hero-in .story{opacity:1; transition:opacity 1.2s var(--expo) .2s}
+@media (max-width:600px){ .story{padding:0 18px} .nav__in{padding-right:18px} .nav__ch{font-size:17.5px} }
+
+/* =========================================================
+   C0 · Hero : le portrait en t-shirt devant « Kenz. » (composant .kz-hero de portraits.css)
+   ========================================================= */
+.is-porte .kz-hero__line{--wd:.15s}
+.is-porte .kz-hero [data-anim]{--ad:.8s}
+/* Mobile : la phrase et le bouton encre se posent en bas de l'écran ; on garde libre le coin bas gauche (revue.js) */
+@media (max-width:640px){ .kz-hero{padding-bottom:calc(76px + env(safe-area-inset-bottom))} }
+
+/* =========================================================
+   C1 · La dernière vidéo : une grande miniature dans une grande carte blanche, ouverte par l'iris
+   ========================================================= */
+.latest__grid{display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(28px,5vw,40px)}
+.poster{margin:0}
+.poster__core{padding:8px}
+.poster__media{--pl:clamp(12px,3.4%,28px); --pb:clamp(12px,5.5%,28px); --ph:64px;
+  --ix:calc(var(--pl) + var(--ph) / 2); --iy:calc(100% - var(--pb) - var(--ph) / 2);
+  position:relative; display:block; aspect-ratio:16 / 9; overflow:hidden; border-radius:calc(var(--r-xl) - 14px); background:var(--bg-2)}
+.poster__link{position:absolute; inset:0; display:block; overflow:hidden; border-radius:inherit}
+.poster__img{width:100%; height:100%; object-fit:cover; transition:transform 1.6s var(--expo)}
+.poster__link:hover .poster__img{transform:scale(1.03)}
+.poster__link:focus-visible{outline:2px solid #fff; outline-offset:-6px; box-shadow:inset 0 0 0 8px rgba(26,25,24,.35)}
+/* Le bouton lecture : une pastille blanche opaque (texte encre, AA quelle que soit l'image), qui s'étire au survol */
+.play{--pw:196px; position:absolute; z-index:1; left:var(--pl); bottom:var(--pb); display:flex; align-items:center; width:calc(var(--ph) + var(--pw)); height:var(--ph); border-radius:999px; background:#fff; color:var(--ink);
+  clip-path:inset(0 var(--pw) 0 0 round 999px); transition:clip-path .85s var(--expo), opacity .6s var(--expo)}
+.play__ico{flex:none; display:grid; place-items:center; width:calc(var(--ph) - 12px); height:calc(var(--ph) - 12px); margin:6px; border-radius:50%; background:var(--ink); color:#fff; transition:transform .85s var(--expo)}
+.play__ico svg{width:18px; height:18px; margin-left:3px}
+.play__label{padding:0 22px 0 6px; font-size:15px; font-weight:600; letter-spacing:-.005em; white-space:nowrap; opacity:0; filter:blur(4px); transform:translateX(-12px); transition:opacity .4s var(--expo), filter .5s var(--expo), transform .85s var(--expo)}
+.poster__link:hover .play,.poster__link:focus-visible .play{clip-path:inset(0 0 0 0 round 999px)}
+.poster__link:hover .play__ico{transform:scale(.92)}
+.poster__link:hover .play__label,.poster__link:focus-visible .play__label{opacity:1; filter:none; transform:none; transition-delay:.06s}
+.js .poster__media:not(.is-in) .play{opacity:0}
+.js .poster__media.is-in .play{opacity:1; transition:clip-path .85s var(--expo), opacity .8s var(--expo) 1.25s}
+@media (hover:none){
+  .poster__media{--ph:56px}
+  .play{--pw:182px; clip-path:inset(0 0 0 0 round 999px)}
+  .play__label{opacity:1; filter:none; transform:none; font-size:14px}
+}
+@media (hover:none) and (max-width:600px){
+  .poster__media{--ph:46px; --pl:10px; --pb:10px}
+  .play{--pw:158px}
+  .play__ico{margin:5px; width:36px; height:36px}
+  .play__ico svg{width:14px; height:14px; margin-left:2px}
+  .play__label{padding:0 16px 0 4px; font-size:13px}
+}
+.poster__meta{display:block; margin:0; padding:clamp(16px,2vw,24px) clamp(10px,1.4vw,18px) clamp(10px,1.2vw,14px)}
+.latest__title{max-width:30ch; font-size:clamp(20px,1.8vw,26px); line-height:1.28; font-weight:500; letter-spacing:-.02em; text-wrap:balance; color:var(--ink)}
+.latest__date{display:block; margin-top:8px; font-family:var(--f-word); font-style:italic; font-size:18px; font-weight:400; letter-spacing:0; color:var(--ink-3)}
+@media (min-width:900px){
+  .latest__grid{grid-template-columns:minmax(0,4fr) minmax(0,8fr); column-gap:clamp(36px,4vw,72px); align-items:end}
+  .latest__head{padding-bottom:clamp(20px,3vw,48px)}
+  .latest .t-title{font-size:clamp(56px,6.2vw,100px)}
+}
+
+/* =========================================================
+   C2 · Le vrai prix : de grandes cartes blanches, objets à l'encre, accent ambre
+   ========================================================= */
+.prix__grid{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"head" "deck" "note"; gap:clamp(36px,6vw,56px)}
+.prix__head{grid-area:head}
+.prix__head .lead{margin-top:clamp(20px,2.4vw,30px); max-width:16ch; font-size:clamp(26px,2.6vw,40px); line-height:1.12; letter-spacing:-.035em; font-weight:500; color:var(--ink); text-wrap:balance}
+.prix__note{grid-area:note; margin:0; font-family:var(--f-word); font-style:italic; font-size:18px; line-height:1.3; color:var(--ink-3)}
+.deck{grid-area:deck; position:relative; display:grid; grid-template-columns:minmax(0,1fr); gap:16px; margin:0; padding:0; list-style:none; --sh:58px}
+.tk{position:relative}
+.tk__shell{position:relative; padding:6px; border-radius:30px; background:rgba(255,255,255,.62);
+  box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 1px 2px rgba(26,25,24,.03), 0 -10px 24px -18px rgba(26,25,24,.16), 0 26px 56px -30px rgba(70,46,12,.3)}
+.tk__core{position:relative; overflow:hidden; border-radius:24px; background:var(--surface); box-shadow:inset 0 0 0 1px rgba(26,25,24,.045), inset 0 1px 0 #fff}
+.tk__core::after{content:""; position:absolute; inset:0; border-radius:inherit; background:rgba(239,229,213,.34); opacity:0; pointer-events:none; transition:opacity .7s var(--expo)}
+.tk__top{position:relative; display:flex; align-items:center; gap:12px; height:var(--sh); padding:0 22px 0 12px}
+.tk__top::after{content:""; position:absolute; left:18px; right:18px; bottom:0; height:1px; background:repeating-linear-gradient(90deg, rgba(26,25,24,.22) 0 5px, transparent 5px 10px)}
+.tk__ico{flex:none; display:grid; place-items:center; width:min(34px, calc(var(--sh) - 16px)); aspect-ratio:1; color:var(--ink-2)}
+.tk__ico svg{width:100%; height:100%; fill:none; stroke:currentColor; stroke-width:1.35; stroke-linecap:round; stroke-linejoin:round; --acc:var(--accent)}
+.tk__poste{flex:1; min-width:0; margin:0; font-size:15px; font-weight:600; line-height:1.3; letter-spacing:-.01em; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:opacity .5s var(--expo)}
+.prix:not(.is-pinned) .tk__top{height:auto; min-height:var(--sh); padding-block:10px}
+.prix:not(.is-pinned) .tk__poste{white-space:normal; text-wrap:balance}
+.tk__mini{flex:none; font-family:var(--f-title); font-weight:600; font-size:clamp(20px,2.6vh,26px); line-height:1; color:var(--ink); opacity:0; transition:opacity .5s var(--expo)}
+.tk__body{position:relative; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:12px 16px; padding:18px 22px 22px}
+.tk__val{margin:0}
+.tk__pre,.tk__det{display:block; margin-bottom:6px; font-size:14.5px; line-height:1.35; color:var(--ink-2)}
+.tk__suf{display:block; margin-top:8px; font-family:var(--f-word); font-style:italic; font-size:21px; line-height:1; color:var(--ink-3)}
+.tk__price{display:block; font-family:var(--f-title); font-weight:600; font-size:clamp(54px,15vw,104px); line-height:.9; letter-spacing:-.01em; white-space:nowrap; color:var(--ink)}
+.tk__art{display:block; width:clamp(84px,24vw,156px); height:auto; overflow:visible; color:var(--ink); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; --acc:var(--accent)}
+.tk__art .acc{stroke:var(--accent)}
+/* La finale : l'iPhone (le « 200 € » barré à la main est le seul rouge de l'écran) */
+.tk--fin .tk__core{background:radial-gradient(70% 80% at 82% 58%, rgb(var(--amb) / .13), transparent 70%), var(--surface)}
+.tk__was{display:block; margin-bottom:12px}
+.tk__old{position:relative; display:inline-block; font-family:var(--f-title); font-weight:600; font-size:clamp(34px,8vw,48px); line-height:1; color:var(--ink-3); text-decoration:none}
+.strike{position:absolute; left:-12%; top:6%; width:124%; height:84%; overflow:visible; pointer-events:none}
+.strike path{fill:none; stroke:var(--red); stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke}
+.tk__src{display:block; margin-top:8px; font-size:13.5px; line-height:1.35; color:var(--ink-3)}
+.crack{stroke:var(--ink-2)}
+.screen{fill:rgb(var(--amb)); stroke:none; opacity:.16}
+
+/* Gestes des cartes : la carte monte et se pose, l'objet se dessine, le prix monte de la fente */
+.js .tk{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .tk.is-in{opacity:1; transform:none; transition:opacity .8s var(--expo), transform 1.1s var(--expo)}
+.js .tk__art{clip-path:inset(-6% 100% -6% -6%); filter:blur(6px); transition:clip-path .2s var(--out), filter .2s var(--out)}
+.js .tk.is-in .tk__art{clip-path:inset(-6% -6% -6% -6%); filter:none; transition:clip-path 1.3s var(--expo) .16s, filter 1s var(--expo) .16s}
+.js .tk .slit .num{transform:translateY(110%); filter:blur(6px); transition:transform .2s var(--out), filter .2s var(--out)}
+.js .tk.is-in .slit .num{transform:none; filter:none; transition:transform 1.15s var(--expo) .36s, filter .9s var(--expo) .36s}
+.js .tk__pre,.js .tk__det,.js .tk__suf,.js .tk__src{opacity:0; transition:opacity .2s var(--out)}
+.js .tk.is-in .tk__pre,.js .tk.is-in .tk__det,.js .tk.is-in .tk__suf,.js .tk.is-in .tk__src{opacity:1; transition:opacity .9s var(--expo) .6s}
+.js .tk__was{opacity:0; transition:opacity .2s var(--out)}
+.js .tk--fin.is-in .tk__was{opacity:1; transition:opacity .8s var(--expo) .3s}
+.js .strike{clip-path:inset(-30% 100% -30% -4%); transition:clip-path .15s var(--out)}
+.js .tk--fin.is-in .strike{clip-path:inset(-30% -4% -30% -4%); transition:clip-path .55s var(--hand) 1s}
+.js .tk--fin .slit .num{transition-delay:0s}
+.js .tk--fin.is-in .slit .num{transition-delay:1.45s}
+.js .tk--fin.is-in .crack{opacity:0; transition:opacity .6s var(--expo) 1.7s}
+.js .tk--fin .screen{opacity:0}
+.js .tk--fin.is-in .screen{opacity:.16; transition:opacity 1s var(--expo) 1.8s}
+.tk.is-under .tk__core::after{opacity:1}
+.tk.is-under .tk__poste{opacity:0}
+.tk.is-under .tk__mini{opacity:1}
+
+/* Ordinateur : la scène est épinglée, les cartes s'empilent */
+@media (min-width:900px) and (min-height:600px){
+  .prix.is-pinned{height:calc(100vh + 6 * 52vh); padding:0}
+  .prix.is-pinned .prix__stage{position:sticky; top:0; height:100vh; display:flex; align-items:center}
+  .prix.is-pinned .prix__grid{width:100%; grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-areas:"head deck" "note deck"; grid-template-rows:auto auto; align-content:center; column-gap:clamp(48px,6vw,112px); row-gap:24px; padding-top:calc(var(--nav-h) + 16px); padding-bottom:28px; height:100%}
+  .prix.is-pinned .prix__head{align-self:end}
+  .prix.is-pinned .prix__note{align-self:start}
+  .prix.is-pinned .deck{display:block; align-self:center; --sh:clamp(44px,6.4vh,60px); --ch:clamp(272px,45vh,420px); height:calc(5 * var(--sh) + var(--ch));
+    transform:translateY(calc((5 - var(--s, 0)) * var(--sh) / 2)); transition:transform 1.1s var(--expo)}
+  .prix.is-pinned .tk{position:absolute; left:0; right:0; top:calc(var(--k) * var(--sh)); height:var(--ch); z-index:var(--k)}
+  .prix.is-pinned .tk__shell{height:100%}
+  .prix.is-pinned .tk__core{display:flex; flex-direction:column; height:100%}
+  .prix.is-pinned .tk__body{flex:1; padding:16px 30px clamp(18px,3vh,28px)}
+  .prix.is-pinned .tk__art{width:min(210px, calc(var(--ch) - var(--sh) - 64px)); align-self:center}
+  .prix.is-pinned .tk__price{font-size:clamp(66px,11.5vh,124px)}
+  .prix.is-pinned .tk__old{font-size:clamp(32px,5vh,46px)}
+  .prix.is-pinned .tk--fin .tk__price{font-size:clamp(72px,12.5vh,136px)}
+}
+@media (min-width:900px){
+  .prix:not(.is-pinned) .deck{max-width:640px}
+}
+
+/* =========================================================
+   C3 · Le voyage : une étagère de grandes cartes blanches, au doigt (scroll-snap natif)
+   ========================================================= */
+.voyage{padding-bottom:calc(var(--sec) * .6)}
+.voyage__head{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:20px 32px; margin-bottom:clamp(14px,2vw,28px)}
+.voyage__ctrl{display:flex; align-items:center; gap:10px}
+.voyage__hint{display:flex; align-items:center; gap:8px; margin:0; font-family:var(--f-word); font-style:italic; font-size:19px; color:var(--ink-3)}
+.voyage__hint svg{width:16px; height:16px}
+.voyage__btns{display:none; gap:10px}
+@media (hover:hover) and (pointer:fine){ .voyage__btns{display:flex} .voyage__hint{display:none} }
+.round[aria-disabled="true"]{opacity:.35; cursor:default; transform:none}
+.route.shelf{display:block; --sg:clamp(14px,1.6vw,22px)}
+.route:focus-visible{outline:2px solid var(--accent); outline-offset:-6px; border-radius:var(--r-xl)}
+.route > .route__track{display:flex; gap:var(--sg); width:max-content; margin:0; padding:0; list-style:none; scroll-snap-align:none}
+.stop{display:flex; flex-direction:column; width:min(80vw, 400px); scroll-snap-align:start}
+.stop__mark{position:relative; display:flex; align-items:center; gap:12px; height:56px; margin:0 0 8px; padding-left:10px}
+.stop__dot{position:relative; flex:none; width:12px; height:12px; border-radius:50%; background:var(--bg); box-shadow:inset 0 0 0 2px var(--accent)}
+.stop__dot::after{content:""; position:absolute; inset:3px; border-radius:50%; background:var(--accent)}
+.stop__name{flex:none; font-family:var(--f-title); font-weight:600; font-size:clamp(30px,2.6vw,38px); line-height:1; letter-spacing:-.01em; color:var(--ink)}
+.stop__line{flex:1; height:1px; margin-right:calc(-1 * var(--sg)); background:repeating-linear-gradient(90deg, rgba(26,25,24,.3) 0 6px, transparent 6px 12px)}
+.stop:last-child .stop__line{background:linear-gradient(90deg, rgba(26,25,24,.3), transparent)}
+.stop__card{flex:1; display:block}
+.stop__core{display:flex; flex-direction:column; padding:8px}
+.stop__media{position:relative; display:block; flex:none; aspect-ratio:16 / 9; overflow:hidden; border-radius:calc(var(--r-xl) - 14px); background:var(--bg-2)}
+.stop__media img{width:100%; height:100%; object-fit:cover; transition:transform 1.4s var(--expo)}
+.stop__card:hover .stop__media img{transform:scale(1.04)}
+.stop__card:focus-visible{outline:2px solid var(--accent); outline-offset:4px}
+.stop__body{display:flex; flex-direction:column; align-items:flex-start; flex:1; gap:6px; padding:16px 12px 6px}
+.stop__best{display:block; font-size:16px; line-height:1.35; font-weight:500; letter-spacing:-.01em; color:var(--ink)}
+.stop__cta{display:inline-flex; align-items:center; gap:8px; min-height:34px; margin-top:auto; font-size:14.5px; font-weight:500; color:var(--ink-2); transition:color .4s var(--expo)}
+.stop__cta svg{width:12px; height:12px; transition:transform .6s var(--expo)}
+.stop__card:hover .stop__cta{color:var(--ink)}
+.stop__card:hover .stop__cta svg{transform:translate(2px,-2px)}
+.js .stop{opacity:0; transform:translateY(34px) scale(.965); transition:opacity .24s var(--out), transform .24s var(--out)}
+.js .route.is-in .stop{opacity:1; transform:none; transition:opacity .9s var(--expo), transform 1.2s var(--expo); transition-delay:calc(var(--i) * 110ms + .1s)}
+.js .stop__line{clip-path:inset(0 100% 0 0); transition:clip-path .24s var(--out)}
+.js .route.is-in .stop__line{clip-path:inset(0 0 0 0); transition:clip-path 1.2s var(--expo); transition-delay:calc(var(--i) * 110ms + .5s)}
+@media (min-width:900px){ .stop{width:min(31vw, 420px)} }
+
+/* =========================================================
+   C4 · Pour ton voyage
+   ========================================================= */
+.guide__wrap{display:flex; flex-direction:column; align-items:flex-start; gap:clamp(32px,4.4vw,56px)}
+.gcard{width:100%; max-width:960px}
+.gcard__core{display:grid; grid-template-columns:minmax(0,1fr)}
+.gcard__art{position:relative; margin:8px; padding:clamp(20px,3vw,36px); border-radius:calc(var(--r-xl) - 14px);
+  background:radial-gradient(90% 100% at 15% 100%, rgb(var(--amb) / .2), transparent 70%), var(--bg)}
+.days{display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:clamp(6px,1vw,10px); margin:0; padding:0; list-style:none}
+.days li{position:relative; display:grid; place-items:center; aspect-ratio:1; border-radius:clamp(9px,1.2vw,13px); font-size:clamp(11px,1.1vw,13px); font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-2); background:#fff; box-shadow:inset 0 0 0 1px rgba(26,25,24,.08); isolation:isolate}
+.days li::before{content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:linear-gradient(160deg, rgb(var(--amb) / .42), rgb(var(--amb) / .17)); box-shadow:inset 0 0 0 1px rgb(var(--accent-rgb) / .28)}
+.js .days li::before{opacity:0; transform:scale(.7); transition:opacity .2s var(--out), transform .2s var(--out)}
+.js .gcard.is-in .days li::before{opacity:1; transform:none; transition:opacity .7s var(--expo), transform .9s var(--expo); transition-delay:calc(.5s + var(--i) * 75ms)}
+.gcard__body{display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:24px; padding:clamp(20px,3.4vw,44px)}
+.gcard__title{margin:0; max-width:16ch; font-size:clamp(24px,2.4vw,34px); line-height:1.15; font-weight:500; letter-spacing:-.025em; text-wrap:balance; color:var(--ink)}
+.guide__soon{margin:0; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1.3; color:var(--ink-3)}
+@media (min-width:760px){
+  .gcard__core{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .gcard__art{display:flex; align-items:center}
+  .days{width:100%}
+}
+
+/* =========================================================
+   C5 · Entre deux voyages : la photo HYROX ouverte par l'iris (filigrane hors cadre)
+   ========================================================= */
+.sport__grid{display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"title" "photo" "side"; gap:28px}
+.sport__title{grid-area:title}
+.sport__photo{grid-area:photo; margin:0}
+.sport__frame{--ix:50%; --iy:40%; position:relative; aspect-ratio:4 / 5; overflow:hidden; border-radius:var(--r-xl); background:var(--bg-2);
+  box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 30px 70px -40px rgba(26,25,24,.4)}
+.sport__frame > img{width:100%; height:100%; object-fit:cover; object-position:50% 15%}
+.sport__cap{margin:14px 0 0 6px; font-family:var(--f-word); font-style:italic; font-size:20px; line-height:1.2; color:var(--ink-3)}
+.sport__side{grid-area:side; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px}
+.mini{display:flex; align-items:center; gap:14px; margin:0}
+.mini img{width:112px; height:76px; object-fit:cover; object-position:50% 30%; border-radius:16px; box-shadow:0 0 0 1px rgba(26,25,24,.06), 0 12px 24px -14px rgba(26,25,24,.4)}
+.mini figcaption{font-family:var(--f-word); font-style:italic; font-size:19px; line-height:1.3; color:var(--ink-3)}
+@media (min-width:900px){
+  .sport__grid{grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-areas:"photo title" "photo side"; grid-template-rows:1fr auto; column-gap:clamp(48px,7vw,120px); row-gap:40px}
+  .sport__title{align-self:end}
+  .sport__photo{width:min(100%, calc(76vh * .8))}
+  .sport__side{align-self:start; justify-content:flex-start; gap:28px 40px}
+}
+
+/* =========================================================
+   C6 · Me suivre : une carte blanche façon lien en bio
+   ========================================================= */
+.links > .wrap{display:flex; justify-content:center}
+.bio{width:min(100%, 480px)}
+.bio__core{display:flex; flex-direction:column; align-items:center; padding:clamp(30px,4vw,44px) clamp(12px,2vw,20px) clamp(12px,2vw,20px); text-align:center}
+.bio__avatar{width:104px; height:104px; border-radius:50%; object-fit:cover; object-position:50% 24%; box-shadow:0 0 0 4px #fff, 0 0 0 5px var(--line), 0 14px 28px -10px rgba(26,25,24,.3)}
+.bio__name{margin:22px auto 0; font-size:clamp(48px,5.4vw,72px)}
+.bio__sub{margin:12px auto 0; max-width:30ch; font-size:15.5px; line-height:1.45; color:var(--ink-2)}
+.bio__list{display:grid; gap:10px; width:100%; margin:28px 0 0; padding:0; list-style:none}
+.bio__row{position:relative; display:flex; align-items:center; gap:14px; min-height:68px; padding:10px; border-radius:22px; overflow:hidden; text-align:left; background:var(--bg); box-shadow:inset 0 0 0 1px var(--line); transition:transform .6s var(--expo), box-shadow .6s var(--expo)}
+.bio__row::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(100deg, transparent 30%, rgba(255,255,255,.75) 50%, transparent 70%); transform:translateX(-110%); transition:transform 1.1s var(--expo)}
+.bio__row:hover{box-shadow:inset 0 0 0 1px var(--line-2)}
+.bio__row:hover::after{transform:translateX(110%)}
+.bio__row:active{transform:scale(.985)}
+.bio__row:focus-visible{outline-offset:3px}
+.bio__glyph{flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:14px; background:#fff; color:var(--ink); box-shadow:0 0 0 1px var(--line), 0 4px 10px -6px rgba(26,25,24,.25)}
+.bio__glyph svg{width:22px; height:22px}
+.bio__txt{position:relative; z-index:1; flex:1; display:grid; min-width:0; line-height:1.3}
+.bio__txt b{font-size:15.5px; font-weight:600; color:var(--ink)}
+.bio__txt span{font-size:13.5px; color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.bio__go{flex:none; display:grid; place-items:center; width:38px; height:38px; border-radius:50%; background:rgba(26,25,24,.06); color:var(--ink); transition:transform .7s var(--expo)}
+.bio__go svg{width:13px; height:13px}
+.bio__row:hover .bio__go{transform:translate(2px,-1px) scale(1.06)}
+
+/* =========================================================
+   C7 · Marques : le formulaire dans une grande carte blanche
+   ========================================================= */
+.split{display:grid; grid-template-columns:minmax(0,1fr); gap:clamp(36px,5vw,88px); align-items:start}
+.split__side{display:flex; flex-direction:column; gap:20px}
+@media (min-width:960px){ .split{grid-template-columns:5fr 7fr; align-items:center} }
+.field legend{margin-bottom:10px}
+.field small{font-size:13px; font-weight:400; color:var(--ink-3)}
+.btn.is-busy{opacity:.75}
+
+/* =========================================================
+   Mouvement réduit : des fondus seulement
+   ========================================================= */
+@media (prefers-reduced-motion: reduce){
+  .js [data-sweep],.js .slit .num,.js .tk,.js .tk__art,.js .strike,.js .stop,.js .stop__line,.js .days li::before,.deck{transform:none !important; filter:none !important; clip-path:none !important}
+  .js [data-sweep]{opacity:0; transition:opacity .6s ease}
+  .js [data-sweep].is-in{opacity:1}
+  .nav__chT.in{animation-name:kzFade}
+  .js .tk .slit .num,.js .tk__art,.js .strike{opacity:0; transition:opacity .5s var(--expo)}
+  .js .tk.is-in .slit .num,.js .tk.is-in .tk__art,.js .tk--fin.is-in .strike{opacity:1; transition:opacity .9s var(--expo) .2s}
+  .play,.poster__img,.stop__media img,.bio__row,.bio__row::after{transition:none !important}
+}
+</style>
+<link rel="stylesheet" href="../shared/passage.css"><link rel="stylesheet" href="../shared/cordon.css">
+</head>
+<body>
+<a class="skip" href="#derniere">Aller au contenu</a>
+<div class="ambient" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Objets dessinés du « vrai prix » -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="o-avion" viewBox="0 0 120 120">
+    <path d="M10 110 C18 102 26 94 34 86" style="stroke:var(--acc)" stroke-dasharray="2 7" vector-effect="non-scaling-stroke"/>
+    <path transform="rotate(45 64 56)" d="M64 14 C67.6 14 69.5 19 69.5 25 L69.5 43 L102.5 62 L102.5 69 L69.5 60 L69.5 80 L79.5 88 L79.5 93.5 L64 89.5 L48.5 93.5 L48.5 88 L58.5 80 L58.5 60 L25.5 69 L25.5 62 L58.5 43 L58.5 25 C58.5 19 60.4 14 64 14 Z" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-train" viewBox="0 0 120 120">
+    <path d="M36 30 C36 19 46 14 60 14 C74 14 84 19 84 30 L87 84 C87 91 82 96 75 96 L45 96 C38 96 33 91 33 84 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M42 31 C42 25 50 22 60 22 C70 22 78 25 78 31 L79 50 C79 53 77 55 74 55 L46 55 C43 55 41 53 41 50 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M35 67 H85" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <circle cx="45" cy="80" r="4" vector-effect="non-scaling-stroke"/>
+    <circle cx="75" cy="80" r="4" vector-effect="non-scaling-stroke"/>
+    <path d="M44 96 L30 112 M76 96 L90 112 M37 104 H83 M32 110 H88" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-lit" viewBox="0 0 120 120">
+    <path d="M62 46 C56 40 68 36 62 28 M76 42 C70 36 82 32 76 24 M90 46 C84 40 96 36 90 28" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M18 100 V54 C18 50 21 47 25 47 C29 47 32 50 32 54 V70" vector-effect="non-scaling-stroke"/>
+    <path d="M32 70 H98 C101.3 70 104 72.7 104 76 V86 H18" vector-effect="non-scaling-stroke"/>
+    <path d="M36 70 C36 63 39 60 45 60 H54 C58 60 60 63 60 70" vector-effect="non-scaling-stroke"/>
+    <path d="M22 86 V100 M100 86 V100" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-bol" viewBox="0 0 120 120">
+    <path d="M40 46 C34 40 46 36 40 28 M54 44 C48 38 60 34 54 26" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M66 52 L100 16 M74 55 L106 24" vector-effect="non-scaling-stroke"/>
+    <path d="M16 58 H104 C104 82 86 98 60 98 C34 98 16 82 16 58 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M24 64 C36 60 44 68 58 63 C72 58 82 66 96 63" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <path d="M46 98 L49 106 H71 L74 98" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-tenue" viewBox="0 0 120 120">
+    <path d="M60 24 V19 C60 14 66 12 67.5 16.5" vector-effect="non-scaling-stroke"/>
+    <path d="M60 24 L28 38 H92 Z" vector-effect="non-scaling-stroke"/>
+    <path d="M44 38 L16 62 L24 72 L40 60 L36 106 H84 L80 60 L96 72 L104 62 L76 38" vector-effect="non-scaling-stroke"/>
+    <path d="M50 38 L60 54 L70 38" vector-effect="non-scaling-stroke"/>
+    <path d="M39 72 H81" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+    <circle cx="60" cy="89" r="6" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+  </symbol>
+  <symbol id="o-tel" viewBox="0 0 120 120">
+    <rect x="36" y="10" width="48" height="100" rx="11" vector-effect="non-scaling-stroke"/>
+    <path d="M54 17 H66" vector-effect="non-scaling-stroke"/>
+    <path d="M53 103 H67" style="stroke:var(--acc)" vector-effect="non-scaling-stroke"/>
+  </symbol>
+</svg>
+
+<!-- ========== Navigation ========== -->
+<header class="nav">
+  <nav class="story" aria-label="Chapitres">
+    <a href="#top"><i></i><span class="sr">Kenz en Asie</span></a>
+    <a href="#derniere"><i></i><span class="sr">La dernière vidéo</span></a>
+    <a href="#prix"><i></i><span class="sr">Le vrai prix</span></a>
+    <a href="#voyage"><i></i><span class="sr">Le voyage</span></a>
+    <a href="#guide"><i></i><span class="sr">Pour ton voyage</span></a>
+    <a href="#sport"><i></i><span class="sr">Entre deux voyages</span></a>
+    <a href="#suivre"><i></i><span class="sr">Me suivre</span></a>
+    <a href="#marques"><i></i><span class="sr">Marques</span></a>
+  </nav>
+  <div class="nav__in">
+    <div class="brand">
+      <a class="brand__name kz-logo" href="#top">Kenz<button class="kz-dot" type="button" data-cordon data-vers="pro.html" data-symbole="lune" aria-label="Kenz"></button></a>
+    </div>
+    <p class="nav__ch" aria-hidden="true"><span class="nav__chT" data-ch-label>Kenz en Asie</span></p>
+  </div>
+</header>
+
+<main>
+  <!-- ========== C0 · Hero : un portrait devant « Kenz. » ========== -->
+  <section class="hero kz-hero" id="top" data-label="Kenz en Asie" aria-labelledby="t-hero">
+    <i class="kz-hero__tint" aria-hidden="true"></i>
+    <div class="kz-hero__in">
+      <div class="kz-hero__stage">
+        <h1 class="kz-hero__word" id="t-hero"><span class="kz-hero__wordIn">Kenz</span><span class="kz-hero__dot" data-cordon data-vers="pro.html" data-symbole="lune" aria-hidden="true"></span></h1>
+        <span class="kz-hero__floor" aria-hidden="true"></span>
+        <figure class="kz-hero__fig">
+          <span class="kz-hero__shadow" aria-hidden="true"></span>
+          <span class="kz-hero__img"><img src="../assets/img/kenz-moi.webp" alt="Kenz en t-shirt vert anis, le regard tourné vers l’horizon" width="1080" height="1920" fetchpriority="high" decoding="async"></span>
+        </figure>
+      </div>
+      <div class="kz-hero__copy">
+        <p class="kz-hero__line" data-words>Je voyage en Asie et je te raconte ce que ça coûte <em class="word">vraiment</em>.</p>
+        <div class="kz-hero__aside">
+          <div class="hero__cta" data-anim>
+            <a class="btn btn--light" href="#derniere">Voir la dernière vidéo<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v10M3.5 8.5L8 13l4.5-4.5"/></svg></span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C1 · La dernière vidéo ========== -->
+  <section class="ch ch--screen latest" id="derniere" data-label="La dernière vidéo" aria-labelledby="t-latest">
+    <div class="wrap latest__grid">
+      <div class="latest__head">
+        <h2 class="t-title" id="t-latest" data-sweep>Dernière vidéo</h2>
+      </div>
+      <figure class="poster bezel" data-reveal="card">
+        <div class="bezel__core poster__core">
+          <div class="poster__media" data-iris>
+            <a class="poster__link" href="https://www.youtube.com/watch?v=uG6WYRatp0I" target="_blank" rel="noopener" aria-label="Regarder « Premier voyage en Chine : itinéraire de 14 jours » sur YouTube">
+              <img class="poster__img" src="../assets/img/video-chine-14-jours.jpg" alt="Miniature « 14 jours » : Kenz sur la Grande Muraille de Chine" width="960" height="540" loading="lazy" decoding="async">
+              <span class="play" aria-hidden="true">
+                <span class="play__ico"><svg viewBox="0 0 24 24"><path d="M7 4.8v14.4c0 .6.7 1 1.2.7l11.3-7.2a.8.8 0 0 0 0-1.4L8.2 4.1C7.7 3.8 7 4.2 7 4.8z" fill="currentColor"/></svg></span>
+                <span class="play__label">Regarder sur YouTube</span>
+              </span>
+            </a>
+          </div>
+          <p class="poster__meta latest__title" data-reveal="fade" style="--d:2">Premier voyage en Chine&nbsp;: itinéraire de 14&nbsp;jours<span class="latest__date">Publiée le <time datetime="2026-10-31">31 octobre 2026</time></span></p>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ========== C2 · Le vrai prix ========== -->
+  <section class="ch prix" id="prix" data-label="Le vrai prix" aria-labelledby="t-prix">
+    <div class="prix__stage">
+      <div class="wrap prix__grid">
+        <header class="prix__head">
+          <h2 class="t-title" id="t-prix" data-sweep>Le vrai prix</h2>
+          <p class="lead" data-words>En Chine, voilà ce que j’ai <em class="word">payé</em>.</p>
+        </header>
+        <ol class="deck" role="list" data-deck>
+          <li class="tk" style="--k:0">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-avion"/></svg></span>
+                <h3 class="tk__poste">Vol Pékin → Chongqing</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;100&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">≈&#8239;100&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-avion"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:1">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-train"/></svg></span>
+                <h3 class="tk__poste">Train Chongqing → Wulong</h3>
+                <span class="tk__mini" aria-hidden="true">&lt;&#8239;9&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__pre">moins de</span><span class="tk__price"><span class="slit"><span class="num">9&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-train"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:2">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-lit"/></svg></span>
+                <h3 class="tk__poste">24&nbsp;h dans un spa à volonté</h3>
+                <span class="tk__mini" aria-hidden="true">25&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__det">petit-déjeuner compris</span><span class="tk__price"><span class="slit"><span class="num">25&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-lit"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:3">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-bol"/></svg></span>
+                <h3 class="tk__poste">Un repas à Shanghai</h3>
+                <span class="tk__mini" aria-hidden="true">7–8&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">7–8&nbsp;€</span></span></span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-bol"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk" style="--k:4">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-tenue"/></svg></span>
+                <h3 class="tk__poste">Tenue d’empereur à la Grande Muraille</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;20&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val"><span class="tk__price"><span class="slit"><span class="num">≈&#8239;20&nbsp;€</span></span></span><span class="tk__suf">la journée</span></p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true"><use href="#o-tenue"/></svg>
+              </div>
+            </div></article>
+          </li>
+          <li class="tk tk--fin" style="--k:5">
+            <article class="tk__shell"><div class="tk__core">
+              <div class="tk__top">
+                <span class="tk__ico" aria-hidden="true"><svg viewBox="0 0 120 120"><use href="#o-tel"/></svg></span>
+                <h3 class="tk__poste">Réparation d’iPhone à Shenzhen</h3>
+                <span class="tk__mini" aria-hidden="true">≈&#8239;10&nbsp;€</span>
+              </div>
+              <div class="tk__body">
+                <p class="tk__val">
+                  <span class="tk__was"><s class="tk__old">200&nbsp;€<svg class="strike" viewBox="0 0 120 40" preserveAspectRatio="none" aria-hidden="true"><path d="M3 31 C 22 27, 40 24, 58 21 S 98 13, 117 8"/></svg></s><span class="tk__src">vu sur le site d’Apple France</span></span>
+                  <span class="tk__price"><span class="slit"><span class="num">≈&#8239;10&nbsp;€</span></span></span>
+                </p>
+                <svg class="tk__art" viewBox="0 0 120 120" aria-hidden="true">
+                  <rect class="screen" x="40" y="14" width="40" height="92" rx="8"/>
+                  <rect x="36" y="10" width="48" height="100" rx="11" vector-effect="non-scaling-stroke"/>
+                  <path d="M54 17 H66" vector-effect="non-scaling-stroke"/>
+                  <path class="crack" d="M43 33 L55 46 L50 56 L63 66 L58 77 L75 93 M55 46 L68 42 M63 66 L74 63" vector-effect="non-scaling-stroke"/>
+                  <path class="acc" d="M53 103 H67" vector-effect="non-scaling-stroke"/>
+                </svg>
+              </div>
+            </div></article>
+          </li>
+        </ol>
+        <p class="prix__note" data-reveal="fade">Prix vécus, pas des tarifs garantis.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C3 · Le voyage : une étagère de grandes cartes blanches ========== -->
+  <section class="ch voyage" id="voyage" data-label="Le voyage" aria-labelledby="t-voyage">
+    <div class="wrap voyage__head">
+      <h2 class="t-title" id="t-voyage" data-sweep>Le voyage</h2>
+      <div class="voyage__ctrl">
+        <p class="voyage__hint" aria-hidden="true">Fais glisser<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></p>
+        <div class="voyage__btns">
+          <button class="round" type="button" data-route-step="-1" aria-label="Arrêt précédent"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8H3M7.5 3.5L3 8l4.5 4.5"/></svg></button>
+          <button class="round" type="button" data-route-step="1" aria-label="Arrêt suivant"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="route shelf" data-route data-play tabindex="0" role="region" aria-label="La route, de la Chine à l’Islande">
+      <ol class="route__track" role="list">
+        <li class="stop" style="--i:0">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Chine</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card bezel lift" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Chine : voir mes vidéos sur YouTube"><span class="bezel__core stop__core">
+            <span class="stop__media"><img src="../assets/img/video-chine.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__body"><span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></span>
+          </span></a>
+        </li>
+        <li class="stop" style="--i:1">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Malaisie</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card bezel lift" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Malaisie, ma vidéo la plus vue : le budget. Voir sur YouTube"><span class="bezel__core stop__core">
+            <span class="stop__media"><img src="../assets/img/video-malaisie.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__body">
+              <span class="stop__best"><span>Ma vidéo la plus vue&nbsp;: le <em class="word">budget</em>.</span></span>
+              <span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span>
+            </span>
+          </span></a>
+        </li>
+        <li class="stop" style="--i:2">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Corée</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card bezel lift" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Corée : voir mes vidéos sur YouTube"><span class="bezel__core stop__core">
+            <span class="stop__media"><img src="../assets/img/video-coree.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__body"><span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></span>
+          </span></a>
+        </li>
+        <li class="stop" style="--i:3">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Japon</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card bezel lift" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Japon : voir mes vidéos sur YouTube"><span class="bezel__core stop__core">
+            <span class="stop__media"><img src="../assets/img/video-japon.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__body"><span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></span>
+          </span></a>
+        </li>
+        <li class="stop" style="--i:4">
+          <p class="stop__mark"><i class="stop__dot" aria-hidden="true"></i><span class="stop__name">Islande</span><i class="stop__line" aria-hidden="true"></i></p>
+          <a class="stop__card bezel lift" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener" aria-label="Islande : voir mes vidéos sur YouTube"><span class="bezel__core stop__core">
+            <span class="stop__media"><img src="../assets/img/video-islande.jpg" alt="" width="960" height="540" loading="lazy" decoding="async"></span>
+            <span class="stop__body"><span class="stop__cta">Voir sur YouTube<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></span>
+          </span></a>
+        </li>
+      </ol>
+    </div>
+    <div class="wrap"><div class="shelf__bar" aria-hidden="true"><span data-route-bar></span></div></div>
+  </section>
+
+  <!-- ========== C4 · Pour ton voyage ========== -->
+  <section class="ch ch--screen guide" id="guide" data-label="Pour ton voyage" aria-labelledby="t-guide">
+    <div class="wrap guide__wrap">
+      <h2 class="statement" id="t-guide" data-words>Tu pars en <em class="word">Chine</em>&nbsp;?</h2>
+      <article class="bezel gcard" data-reveal="card">
+        <div class="bezel__core gcard__core">
+          <div class="gcard__art" aria-hidden="true">
+            <ol class="days">
+              <li style="--i:0">1</li><li style="--i:1">2</li><li style="--i:2">3</li><li style="--i:3">4</li><li style="--i:4">5</li><li style="--i:5">6</li><li style="--i:6">7</li>
+              <li style="--i:7">8</li><li style="--i:8">9</li><li style="--i:9">10</li><li style="--i:10">11</li><li style="--i:11">12</li><li style="--i:12">13</li><li style="--i:13">14</li>
+            </ol>
+          </div>
+          <div class="gcard__body">
+            <h3 class="gcard__title">L’itinéraire de 14&nbsp;jours, jour par jour</h3>
+            <a class="btn btn--light" href="https://kenzenbien.fr/itineraire/chine" target="_blank" rel="noopener">Ouvrir l’itinéraire<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+          </div>
+        </div>
+      </article>
+      <p class="guide__soon" data-reveal="fade">D’autres guides arrivent.</p>
+    </div>
+  </section>
+
+  <!-- ========== C5 · Entre deux voyages ========== -->
+  <section class="ch ch--screen sport" id="sport" data-label="Entre deux voyages" aria-labelledby="t-sport">
+    <div class="wrap sport__grid">
+      <h2 class="statement sport__title" id="t-sport" data-words>Et entre deux voyages, je <em class="word">m’entraîne</em>.</h2>
+      <figure class="sport__photo">
+        <div class="sport__frame" data-iris>
+          <img src="../assets/img/hyrox-2.jpg" alt="Kenz pousse un traîneau lesté pendant une course HYROX, le regard droit devant" width="733" height="1100" loading="lazy" decoding="async">
+        </div>
+        <figcaption class="sport__cap">HYROX · mai 2025</figcaption>
+      </figure>
+      <div class="sport__side">
+        <figure class="mini" data-reveal="fade">
+          <img src="../assets/img/spartan-2.jpg" alt="Kenz saute au-dessus d’un feu pendant une Spartan Race" width="768" height="511" loading="lazy" decoding="async">
+          <figcaption>Spartan Race</figcaption>
+        </figure>
+        <a class="btn btn--ghost" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener" data-reveal="fade" style="--d:1">La chaîne k15ze<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C6 · Me suivre : une carte blanche façon lien en bio ========== -->
+  <section class="ch links" id="suivre" data-label="Me suivre" aria-labelledby="t-links">
+    <div class="wrap">
+      <div class="bio bezel" data-reveal="card">
+        <div class="bezel__core bio__core">
+          <img class="bio__avatar" src="../assets/img/kenz-carre.jpg" alt="Kenz en t-shirt vert devant les rizières de Malaisie" width="900" height="855" loading="lazy" decoding="async">
+          <h2 class="t-title bio__name" id="t-links" data-sweep>Me suivre</h2>
+          <p class="bio__sub" data-reveal="fade" style="--d:1">≈&#8239;28&#8239;000 personnes me suivent sur TikTok.</p>
+          <ul class="bio__list" role="list">
+            <li><a class="bio__row" data-reveal="card" style="--d:1" href="https://www.youtube.com/@7Kinze" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4.5"/><path d="M10 9.3v5.4l4.6-2.7z"/></svg></span>
+              <span class="bio__txt"><b>YouTube · Kenz in Asia</b><span>@7Kinze</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row" data-reveal="card" style="--d:2" href="https://www.tiktok.com/@7kinze" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3.5v11a3.6 3.6 0 1 1-3.6-3.6"/><path d="M14 3.5c.6 2.5 2.4 4.1 5 4.3"/></svg></span>
+              <span class="bio__txt"><b>TikTok · En Bien en Asie</b><span>@7kinze</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row" data-reveal="card" style="--d:3" href="https://www.instagram.com/kenzvoyage_enbien/" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.8"/><circle cx="17.1" cy="6.9" r=".7" fill="currentColor" stroke="none"/></svg></span>
+              <span class="bio__txt"><b>Instagram</b><span>@kenzvoyage_enbien</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+            <li><a class="bio__row" data-reveal="card" style="--d:4" href="https://www.youtube.com/@K15ze-l6z" target="_blank" rel="noopener">
+              <span class="bio__glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="13.5" r="7"/><path d="M12 13.5V10M10 3.5h4M17.6 7.4l1.2-1.2"/></svg></span>
+              <span class="bio__txt"><b>YouTube · k15ze</b><span>Entre deux voyages</span></span>
+              <span class="bio__go" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== C7 · Marques ========== -->
+  <section class="ch ch--screen brands" id="marques" data-label="Marques" aria-labelledby="t-brands">
+    <div class="wrap split">
+      <div class="split__side">
+        <h2 class="statement" id="t-brands" data-words>Une marque, une destination, une <em class="word">idée</em>&nbsp;?</h2>
+      </div>
+      <form class="form bezel" data-form data-reveal="card" novalidate aria-labelledby="t-brands">
+        <div class="bezel__core form__core">
+          <div class="form__body">
+            <div class="field">
+              <label for="b-marque">Votre marque</label>
+              <input class="input" id="b-marque" name="marque" type="text" autocomplete="organization" placeholder="Le nom de votre marque" data-required data-min="2" data-msg="Indiquez le nom de votre marque." aria-describedby="b-marque-err">
+              <p class="field__err" id="b-marque-err" aria-live="polite"></p>
+            </div>
+            <div class="field">
+              <label for="b-idee">Votre idée</label>
+              <textarea class="input" id="b-idee" name="idee" placeholder="Une destination, un format, une envie…" data-required data-min="10" data-msg="Décrivez votre idée en quelques mots (10 caractères au moins)." aria-describedby="b-idee-err"></textarea>
+              <p class="field__err" id="b-idee-err" aria-live="polite"></p>
+            </div>
+            <fieldset class="field">
+              <legend>Ordre de budget <small>(facultatif)</small></legend>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="budget" value="moins-1000"><span>Moins de 1&nbsp;000&nbsp;€</span></label>
+                <label class="choice"><input type="radio" name="budget" value="1000-5000"><span>1&nbsp;000 à 5&nbsp;000&nbsp;€</span></label>
+                <label class="choice"><input type="radio" name="budget" value="plus-5000"><span>Plus de 5&nbsp;000&nbsp;€</span></label>
+                <label class="choice"><input type="radio" name="budget" value="a-definir"><span>À définir</span></label>
+              </div>
+            </fieldset>
+            <div class="form__foot">
+              <button class="btn btn--light" type="submit"><span data-label>Envoyer</span><span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11.5l7-7M5.5 4.5h6v6"/></svg></span></button>
+            </div>
+          </div>
+        </div>
+        <div class="form__ok" hidden>
+          <svg class="ok__check" viewBox="0 0 48 48" aria-hidden="true"><circle pathLength="1" cx="24" cy="24" r="22"/><path pathLength="1" d="M15 24.5l6 6L33.5 18"/></svg>
+          <h3 tabindex="-1" data-ok-title>Merci, c’est noté.</h3>
+          <p>Je reviens vers vous très vite.</p>
+          <button class="btn btn--ghost btn--sm" type="button" data-again>Écrire un autre message<span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M8.5 3.5L13 8l-4.5 4.5"/></svg></span></button>
+        </div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><p>Kenz en Asie · 2026</p></footer>
+
+<script>
+(function () {
+  'use strict';
+  var d = document.documentElement;
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var PIN = window.matchMedia('(min-width: 900px) and (min-height: 600px)');
+  var hasIO = 'IntersectionObserver' in window;
+  var each = function (sel, fn, root) { Array.prototype.forEach.call((root || document).querySelectorAll(sel), fn); };
+
+  /* ---------- 1. Mot par mot ---------- */
+  function splitWords(el) {
+    var i = 0;
+    Array.prototype.slice.call(el.childNodes).forEach(function (n) {
+      if (n.nodeType === 3) {
+        var frag = document.createDocumentFragment();
+        n.textContent.split(/([ \t\r\n]+)/).forEach(function (p) {
+          if (!p) return;
+          if (/^[ \t\r\n]+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
+          var s = document.createElement('span');
+          s.className = 'w'; s.style.setProperty('--i', i++); s.textContent = p;
+          frag.appendChild(s);
+        });
+        n.parentNode.replaceChild(frag, n);
+      } else if (n.nodeType === 1) {
+        n.classList.add('w'); n.style.setProperty('--i', i++);
+      }
+    });
+  }
+  each('[data-words]', splitWords);
+
+  /* ---------- 2. Apparitions à l'entrée (une seule fois) ---------- */
+  var io = hasIO ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var t = e.target;
+      if (t.__sweep) t.__sweep.forEach(function (s) { s.classList.add('is-in'); });
+      if (t.matches('[data-reveal],[data-words],[data-play]')) t.classList.add('is-in');
+      io.unobserve(t);
+    });
+  }, { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }) : null;
+  each('[data-reveal],[data-words],[data-play]', function (el) {
+    if (el.closest('.hero')) return;
+    if (io) io.observe(el); else el.classList.add('is-in');
+  });
+  /* Un titre en balayage est rogné à zéro (clip-path) : Chrome le croit invisible, on observe donc son parent. */
+  each('[data-sweep]', function (el) {
+    if (el.closest('.hero')) return;
+    if (!io) { el.classList.add('is-in'); return; }
+    var host = el.parentElement;
+    host.__sweep = (host.__sweep || []).concat(el);
+    io.observe(host);
+  });
+
+  /* ---------- 2 bis. L'iris : le point attend, puis s'ouvre en cercle ----------
+     On observe le parent : un élément entièrement découpé ne « croise » pas toujours l'écran. */
+  function irisOpen(el) {
+    if (el.classList.contains('is-in')) return;
+    el.classList.add('is-in');
+    setTimeout(function () { el.classList.add('is-open'); }, RM.matches ? 0 : 1750);
+  }
+  try {
+    if (!hasIO) each('[data-iris]', irisOpen);
+    else {
+      var io2 = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          (e.target.__iris || []).forEach(irisOpen);
+          io2.unobserve(e.target);
+        });
+      }, { threshold: 0.22 });
+      each('[data-iris]', function (el) {
+        var p = el.parentElement;
+        (p.__iris = p.__iris || []).push(el);
+        io2.observe(p);
+      });
+    }
+  } catch (e) { console.error('[kz] iris : ' + e.message); }
+
+  /* ---------- 3. Entrée du hero (attend les battants si on arrive par la porte, ou le voile du passage) ---------- */
+  var heroPlayed = false;
+  function playHero() {
+    if (heroPlayed) return;
+    heroPlayed = true;
+    d.classList.add('is-loaded', 'hero-in');
+    each('.hero [data-words]', function (el) { el.classList.add('is-in'); });
+  }
+  var viaPassage = false;
+  try { var kp = JSON.parse(sessionStorage.getItem('kz-passage') || 'null'); viaPassage = !!(kp && Date.now() - kp.t < 6000); } catch (e) {}
+  if (location.hash.indexOf('porte') > -1 || viaPassage) {
+    d.classList.add('is-porte');
+    document.addEventListener('porte:arrivee', playHero, { once: true });
+    document.addEventListener('passage:arrivee', playHero, { once: true });
+    setTimeout(playHero, 2500);
+  } else {
+    var go = function () { requestAnimationFrame(function () { requestAnimationFrame(playHero); }); };
+    var t = setTimeout(go, 700);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { clearTimeout(t); go(); });
+  }
+
+  /* ---------- 4. Repère « stories », nom du chapitre, scène du vrai prix ---------- */
+  var nav = document.querySelector('.nav');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('main [data-label]'));
+  var segs = Array.prototype.slice.call(document.querySelectorAll('.story a'));
+  var fills = segs.map(function (a) { return a.querySelector('i'); });
+  var label = document.querySelector('[data-ch-label]');
+  var heroBg = document.querySelector('.hero__bg');
+  var prix = document.getElementById('prix');
+  var deck = prix.querySelector('[data-deck]');
+  var cards = Array.prototype.slice.call(prix.querySelectorAll('.tk'));
+  var vh = window.innerHeight, maxY = 1, tops = [], hs = [];
+  var pinned = false, step = -1, prixTop = 0, prixLen = 1, cardIO = null, current = -1, ticking = false;
+
+  function measure() {
+    vh = window.innerHeight;
+    maxY = Math.max(1, d.scrollHeight - vh);
+    var y = window.scrollY;
+    chapters.forEach(function (c, i) { var r = c.getBoundingClientRect(); tops[i] = r.top + y; hs[i] = Math.max(1, r.height); });
+    if (pinned) { var r = prix.getBoundingClientRect(); prixTop = r.top + y; prixLen = Math.max(1, r.height - vh); }
+  }
+
+  function swapLabel(text) {
+    if (!label || label.textContent === text) return;
+    label.classList.remove('in');
+    void label.offsetWidth;
+    label.textContent = text;
+    label.classList.add('in');
+  }
+
+  function setStep(s) {
+    if (s === step) return;
+    step = s;
+    cards.forEach(function (c, i) {
+      c.classList.toggle('is-in', i < s);
+      c.classList.toggle('is-under', i < s - 1);
+    });
+    deck.style.setProperty('--s', Math.max(0, s - 1));
+  }
+
+  function frame() {
+    ticking = false;
+    var y = window.scrollY;
+    var ref = y + vh * 0.35 * Math.min(1, y / (vh * 0.5));
+    var end = y >= maxY - 4;
+    var act = 0;
+    for (var i = 0; i < chapters.length; i++) {
+      var f = end ? 1 : Math.min(1, Math.max(0, (ref - tops[i]) / hs[i]));
+      if (fills[i]) fills[i].style.transform = 'scaleX(' + f.toFixed(4) + ')';
+      if (tops[i] <= ref + 1) act = i;
+    }
+    if (end) act = chapters.length - 1;
+    if (act !== current) {
+      current = act;
+      segs.forEach(function (a, j) { if (j === act) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
+      swapLabel(chapters[act].getAttribute('data-label'));
+    }
+    nav.classList.toggle('is-scrolled', y > 24);
+    if (heroBg && !RM.matches && y < vh * 1.3) heroBg.style.transform = 'translate3d(0,' + (y * 0.16).toFixed(1) + 'px,0)';
+    if (pinned) {
+      var p = (y - prixTop + vh * 0.2) / prixLen;
+      setStep(p < 0 ? 0 : Math.min(cards.length, Math.floor(p * 6.6) + 1));
+    }
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
+
+  function setupPrix() {
+    pinned = PIN.matches && !RM.matches;
+    prix.classList.toggle('is-pinned', pinned);
+    if (cardIO) { cardIO.disconnect(); cardIO = null; }
+    step = -1;
+    cards.forEach(function (c) { c.classList.remove('is-under'); });
+    if (pinned) {
+      cards.forEach(function (c) { c.classList.remove('is-in'); });
+    } else if (hasIO) {
+      deck.style.removeProperty('--s');
+      cardIO = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('is-in'); cardIO.unobserve(e.target); }
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.3 });
+      cards.forEach(function (c) { if (!c.classList.contains('is-in')) cardIO.observe(c); });
+    } else {
+      cards.forEach(function (c) { c.classList.add('is-in'); });
+    }
+    measure(); frame();
+  }
+
+  var rz;
+  function onResize() { clearTimeout(rz); rz = setTimeout(function () { measure(); frame(); }, 120); }
+  var onMQ = function () { setupPrix(); };
+  if (PIN.addEventListener) { PIN.addEventListener('change', onMQ); RM.addEventListener('change', onMQ); }
+  else if (PIN.addListener) { PIN.addListener(onMQ); RM.addListener(onMQ); }
+
+  setupPrix();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize);
+  window.addEventListener('load', function () { measure(); frame(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); frame(); });
+
+  /* ---------- 5. Le voyage : flèches pour la souris ---------- */
+  var route = document.querySelector('[data-route]');
+  each('[data-route-step]', function (btn) {
+    btn.addEventListener('click', function () {
+      var item = route.querySelector('.stop');
+      var w = item ? item.getBoundingClientRect().width + 16 : 300;
+      route.scrollBy({ left: (+btn.getAttribute('data-route-step')) * w, behavior: RM.matches ? 'auto' : 'smooth' });
+    });
+  });
+  /* L'étagère : barre de progression, flèches éteintes aux deux bouts */
+  try {
+    var routeBar = document.querySelector('[data-route-bar]');
+    var routeTick = false;
+    var routeUI = function () {
+      routeTick = false;
+      var max = route.scrollWidth - route.clientWidth, x = route.scrollLeft;
+      if (routeBar) routeBar.style.transform = 'scaleX(' + (max > 2 ? Math.min(1, (x + route.clientWidth) / route.scrollWidth) : 1).toFixed(4) + ')';
+      each('[data-route-step]', function (b) {
+        var back = +b.getAttribute('data-route-step') < 0;
+        b.setAttribute('aria-disabled', (max <= 2 || (back ? x <= 2 : x >= max - 2)) ? 'true' : 'false');
+      });
+    };
+    route.addEventListener('scroll', function () { if (!routeTick) { routeTick = true; requestAnimationFrame(routeUI); } }, { passive: true });
+    window.addEventListener('resize', routeUI);
+    window.addEventListener('load', routeUI);
+    routeUI();
+  } catch (e) { console.error('[kz] étagère : ' + e.message); }
+
+  /* ---------- 6. Formulaire marques : validation douce, envoi simulé ---------- */
+  var form = document.querySelector('[data-form]');
+  if (form) {
+    var ok = form.querySelector('.form__ok');
+    var btn = form.querySelector('[type="submit"]');
+    var btnLabel = btn.querySelector('[data-label]');
+    var check = function (f) {
+      var bad = f.value.trim().length < (+f.getAttribute('data-min') || 1);
+      var err = document.getElementById(f.getAttribute('aria-describedby'));
+      f.setAttribute('aria-invalid', bad ? 'true' : 'false');
+      if (err) err.textContent = bad ? f.getAttribute('data-msg') : '';
+      return !bad;
+    };
+    each('[data-required]', function (f) {
+      f.addEventListener('input', function () { if (f.getAttribute('aria-invalid') === 'true') check(f); });
+    }, form);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var first = null;
+      each('[data-required]', function (f) { if (!check(f) && !first) first = f; }, form);
+      if (first) { first.focus(); return; }
+      btn.disabled = true; btn.classList.add('is-busy'); btnLabel.textContent = 'Envoi…';
+      setTimeout(function () {
+        ok.hidden = false;
+        void ok.offsetWidth;
+        form.classList.add('is-sent');
+        var title = ok.querySelector('[data-ok-title]');
+        setTimeout(function () { title.focus({ preventScroll: true }); }, 300);
+      }, 650);
+    });
+    form.querySelector('[data-again]').addEventListener('click', function () {
+      form.reset();
+      each('[data-required]', function (f) { f.removeAttribute('aria-invalid'); }, form);
+      btn.disabled = false; btn.classList.remove('is-busy'); btnLabel.textContent = 'Envoyer';
+      form.classList.remove('is-sent');
+      setTimeout(function () { ok.hidden = true; form.querySelector('#b-marque').focus({ preventScroll: true }); }, 300);
+    });
+  }
+
+  /* ---------- Tout s'est bien chargé : on désarme le garde-fou ---------- */
+  clearTimeout(window.__kzFallback);
+})();
+</script>
+<script src="../shared/passage.js" defer></script><script src="../shared/cordon.js" defer></script>
+
+
+<script src="../shared/revue.js" defer></script>
+</body>
+</html>

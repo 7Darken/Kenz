@@ -1,0 +1,22 @@
+{
+  "status": "awaiting-user-review",
+  "revision": 2,
+  "generator": "built-in image_gen",
+  "styleReference": "/Users/kenz15/Documents/Dev/Kenz/kenz/maquettes/v6/assets/sport3d/planches/sombre-160.webp",
+  "assets": [
+    {
+      "id": "pro-noyau-ia",
+      "label": "Noyau IA",
+      "series": "pro",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-fd0aa680-3777-4b4e-b248-0752afa45a90.png",
+      "background": "output/hero-horizon-valide/01-horizon-pro.png"
+    },
+    {
+      "id": "createur-passeport",
+      "label": "Passeport",
+      "series": "createur",
+      "source": "/Users/kenz15/.codex/generated_images/01a1dec5-23c4-7332-91f6-c2b9df5b0cd0/exec-e8ec2be3-770c-453f-9d6e-2fb7799730fd.png",
+      "background": "output/hero-horizon-valide/02-horizon-createur.png"
+    }
+  ]
+}
