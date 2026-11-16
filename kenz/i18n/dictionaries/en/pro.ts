@@ -15,7 +15,6 @@ export const pro: ProDictionary = {
     title: "My apps",
     sub: "I dream them up, I build them, I *ship* them.",
     portraitAlt: "Kenz",
-    starLabel: "{app}, {domain}: {line}",
     hint: "Touch a star.",
     explore: "Explore",
     scene: {

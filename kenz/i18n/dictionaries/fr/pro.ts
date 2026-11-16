@@ -20,8 +20,6 @@ export const pro = {
     title: "Mes apps",
     sub: "Je les imagine, je les code, je les *publie*.",
     portraitAlt: "Kenz",
-    /** Nom accessible d'un astre : « Oshii, cuisine : Ta vidéo TikTok devient une vraie recette. » */
-    starLabel: "{app}, {domain}\u00a0: {line}",
     hint: "Touche une étoile.",
     explore: "Explorer",
     /** La mini-animation de la fiche (données d'exemple). */

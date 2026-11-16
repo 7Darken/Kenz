@@ -98,8 +98,6 @@ export type AppSpacePreview =
 export interface AppSpaceCard {
   domain: Localized<string>;
   line: Localized<string>;
-  /** Deux ou trois phrases reprises des captures (rien d'inventé). */
-  points?: readonly Localized<string>[];
   preview: AppSpacePreview;
 }
 
@@ -195,14 +193,6 @@ export const apps: AppsBySlug = {
     space: {
       domain: { fr: "Cuisine", en: "Cooking" },
       line: { fr: "Ta vidéo TikTok devient une vraie recette.", en: "Your TikTok video becomes a real recipe." },
-      points: [
-        {
-          fr: "Ta vidéo TikTok, Instagram ou YouTube devient une recette.",
-          en: "Your TikTok, Instagram or YouTube video becomes a recipe.",
-        },
-        { fr: "Pas à pas, avec quantités et minuteurs.", en: "Step by step, with quantities and timers." },
-        { fr: "Ta liste de courses se fait toute seule.", en: "Your shopping list writes itself." },
-      ],
       preview: gallery("oshii", ["01", "02", "03", "04"]),
     },
     story: {
@@ -317,11 +307,6 @@ export const apps: AppsBySlug = {
     space: {
       domain: { fr: "Sport & nutrition", en: "Fitness & nutrition" },
       line: { fr: "Une photo de ton plat, et ton plan s’ajuste.", en: "A photo of your meal, and your plan adjusts." },
-      points: [
-        { fr: "Ton repas en photo, calories et macros comptées.", en: "Snap your meal: calories and macros, counted." },
-        { fr: "Charge et reps exactes, à chaque série.", en: "Exact weight and reps, every set." },
-        { fr: "Une date estimée pour ton poids cible.", en: "An estimated date for your goal weight." },
-      ],
       preview: gallery("wado", ["01", "02", "03", "04"]),
     },
     story: {
@@ -427,11 +412,6 @@ export const apps: AppsBySlug = {
         fr: "Le japonais, par l’image, épisode par épisode.",
         en: "Japanese through pictures, one episode at a time.",
       },
-      points: [
-        { fr: "Le japonais, comme dans un anime.", en: "Japanese, just like in an anime." },
-        { fr: "Un épisode de 15 minutes, chaque jour.", en: "A 15-minute episode, every day." },
-        { fr: "Chaque mot, épinglé à sa place dans l’image.", en: "Every word, pinned right where it is in the picture." },
-      ],
       preview: gallery("sago", ["01", "02", "03", "04", "06"]),
     },
     story: {
@@ -539,11 +519,6 @@ export const apps: AppsBySlug = {
         fr: "Un petit pacte par jour pour arrêter de te ronger les ongles.",
         en: "One small pact a day to stop biting your nails.",
       },
-      points: [
-        { fr: "Un pacte par jour, sans te juger.", en: "One pact a day, no judgment." },
-        { fr: "Une envie ? 30 secondes guidées pour tenir.", en: "An urge? 30 guided seconds to hold on." },
-        { fr: "Un rappel juste avant tes heures à risque.", en: "A reminder just before your high-risk hours." },
-      ],
       preview: gallery("croc", ["01", "02", "03", "04", "05"]),
     },
     story: {
@@ -640,14 +615,6 @@ export const apps: AppsBySlug = {
     space: {
       domain: { fr: "Jeux entre amis", en: "Games with friends" },
       line: { fr: "Un thème, et le jeu se crée en direct.", en: "One theme, and the game builds itself live." },
-      points: [
-        { fr: "9 jeux de soirée, zéro préparation.", en: "9 party games, zero prep." },
-        {
-          fr: "Un seul tél, ou chacun le sien, même à distance.",
-          en: "One phone, or one each, even from a distance.",
-        },
-        { fr: "Écris une idée, Miru crée les mots.", en: "Type an idea, Miru comes up with the words." },
-      ],
       preview: gallery("miru", ["01", "02", "03", "04", "05"]),
     },
     story: {

@@ -6,9 +6,13 @@
  * lumière relient les astres voisins ; toutes les 4 s environ, un photon passe de l'un au suivant, qui s'éclaire.
  * Une seule boucle requestAnimationFrame, arrêtée hors écran. À l'arrivée : les étoiles s'allument depuis le
  * centre, les nébuleuses s'épanouissent, les astres s'allument un à un.
- * LA FICHE (survol à la souris, focus clavier, premier toucher) : près de l'astre, du côté où il y a de la place,
- * reliée à lui par un fil de lumière. Apparition holographique en 340 ms, disparition en 180 ms ; la caméra glisse
- * à peine vers l'astre (≈ 3 %), les autres s'atténuent.
+ * LA FICHE (survol à la souris, focus clavier, premier toucher) : une seule, compacte, qui ne couvre jamais un
+ * autre astre. Sur ordinateur, elle se pose dans le vide le plus proche de l'astre (à droite, à gauche, dessous ou
+ * dessus), reliée à lui par un fil de lumière ; si la constellation n'en laisse pas pour chaque astre (écran étroit
+ * ou bas), c'est une feuille en bas de la scène, sous les astres. D'un astre à l'autre, elle ne se ferme pas : elle
+ * glisse vers le nouvel astre et son contenu se fond (la couleur aussi). Tolérance de 120 ms pour traverser le vide
+ * jusqu'à elle, ou jusqu'au voisin ; au clavier, Tab et les flèches vont d'astre en astre. Apparition holographique
+ * en 340 ms, disparition en 220 ms ; la caméra glisse à peine vers l'astre (≈ 3 %), les autres s'atténuent.
  * LE DÉPART (clic, Entrée, « Explorer », deuxième toucher) : la caméra plonge vers l'astre, les autres filent
  * hors du cadre, la fiche se replie dans l'icône ; puis le passage (openPassage) : l'icône vole vers la page.
  * Mouvement réduit : ciel fixe sans scintillement, pas de caméra, des fondus.
@@ -47,10 +51,43 @@ const DIVE_ZOOM = [[1.05, 0.12], [1.2, 0.4], [1.8, 1], [2.5, 1.6]] as const;
 const ICON_SIZE = 112;
 const IOS = "cubic-bezier(.2,.8,.2,1)";
 const FAST = "cubic-bezier(.4,0,1,1)";
+/** ms : le temps de traverser le vide jusqu'à la fiche, ou jusqu'à l'astre voisin, sans qu'elle se ferme. */
+const GRACE_MS = 120;
+/** ms : la fiche glisse d'un astre à l'autre. */
+const GLIDE_MS = 440;
+/** ms : la fiche s'éteint ; un astre survolé pendant ce temps la rattrape (elle glisse au lieu de se rouvrir). */
+const FADE_MS = 220;
+/** px : marge entre la fiche et ce qu'elle ne doit pas couvrir (astres, noms, signature). */
+const CLEAR = 14;
+/** Coût d'une place qui couvre quelque chose (la signature, au moins) : elle est exclue. */
+const BLOCKED = 50;
+/** Largeur sous laquelle la fiche est toujours une feuille (la constellation de poche). */
+const SHEET_BELOW = 600;
+/** px : la hauteur du téléphone de la fiche flottante (la feuille le met à l'échelle, --ek). */
+const PHONE_H = 226;
 
 const px = (v: number) => `${Math.round(v * 10) / 10}px`;
 const n1 = (v: number) => String(Math.round(v * 10) / 10);
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+const easeOut = (k: number) => 1 - (1 - k) ** 4;
+
+interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+/** Où la fiche se pose : à côté de l'astre, ou en feuille en bas de la scène. */
+type Side = "right" | "left" | "below" | "above" | "sheet";
+interface Spot {
+  x: number;
+  y: number;
+  side: Side;
+  cost: number;
+}
+
+const grow = (b: Box, m: number): Box => ({ x: b.x - m, y: b.y - m, w: b.w + 2 * m, h: b.h + 2 * m });
+const meets = (a: Box, b: Box) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
 function required<T extends Element>(root: Element, selector: string): T {
   const el = root.querySelector<T>(selector);
@@ -75,6 +112,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   const legendDot = required<SVGCircleElement>(scene, "[data-legend-dot]");
   const fiche = required<HTMLElement>(scene, "[data-fiche]");
   const scan = required<HTMLElement>(scene, "[data-fiche-scan]");
+  const panels = Array.from(fiche.querySelectorAll<HTMLElement>("[data-panel]"));
 
   const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mqMouse = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -108,8 +146,22 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   const arrivalTimers: number[] = [];
   const glint = { k: 0, t: 0, next: 0 };
   let hovered = -1;
+  /** L'astre dont la fiche est ouverte (-1 : aucune, ou elle s'éteint). */
   let open = -1;
-  let ficheBox: { x: number; y: number; w: number; h: number; s: number; v: number } | null = null;
+  /** Le panneau affiché, fiche ouverte ou en train de s'éteindre (-1 : la fiche est cachée). */
+  let shown = -1;
+  let mode: "float" | "sheet" = "float";
+  let ficheW = 0;
+  let ficheH = 0;
+  /** Ce que la fiche ne doit pas couvrir : l'icône et le nom de chaque astre, la signature (repère du dock). */
+  let marks: { icon: Box; label: Box | null }[] = [];
+  let sigBox: Box | null = null;
+  /** Le bas de la nuit (la ligne de l'invitation) : plus bas, la scène fond dans la page. */
+  let nightBottom = 0;
+  /** Où la fiche va (sans la parallaxe), où elle est, et d'où elle glisse. */
+  let spot: Spot | null = null;
+  const pos = { x: 0, y: 0 };
+  let glide: { x: number; y: number; t: number } | null = null;
   let ficheAnims: Animation[] = [];
   let ficheTimer = 0;
   let preview: PreviewController | null = null;
@@ -155,15 +207,25 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
       return s;
     });
     sky.measure(textZones());
-    if (open >= 0 && !leaving) {
-      placeFiche(open);
-      camera(open, "hover");
-    }
+    refit();
     if (reduced() || !active) drawSky(now());
   }
 
+  /** La forme de la fiche, et sa place si elle est ouverte (aussi quand elle ou un nom change de taille : la langue). */
+  function refit() {
+    if (!W || !H || !pts.length) return;
+    layoutFiche();
+    if (open >= 0 && !leaving) {
+      spot = spotFor(open, spot?.side ?? null);
+      glide = null;
+      moveFiche(now());
+      drawLegend();
+      camera(open, "hover");
+    }
+  }
+
   function drawSky(t: number) {
-    const box = open >= 0 ? ficheBox : null;
+    const box = open >= 0 ? spot : null;
     sky.draw({
       t,
       reduced: reduced(),
@@ -172,7 +234,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
       plungeX,
       plungeY,
       shooting: skyReady && !leaving,
-      extraZones: box ? [{ x: box.x - 40, y: box.y - 40, w: box.w + 80, h: box.h + 80 }] : [],
+      extraZones: box ? [{ x: box.x - 40, y: box.y - 40, w: ficheW + 80, h: ficheH + 80 }] : [],
       W,
       H,
     });
@@ -267,7 +329,10 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     });
     drawSky(t);
     glintStep(t);
-    if (open >= 0) drawLegend();
+    if (shown >= 0) {
+      moveFiche(t);
+      drawLegend();
+    }
     if (!rm || plunge) raf = requestAnimationFrame(loop);
   }
 
@@ -331,92 +396,186 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     ficheAnims = [];
   }
 
-  /** À côté de l'astre, du côté où il y a de la place, jamais hors du cadre ; si la galerie ne tient d'aucun
-   *  côté (écran étroit), au-dessus ou au-dessous. On garde la place qui recouvre le moins d'autres astres. */
-  function placeFiche(k: number) {
-    const P = pts[k];
-    if (!P) return;
-    const small = W < 600;
-    const fw = fiche.offsetWidth;
-    const fh = fiche.offsetHeight;
-    const m = small ? 12 : 24;
-    const top = small ? 92 : 104;
-    const bottom = small ? 40 : 72;
-    const slide = HOVER_ZOOM[2][1];
-    const x0 = P.x + (W / 2 - P.x) * slide;
-    const y0 = P.y + (H / 2 - P.y) * slide;
-    const gap = P.r * 1.2 + (small ? 14 : 64);
-    const yMax = Math.max(top, H - bottom - fh);
-    const cx = (v: number) => clamp(v, m, W - m - fw);
-    const cy = (v: number) => clamp(v, top, yMax);
-    const sides = [
-      { x: x0 + gap, s: 1 },
-      { x: x0 - gap - fw, s: -1 },
-    ];
-    if (x0 > W / 2) sides.reverse();
-    const free = sides.filter((c) => c.x >= m && c.x + fw <= W - m);
-    const gallery = apps[k]?.preview === "gallery";
-    let best: { x: number; y: number; s: number; v: number; cost: number } | null = null;
-    const attempt = (x: number, y: number, s: number, v: number, base: number) => {
-      let cost = base;
-      if (gallery && P.x + P.r > x && P.x - P.r < x + fw && P.y + P.r > y && P.y - P.r < y + fh) cost += 4;
-      pts.forEach((q, j) => {
-        if (j !== k && q.x + q.r + 14 > x && q.x - q.r - 14 < x + fw && q.y + q.r + 14 > y && q.y - q.r - 14 < y + fh) cost += 1;
-      });
-      if (!best || cost < best.cost) best = { x, y, s, v, cost };
-    };
-    (free.length ? free : [sides[0]]).forEach((side, si) => {
-      [y0 - fh / 2, y0 - P.r * 1.4, y0 - fh + P.r * 1.4, y0 + P.r * 0.5, y0 - fh - P.r * 0.5].forEach((yc, o) => {
-        attempt(cx(side.x), cy(yc), side.s, 0, o * 0.1 + si * 0.5 + (free.length ? 0 : 2));
-      });
+  /** Ce que la fiche ne doit pas couvrir (mesuré sans parallaxe ni caméra : les offsets ignorent les transformations),
+   *  puis sa forme : flottante si chaque astre a un vide assez grand à côté de lui, sinon une feuille pour tous
+   *  (la même partout, pour que le passage d'un astre à l'autre reste un glissé). */
+  function layoutFiche() {
+    marks = astres.map((star) => {
+      const icon = { x: star.offsetLeft, y: star.offsetTop, w: star.offsetWidth, h: star.offsetHeight };
+      const name = star.querySelector<HTMLElement>("[data-nom]");
+      // Le nom est centré sous (ou sur) l'astre par une translation de -50 %, que les offsets ignorent.
+      const label = name
+        ? { x: icon.x + name.offsetLeft - name.offsetWidth / 2, y: icon.y + name.offsetTop, w: name.offsetWidth, h: name.offsetHeight }
+        : null;
+      return { icon, label };
     });
-    if (!free.length && gallery) {
-      const gv = P.r * 1.4 + (small ? 12 : 30);
-      ([[y0 + gv, 1], [y0 - gv - fh, -1]] as const).forEach(([y, v], o) => {
-        attempt(cx(x0 - fw / 2), cy(y), 0, v, 1 + o * 0.1 + (y < top - 1 || y > yMax + 1 ? 2 : 0));
-      });
+    const sig = scene.querySelector<HTMLElement>("[data-sig]");
+    sigBox = sig ? { x: sig.offsetLeft, y: sig.offsetTop, w: sig.offsetWidth, h: sig.offsetHeight } : null;
+    const hint = scene.querySelector<HTMLElement>("[data-indice]");
+    nightBottom = hint ? hint.offsetTop + hint.offsetHeight : H;
+    let next: typeof mode = "sheet";
+    // La fiche flottante est mesurée à sa vraie taille (sans l'échelle d'une feuille précédente).
+    fiche.style.removeProperty("--ek");
+    if (W >= SHEET_BELOW) {
+      fiche.setAttribute("data-mode", "float");
+      ficheW = fiche.offsetWidth;
+      ficheH = fiche.offsetHeight;
+      if (apps.every((_, k) => (floatSpot(k, null)?.cost ?? BLOCKED) < BLOCKED)) next = "float";
     }
-    const chosen = best as { x: number; y: number; s: number; v: number; cost: number } | null;
-    if (!chosen) return;
-    fiche.style.left = px(chosen.x);
-    fiche.style.top = px(chosen.y);
-    ficheBox = { x: chosen.x, y: chosen.y, w: fw, h: fh, s: chosen.s, v: chosen.v };
+    mode = next;
+    fiche.setAttribute("data-mode", mode);
+    if (mode === "sheet") {
+      // Le téléphone de la feuille prend la place laissée sous l'astre le plus bas (caméra comprise).
+      const lowest = Math.max(
+        ...apps.map((_, k) => Math.max(...marks.map((m, j) => Math.max(edge(k, m.icon), j !== k && m.label ? edge(k, m.label) : 0)))),
+      );
+      const pad = parseFloat(getComputedStyle(fiche).paddingTop) || 12;
+      const phone = clamp(H - sheetMargin() - lowest - CLEAR - pad * 2, 96, 150);
+      fiche.style.setProperty("--ek", (phone / PHONE_H).toFixed(3));
+    }
+    ficheW = fiche.offsetWidth;
+    ficheH = fiche.offsetHeight;
+    legend.toggleAttribute("data-on", shown >= 0 && mode === "float");
   }
 
-  /** La légende de HUD : un fil de lumière de l'astre à la fiche (il suit l'astre pendant la parallaxe). */
+  const sheetMargin = () => (W < SHEET_BELOW ? 12 : Math.max(16, H * 0.04));
+
+  /** La caméra du survol rapproche l'astre k : où se trouve alors une boîte du dock. */
+  function viewFrom(k: number) {
+    const P = pts[k];
+    const [s, rc] = reduced() || !P ? [1, 0] : HOVER_ZOOM[2];
+    const fx = P ? P.x + (W / 2 - P.x) * rc : 0;
+    const fy = P ? P.y + (H / 2 - P.y) * rc : 0;
+    return (b: Box): Box => ({ x: fx + s * (b.x - (P?.x ?? 0)), y: fy + s * (b.y - (P?.y ?? 0)), w: b.w * s, h: b.h * s });
+  }
+  /** Le bas d'une boîte de l'astre j, quand la caméra rapproche l'astre k. */
+  const edge = (k: number, b: Box) => {
+    const v = viewFrom(k)(b);
+    return v.y + v.h;
+  };
+
+  /** La place la plus proche de l'astre k qui ne couvre ni un autre astre, ni son nom, ni la signature.
+   *  Coût : 100 par astre ou nom couvert, 200 si elle couvre son propre astre, 50 pour la signature (au-delà de
+   *  BLOCKED, la place est interdite) ; puis, à la marge : descendre dans le fondu du bas de la scène, la distance,
+   *  et de petites préférences (centrée, sur le côté, du même côté que la fiche d'avant). */
+  function floatSpot(k: number, prev: Side | null): Spot | null {
+    const view = viewFrom(k);
+    const mark = marks[k];
+    if (!mark) return null;
+    const self = view(mark.icon);
+    const cx = self.x + self.w / 2;
+    const cy = self.y + self.h / 2;
+    const R = (self.w / 2) * 1.16;
+    const gap = 22;
+    const fw = ficheW;
+    const fh = ficheH;
+    const top = sigBox ? sigBox.y : 16;
+    const bottom = H - Math.max(16, H * 0.07);
+    const blocks = marks.flatMap((m, j) =>
+      j === k ? [] : [grow(view(m.icon), CLEAR), ...(m.label ? [grow(view(m.label), CLEAR / 2)] : [])],
+    );
+    const own = grow({ x: cx - R, y: cy - R, w: R * 2, h: R * 2 }, 6);
+    const sig = sigBox ? grow(sigBox, CLEAR) : null;
+    let best: Spot | null = null;
+    for (const a of [0.5, 0.24, 0.76]) {
+      const tries: [Side, number, number][] = [
+        ["right", cx + R + gap, cy - fh * a],
+        ["left", cx - R - gap - fw, cy - fh * a],
+        ["below", cx - fw * a, cy + R + gap],
+        ["above", cx - fw * a, cy - R - gap - fh],
+      ];
+      for (const [side, x0, y0] of tries) {
+        const x = clamp(x0, 16, W - 16 - fw);
+        const y = clamp(y0, top, Math.max(top, bottom - fh));
+        const box = { x, y, w: fw, h: fh };
+        let cost = blocks.reduce((c, b) => c + (meets(box, b) ? 100 : 0), 0);
+        if (meets(box, own)) cost += 200;
+        if (sig && meets(box, sig)) cost += 50;
+        const dx = Math.max(x - cx, 0, cx - x - fw);
+        const dy = Math.max(y - cy, 0, cy - y - fh);
+        cost += Math.hypot(dx, dy) / 300 + (a === 0.5 ? 0 : 0.04) + (side === "above" || side === "below" ? 0.08 : 0);
+        if (y + fh > nightBottom) cost += 0.3 + (y + fh - nightBottom) / 200;
+        if (side === prev) cost -= 0.12;
+        if (!best || cost < best.cost) best = { x, y, side, cost };
+      }
+    }
+    return best;
+  }
+
+  function spotFor(k: number, prev: Side | null): Spot | null {
+    if (mode === "float") return floatSpot(k, prev);
+    return { x: (W - ficheW) / 2, y: H - sheetMargin() - ficheH, side: "sheet", cost: 0 };
+  }
+
+  /** La fiche suit la parallaxe du dock (elle reste à sa place près de l'astre) ; d'un astre à l'autre, elle glisse. */
+  function moveFiche(t: number) {
+    if (!spot) return;
+    if (glide) {
+      const e = easeOut(clamp((t - glide.t) / GLIDE_MS, 0, 1));
+      pos.x = glide.x + (spot.x - glide.x) * e;
+      pos.y = glide.y + (spot.y - glide.y) * e;
+      if (e >= 1) glide = null;
+    } else {
+      pos.x = spot.x;
+      pos.y = spot.y;
+    }
+    const [dx, dy] = parallax[2];
+    fiche.style.translate = `${px(pos.x + dx)} ${px(pos.y + dy)}`;
+  }
+
+  /** Le panneau de l'app k ; sans fondu quand la fiche était cachée. */
+  function showPanelOf(k: number, fade: boolean) {
+    if (!fade) fiche.setAttribute("data-net", "");
+    panels.forEach((panel, j) => panel.toggleAttribute("data-on", j === k));
+    if (!fade) {
+      void fiche.offsetWidth;
+      fiche.removeAttribute("data-net");
+    }
+    shown = k;
+  }
+
+  /** La légende de HUD : un fil de lumière de l'astre au bord le plus proche de la fiche (il suit l'astre pendant la
+   *  parallaxe, et la fiche pendant qu'elle glisse). La feuille n'en a pas : l'astre visé est mis en avant. */
   function drawLegend() {
-    const F = ficheBox;
-    const icon = astres[open]?.querySelector("img");
-    if (!F || !icon) return;
+    if (mode !== "float") return;
+    const icon = astres[shown]?.querySelector("img");
+    if (!icon) return;
     const r = scene.getBoundingClientRect();
     const b = icon.getBoundingClientRect();
+    const f = fiche.getBoundingClientRect();
     const ax = b.left - r.left + b.width / 2;
     const ay = b.top - r.top + b.height / 2;
     const R = b.width * 0.82;
-    let d: string;
-    let sx: number;
-    let sy: number;
-    if (F.v) {
-      // Fiche au-dessus ou au-dessous : le fil descend (ou monte) droit vers son bord.
-      const ex = clamp(ax, F.x + 28, F.x + F.w - 28);
-      const ey = F.v > 0 ? F.y : F.y + F.h;
-      const L = Math.hypot(ex - ax, ey - ay) || 1;
-      sx = ax + ((ex - ax) / L) * R;
-      sy = ay + ((ey - ay) / L) * R;
-      d = `M${n1(sx)} ${n1(sy)}L${n1(ex)} ${n1(ey)}`;
+    const F = { x: f.left - r.left, y: f.top - r.top, w: f.width, h: f.height };
+    const outX = Math.max(F.x - ax, 0, ax - F.x - F.w);
+    const outY = Math.max(F.y - ay, 0, ay - F.y - F.h);
+    let ex: number;
+    let ey: number;
+    let kx: number;
+    let ky: number;
+    if (outX >= outY) {
+      // L'astre est à côté : le fil arrive à l'horizontale sur le bord gauche ou droit.
+      const dir = ax < F.x ? -1 : 1;
+      ex = dir < 0 ? F.x : F.x + F.w;
+      ey = clamp(ay, F.y + 26, F.y + F.h - 26);
+      kx = ex + dir * 20;
+      ky = ey;
     } else {
-      const ex = F.s > 0 ? F.x : F.x + F.w;
-      const ey = clamp(ay, F.y + 28, F.y + F.h - 28);
-      const kx = ex - F.s * 20;
-      const L = Math.hypot(kx - ax, ey - ay) || 1;
-      sx = ax + ((kx - ax) / L) * R;
-      sy = ay + ((ey - ay) / L) * R;
-      d =
-        (kx - sx) * F.s < 6
-          ? `M${n1(sx)} ${n1(sy)}L${n1(ex)} ${n1(ey)}`
-          : `M${n1(sx)} ${n1(sy)}L${n1(kx)} ${n1(ey)}L${n1(ex)} ${n1(ey)}`;
+      // Au-dessus ou au-dessous : le fil arrive à la verticale sur le bord haut ou bas.
+      const dir = ay < F.y ? -1 : 1;
+      ey = dir < 0 ? F.y : F.y + F.h;
+      ex = clamp(ax, F.x + 26, F.x + F.w - 26);
+      kx = ex;
+      ky = ey + dir * 18;
     }
-    legendLine.setAttribute("d", d);
+    const L = Math.hypot(kx - ax, ky - ay) || 1;
+    const sx = ax + ((kx - ax) / L) * R;
+    const sy = ay + ((ky - ay) / L) * R;
+    const straight = Math.hypot(kx - sx, ky - sy) < 6;
+    legendLine.setAttribute(
+      "d",
+      straight ? `M${n1(sx)} ${n1(sy)}L${n1(ex)} ${n1(ey)}` : `M${n1(sx)} ${n1(sy)}L${n1(kx)} ${n1(ky)}L${n1(ex)} ${n1(ey)}`,
+    );
     legendDot.setAttribute("cx", n1(sx));
     legendDot.setAttribute("cy", n1(sy));
   }
@@ -428,6 +587,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     skyReady = true;
   }
 
+  /** Ouvre la fiche de l'astre k. Si elle est déjà là (ouverte, ou en train de s'éteindre), elle ne se rouvre pas :
+   *  elle glisse vers k, son contenu et sa couleur se fondent. */
   function openFiche(k: number) {
     if (leaving || !seen) return;
     window.clearTimeout(ficheTimer);
@@ -435,23 +596,54 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     const app = apps[k];
     if (!app) return;
     if (!skyReady) finishArrival();
+    const there = shown >= 0;
+    const again = there && shown === k;
+    const rm = reduced();
+    const moving = there && !rm && active;
     open = k;
     hover(k);
-    fiche.style.setProperty("--c", app.color);
-    legend.style.setProperty("--c", app.color);
-    options.showPanel(k);
-    stopPreview();
-    const panel = fiche.querySelector(`[data-panel="${k}"]`);
-    if (panel) preview = app.preview === "gallery" ? playGallery(panel, reduced()) : playAnimation(panel, reduced());
+    if (!again) {
+      options.showPanel(k);
+      // La couleur avant le panneau : quand la fiche était cachée, les deux se posent sans fondu.
+      fiche.style.setProperty("--kz-fiche-c", app.color);
+      legend.style.setProperty("--c", app.color);
+      showPanelOf(k, there);
+      stopPreview();
+      const panel = panels[k];
+      if (panel) preview = app.preview === "gallery" ? playGallery(panel, rm) : playAnimation(panel, rm);
+    }
+    spot = spotFor(k, there ? (spot?.side ?? null) : null);
+    glide = moving ? { x: pos.x, y: pos.y, t: now() } : null;
+    camera(k, "hover");
+    fiche.setAttribute("data-on", "");
+    legend.toggleAttribute("data-on", mode === "float");
+    if (there) {
+      // Rattrapée pendant qu'elle s'éteignait : elle revient de là où elle en était.
+      const cs = getComputedStyle(fiche);
+      const from = { opacity: cs.opacity, filter: cs.filter === "none" ? "blur(0px)" : cs.filter };
+      cancelFicheAnims();
+      moveFiche(now());
+      drawLegend();
+      if (Number(from.opacity) < 0.999)
+        ficheAnims.push(fiche.animate([from, { opacity: 1, filter: "blur(0px)" }], { duration: 200, easing: IOS }));
+      if (!rm && !again)
+        ficheAnims.push(
+          legendLine.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 300, easing: IOS }),
+          scan.animate(
+            [
+              { transform: "translateY(0px)", opacity: 0.55 },
+              { transform: `translateY(${ficheH}px)`, opacity: 0 },
+            ],
+            { duration: 380, easing: "cubic-bezier(.45,0,.55,1)" },
+          ),
+        );
+      if (moving && !raf) raf = requestAnimationFrame(loop);
+      return;
+    }
     cancelFicheAnims();
     fiche.style.transformOrigin = "";
-    fiche.setAttribute("data-on", "");
-    legend.setAttribute("data-on", "");
-    placeFiche(k);
+    moveFiche(now());
     drawLegend();
-    camera(k, "hover");
-    const rm = reduced();
-    const h = fiche.offsetHeight;
     // Apparition holographique : un balayage la dessine de haut en bas, du flou au net, une très légère
     // aberration de couleur sur les bords, à l'arrivée seulement.
     ficheAnims.push(
@@ -484,8 +676,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
         scan.animate(
           [
             { transform: "translateY(0px)", opacity: 1 },
-            { transform: `translateY(${h}px)`, opacity: 0.9, offset: 0.86 },
-            { transform: `translateY(${h}px)`, opacity: 0 },
+            { transform: `translateY(${ficheH}px)`, opacity: 0.9, offset: 0.86 },
+            { transform: `translateY(${ficheH}px)`, opacity: 0 },
           ],
           { duration: 320, easing: "cubic-bezier(.45,0,.55,1)" },
         ),
@@ -494,6 +686,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     }
   }
 
+  /** La fiche s'éteint (lentement d'abord : un astre voisin survolé à temps la rattrape). */
   function closeFiche(fast = false) {
     window.clearTimeout(ficheTimer);
     if (open < 0 || leaving) return;
@@ -502,6 +695,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     camera(-1);
     cancelFicheAnims();
     const end = () => {
+      shown = -1;
+      glide = null;
       fiche.removeAttribute("data-on");
       legend.removeAttribute("data-on");
       stopPreview();
@@ -516,9 +711,9 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
         { opacity: 1, filter: "blur(0px)", transform: "scale(1)" },
         { opacity: 0, filter: "blur(4px)", transform: "scale(.985)" },
       ],
-      { duration: 180, easing: FAST, fill: "forwards" },
+      { duration: FADE_MS, easing: "cubic-bezier(.55,0,.8,.2)", fill: "forwards" },
     );
-    ficheAnims = [out, legend.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 140, easing: FAST, fill: "forwards" })];
+    ficheAnims = [out, legend.animate([{ opacity: 1 }, { opacity: 0 }], { duration: FADE_MS - 40, easing: FAST, fill: "forwards" })];
     out.onfinish = () => {
       if (open < 0) end();
     };
@@ -526,7 +721,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
 
   function closeFicheSoon() {
     window.clearTimeout(ficheTimer);
-    ficheTimer = window.setTimeout(() => closeFiche(), 170);
+    ficheTimer = window.setTimeout(() => closeFiche(), GRACE_MS);
   }
 
   /* ---------- Le départ ---------- */
@@ -539,6 +734,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     legend.removeAttribute("data-on");
     stopPreview();
     open = -1;
+    shown = -1;
+    glide = null;
     hover(-1);
     camera(-1);
   }
@@ -555,10 +752,10 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     scene.setAttribute("data-saut", "");
     hover(k);
     // La fiche se replie dans l'icône.
-    if (open >= 0 && !reduced() && ficheBox) {
-      const F = ficheBox;
-      const tx = b.left - r.left + b.width / 2 - (F.x + F.w / 2);
-      const ty = b.top - r.top + b.height / 2 - (F.y + F.h / 2);
+    if (shown >= 0 && !reduced()) {
+      const f = fiche.getBoundingClientRect();
+      const tx = b.left + b.width / 2 - (f.left + f.width / 2);
+      const ty = b.top + b.height / 2 - (f.top + f.height / 2);
       cancelFicheAnims();
       fiche.style.transformOrigin = "50% 50%";
       const fold = fiche.animate(
@@ -576,6 +773,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
       stopPreview();
     }
     open = -1;
+    glide = null;
     plunge = now();
     plungeX = b.left - r.left + b.width / 2;
     plungeY = b.top - r.top + b.height / 2;
@@ -630,7 +828,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
 
   /* ---------- Les gestes ---------- */
   const isMouse = (e: PointerEvent) => e.pointerType === "mouse" && mqMouse.matches;
-  const modified = (e: MouseEvent) => e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+  const modified = (e: MouseEvent | KeyboardEvent) => e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
 
   astres.forEach((star, k) => {
     listen(star, "pointerdown", (e: PointerEvent) => {
@@ -679,10 +877,23 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     listen(star, "blur", () => {
       if (open === k) closeFicheSoon();
     });
+    // Au clavier, les flèches vont d'astre en astre (dans l'ordre de la constellation, en boucle) ; Tab aussi.
+    listen(star, "keydown", (e: KeyboardEvent) => {
+      if (modified(e) || leaving) return;
+      const n = astres.length;
+      const to: Record<string, number> = { ArrowRight: k + 1, ArrowDown: k + 1, ArrowLeft: k - 1, ArrowUp: k - 1, Home: 0, End: n - 1 };
+      const j = to[e.key];
+      if (j === undefined) return;
+      e.preventDefault();
+      astres[(j + n) % n]?.focus();
+    });
   });
 
   listen(fiche, "pointerenter", (e: PointerEvent) => {
-    if (isMouse(e)) window.clearTimeout(ficheTimer);
+    if (!isMouse(e) || trace.isActive()) return;
+    window.clearTimeout(ficheTimer);
+    // Rejointe pendant qu'elle s'éteignait : elle se rallume.
+    if (open < 0 && shown >= 0) openFiche(shown);
   });
   listen(fiche, "pointerleave", (e: PointerEvent) => {
     if (isMouse(e)) closeFicheSoon();
@@ -702,13 +913,13 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     if (dragged(e)) return;
     explore(open >= 0 ? open : hovered);
   });
-  // Un toucher dans le vide referme la fiche ; Échap aussi.
+  // Un toucher dans le vide referme la fiche ; Échap aussi, même ouverte au survol (le focus est alors ailleurs).
   listen(scene, "pointerdown", (e: PointerEvent) => {
     if (open < 0 || e.pointerType === "mouse") return;
     if (e.target instanceof Element && e.target.closest("[data-astre], [data-fiche]")) return;
     closeFiche();
   });
-  listen(scene, "keydown", (e: KeyboardEvent) => {
+  listen(document, "keydown", (e: KeyboardEvent) => {
     if (e.key === "Escape" && open >= 0) closeFiche();
   });
   // La parallaxe au pointeur (souris) ; pendant un tracé, le ciel la retient.
@@ -807,6 +1018,9 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   listen(document, "visibilitychange", setActive);
   const ro = new ResizeObserver(() => measure());
   ro.observe(scene);
+  // La fiche et les noms changent de taille avec la langue : la place de la fiche se recalcule, le ciel ne bouge pas.
+  const roFiche = new ResizeObserver(() => refit());
+  [fiche, ...scene.querySelectorAll("[data-nom]")].forEach((el) => roFiche.observe(el));
   listen(window, "resize", measure);
   void document.fonts?.ready.then(() => {
     if (!dead) measure();
@@ -818,6 +1032,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     dead = true;
     io.disconnect();
     ro.disconnect();
+    roFiche.disconnect();
     cleanups.forEach((fn) => fn());
     if (raf) cancelAnimationFrame(raf);
     [ficheTimer, hoverDelay, restoreTimer, ...arrivalTimers].forEach(window.clearTimeout);

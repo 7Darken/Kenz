@@ -1,7 +1,8 @@
 /**
  * Ce que joue la fiche ouverte (shared/apps.js : galerieJouer, ficheJouer).
- * - Galerie : un éventail de trois vrais écrans App Store ; toutes les 2,6 s, celui de droite passe au centre,
- *   celui de gauche s'efface (mouvement réduit : l'éventail reste fixe). À l'ouverture, les trois montent en place.
+ * - Galerie : les vrais écrans App Store, un à la fois dans le téléphone ; toutes les 2,6 s, le suivant entre par
+ *   la droite et l'écran affiché sort par la gauche (mouvement réduit : le premier écran reste). À l'ouverture,
+ *   l'écran monte en place.
  * - Animation (Zenko) : la mini-animation en boucle, puis la vraie capture, qui ressort avant que la scène reparte.
  * Le contrôleur rendu se met en pause hors écran et s'arrête à la fermeture (tout est annulé).
  */
@@ -44,24 +45,23 @@ export function playGallery(panel: Element, reduced: boolean): PreviewController
   const unload = markLoaded(Array.from(panel.querySelectorAll<HTMLImageElement>("[data-cap] img")));
   const slots = new Map<HTMLElement, number>();
   const count = caps.length;
-  const half = Math.floor((count - 1) / 2);
   let current = 0;
   let timer = 0;
   let stopped = false;
   let paused = false;
   const animations: Animation[] = [];
 
-  /** La place de chaque écran : 0 au centre, ±1 de côté, ±2 caché. Un écran qui revient par la droite y est
-   *  d'abord posé sans transition (il ne traverse jamais l'éventail). */
+  /** La place de chaque écran : 0 affiché, -1 sorti à gauche, 1 en attente à droite. L'écran sorti revient en
+   *  attente sans transition (il ne retraverse jamais le téléphone). */
   function layout(instant: boolean) {
     const jumped: HTMLElement[] = [];
     caps.forEach((cap, i) => {
       const o = (((i - current) % count) + count) % count;
-      const slot = Math.max(-2, Math.min(2, o <= half ? o : o - count));
+      const slot = o === 0 ? 0 : o === count - 1 ? -1 : 1;
       const previous = slots.get(cap);
       if (instant || (previous !== undefined && slot - previous > 1)) {
         cap.style.transition = "none";
-        cap.setAttribute("data-s", instant ? String(slot) : "2");
+        cap.setAttribute("data-s", instant ? String(slot) : "1");
         jumped.push(cap);
       }
       slots.set(cap, slot);
@@ -86,19 +86,16 @@ export function playGallery(panel: Element, reduced: boolean): PreviewController
 
   layout(true);
   if (!reduced && count > 1) {
-    caps.forEach((cap) => {
-      const slot = slots.get(cap) ?? 2;
-      const inner = cap.firstElementChild;
-      if (Math.abs(slot) > 1 || !inner) return;
+    const first = caps[current];
+    if (first)
       animations.push(
-        inner.animate([{ opacity: 0, transform: "translateY(16px) scale(.94)" }, { opacity: 1, transform: "none" }], {
-          duration: 620,
-          delay: 40 + Math.abs(slot) * 90,
+        first.animate([{ opacity: 0, transform: "translateY(10px) scale(.96)" }, { opacity: 1, transform: "none" }], {
+          duration: 560,
+          delay: 40,
           easing: CSS_EASE.expo,
           fill: "backwards",
         }),
       );
-    });
     arm(FIRST_MS);
   }
 

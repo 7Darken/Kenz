@@ -468,12 +468,12 @@
 .astre[data-vise] .hal { opacity: 1; }
 .astre[data-vise] .aig { scale: 1.5; }
 .astre[data-vise] .orb { opacity: .9; transform: rotateX(72deg) rotateZ(-18deg) scale(1); }
-.astres[data-survol] .astre:not([data-vise]) { opacity: .5; filter: saturate(.6) brightness(.8); }
+.astres[data-survol] .astre:not([data-vise]) { opacity: .62; filter: saturate(.7) brightness(.85); }
 .astres[data-survol] .fils { opacity: .45; }
 /* La fiche prend le relais du nom de l'astre survolé */
 .astre[data-vise] .etiq { opacity: 0; }
 
-/* Positions, petit écran : un zigzag vertical, le nom sous chaque astre */
+/* Positions, tablette (le mobile et l'ordinateur les remplacent) : un zigzag vertical, le nom sous chaque astre */
 .astre:nth-child(1) { --x: 27; --y: 19; }
 .astre:nth-child(2) { --x: 73; --y: 28.5; }
 .astre:nth-child(3) { --x: 27; --y: 38; }
@@ -507,32 +507,52 @@
   transition: opacity 1s var(--ios) 1.4s;
 }
 
-/* ---------- La fiche holographique (survol, focus clavier, premier toucher) ----------
-   Verre sombre teinté de la couleur de l'app, liseré lumineux fin, trame de balayage à peine visible. */
+/* ---------- La fiche holographique (survol, focus clavier, toucher) ----------
+   Compacte : un téléphone (une vraie capture App Store à la fois), le nom, le domaine, une phrase, « Explorer ».
+   Verre sombre teinté de la couleur de l'app, liseré lumineux fin, trame de balayage à peine visible. Le moteur
+   la pose (translate) et choisit sa forme : data-mode="float" (dans le vide près de l'astre) ou "sheet" (une
+   feuille en bas de la scène, sous les astres ; --ek y règle la taille du téléphone). Un panneau par app, tous
+   dans la même grille : d'une app à l'autre, le conteneur glisse, les panneaux et la couleur se fondent. */
+@property --kz-fiche-c {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #6A4BE6;
+}
+
 .fiche {
+  --ek: 1;
+  --pw: calc(104px * var(--ek));                    /* le téléphone (captures 600 × 1305) */
+  --ph: calc(226px * var(--ek));
+  --pr: calc(13px * var(--ek));
+  --c: var(--kz-fiche-c);
   position: absolute;
-  z-index: 6;
+  z-index: 7;
   left: 0;
   top: 0;
-  display: none;
-  gap: 16px;
-  padding: 14px;
+  display: grid;
+  grid-template-columns: var(--pw) 158px;
+  grid-template-areas: "ecran txt";
+  column-gap: 14px;
+  padding: 12px;
   border-radius: 20px;
   color: var(--ink);
-  background: linear-gradient(155deg, color-mix(in srgb, var(--c, #6A4BE6) 26%, rgba(14, 16, 32, .8)), rgba(8, 10, 22, .84) 72%);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--c) 26%, rgba(14, 16, 32, .8)), rgba(8, 10, 22, .84) 72%);
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--c, #6A4BE6) 55%, rgba(255, 255, 255, .38)),
+    inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, rgba(255, 255, 255, .38)),
     inset 0 1px 0 rgba(255, 255, 255, .14),
-    0 0 34px -8px color-mix(in srgb, var(--c, #6A4BE6) 60%, transparent),
+    0 0 34px -8px color-mix(in srgb, var(--c) 60%, transparent),
     0 30px 60px -30px rgba(0, 0, 0, .9);
   -webkit-backdrop-filter: blur(16px) saturate(1.3);
   backdrop-filter: blur(16px) saturate(1.3);
-  pointer-events: auto;
+  visibility: hidden;
+  pointer-events: none;
   cursor: pointer;
+  transition: --kz-fiche-c .45s var(--ios);
 }
 
 .fiche[data-on] {
-  display: flex;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .fiche::before {
@@ -545,11 +565,6 @@
   background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px);
 }
 
-/* Une fiche par app, rendue à sa première ouverture ; seule celle en cours est affichée */
-.panel {
-  display: contents;
-}
-
 .ficheScan {
   position: absolute;
   left: 0;
@@ -560,27 +575,130 @@
   margin-top: -1px;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c, #6A4BE6) 40%, #fff) 18%, #fff 50%, color-mix(in srgb, var(--c, #6A4BE6) 40%, #fff) 82%, transparent);
-  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--c, #6A4BE6) 60%, transparent);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 40%, #fff) 18%, #fff 50%, color-mix(in srgb, var(--c) 40%, #fff) 82%, transparent);
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--c) 60%, transparent);
 }
 
-/* Le mini-écran (Zenko) : la mini-animation de l'app en boucle, puis sa vraie capture */
-.ficheEcran {
+/* Le cadre du téléphone : le même d'une app à l'autre (sa lueur prend la couleur qui se fond) */
+.ficheCadre {
+  grid-area: ecran;
+  width: var(--pw);
+  height: var(--ph);
+  border-radius: var(--pr);
+  background: #0B0B10;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, .16),
+    0 0 0 3px rgba(0, 0, 0, .55),
+    0 14px 26px -12px rgba(0, 0, 0, .85),
+    0 0 30px -10px color-mix(in srgb, var(--c) 75%, transparent);
+}
+
+/* Un panneau par app (rendu d'emblée : sa phrase décrit l'astre) ; seul celui de l'astre visé se voit */
+.panel {
+  display: contents;
+}
+
+/* L'entrant attend que le sortant se soit presque effacé : les deux textes ne se mêlent pas */
+.ficheEcran,
+.ficheTxt {
   position: relative;
-  flex: none;
-  width: 110px;
-  height: 220px;
+  z-index: 1;
+  transition: opacity .28s var(--ios) .11s, translate .5s var(--expo) .06s;
+}
+
+.panel:not([data-on]) > .ficheEcran,
+.panel:not([data-on]) > .ficheTxt {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .12s var(--out), translate .3s var(--out), visibility 0s linear .12s;
+}
+
+.panel:not([data-on]) > .ficheTxt {
+  translate: 0 5px;
+}
+
+/* La fiche était cachée : le panneau et la couleur se posent sans fondu */
+.fiche[data-net],
+.fiche[data-net] .ficheEcran,
+.fiche[data-net] .ficheTxt {
+  transition: none;
+}
+
+/* L'écran : les captures, une à la fois (le moteur pose data-s : 0 affichée, -1 sortie, 1 en attente) */
+.ficheEcran {
+  grid-area: ecran;
+  width: var(--pw);
+  height: var(--ph);
   overflow: hidden;
   isolation: isolate;
-  border-radius: 17px;
-  background: #0B0B10;
-  container-type: size;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .16), 0 0 0 3px rgba(0, 0, 0, .55), 0 14px 26px -12px rgba(0, 0, 0, .85);
+  border-radius: var(--pr);
+  background: linear-gradient(165deg, color-mix(in srgb, var(--c) 34%, #1A1C2E), #0C0E1A 78%);
 }
 
-.ficheVues {
+.cap {
   position: absolute;
   inset: 0;
+  transition: transform .8s var(--expo), opacity .55s var(--ios);
+}
+
+.cap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 0%;
+  opacity: 0;
+  transition: opacity .45s var(--ios);
+  -webkit-user-drag: none;
+}
+
+.cap img[data-pret] {
+  opacity: 1;
+}
+
+.cap[data-s="0"] { z-index: 2; }
+.cap[data-s="-1"] { opacity: 0; transform: translateX(-24%) scale(.94); }
+.cap[data-s="1"] { opacity: 0; transform: translateX(24%) scale(.94); }
+
+/* Où l'on en est dans la série */
+.galPts {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 6px;
+  translate: -50% 0;
+  display: flex;
+  gap: 4px;
+  padding: 3px 5px;
+  border-radius: 99px;
+  background: rgba(6, 8, 16, .5);
+}
+
+.galPts i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(244, 239, 230, .42);
+  transition: width .6s var(--expo), background-color .6s var(--ios);
+}
+
+.galPts i[data-on] {
+  width: 11px;
+  background: #F4EFE6;
+}
+
+/* Zenko : la mini-animation (dessinée pour un écran de 104 px, mise à l'échelle), puis sa vraie capture */
+.ficheVues {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 104px;
+  height: 226px;
+  container-type: size;
+  transform: scale(var(--ek));
+  transform-origin: 0 0;
 }
 
 .ficheCap {
@@ -596,45 +714,45 @@
   opacity: 0;
 }
 
-/* Sans mini-animation : la capture seule */
-.ficheCapAlone {
-  opacity: 1;
-}
-
+/* Le texte : le nom, le domaine, la phrase, « Explorer » */
 .ficheTxt {
-  position: relative;
-  z-index: 1;
+  grid-area: txt;
   display: flex;
   flex-direction: column;
-  width: 176px;
-  padding: 6px 2px 2px;
+  min-width: 0;
+  padding: 4px 0 0;
+}
+
+.ficheTete {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
 }
 
 .ficheNom {
-  margin: 0;
   font-family: var(--f-title);
   font-weight: 600;
-  font-size: 36px;
+  font-size: 30px;
   line-height: .95;
   letter-spacing: -.01em;
   color: var(--ink);
-  text-shadow: 0 0 20px color-mix(in srgb, var(--c, #6A4BE6) 50%, transparent);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--c) 50%, transparent);
 }
 
 .ficheDom {
-  margin: 5px 0 0;
+  margin-top: 4px;
   font-family: var(--f-word);
   font-style: italic;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.2;
-  color: color-mix(in oklab, var(--c, #6A4BE6) 42%, #F4EFE6);
+  color: color-mix(in oklab, var(--c) 42%, #F4EFE6);
 }
 
 .ficheLigne {
-  margin: 12px 0 0;
-  font-size: 14px;
-  line-height: 1.45;
-  color: rgba(244, 239, 230, .82);
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.42;
+  color: rgba(244, 239, 230, .86);
   text-wrap: pretty;
 }
 
@@ -643,7 +761,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 38px;
+  height: 36px;
   margin-top: auto;
   padding: 0 14px 0 16px;
   border-radius: 999px;
@@ -653,7 +771,7 @@
   text-decoration: none;
   color: #0B0D18;
   background: #F4EFE6;
-  box-shadow: 0 0 24px -4px color-mix(in srgb, var(--c, #6A4BE6) 65%, transparent);
+  box-shadow: 0 0 24px -4px color-mix(in srgb, var(--c) 65%, transparent);
   transition: transform .5s var(--expo);
 }
 
@@ -663,7 +781,7 @@
   transition: translate .5s var(--expo);
 }
 
-.ficheCta:hover svg {
+.fiche:hover .ficheCta svg {
   translate: 2px 0;
 }
 
@@ -671,165 +789,32 @@
   transform: scale(.97);
 }
 
-/* ---------- La fiche en galerie (Oshii, Wado, Sago, Croc, Miru) : les vrais écrans App Store ----------
-   En haut, un éventail de trois écrans (le moteur pose data-s : 0 au centre, ±1 de côté, ±2 caché) ; toutes les
-   2,6 s, celui de droite passe au centre. Dessous : le nom et le domaine sur une ligne, deux ou trois phrases. */
-.ficheGal {
-  --gh: clamp(236px, 42svh, 356px);                  /* hauteur de l'éventail */
-  --ch: calc(var(--gh) - 24px);                      /* hauteur d'un écran (1206 × 2622) */
-  z-index: 7;
-  flex-direction: column;
-  gap: 0;
-  width: 352px;
-  padding: 12px 18px 18px;
+/* La feuille : toute la largeur utile, en bas de la scène ; le nom et le domaine sur une ligne */
+.fiche[data-mode="sheet"] {
+  width: min(460px, calc(100vw - 24px));
+  grid-template-columns: var(--pw) minmax(0, 1fr);
+  padding: 12px 14px 12px 12px;
   border-radius: 22px;
 }
 
-.ficheGalerie {
-  position: relative;
-  z-index: 2;                                        /* au-dessus de la trame : les écrans restent nets */
-  display: block;
-  height: var(--gh);
-  margin: 0 -18px;
-  clip-path: inset(-40px 0 -20px 0);                 /* un écran qui sort ou entre ne déborde jamais */
+.fiche[data-mode="sheet"] .ficheTete {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
 }
 
-.gal {
-  position: absolute;
-  inset: 0;
-}
+.fiche[data-mode="sheet"] .ficheNom { font-size: 26px; }
+.fiche[data-mode="sheet"] .ficheDom { margin: 0; font-size: 16px; }
+.fiche[data-mode="sheet"] .ficheLigne { margin-top: 6px; font-size: 13px; line-height: 1.4; }
+.fiche[data-mode="sheet"] .ficheCta { height: 40px; margin-top: auto; padding: 0 16px 0 18px; }
+.fiche[data-mode="sheet"] .galPts { display: none; }
 
-/* La lueur de l'app derrière l'éventail */
-.gal::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 46%;
-  width: 78%;
-  height: 62%;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--c, #6A4BE6) 62%, transparent), transparent);
-  opacity: .6;
-  filter: blur(10px);
-  pointer-events: none;
-}
-
-.cap {
-  position: absolute;
-  left: 50%;
-  top: 2px;
-  width: calc(var(--ch) * .46);
-  height: var(--ch);
-  margin-left: calc(var(--ch) * -.23);
-  transform-origin: 50% 84%;
-  transition: transform .95s var(--expo), opacity .6s var(--ios), filter .95s var(--expo);
-}
-
-.capIn {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: calc(var(--ch) * .036);
-  background: linear-gradient(165deg, color-mix(in srgb, var(--c, #6A4BE6) 34%, #1A1C2E), #0C0E1A 78%);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, .16),
-    0 22px 34px -16px rgba(0, 0, 0, .95),
-    0 0 34px -12px color-mix(in srgb, var(--c, #6A4BE6) 70%, transparent);
-}
-
-.capIn img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  object-position: 50% 0%;
-  opacity: 0;
-  transition: opacity .45s var(--ios);
-}
-
-.capIn img[data-pret] {
-  opacity: 1;
-}
-
-.cap[data-s="0"] { z-index: 3; }
-.cap[data-s="-1"],
-.cap[data-s="1"] { z-index: 2; filter: brightness(.56) saturate(.82); }
-.cap[data-s="-1"] { transform: translateX(-60%) scale(.8) rotate(-5deg); }
-.cap[data-s="1"] { transform: translateX(60%) scale(.8) rotate(5deg); }
-.cap[data-s="-2"],
-.cap[data-s="2"] { z-index: 1; opacity: 0; filter: brightness(.35) saturate(.7); }
-.cap[data-s="-2"] { transform: translateX(-92%) scale(.64) rotate(-9deg); }
-.cap[data-s="2"] { transform: translateX(92%) scale(.64) rotate(9deg); }
-
-/* La grande fiche passe devant l'invitation, qui s'efface tant qu'elle est ouverte */
-.scene[data-arrive] .ficheGal[data-on] ~ .indice {
+/* La fiche (ou la feuille) prend la place de l'invitation, qui s'efface tant qu'elle est ouverte */
+.scene[data-arrive] .fiche[data-on] ~ .indice {
   opacity: 0;
   transition: opacity .2s var(--ios);
 }
-
-/* Où l'on en est dans la série */
-.galPts {
-  position: absolute;
-  left: 50%;
-  bottom: 3px;
-  translate: -50% 0;
-  display: flex;
-  gap: 5px;
-}
-
-.galPts i {
-  display: block;
-  width: 5px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(244, 239, 230, .26);
-  transition: width .6s var(--expo), background-color .6s var(--ios);
-}
-
-.galPts i[data-on] {
-  width: 18px;
-  background: color-mix(in oklab, var(--c, #6A4BE6) 35%, #F4EFE6);
-}
-
-/* Le texte, sous l'éventail */
-.ficheGal .ficheTxt { width: auto; padding: 14px 2px 0; }
-.ficheTete { display: contents; }
-.ficheGal .ficheTete { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 11px; }
-.ficheGal .ficheNom { font-size: 34px; }
-.ficheGal .ficheDom { margin: 0; font-size: 18px; }
-
-.fichePts {
-  display: grid;
-  gap: 6px;
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.fichePts li {
-  position: relative;
-  padding-left: 17px;
-  font-size: 13.5px;
-  line-height: 1.4;
-  color: rgba(244, 239, 230, .84);
-  text-wrap: pretty;
-}
-
-.fichePts li::before {
-  content: "";
-  position: absolute;
-  left: 1px;
-  top: calc(.7em - 1px);
-  width: 8px;
-  height: 1.5px;
-  border-radius: 1px;
-  background: color-mix(in oklab, var(--c, #6A4BE6) 40%, #F4EFE6);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--c, #6A4BE6) 80%, transparent);
-}
-
-.ficheGal .ficheCta { margin-top: 16px; }
 
 /* La légende de HUD : un fil de lumière de l'astre à la fiche */
 .legende {
@@ -957,29 +942,21 @@
 .scene[data-arrive][data-saut] .neb,
 .scene[data-arrive][data-saut] .pous { transition: transform .76s var(--cam); }
 
-/* ---------- Mobile ---------- */
+/* ---------- Mobile : une constellation de poche (trois colonnes, deux rangs en zigzag), qui laisse sous elle la
+   place de la feuille. Les rangs se placent en pixels sous la signature, et respirent sur les grands écrans. ---------- */
 @media (max-width: 599px) {
-  .fiche { gap: 12px; padding: 11px; border-radius: 18px; }
-  .ficheEcran { width: 84px; height: 168px; border-radius: 13px; }
-  .ficheTxt { width: 118px; padding-top: 3px; }
-  .ficheNom { font-size: 27px; }
-  .ficheDom { font-size: 15.5px; margin-top: 3px; }
-  .ficheLigne { margin-top: 8px; font-size: 12.5px; line-height: 1.38; }
-  .ficheCta { height: 34px; padding: 0 12px 0 14px; font-size: 13px; }
-  /* La galerie au-dessus ou au-dessous de l'astre, sur toute la largeur utile */
-  .ficheGal {
-    --gh: clamp(196px, 31svh, 262px);
-    width: min(340px, calc(100vw - 24px));
-    padding: 10px 14px 14px;
-    border-radius: 20px;
+  .scene {
+    --zt: calc(var(--haut) + 84px);                    /* le centre du premier rang, sous la signature */
+    --dz: clamp(40px, 7%, 64px);                       /* le zigzag */
+    --rg: calc(var(--dz) + clamp(132px, 17%, 190px));  /* d'un rang à l'autre (le nom du dessus passe) */
   }
-  .ficheGal .ficheGalerie { margin: 0 -14px; }
-  .ficheGal .ficheTxt { padding-top: 11px; }
-  .ficheGal .ficheNom { font-size: 28px; }
-  .ficheGal .ficheDom { font-size: 16px; }
-  .fichePts { gap: 5px; margin-top: 9px; }
-  .fichePts li { padding-left: 15px; font-size: 12.5px; line-height: 1.36; }
-  .ficheGal .ficheCta { margin-top: 12px; }
+  .astre { top: calc(var(--zt) + var(--ry) * var(--rg) + var(--zy) * var(--dz)); }
+  .astre:nth-child(1) { --x: 20; --ry: 0; --zy: 0; }
+  .astre:nth-child(2) { --x: 50; --ry: 0; --zy: 1; }
+  .astre:nth-child(3) { --x: 80; --ry: 0; --zy: 0; }
+  .astre:nth-child(4) { --x: 80; --ry: 1; --zy: 1; }
+  .astre:nth-child(5) { --x: 50; --ry: 1; --zy: 0; }
+  .astre:nth-child(6) { --x: 20; --ry: 1; --zy: 1; }
 }
 
 /* ---------- Tablette ---------- */
@@ -1030,8 +1007,13 @@
   .astre { transition: opacity .2s linear; }
   .ficheCta,
   .ficheCta svg { transition: none; }
-  /* La galerie : un éventail fixe */
+  /* La fiche : pas de glissé ni de rotation des captures, des fondus */
+  .fiche { transition: none; }
+  .ficheEcran,
+  .ficheTxt,
+  .panel:not([data-on]) > .ficheEcran,
+  .panel:not([data-on]) > .ficheTxt { translate: none; transition-property: opacity, visibility; }
   .cap,
-  .capIn img,
+  .cap img,
   .galPts i { transition: none; }
 }
