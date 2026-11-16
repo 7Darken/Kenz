@@ -191,9 +191,7 @@
   color: var(--accent);
 }
 
-/* Le total des utilisateurs, toutes apps confondues : un grand chiffre (la police des titres) et sa légende en petit.
-   Pendant le compte (data-run, posé par apps-total), le total rendu réserve la largeur et le chiffre qui monte se
-   pose dessus : rien ne bouge autour. */
+/* Le total des utilisateurs, toutes apps confondues : un grand chiffre (la police des titres) et sa légende en petit. */
 /* La zone du total : sous la signature, alignée sur son texte (mobile, tablette) ; en haut à droite de la scène
    sur ordinateur, comme le chiffre clé de la section */
 .totalZone {
@@ -231,22 +229,32 @@
   letter-spacing: 0;
 }
 
-.totalNum {
-  display: inline-grid;
+/* Un chiffre : coupé juste sous sa ligne, il en monte à sa première apparition (data-rise, posé par apps-total),
+   l'un après l'autre, sans flou. Le découpage (clip-path) ne touche ni la place ni la ligne de base. */
+.digit {
+  display: inline-block;
+  clip-path: inset(-.3em -.2em 0 -.2em);
 }
 
-.totalFin,
-.totalRun {
-  grid-area: 1 / 1;
+.digitIn {
+  display: inline-block;
 }
 
-.totalRun,
-.total[data-run] .totalFin {
-  visibility: hidden;
+.total[data-rise="armed"] .digitIn {
+  transform: translateY(105%);
 }
 
-.total[data-run] .totalRun {
-  visibility: visible;
+.total[data-rise="go"] .digitIn {
+  transition: transform .9s var(--expo) var(--delay);   /* RISE_MS, apps-total */
+}
+
+/* « + » et « utilisateurs » se posent pendant que les derniers chiffres arrivent */
+.total[data-rise="armed"] :is(.totalAff, .totalLeg) {
+  opacity: 0;
+}
+
+.total[data-rise="go"] :is(.totalAff, .totalLeg) {
+  transition: opacity .8s var(--ios) .35s;
 }
 
 .totalLeg {

@@ -1,15 +1,15 @@
 "use client";
 
 /**
- * Le total des utilisateurs, toutes apps confondues : sous l'en-tête de la scène, jamais près d'un astre (ce n'est le
- * chiffre d'aucune app). À sa première apparition de la visite, il monte de 0 au total (1,6 s, expo.out), puis
- * `onDone` : la scène allume tous les astres ensemble. Sans JS, en mouvement réduit ou déjà vu : le total, tout de suite.
- * Le total rendu par React reste en place (il réserve la largeur, il suit la langue) ; le chiffre qui monte est un
- * calque écrit à la main par-dessus, le temps du compte. Les lecteurs d'écran lisent la phrase complète, jamais lui.
+ * Le total des utilisateurs, toutes apps confondues : jamais près d'un astre (ce n'est le chiffre d'aucune app).
+ * À sa première apparition de la visite, une micro-animation discrète : chaque chiffre monte de sous sa ligne de base,
+ * l'un après l'autre de gauche à droite (sans flou) ; « + » et « utilisateurs » se posent ensuite. Puis `onDone` : la
+ * scène allume tous les astres ensemble. Tout se joue en CSS (une transition de `transform` par chiffre).
+ * Sans JS, en mouvement réduit, déjà vu ou déjà à l'écran au chargement : le total, tout de suite.
+ * Les lecteurs d'écran lisent la phrase complète.
  */
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 
-import { gsap } from "@/design-system/motion/gsap";
 import { useInView } from "@/design-system/motion/use-in-view";
 import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import type { Lang } from "@/i18n/config";
@@ -20,7 +20,22 @@ import styles from "./apps-space.module.css";
 /** Le format des nombres : espace fine en français (13 000), virgule en anglais (13,000). */
 const LOCALES: Readonly<Record<Lang, string>> = { fr: "fr-FR", en: "en-US" };
 const SEEN_KEY = "kz-apps-total";
-const COUNT_S = 1.6;
+const RISE_MS = 900; // la montée d'un chiffre (même valeur que le CSS)
+const STAGGER_MS = 70; // d'un chiffre au suivant, de gauche à droite
+
+type Char = { ch: string; style?: undefined } | { ch: string; style: CSSProperties };
+
+/** Les caractères du total ; un chiffre porte son retard (`--delay`). */
+function toChars(total: string): { chars: Char[]; lastDelay: number } {
+  let k = 0;
+  const chars = [...total].map((ch): Char => {
+    if (!/\d/.test(ch)) return { ch };
+    const delay = k * STAGGER_MS;
+    k += 1;
+    return { ch, style: { "--delay": `${delay}ms` } as CSSProperties };
+  });
+  return { chars, lastDelay: Math.max(0, k - 1) * STAGGER_MS };
+}
 
 function seenBefore() {
   try {
@@ -34,13 +49,19 @@ function markSeen() {
   try {
     window.sessionStorage.setItem(SEEN_KEY, "1");
   } catch {
-    /* stockage indisponible : le compte ne se rejoue pas pour la page */
+    /* stockage indisponible : l'animation ne se rejoue pas pour la page */
   }
+}
+
+/** Déjà (même en partie) à l'écran : on n'anime pas un chiffre que le visiteur a sous les yeux. */
+function onScreen(el: Element) {
+  const r = el.getBoundingClientRect();
+  return r.bottom > 0 && r.top < window.innerHeight;
 }
 
 interface AppsTotalProps {
   value: number;
-  /** Le compte est fini : l'ensemble s'allume. */
+  /** L'animation est finie (ou n'a pas lieu) : l'ensemble s'allume. */
   onDone: () => void;
 }
 
@@ -48,66 +69,65 @@ export function AppsTotal({ value, onDone }: AppsTotalProps) {
   const { lang, t } = useLanguage();
   const s = t.pro.space.users;
   const rootRef = useRef<HTMLParagraphElement>(null);
-  const runRef = useRef<HTMLSpanElement>(null);
-  /** init : rien décidé ; armed : le 0 attend d'être vu ; done : le compte est joué (ou n'a pas lieu). */
+  /** init : rien décidé ; armed : les chiffres attendent d'être vus ; done : joué (ou n'a pas lieu). */
   const phase = useRef<"init" | "armed" | "done">("init");
   const reduced = useReducedMotion();
   // Entièrement visible, bien dans l'écran : la scène s'est déjà allumée autour de lui.
-  const inView = useInView(rootRef, { threshold: 1, rootMargin: "0px 0px -20% 0px" });
-  const fmt = useMemo(() => new Intl.NumberFormat(LOCALES[lang]), [lang]);
-  const total = fmt.format(value);
+  const inView = useInView(rootRef, { threshold: 1, rootMargin: "0px 0px -15% 0px" });
+  const total = useMemo(() => new Intl.NumberFormat(LOCALES[lang]).format(value), [lang, value]);
+  const { chars, lastDelay } = useMemo(() => toChars(total), [total]);
   const [before, after = ""] = s.amount.split("{n}");
 
   useEffect(() => {
     const root = rootRef.current;
-    const run = runRef.current;
-    if (!root || !run || phase.current === "done") return;
+    if (!root || phase.current === "done") return;
     if (phase.current === "init") {
-      if (reduced || seenBefore()) {
+      if (reduced || seenBefore() || onScreen(root)) {
         phase.current = "done";
         return;
       }
       phase.current = "armed";
+      root.dataset.rise = "armed";
     }
     if (reduced) {
       phase.current = "done";
-      root.removeAttribute("data-run");
+      delete root.dataset.rise;
       return;
     }
-    run.textContent = fmt.format(0);
-    root.setAttribute("data-run", "");
     if (!inView) return;
     phase.current = "done";
     markSeen();
-    const count = { v: 0 };
-    const tween = gsap.to(count, {
-      v: value,
-      duration: COUNT_S,
-      ease: "expo.out",
-      onUpdate: () => {
-        run.textContent = fmt.format(Math.round(count.v));
-      },
-      onComplete: () => {
-        root.removeAttribute("data-run");
+    // Une image entre la position de départ et le départ : la transition part bien de là.
+    let timer = 0;
+    const frame = requestAnimationFrame(() => {
+      root.dataset.rise = "go";
+      timer = window.setTimeout(() => {
+        delete root.dataset.rise;
         onDone();
-      },
+      }, RISE_MS + lastDelay + 60);
     });
     // Interrompu (langue, mouvement réduit, démontage) : le total, tout de suite.
     return () => {
-      tween.kill();
-      root.removeAttribute("data-run");
+      cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+      delete root.dataset.rise;
     };
-  }, [inView, reduced, fmt, value, onDone]);
+  }, [inView, reduced, lastDelay, onDone]);
 
   return (
     <p ref={rootRef} className={styles.total} aria-live="off">
       <span className="sr">{format(s.full, { n: total })}</span>
       <span className={styles.totalVal} aria-hidden="true">
         {before ? <span className={styles.totalAff}>{before}</span> : null}
-        <span className={styles.totalNum}>
-          <span className={styles.totalFin}>{total}</span>
-          <span className={styles.totalRun} ref={runRef} />
-        </span>
+        {chars.map(({ ch, style }, i) =>
+          style ? (
+            <span key={i} className={styles.digit} style={style}>
+              <span className={styles.digitIn}>{ch}</span>
+            </span>
+          ) : (
+            <span key={i}>{ch}</span>
+          ),
+        )}
         {after ? <span className={styles.totalAff}>{after}</span> : null}
       </span>
       <span className={styles.totalLeg} aria-hidden="true">
