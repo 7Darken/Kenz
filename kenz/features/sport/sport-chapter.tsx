@@ -12,6 +12,7 @@ import { Section } from "@/design-system/components/section";
 import { Words } from "@/design-system/components/words";
 import { Courses } from "@/features/courses";
 import { T } from "@/i18n/text";
+import { SportBleed } from "./sport-bleed";
 import styles from "./sport-chapter.module.css";
 
 const TITLE_ID = "sport-t";
@@ -19,6 +20,7 @@ const TITLE_ID = "sport-t";
 export function SportChapter() {
   return (
     <Section id="sport" aura="gauche" fil="none" aria-labelledby={TITLE_ID} className={styles.sport}>
+      <SportBleed />
       <Container className={styles.inner}>
         <header className={styles.head}>
           <Reveal variant="fade" as="p" className={styles.universe}>

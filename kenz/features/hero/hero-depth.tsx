@@ -2,7 +2,7 @@
 
 /** Les objets 3D du hero (features/profondeur) : ils entrent après le hero. */
 import { Profondeur } from "@/features/profondeur";
-import { useHeroEntered } from "./hero-director";
+import { useHeroEntered, useHeroLag } from "./hero-director";
 import type { HeroVariant } from "./hero-variants";
 import styles from "./hero.module.css";
 
@@ -11,5 +11,6 @@ const AVOID = `[data-hero-avoid], .${styles.line}`;
 
 export function HeroDepth({ variant }: { variant: HeroVariant }) {
   const entered = useHeroEntered();
-  return <Profondeur series={variant} ready={entered} avoidSelector={AVOID} />;
+  const lag = useHeroLag();
+  return <Profondeur series={variant} ready={entered} readyLag={lag} avoidSelector={AVOID} />;
 }

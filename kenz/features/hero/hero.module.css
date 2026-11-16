@@ -1,7 +1,8 @@
 /* ==========================================================================
    Le hero (pro.html A0, createur.html C0) : le paysage, le portrait détouré, l'arche de lumière derrière lui.
    Pile, du fond vers l'avant : paysage (0) < calque `behind` (0) < scène (1) < voile Pro (2) < texte (3).
-   L'arrivée : data-in sur le chapitre (posé par HeroDirector) ; data-arriving après un passage ou une porte,
+   L'arrivée : des animations CSS, jouées dès le premier affichage (sans attendre React) ; data-hold les retient
+   pendant un passage, data-in les libère (posés par HeroDirector) ; data-arriving après un passage ou une porte,
    data-dive après la plongée (Créateur). L'état final est celui du CSS sans .js.
    ========================================================================== */
 
@@ -184,7 +185,7 @@
 }
 
 .line {
-  --wd: 1.05s;
+  --wd: calc(1.05s - var(--hero-lag, 0s));
   margin: 0 0 30px;
   max-width: 22ch;
   font-size: clamp(19px, 1.7vw, 24px);
@@ -270,8 +271,9 @@
 
 /* L'arche : un halo de lumière derrière le portrait, dessinée par le fil (un peu après le portrait) */
 .hero .arch {
-  --fil-delay: .45s;
-  --shadow-delay: .9s;
+  --fil-delay: calc(.45s - var(--hero-lag, 0s));
+  --shadow-delay: calc(.9s - var(--hero-lag, 0s));
+  --floor-delay: calc(0s - var(--hero-lag, 0s));
   position: absolute;
   z-index: 0;
   left: 50%;
@@ -342,7 +344,13 @@
   }
 }
 
-/* ---------- L'arrivée ---------- */
+/* ---------- L'arrivée ----------
+   Jouée en CSS dès le premier affichage, sans attendre React. Le portrait (l'élément du LCP : le paysage, plein
+   écran, n'est pas retenu) part de 1 % d'opacité sous son flou, invisible à l'œil : il est peint tout de suite, et
+   non à la fin de son fondu. Pendant un passage, HeroDirector pose data-hold avant l'affichage : tout attend
+   data-in (le voile levé).
+   La phrase, le fil de l'arche et les objets 3D suivent React : --hero-lag (le temps déjà écoulé de l'arrivée)
+   retire ce retard de leurs délais. */
 @keyframes kzIn {
   from { opacity: 0; filter: blur(8px); }
   to { opacity: 1; filter: none; }
@@ -351,6 +359,21 @@
 @keyframes kzFade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes heroSettle {
+  from { transform: scale(1.07); }
+  to { transform: none; }
+}
+
+@keyframes heroStage {
+  from { opacity: .01; filter: blur(10px); }
+  to { opacity: 1; filter: none; }
+}
+
+@keyframes heroRise {
+  from { transform: translateY(3%); }
+  to { transform: none; }
 }
 
 @keyframes ttlMain {
@@ -365,54 +388,42 @@
 }
 
 :global(.js) .bgIn {
-  opacity: 0;
-  transform: scale(1.07);
-}
-
-.hero[data-in] .bgIn {
-  opacity: 1;
-  transform: none;
-  transition: opacity 1.6s var(--expo), transform 2.6s var(--expo);
+  animation: kzFade 1.6s var(--expo) both, heroSettle 2.6s var(--expo) both;
 }
 
 :global(.js) .stage {
-  opacity: 0;
-  filter: blur(10px);
-  transform: translateY(3%);
-}
-
-.hero[data-in] .stage {
-  opacity: 1;
-  filter: none;
-  transform: none;
-  transition: opacity 1.4s var(--expo) .3s, filter 1.4s var(--expo) .3s, transform 1.8s var(--expo) .3s;
+  animation: heroStage 1.4s var(--expo) var(--sd, .3s) both, heroRise 1.8s var(--expo) var(--sd, .3s) both;
 }
 
 /* Après la plongée : le portrait attend la fin de la descente */
-.hero.createur[data-dive][data-in] .stage {
-  transition-delay: .9s;
+.hero.createur[data-dive] .stage {
+  --sd: .9s;
 }
 
 :global(.js) .ttlMain {
-  clip-path: inset(-25% 100% -30% -8%);
-}
-
-.hero[data-in] .ttlMain {
   animation: ttlMain 1.7s var(--expo) var(--td, .6s) both;
 }
 
-.hero[data-in] .ttlGhost {
+:global(.js) .ttlGhost {
   animation: ttlGhost 1.5s var(--expo) calc(var(--td, .6s) - .18s) both;
 }
 
 :global(.js) .down {
-  opacity: 0;
+  animation: kzIn 1s var(--expo) var(--ad, 1.85s) both;
 }
 
-.hero[data-in] .down {
-  opacity: 1;
-  animation: kzIn 1s var(--expo) both;
-  animation-delay: var(--ad, 1.85s);
+/* Retenue : un passage (data-hold), ou une page rechargée par un passage (data-kz-arrive, posé avant l'affichage) */
+.hero[data-hold]:not([data-in]) .bgIn,
+.hero[data-hold]:not([data-in]) .stage,
+.hero[data-hold]:not([data-in]) .ttlMain,
+.hero[data-hold]:not([data-in]) .ttlGhost,
+.hero[data-hold]:not([data-in]) .down,
+:global(html[data-kz-arrive]) .hero:not([data-in]) .bgIn,
+:global(html[data-kz-arrive]) .hero:not([data-in]) .stage,
+:global(html[data-kz-arrive]) .hero:not([data-in]) .ttlMain,
+:global(html[data-kz-arrive]) .hero:not([data-in]) .ttlGhost,
+:global(html[data-kz-arrive]) .hero:not([data-in]) .down {
+  animation-play-state: paused;
 }
 
 /* Créateur, après un passage ou la porte : le voile s'est levé, tout arrive plus vite */
@@ -436,13 +447,9 @@
     filter: none !important;
   }
 
-  :global(.js) .ttlMain {
-    clip-path: none;
-  }
-
-  .hero[data-in] .ttlMain,
-  .hero[data-in] .ttlGhost,
-  .hero[data-in] .down {
+  :global(.js) .ttlMain,
+  :global(.js) .ttlGhost,
+  :global(.js) .down {
     animation-name: kzFade !important;
   }
 

@@ -24,9 +24,9 @@ export interface PassageArrival {
 
 export const NO_ARRIVAL: PassageArrival = { via: null, withIcon: false, ready: true };
 
-const STORAGE_KEY = "kz-passage";
+export const STORAGE_KEY = "kz-passage";
 /** Au-delà, le drapeau est périmé : un passage coloré se joue en un instant ; un passage secret peut attendre la Terre. */
-const FRESH_MS: Record<PassageKind, number> = { passage: 6000, dive: 60000, liftoff: 60000 };
+export const FRESH_MS: Record<PassageKind, number> = { passage: 6000, dive: 60000, liftoff: 60000 };
 
 export const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 

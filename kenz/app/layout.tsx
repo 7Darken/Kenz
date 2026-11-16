@@ -10,6 +10,7 @@ import "@/design-system/tokens.css";
 import "@/design-system/base.css";
 import { SITE_NAME, SITE_URL } from "@/content/site";
 import { qualityScript } from "@/design-system/motion/quality-script";
+import { arrivalScript } from "@/features/passages";
 import { themeScript } from "@/design-system/theme/theme-script";
 import { getDictionary } from "@/i18n/server";
 import { fontVariables } from "./fonts";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script dangerouslySetInnerHTML={{ __html: qualityScript }} />
+        <script dangerouslySetInnerHTML={{ __html: arrivalScript }} />
       </head>
       <body>
         <Providers>{children}</Providers>

@@ -31,6 +31,8 @@
  *   usePageEntrance({ enabled?, waitFonts?, delay?, maxWait? }) → { entered, via, ready }
  *   Le moment de jouer l'entrée d'une page (heros, /agents, nav) : après le voile, ou après les polices, ou après
  *   une image et `delay` ms. Une seule règle pour tout le site.
+ *   arrivalScript : script inline du <head> (layout racine) ; une page rechargée par un passage pose
+ *   <html data-kz-arrive> avant l'affichage (le hero, qui joue son arrivée en CSS, attend alors le voile).
  */
 export { PassageRoot } from "./passage-root";
 export { Cordon } from "./cordon";
@@ -40,3 +42,4 @@ export { announceTerreReady, DIVE_PLUNGE_DELAY, startDive, startLiftoff } from "
 export { isPassageBusy, type PassageArrival, type PassageKind } from "./passage-state";
 export { usePassageArrival } from "./use-passage-arrival";
 export { usePageEntrance, type PageEntrance, type PageEntranceOptions } from "./use-page-entrance";
+export { arrivalScript } from "./arrival-script";

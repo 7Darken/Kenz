@@ -4,8 +4,8 @@
  * ici, la mesure réelle, discrète, ne fait que le baisser :
  * - la sonde : les premières images après le démarrage (≈ 2,4 s), sans boucle permanente ;
  * - en cours de route : les images échantillonnées pendant un défilement, et celles des boucles lourdes (globe, ciel
- *   des apps) qui les signalent par `noteFrame(t)`. Une baisse demande deux fenêtres lentes de suite (hystérésis),
- *   puis un temps de repos le temps que le nouveau niveau se mesure. Jamais de remontée dans la session : pas de
+ *   des apps) qui les signalent par `noteFrame(t)`, par fenêtres de 60. Une baisse demande deux fenêtres lentes de
+ *   suite, ou une seule très lente (hystérésis), puis un temps de repos le temps que le nouveau niveau se mesure. Jamais de remontée dans la session : pas de
  *   va-et-vient. La baisse est mémorisée pour la session (les pages suivantes partent du bon niveau).
  * Mouvement réduit : pas de mesure (rien ne bouge en continu) ; le niveau de départ reste.
  *
@@ -19,15 +19,15 @@ export type Quality = "high" | "medium" | "low";
 const RANK: Record<Quality, number> = { low: 0, medium: 1, high: 2 };
 const LOWER: Record<Quality, Quality> = { high: "medium", medium: "low", low: "low" };
 
-/** Intervalles par fenêtre de mesure (≈ 1,5 s à 60 i/s). */
-const WINDOW = 90;
+/** Intervalles par fenêtre de mesure (1 s à 60 i/s, 2 s à 30 i/s). */
+const WINDOW = 60;
 /** ms : une médiane au-delà, c'est moins de ≈ 42 i/s soutenus (à 120 Hz, 40 i/s donnent des intervalles de 25 ms). */
 const SLOW_MEDIAN = 24;
 /** ms : une médiane au-delà, c'est moins de ≈ 26 i/s : on descend d'un coup en `low`. */
 const VERY_SLOW_MEDIAN = 38;
 /** Part d'images de plus de 50 ms au-delà de laquelle la fenêtre est saccadée. */
 const JANK_SHARE = 0.12;
-/** Fenêtres lentes de suite avant de baisser. */
+/** Fenêtres lentes de suite avant de baisser ; une fenêtre très lente (moins de ≈ 26 i/s) suffit. */
 const BAD_WINDOWS = 2;
 /** ms : après une baisse, le temps que le nouveau niveau se mesure. */
 const COOLDOWN = 4000;
@@ -95,7 +95,7 @@ function evaluate(t: number) {
   if (t < quietUntil || getQuality() === "low") return;
   const v = verdict(batch);
   bad = v ? bad + 1 : 0;
-  if (bad < BAD_WINDOWS) return;
+  if (bad < BAD_WINDOWS && v < 2) return;
   bad = 0;
   quietUntil = t + COOLDOWN;
   lowerTo(v === 2 ? "low" : LOWER[getQuality()]);

@@ -34,6 +34,8 @@ interface DepthEngineOptions {
   mouse: boolean;
   /** Le hero est arrivé. */
   ready: boolean;
+  /** Secondes déjà écoulées de l'arrivée du hero (jouée en CSS avant React) : retirées de l'attente de 1,05 s. */
+  readyLag: number;
   /** Déjà révélé lors d'une mise en place précédente (changement de mode). */
   revealed: boolean;
   onReveal: () => void;
@@ -195,12 +197,13 @@ export function startDepth(container: HTMLElement, options: DepthEngineOptions):
     reveal();
   }
   function startCountdown() {
+    const wait = Math.max(0, DELAY_S - options.readyLag) * 1000;
     later(() => {
       delayDone = true;
       t0 = Date.now();
       tryReveal();
       later(reveal, WAIT_MS + 50);
-    }, DELAY_S * 1000);
+    }, wait);
   }
   /* ---------- Le défilement : chaque plan à sa vitesse, puis l'effacement au départ du hero ---------- */
   function startMotion() {

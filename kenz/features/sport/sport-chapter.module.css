@@ -43,6 +43,18 @@
     var(--bg) calc(100% - 22vh), transparent 100%);
 }
 
+/* Le débord reste caché tant que le chapitre est loin (SportBleed pose data-near quand il approche) : un saut du
+   chapitre vers l'écran (le voyage « vu une fois » retire son épinglage) n'est pas un décalage de mise en page,
+   et le débord apparaît alors en fondu */
+:global(.js) .sport:not([data-near])::after {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.sport[data-near="fade"]::after {
+  transition: opacity .6s var(--expo);
+}
+
 .inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

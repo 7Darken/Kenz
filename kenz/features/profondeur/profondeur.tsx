@@ -23,6 +23,8 @@ export interface ProfondeurProps {
   series: DepthSeriesId;
   /** Le hero est arrivé : les objets entrent 1,05 s plus tard. */
   ready: boolean;
+  /** Lit le temps (s) déjà écoulé de l'arrivée du hero quand `ready` est passé à vrai : il est retiré de l'attente. */
+  readyLag?: () => number;
   /** Le portrait (le visage est protégé). */
   figSelector?: string;
   /** Ce qu'aucun objet ne doit couvrir. */
@@ -90,6 +92,7 @@ function DepthItem({ p }: { p: PlacedObject }) {
 export function Profondeur({
   series,
   ready,
+  readyLag,
   figSelector = "[data-hero-fig]",
   avoidSelector = "[data-hero-avoid]",
 }: ProfondeurProps) {
@@ -121,6 +124,7 @@ export function Profondeur({
       // Qualité basse : pas de parallaxe à la souris (une mise à jour de style par image).
       mouse: mouse && quality !== "low",
       ready,
+      readyLag: ready && readyLag ? readyLag() : 0,
       revealed: revealedRef.current,
       onReveal: () => {
         revealedRef.current = true;
@@ -130,7 +134,7 @@ export function Profondeur({
       face: FACE,
       avoidSelector,
     });
-  }, [placed, desktop, quality, reduced, mouse, ready, config.fade, figSelector, avoidSelector]);
+  }, [placed, desktop, quality, reduced, mouse, ready, readyLag, config.fade, figSelector, avoidSelector]);
 
   return (
     <div ref={containerRef} className={styles.prof} aria-hidden="true">
