@@ -30,4 +30,7 @@ export interface ImageAsset {
   alt?: Localized<string>;
   /** Cadrage (`object-position`), ex. `50% 30%`. */
   position?: string;
+  /** Qualité de réencodage par next/image (75 par défaut). 90 pour une photo déjà compressée à la source (LinkedIn) :
+   *  un second passage à 75 ajouterait ses artefacts aux siens. Valeurs permises : `images.qualities` (next.config). */
+  quality?: 75 | 90;
 }

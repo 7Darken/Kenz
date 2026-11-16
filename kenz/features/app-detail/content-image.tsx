@@ -31,6 +31,7 @@ export function ContentImage({ image, sizes, className, loupe = false, priority 
       height={image.height}
       alt={image.alt ? localize(image.alt, lang) : ""}
       sizes={sizes}
+      quality={image.quality}
       priority={priority}
       style={image.position ? { objectPosition: image.position } : undefined}
       data-loupe={loupe ? "" : undefined}

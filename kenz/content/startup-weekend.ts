@@ -79,18 +79,20 @@ export const startupWeekend: StartupWeekend = {
   color: project.tint,
   photos: {
     check: {
-      src: "/assets/img/startup-weekend-1.jpg",
-      width: 1200,
-      height: 900,
+      src: "/assets/img/startup-weekend-1.webp",
+      width: 1280,
+      height: 960,
+      quality: 90,
       alt: {
         fr: "L’équipe sur scène avec le chèque géant du Techstars Startup Weekend Grenoble, 15e anniversaire.",
         en: "The team on stage with the giant check from Techstars Startup Weekend Grenoble, 15th anniversary.",
       },
     },
     win: {
-      src: "/assets/img/startup-weekend-2.jpg",
-      width: 1200,
-      height: 800,
+      src: "/assets/img/startup-weekend-2.webp",
+      width: 1280,
+      height: 854,
+      quality: 90,
       alt: {
         fr: "Kenz, en t-shirt vert, les deux poings levés au moment de l’annonce de la première place, à côté d’un coéquipier qui lève le poing, au milieu du public qui applaudit.",
         en: "Kenz, in a green T-shirt, both fists in the air as first place is announced, next to a teammate raising his fist, amid an applauding crowd.",
@@ -101,9 +103,10 @@ export const startupWeekend: StartupWeekend = {
       credit: "Annie Frénot",
     },
     team: {
-      src: "/assets/img/startup-weekend-3.jpg",
-      width: 900,
-      height: 1200,
+      src: "/assets/img/startup-weekend-3.webp",
+      width: 960,
+      height: 1280,
+      quality: 90,
       alt: {
         fr: "L’équipe, réunie devant le tableau blanc couvert de recherches.",
         en: "The team, gathered in front of a whiteboard covered in research.",

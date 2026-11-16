@@ -42,6 +42,7 @@ export function VictoryArch({ win, team, check, credit }: VictoryArchProps) {
             width={win.image.width}
             height={win.image.height}
             alt={win.alt}
+            quality={win.image.quality}
             sizes="(min-width: 900px) 61vw, 100vw"
             data-kv="arch-img"
           />
@@ -94,12 +95,12 @@ export function VictoryArch({ win, team, check, credit }: VictoryArchProps) {
       <span className={styles.prints}>
         <figure className={`${styles.print} ${styles.printTeam}`} data-kv="print-team">
           <span className={styles.printImg} data-loupe="">
-            <Image src={team.image.src} width={team.image.width} height={team.image.height} alt={team.alt} sizes="(min-width: 900px) 180px, 16vw" />
+            <Image src={team.image.src} width={team.image.width} height={team.image.height} alt={team.alt} quality={team.image.quality} sizes="(min-width: 900px) 180px, 16vw" />
           </span>
         </figure>
         <figure className={`${styles.print} ${styles.printCheck}`} data-kv="print-check">
           <span className={styles.printImg} data-loupe="">
-            <Image src={check.image.src} width={check.image.width} height={check.image.height} alt={check.alt} sizes="(min-width: 900px) 270px, 22vw" />
+            <Image src={check.image.src} width={check.image.width} height={check.image.height} alt={check.alt} quality={check.image.quality} sizes="(min-width: 900px) 270px, 22vw" />
           </span>
         </figure>
       </span>

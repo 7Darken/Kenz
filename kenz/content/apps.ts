@@ -892,9 +892,10 @@ export const apps: AppsBySlug = {
       weekend: {
         dates: { fr: "du 28 au 30 novembre 2025", en: "November 28–30, 2025" },
         photo: {
-          src: "/assets/img/startup-weekend-1.jpg",
-          width: 1200,
-          height: 900,
+          src: "/assets/img/startup-weekend-1.webp",
+          width: 1280,
+          height: 960,
+          quality: 90,
           alt: {
             fr: "Sur scène au Startup Weekend Grenoble : l’équipe autour du chèque géant de la première place.",
             en: "On stage at Startup Weekend Grenoble: the team around the giant first-place check.",
