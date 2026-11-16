@@ -1,0 +1,219 @@
+/* Le calendrier : 7 colonnes, une case par jour ; la case du jour ouvert prend la couleur de sa ville */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 132px;
+  padding: 12px 12px 16px;
+  border-radius: 18px;
+  text-align: left;
+  color: var(--fg);
+  background: rgb(var(--fg-rgb) / .025);
+  box-shadow: inset 0 0 0 1px var(--line);
+  overflow: hidden;
+  isolation: isolate;
+  transition: background-color .45s var(--expo), box-shadow .45s var(--expo), transform .6s var(--expo);
+}
+
+:global(html[data-theme="light"]) .cell {
+  background: rgba(255, 255, 255, .6);
+}
+
+.cell:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.cell:active {
+  transform: scale(.97);
+}
+
+.cell[aria-selected="true"] {
+  background: color-mix(in srgb, var(--c) 13%, transparent);
+  box-shadow:
+    inset 0 0 0 1.5px var(--c),
+    0 0 0 4px color-mix(in srgb, var(--c) 14%, transparent),
+    0 18px 40px -18px var(--c);
+}
+
+.cell:focus-visible {
+  outline-color: var(--c);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.number {
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 28px;
+  line-height: .9;
+  font-variant-numeric: tabular-nums;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+  background: color-mix(in srgb, var(--c) 13%, transparent);
+}
+
+.icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.date {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.date::first-letter {
+  text-transform: uppercase;
+}
+
+.highlight {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.city {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  font-size: 12px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+}
+
+.mode {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+/* Le filet du bas : de la ville quittée à la ville du jour */
+.bar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, var(--from), var(--c));
+}
+
+@media (max-width: 899px) {
+  .cell {
+    min-height: 112px;
+    padding: 10px 10px 14px;
+  }
+
+  .highlight {
+    font-size: 12px;
+  }
+}
+
+/* Petit écran : le numéro et le pictogramme seulement */
+@media (max-width: 639px) {
+  .grid {
+    gap: 3px;
+  }
+
+  .cell {
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 0;
+    aspect-ratio: .8;
+    padding: 6px 2px 9px;
+    border-radius: 12px;
+  }
+
+  .top {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .number {
+    font-size: 19px;
+  }
+
+  .icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 7px;
+  }
+
+  .icon svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .bottom {
+    display: none;
+  }
+
+  .bar {
+    left: 6px;
+    right: 6px;
+  }
+}
+
+/* L'entrée : les cases s'allument une à une (avec JS) */
+:global(.js) .cell {
+  opacity: 0;
+  transform: translateY(14px) scale(.96);
+}
+
+:global(.js) .grid[data-in] .cell {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity .7s var(--expo) calc(var(--i) * 35ms),
+    transform .9s var(--expo) calc(var(--i) * 35ms),
+    background-color .45s var(--expo),
+    box-shadow .45s var(--expo);
+}
+
+:global(.js) .grid[data-in] .cell:active {
+  transform: scale(.97);
+  transition-delay: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .cell,
+  :global(.js) .grid[data-in] .cell:active {
+    transform: none;
+  }
+}

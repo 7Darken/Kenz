@@ -32,7 +32,6 @@ export const voyage: VoyageDictionary = {
   guide: {
     title: "Heading to *China*?",
     bases: "The three bases",
-    watch: "Watch the itinerary video",
     soon: "More guides are on the way.",
   },
   marques: {

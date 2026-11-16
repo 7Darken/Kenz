@@ -1,0 +1,368 @@
+/* La porte « abonnés » : une fiche étroite au centre, sur un voile dense (sans flou), la page en transparence */
+dialog.gate {
+  width: min(480px, calc(100vw - 2 * var(--gutter)));
+  max-height: min(92vh, 860px);
+}
+
+dialog.gate[open]::backdrop,
+:global(html[data-quality][data-theme]) dialog.gate[open]::backdrop {
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px 0 8px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--target);
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .3s var(--expo), background-color .3s var(--expo);
+}
+
+.back svg {
+  width: 14px;
+  height: 14px;
+}
+
+.back:hover {
+  color: var(--fg);
+  background: rgb(var(--fg-rgb) / .06);
+}
+
+.toggles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.body {
+  padding: 12px clamp(20px, 6vw, 36px) 32px;
+  text-align: center;
+}
+
+/* Le portrait, l'anneau, le badge YouTube (puis la coche) */
+.avatar {
+  --ring: #FF0033;
+  position: relative;
+  width: 88px;
+  height: 88px;
+  margin: 0 auto;
+}
+
+.avatar[data-success] {
+  --ring: rgb(var(--lum));
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ring {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--ring), transparent 45%, var(--ring) 70%, transparent 85%, var(--ring));
+  -webkit-mask: radial-gradient(circle, transparent 58%, #000 60%);
+  mask: radial-gradient(circle, transparent 58%, #000 60%);
+  animation: spin 3.5s linear infinite;
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--bg-2);
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  transform: scale(1.5);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(.4) rotate(-30deg);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+.badge {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: #FFFFFF;
+  background: var(--ring);
+  box-shadow: 0 0 0 3px var(--bg-2);
+  animation: pop .6s var(--expo) both;
+}
+
+.badge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.avatar[data-success] .badge {
+  color: var(--accent-fg);
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 30;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.drawn path {
+  stroke-dasharray: 30;
+  animation: draw .5s var(--expo) .15s both;
+}
+
+.handle {
+  margin: 12px 0 0;
+  font-size: 14px;
+  color: var(--faint);
+}
+
+/* Les trois temps : s'abonner, revenir ici, valider */
+.steps {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.steps li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 96px;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.steps li + li::before {
+  content: "";
+  position: absolute;
+  top: 11px;
+  right: calc(50% + 16px);
+  width: calc(100% - 32px);
+  height: 2px;
+  border-radius: 2px;
+  background: rgb(var(--fg-rgb) / .12);
+}
+
+.steps li[data-state]::before {
+  background: rgb(var(--lum));
+}
+
+.steps li[data-state] {
+  color: var(--muted);
+}
+
+.stepDot {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1.5px rgb(var(--fg-rgb) / .24);
+}
+
+.stepDot svg {
+  width: 12px;
+  height: 12px;
+}
+
+li[data-state="done"] .stepDot {
+  color: var(--accent-fg);
+  background: rgb(var(--lum));
+  box-shadow: none;
+}
+
+li[data-state="current"] .stepDot {
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1.5px var(--fg);
+}
+
+/* Une étape : elle monte en fondu, sans flou */
+@keyframes stepIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.step {
+  margin-top: 18px;
+  animation: stepIn .5s var(--expo) both;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(30px, 7vw, 38px);
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.text {
+  margin: 12px auto 0;
+  max-width: 34ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.actions > * {
+  justify-content: center;
+}
+
+.actions > [target] {
+  justify-content: space-between;
+}
+
+.perks {
+  margin: 20px 0 0;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+/* En attente de YouTube : trois ondes autour du logo */
+@keyframes ping {
+  from {
+    opacity: .55;
+    transform: scale(.6);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+.radar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 12px auto 24px;
+  color: #FF0033;
+}
+
+.radar span {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px #FF0033;
+  animation: ping 2.4s var(--ios) infinite;
+}
+
+.radar span:nth-child(2) {
+  animation-delay: .8s;
+}
+
+.radar span:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+.radar svg {
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+/* Accès débloqué : la barre se remplit, puis la page s'ouvre */
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.progress {
+  display: block;
+  width: 60%;
+  height: 3px;
+  margin: 26px auto 0;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgb(var(--fg-rgb) / .12);
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: rgb(var(--lum));
+  transform-origin: left;
+  animation: fill var(--unlock) linear both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .radar span {
+    animation: none;
+  }
+
+  .badge,
+  .step {
+    animation-name: none;
+  }
+
+  .drawn path {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
+
+:global(html[data-quality="low"]) .ring {
+  animation: none;
+}

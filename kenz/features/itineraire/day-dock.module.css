@@ -1,0 +1,138 @@
+/* La barre des jours : une pilule fixe en bas, centrée ; elle monte quand le calendrier est passé */
+.dock {
+  --tint: 86%;
+  position: fixed;
+  z-index: calc(var(--z-nav) - 1);
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border-radius: var(--r-pill);
+  background: var(--bg-2);
+  box-shadow: inset 0 0 0 1px var(--line), var(--sh-2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 40px) scale(.96);
+  transition: opacity .25s var(--out), transform .25s var(--out), visibility 0s .25s;
+}
+
+:global(html[data-theme="light"]) .dock {
+  --tint: 60%;
+  background: #FFFFFF;
+}
+
+.dock[data-visible] {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+  transition: opacity .6s var(--expo), transform .8s var(--expo), visibility 0s;
+}
+
+.dock .arrow,
+:global(html[data-theme="light"]) .dock .arrow {
+  background: transparent;
+  box-shadow: none;
+}
+
+.dock .arrow:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+}
+
+/* Un jour : un filet de 10 px, le jour en cours s'ouvre (J5) ; la cible tient toute la hauteur de la barre */
+.segment {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 10px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 700;
+  color: #0A1117;
+  background: var(--c);
+  opacity: .3;
+  overflow: hidden;
+  cursor: pointer;
+  transition: width .5s var(--expo), height .5s var(--expo), opacity .3s;
+}
+
+.segment::after {
+  content: "";
+  position: absolute;
+  inset: -13px -2px;
+}
+
+.segment:hover,
+.segment[data-state="past"] {
+  opacity: .75;
+}
+
+.segment[data-state="current"] {
+  width: 44px;
+  height: 26px;
+  opacity: 1;
+}
+
+.segmentLabel {
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.segment[data-state="current"] .segmentLabel {
+  opacity: 1;
+  transition: opacity .4s .15s;
+}
+
+.where {
+  padding: 0 6px 0 2px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+}
+
+@media (max-width: 519px) {
+  .where {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .track {
+    gap: 3px;
+    padding: 0 2px;
+  }
+
+  .segment {
+    width: 9px;
+  }
+
+  .segment[data-state="current"] {
+    width: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .dock[data-visible] {
+    transform: translate(-50%, 0);
+  }
+
+  .segment {
+    transition: opacity .3s;
+  }
+}

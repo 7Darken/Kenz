@@ -13,7 +13,8 @@
  * Les titres de section et les libellés fixes (« Prochaine escale », « YouTube »…) vont dans les dictionnaires.
  */
 import type { Localized } from "@/i18n/localize";
-import type { ExternalLink, ImageAsset, IsoDate } from "@/content/types";
+import { ROUTES } from "@/content/site";
+import type { ImageAsset, IsoDate } from "@/content/types";
 
 /** Jeton remplacé par `seriesName` (en gras) dans le texte d'une ligne de série. */
 export const SERIES_NAME_TOKEN = "{series}";
@@ -490,10 +491,8 @@ export interface TravelGuide {
   /** Nombre de jours : le calendrier dessiné sur la carte. */
   days: number;
   bases: readonly Place[];
-  /** La page de l'itinéraire ; tant qu'elle n'est pas en ligne (`online: false`), le bouton mène à `video`. */
-  page: ExternalLink & { online: boolean };
-  /** La vidéo du même itinéraire, sur YouTube. */
-  video: `https://${string}`;
+  /** La page de l'itinéraire jour par jour (content/itineraries.ts), dans l'univers Créateur. */
+  page: { label: Localized<string>; href: string };
 }
 
 export const CHINA_GUIDE: TravelGuide = {
@@ -507,13 +506,10 @@ export const CHINA_GUIDE: TravelGuide = {
     { name: { fr: "Chongqing", en: "Chongqing" }, nativeName: { text: "重庆", lang: "zh" } },
     { name: { fr: "Shanghai", en: "Shanghai" }, nativeName: { text: "上海", lang: "zh" } },
   ],
-  // /itineraire/chine n'existe pas encore : le bouton ouvre la vidéo de l'itinéraire (LATEST_VIDEO).
   page: {
     label: { fr: "Ouvrir l’itinéraire", en: "Open the itinerary" },
-    href: "https://kenzenbien.fr/itineraire/chine",
-    online: false,
+    href: ROUTES.itineraire("chine"),
   },
-  video: LATEST_VIDEO.href,
 };
 
 /* ------------------------------------------------------------------------

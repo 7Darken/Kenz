@@ -17,6 +17,7 @@ export const ROUTES = {
   agents: "/agents",
   createur: "/createur",
   voyage: "/createur/voyage",
+  itineraire: (slug: string) => `/createur/itineraire/${slug}` as const,
   sport: "/createur/sport",
 } as const;
 

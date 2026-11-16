@@ -2,12 +2,12 @@
 
 /**
  * La carte du guide Chine (voyage.html, `.gcard`) : le calendrier des 14 jours qui s'allume case par case,
- * le titre, les trois bases, et le bouton. Tant que la page de l'itinéraire n'est pas en ligne
- * (content/series.ts, `page.online`), le bouton ouvre la vidéo du même itinéraire.
+ * le titre, les trois bases, et le bouton vers la page de l'itinéraire jour par jour (avec la transition Passage).
  */
 import { useRef, type CSSProperties } from "react";
 
 import { CHINA_GUIDE } from "@/content/series";
+import { passageAttributes } from "@/content/site";
 import { Button } from "@/design-system/components/button";
 import { useInView } from "@/design-system/motion/use-in-view";
 import bezel from "@/design-system/styles/bezel.module.css";
@@ -20,9 +20,6 @@ export function GuideCard() {
   const inView = useInView(ref, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
   const { lang, t } = useLanguage();
   const guide = CHINA_GUIDE;
-  const cta = guide.page.online
-    ? { href: guide.page.href, label: localize(guide.page.label, lang) }
-    : { href: guide.video, label: t.voyage.guide.watch };
 
   return (
     <article ref={ref} className={`${bezel.bezel} ${styles.card}`} data-in={inView ? "" : undefined}>
@@ -46,8 +43,8 @@ export function GuideCard() {
               </li>
             ))}
           </ol>
-          <Button href={cta.href} external>
-            {cta.label}
+          <Button href={guide.page.href} icon="arrow-right" {...passageAttributes("voyage")}>
+            {localize(guide.page.label, lang)}
           </Button>
         </div>
       </div>

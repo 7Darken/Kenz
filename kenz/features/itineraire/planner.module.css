@@ -1,0 +1,326 @@
+/* « Jour par jour » : l'en-tête, la carte du calendrier (villes, date de départ, export), le jour ouvert et la carte */
+.planner {
+  --tint: 86%;
+  scroll-margin-top: 0;
+}
+
+:global(html[data-theme="light"]) .planner {
+  --tint: 60%;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 40px;
+  margin-bottom: clamp(28px, 4vw, 44px);
+}
+
+.hint {
+  max-width: 32ch;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--faint);
+}
+
+/* La carte du calendrier */
+.calendarCore {
+  padding: clamp(14px, 2vw, 22px);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Une ville : un bouton discret, la pastille de couleur ; la ville du jour ouvert s'allume */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: var(--target);
+  padding: 0 16px 0 14px;
+  border-radius: var(--r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: color .4s var(--expo), background-color .4s var(--expo), box-shadow .4s var(--expo);
+}
+
+.chip:hover {
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent);
+}
+
+.chip[aria-pressed="true"] {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 50%, transparent);
+}
+
+.chipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  transition: box-shadow .4s var(--expo);
+}
+
+.chip[aria-pressed="true"] .chipDot {
+  box-shadow: 0 0 10px var(--c);
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* La date de départ : un champ natif, habillé */
+.dateField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 4px 0 14px;
+  border-radius: var(--r-md);
+  background: var(--field-bg);
+  box-shadow: inset 0 0 0 1px var(--field-line);
+  transition: box-shadow .4s var(--expo);
+}
+
+.dateField:focus-within {
+  box-shadow: inset 0 0 0 1px var(--field-focus);
+}
+
+.dateField[data-alert] {
+  box-shadow: inset 0 0 0 1px rgb(var(--lum-2)), 0 0 0 4px rgb(var(--lum-2) / .16);
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: none;
+  }
+
+  20% {
+    transform: translateX(-7px);
+  }
+
+  40% {
+    transform: translateX(7px);
+  }
+
+  60% {
+    transform: translateX(-5px);
+  }
+
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.dateField[data-shake] {
+  animation: shake .45s var(--io);
+}
+
+.dateIcon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+}
+
+.dateLabel {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.dateLabel span {
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--faint);
+}
+
+.dateLabel input {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fg);
+  color-scheme: inherit;
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--target);
+  height: var(--target);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color .3s var(--expo), background-color .3s var(--expo);
+}
+
+.clear svg {
+  width: 14px;
+  height: 14px;
+}
+
+.clear:hover {
+  color: var(--fg);
+  background: rgb(var(--fg-rgb) / .06);
+}
+
+.export {
+  flex: none;
+}
+
+/* Le message de l'export (choisir une date, agenda téléchargé), annoncé aux lecteurs d'écran */
+.notice {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin: 0;
+  transition: grid-template-rows .45s var(--expo);
+}
+
+.notice > span {
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notice[data-visible] {
+  grid-template-rows: 1fr;
+}
+
+.notice[data-visible] > span {
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+.notice[data-tone="needs-date"] > span {
+  color: rgb(var(--lum-2));
+  background: rgb(var(--lum-2) / .1);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum-2) / .28);
+}
+
+:global(html[data-theme="light"]) .notice[data-tone="needs-date"] > span {
+  color: #8A5A12;
+}
+
+/* Le jour ouvert et, à côté, la carte du trajet (collée sous la nav sur grand écran) */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 4vw, 56px);
+  margin-top: clamp(40px, 5vw, 64px);
+}
+
+.detail {
+  min-width: 0;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Les 14 jours en une ligne, couleur de leur ville : passés, en cours, à venir */
+.strip {
+  display: flex;
+  gap: 3px;
+  padding: 0 10px;
+}
+
+.strip li {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--c);
+  opacity: .2;
+  transition: opacity .5s var(--expo), box-shadow .5s var(--expo);
+}
+
+.strip li[data-state="past"] {
+  opacity: .6;
+}
+
+.strip li[data-state="current"] {
+  opacity: 1;
+  box-shadow: 0 0 12px var(--c);
+}
+
+@media (min-width: 1024px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+
+  .aside {
+    position: sticky;
+    top: calc(var(--nav-h) + 16px);
+  }
+}
+
+/* Petit écran : le calendrier sort de sa coque, pour des cases de 44 px au moins */
+@media (max-width: 559px) {
+  .planner .calendar {
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .calendar > .calendarCore {
+    overflow: visible;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .tools {
+    width: 100%;
+  }
+
+  .dateField {
+    flex: 1 1 auto;
+  }
+
+  .export {
+    flex: 1 1 auto;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dateField[data-shake] {
+    animation: none;
+  }
+
+  .notice {
+    transition: none;
+  }
+}

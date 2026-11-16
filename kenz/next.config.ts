@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
       { source: `/projets/:slug(${APP_SLUG_PATTERN})`, destination: "/apps/:slug", permanent: true },
       { source: "/projets/:path*", destination: "/", permanent: true },
       { source: "/destination/:path*", destination: "/createur/voyage", permanent: true },
+      // Les liens déjà partagés (descriptions YouTube) vers l'itinéraire de l'ancien site.
+      { source: "/itineraire/:slug", destination: "/createur/itineraire/:slug", permanent: true },
     ];
   },
 };

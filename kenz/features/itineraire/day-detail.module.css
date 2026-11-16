@@ -1,0 +1,321 @@
+/* Le jour ouvert : en-tête, faits du jour, programme, lendemain ; la couleur --c est celle de la ville */
+.panel {
+  touch-action: pan-y;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "meta actions" "title title" "summary summary";
+  align-items: start;
+  gap: 0 16px;
+}
+
+.meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  min-height: var(--target);
+}
+
+.city {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.city span[lang] {
+  font-family: var(--f-ja);
+  font-weight: 500;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10px var(--c);
+}
+
+.counter {
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+}
+
+.date {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.date::first-letter {
+  text-transform: uppercase;
+}
+
+.title {
+  grid-area: title;
+  margin: 14px 0 0;
+  max-width: 20ch;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(36px, 4.2vw, 56px);
+  line-height: 1;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+.summary {
+  grid-area: summary;
+  margin: 16px 0 0;
+  max-width: 58ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  gap: 8px;
+}
+
+/* Partager : le même bouton rond que précédent / suivant (IconButton du design system) */
+.round {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--target);
+  height: var(--target);
+  border-radius: 50%;
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px rgb(var(--fg-rgb) / .2);
+  transition: transform .5s var(--expo), background-color .4s var(--expo);
+}
+
+.round svg {
+  width: 16px;
+  height: 16px;
+}
+
+.round:hover {
+  transform: scale(1.05);
+}
+
+.round:active {
+  transform: scale(.96);
+}
+
+:global(html[data-theme="light"]) .round {
+  background: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 0 0 1px var(--line), 0 6px 14px -8px rgba(26, 25, 24, .3);
+}
+
+.actions button:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.shareWrap {
+  position: relative;
+}
+
+.toast {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 8px);
+  left: 50%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition: opacity .25s var(--out), transform .25s var(--out);
+}
+
+.toast[data-visible] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition: opacity .5s var(--expo), transform .6s var(--expo);
+}
+
+/* Le trajet, la nuit, le budget */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 40px;
+  margin: 28px 0 0;
+  padding: 18px 0;
+  border-block: 1px solid var(--line);
+}
+
+.facts dt {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.facts dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.note {
+  color: var(--faint);
+}
+
+.factIcon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  margin-top: 32px;
+}
+
+/* Le lendemain : une grande carte bouton, à la couleur de la ville de demain */
+.next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 22px 22px 22px 26px;
+  border-radius: var(--r-lg);
+  text-align: left;
+  color: var(--fg);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--n) 16%, transparent), transparent 62%), var(--surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--n) 32%, transparent);
+  transition: box-shadow .5s var(--expo), transform .6s var(--expo);
+}
+
+.next:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--n) 62%, transparent);
+}
+
+.next:active {
+  transform: scale(.99);
+}
+
+.nextText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nextMeta {
+  font-size: 13px;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--n) var(--tint), var(--fg));
+}
+
+.nextTitle {
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: clamp(24px, 2.4vw, 30px);
+  line-height: 1.1;
+}
+
+.nextIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: var(--btn-fg);
+  background: var(--btn-bg);
+  transition: transform .7s var(--expo);
+}
+
+.nextIcon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.next:hover .nextIcon {
+  transform: translateX(3px);
+}
+
+/* La fin du voyage */
+.end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 36px 24px;
+  border-radius: var(--r-lg);
+  text-align: center;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.bye {
+  font-family: var(--f-ja);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+  text-shadow: 0 0 30px color-mix(in srgb, var(--c) 50%, transparent);
+}
+
+.endText {
+  margin: 0 0 6px;
+  font-family: var(--f-word);
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+@media (max-width: 639px) {
+  .head {
+    grid-template-areas: "meta meta" "title title" "summary summary" "actions actions";
+  }
+
+  .actions {
+    margin-top: 18px;
+  }
+
+  .facts {
+    gap: 14px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast[data-visible] {
+    transform: translate(-50%, 0);
+  }
+
+  .next,
+  .nextIcon,
+  .round {
+    transition: box-shadow .3s, background-color .3s;
+  }
+
+  .next:hover .nextIcon,
+  .next:active,
+  .round:hover,
+  .round:active {
+    transform: none;
+  }
+}

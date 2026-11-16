@@ -20,7 +20,7 @@ export function getDictionary(lang: Lang = DEFAULT_LANG): Dictionary {
  */
 const SPACES = {
   pro: ["common", "footer", "pro", "apps", "agents", "victoire"],
-  createur: ["common", "footer", "createur", "voyage", "sport"],
+  createur: ["common", "footer", "createur", "voyage", "itineraire", "sport"],
   k15ze: ["common", "footer", "sport"],
   page: ["common"],
 } as const satisfies Record<Universe | "page", readonly Space[]>;

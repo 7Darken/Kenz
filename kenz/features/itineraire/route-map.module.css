@@ -1,0 +1,240 @@
+/* Le parcours : la carte du trajet (SVG), ses villes cliquables et la ville du jour */
+.core {
+  padding: 18px 20px 20px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.step {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+}
+
+.map {
+  position: relative;
+  margin: 10px -4px 0;
+  aspect-ratio: 100 / 84;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  font-family: var(--f-text);
+  -webkit-mask-image: radial-gradient(120% 100% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(120% 100% at 50% 50%, #000 62%, transparent 100%);
+}
+
+.dotFill {
+  fill: rgb(var(--fg-rgb) / .14);
+}
+
+.watermark {
+  font-family: var(--f-ja);
+  font-size: 34px;
+  font-weight: 700;
+  fill: rgb(var(--fg-rgb) / .04);
+  user-select: none;
+}
+
+.base {
+  fill: none;
+  stroke: rgb(var(--fg-rgb) / .16);
+  stroke-width: .5;
+  stroke-linecap: round;
+}
+
+/* Le tracé d'un trajet franchi (pathLength = 1) */
+.progress {
+  fill: none;
+  stroke-width: .9;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition: stroke-dashoffset .9s var(--expo), opacity .3s var(--out);
+}
+
+.progress[data-done] {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition: stroke-dashoffset 1.1s var(--expo), opacity .2s;
+}
+
+.modeDisc {
+  fill: var(--bg);
+  stroke: rgb(var(--fg-rgb) / .2);
+  stroke-width: .35;
+  transition: stroke .5s var(--expo);
+}
+
+.modeDisc[data-done] {
+  stroke: var(--to);
+}
+
+.modeIcon {
+  color: var(--faint);
+}
+
+.cityDot {
+  fill: var(--bg);
+  stroke: var(--c);
+  stroke-width: .5;
+  transition: fill .5s var(--expo);
+}
+
+.cityDot[data-visited] {
+  fill: var(--c);
+}
+
+/* La ville du jour respire */
+@keyframes pulse {
+  from {
+    opacity: .8;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(3.5);
+  }
+}
+
+.pulse {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: .4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulse 1.8s var(--ios) infinite;
+}
+
+.label {
+  font-size: 3.3px;
+  font-weight: 500;
+  fill: var(--muted);
+  transition: fill .4s var(--expo);
+}
+
+.label[data-active] {
+  font-weight: 700;
+  fill: var(--fg);
+}
+
+.labelHanzi {
+  font-family: var(--f-ja);
+  font-size: 2.5px;
+  font-weight: 400;
+  fill: var(--faint);
+}
+
+/* Le repère glisse d'une ville à l'autre */
+.target {
+  transition: transform .9s var(--expo);
+}
+
+.target circle {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: .4;
+  stroke-dasharray: 1.6 1.2;
+}
+
+/* Les villes : des boutons de 44 px posés sur leurs points */
+.hit {
+  position: absolute;
+  width: var(--target);
+  height: var(--target);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hit:focus-visible {
+  outline-offset: -6px;
+}
+
+/* La ville du jour */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  animation: rise .5s var(--expo) both;
+}
+
+.hanzi {
+  flex: none;
+  white-space: nowrap;
+  font-family: var(--f-ja);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: color-mix(in srgb, var(--c) var(--tint), var(--fg));
+  text-shadow: 0 0 24px color-mix(in srgb, var(--c) 50%, transparent);
+}
+
+.name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.tagline {
+  margin: 2px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--faint);
+}
+
+.range {
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse {
+    display: none;
+  }
+
+  .info {
+    animation-name: none;
+  }
+
+  .target,
+  .progress,
+  .progress[data-done] {
+    transition: opacity .3s;
+  }
+}
+
+:global(html[data-quality="low"]) .pulse {
+  animation: none;
+  opacity: .5;
+}

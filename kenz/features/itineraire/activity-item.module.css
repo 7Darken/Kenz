@@ -1,0 +1,224 @@
+/* Une étape du jour : l'heure, le nœud sur le fil de la journée, la carte ; --k est la couleur du genre */
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px 40px minmax(0, 1fr);
+  gap: 0 14px;
+}
+
+.time {
+  padding-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.node {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  color: color-mix(in srgb, var(--k) var(--tint), var(--fg));
+  background: color-mix(in srgb, var(--k) 12%, var(--bg));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 34%, transparent), 0 0 22px -8px color-mix(in srgb, var(--k) 60%, transparent);
+}
+
+.node svg {
+  width: 18px;
+  height: 18px;
+}
+
+.line {
+  flex: 1;
+  width: 2px;
+  min-height: 16px;
+  margin: 6px 0;
+  border-radius: 2px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--k) 50%, transparent), var(--line-2));
+}
+
+.card {
+  margin-bottom: 16px;
+  padding: 16px 20px 18px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  transition: box-shadow .5s var(--expo), background-color .5s var(--expo);
+}
+
+.card:hover {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--k) 32%, transparent);
+}
+
+:global(html[data-theme="light"]) .card {
+  background: rgba(255, 255, 255, .7);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.kind {
+  margin-right: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--k) var(--tint), var(--fg));
+}
+
+.mobileTime {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip {
+  padding: 2px 9px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: rgb(var(--fg-rgb) / .06);
+}
+
+.title {
+  margin: 10px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.text {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* L'astuce : l'or doux de la Terre */
+.tip {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0 0;
+  padding: 11px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgb(var(--fg-rgb) / .88);
+  background: rgb(var(--lum-2) / .08);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum-2) / .22);
+}
+
+.tip strong {
+  font-weight: 600;
+  color: rgb(var(--lum-2));
+}
+
+:global(html[data-theme="light"]) .tip {
+  background: rgb(var(--lum-2) / .18);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum-2) / .5);
+}
+
+:global(html[data-theme="light"]) .tip strong {
+  color: #8A5A12;
+}
+
+.tipIcon {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  color: rgb(var(--lum-2));
+}
+
+:global(html[data-theme="light"]) .tipIcon {
+  color: #8A5A12;
+}
+
+/* Voir sur la carte : un lien sobre, sa flèche part en diagonale au survol */
+.map {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: var(--target);
+  margin: 4px 0 -10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color .3s var(--expo);
+}
+
+.map:hover {
+  color: var(--fg);
+}
+
+.mapIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.mapArrow {
+  width: 13px;
+  height: 13px;
+  transition: transform .5s var(--expo);
+}
+
+.map:hover .mapArrow {
+  transform: translate(2px, -2px);
+}
+
+@media (max-width: 639px) {
+  .item {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 0 12px;
+  }
+
+  /* L'heure passe dans la ligne de la carte ; elle reste lue par les lecteurs d'écran */
+  .time {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .node {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
+  .node svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mobileTime {
+    display: inline;
+  }
+
+  .card {
+    padding: 14px 16px 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map:hover .mapArrow {
+    transform: none;
+  }
+}

@@ -16,10 +16,11 @@ interface PageMetadataInput {
   /** Chemin canonique, ex. « /agents ». */
   path: string;
   universe: Universe;
+  /** L'image de partage propre à la page (sinon celle de l'univers). */
+  image?: (typeof SHARE_IMAGES)[Universe];
 }
 
-export function pageMetadata({ title, description, path, universe }: PageMetadataInput): Metadata {
-  const image = SHARE_IMAGES[universe];
+export function pageMetadata({ title, description, path, universe, image = SHARE_IMAGES[universe] }: PageMetadataInput): Metadata {
   return {
     title: { absolute: title },
     description,

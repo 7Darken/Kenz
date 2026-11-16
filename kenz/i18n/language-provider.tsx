@@ -92,7 +92,7 @@ function syncUrl(lang: Lang) {
 }
 
 const SPACE_NAMES: ReadonlySet<string> = new Set<keyof Dictionary>([
-  "common", "pro", "apps", "agents", "victoire", "createur", "voyage", "sport", "footer",
+  "common", "pro", "apps", "agents", "victoire", "createur", "voyage", "itineraire", "sport", "footer",
 ]);
 
 /**

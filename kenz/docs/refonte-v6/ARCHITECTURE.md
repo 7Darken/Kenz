@@ -7,9 +7,9 @@ Branche : `refonte-v6`. Pas de push sans accord de Kenz. L'orchestrateur commite
 ## Décisions
 - **Deux univers, deux URL, aucun lien visible entre eux.**
   - **Pro** : `/`, `/apps/[slug]` (Oshii, Wado, Sago, Croc, Miru, Zenko, Escapades Libres), `/agents`.
-  - **Créateur** : `/createur`, `/createur/voyage`, `/createur/sport`.
+  - **Créateur** : `/createur`, `/createur/voyage`, `/createur/sport`, `/createur/itineraire/[slug]` (l'itinéraire jour par jour, porté de l'ancien site).
   - On passe d'un univers à l'autre **seulement par les passages secrets** : le code de la constellation côté Pro ; le ciel en arche et le cordon côté Créateur.
-  - Les anciennes URL (`/projets/[slug]`, `/destination/[slug]`, et toute route publique existante) sont **redirigées** (redirections 308 dans `next.config.ts`) vers leur équivalent.
+  - Les anciennes URL (`/projets/[slug]`, `/destination/[slug]`, `/itineraire/[slug]`, et toute route publique existante) sont **redirigées** (redirections 308 dans `next.config.ts`) vers leur équivalent.
 - **Next.js 16 App Router, React 19, TypeScript strict.** Composants serveur par défaut ; `"use client"` seulement là où il y a de l'interaction ou de l'animation, aussi bas que possible dans l'arbre.
 - **Styles : CSS Modules + design tokens** (variables CSS), portés depuis le CSS de la maquette.
   - On **retire** styled-components, framer-motion, canvas-confetti et Tailwind, s'ils ne servent plus à la fin (étape de nettoyage).
@@ -19,7 +19,7 @@ Branche : `refonte-v6`. Pas de push sans accord de Kenz. L'orchestrateur commite
   - une seule instance Lenis, avec GSAP enregistré une seule fois (provider) ;
   - `prefers-reduced-motion` respecté partout.
 - **Bilingue FR/EN** (convention existante, FR par défaut, `?lang=en` partageable) :
-  - textes d'interface dans des dictionnaires typés **découpés par espace de noms** : `i18n/dictionaries/{fr,en}/{common,pro,apps,agents,victoire,createur,voyage,sport,footer}.ts`, avec un agrégateur typé ;
+  - textes d'interface dans des dictionnaires typés **découpés par espace de noms** : `i18n/dictionaries/{fr,en}/{common,pro,apps,agents,victoire,createur,voyage,itineraire,sport,footer}.ts`, avec un agrégateur typé ;
   - contenus de données en `Localized<T>` + `localize()` ;
   - aucun texte en dur dans les composants ;
   - l'anglais est une vraie traduction, naturelle, pas du mot à mot.
@@ -45,6 +45,7 @@ app/
   (createur)/createur/page.tsx          /createur
   (createur)/createur/voyage/page.tsx   /createur/voyage
   (createur)/createur/sport/page.tsx    /createur/sport  (identité k15ze)
+  (createur)/createur/(terre)/itineraire/[slug]/page.tsx   /createur/itineraire/chine (generateStaticParams)
   api/contact/route.ts
   fonts/                     Melodrama en local (woff2 extrait de maquettes/v6/assets/melodrama.css)
 design-system/
@@ -78,10 +79,11 @@ features/                    un dossier par module, avec composants, hooks et CS
   marques/                   section et formulaire Marques & collaborations
   voyage/                    les chapitres de /createur/voyage
   sport/                     le chapitre #sport de /createur (index) et les chapitres de /createur/sport (page.ts)
+  itineraire/                la page d'un itinéraire jour par jour (calendrier, jour ouvert, carte du trajet, porte « abonnés »)
   zenko-demo/                la mini-animation de Zenko, partagée par apps-space (la fiche) et app-detail
 content/                     données typées et localisées (une seule source) :
                              apps.ts, app-scenes.ts (valeurs d'exemple des animations), startup-weekend.ts, ia.ts,
-                             series.ts (voyage), courses.ts, socials.ts, site.ts, contact.ts
+                             series.ts (voyage), itineraries.ts, courses.ts, socials.ts, site.ts, contact.ts
 i18n/                        existant, découpé par espace de noms (voir plus haut) ; chaque univers ne reçoit côté
                              client que ses espaces (`universeMessages`, i18n/server.ts)
 public/assets/               assets de la maquette, rangés : img/, apps/<slug>/, sport/, sport3d/, hero3d/, terre/,

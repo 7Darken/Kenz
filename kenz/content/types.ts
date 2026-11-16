@@ -31,9 +31,3 @@ export interface ImageAsset {
   /** Cadrage (`object-position`), ex. `50% 30%`. */
   position?: string;
 }
-
-/** Lien externe (ouvert dans un nouvel onglet). */
-export interface ExternalLink {
-  label: Localized<string>;
-  href: `https://${string}`;
-}

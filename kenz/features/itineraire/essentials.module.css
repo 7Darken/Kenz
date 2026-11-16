@@ -1,0 +1,65 @@
+/* Infos pratiques : trois colonnes de cartes, la checklist en quatrième colonne sur grand écran */
+.title {
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.core {
+  padding: 22px 22px 24px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: rgb(var(--lum));
+  background: rgb(var(--lum) / .1);
+  box-shadow: inset 0 0 0 1px rgb(var(--lum) / .22);
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cardTitle {
+  margin: 18px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.text {
+  margin: 8px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .checklist {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.15fr);
+  }
+
+  .checklist {
+    grid-column: 4;
+    grid-row: 1 / span 2;
+  }
+}

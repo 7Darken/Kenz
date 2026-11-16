@@ -4,11 +4,12 @@ import { apps } from "./apps";
 import { common } from "./common";
 import { createur } from "./createur";
 import { footer } from "./footer";
+import { itineraire } from "./itineraire";
 import { pro } from "./pro";
 import { sport } from "./sport";
 import { victoire } from "./victoire";
 import { voyage } from "./voyage";
 
-export const fr = { common, pro, apps, agents, victoire, createur, voyage, sport, footer };
+export const fr = { common, pro, apps, agents, victoire, createur, voyage, itineraire, sport, footer };
 
 export type Dictionary = typeof fr;

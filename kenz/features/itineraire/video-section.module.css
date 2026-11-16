@@ -1,0 +1,116 @@
+/* La vidéo du voyage : l'affiche (puis le lecteur) à gauche, la phrase et les deux boutons à droite */
+.core {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 56px);
+  padding: 8px;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: calc(var(--r-xl) - 12px);
+  background: var(--media-bg);
+}
+
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.poster:focus-visible {
+  outline-offset: -4px;
+  outline-color: var(--creme);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 1.2s var(--expo);
+}
+
+.poster:hover .image {
+  transform: scale(1.03);
+}
+
+.play {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  transition: transform .7s var(--expo);
+}
+
+.play svg {
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.poster:hover .play {
+  transform: scale(1.08);
+}
+
+.copy {
+  padding: 8px clamp(12px, 2vw, 24px) clamp(20px, 3vw, 28px);
+}
+
+.title {
+  margin: 0;
+  max-width: 14ch;
+  font-size: clamp(32px, 3.6vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -.03em;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.text {
+  margin: 18px 0 0;
+  max-width: 40ch;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+@media (min-width: 900px) {
+  .core {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+
+  .copy {
+    padding: 24px 32px 24px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image,
+  .play {
+    transition: none;
+  }
+
+  .poster:hover .image,
+  .poster:hover .play {
+    transform: none;
+  }
+}

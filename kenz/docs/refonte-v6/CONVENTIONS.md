@@ -72,6 +72,7 @@ export default function ProHomePage() {
 | `/createur` | `#voyage`, `#sport`, `#suivre` |
 | `/createur/voyage` | `#marques` |
 | `/createur/sport` | `#partage`, `#courses` |
+| `/createur/itineraire/[slug]` | `#itineraire` (le calendrier ; un jour : `#jour-5`), `#infos`, `#video` |
 
 Une section qu'on atteint par une ancre et qui doit recevoir le focus porte `tabIndex={-1}`.
 
@@ -98,7 +99,7 @@ Le serveur rend toujours le français. L'anglais (`?lang=en` ou le choix mémori
 
 **Les espaces de chaque univers.** Le provider de langue est monté par `UniverseShell` avec les seuls espaces de son
 univers (`universeMessages` d'i18n/server.ts) : Pro `common`, `footer`, `pro`, `apps`, `agents`, `victoire` ;
-Créateur `common`, `footer`, `createur`, `voyage`, `sport` ; k15ze `common`, `footer`, `sport`. Un composant ne lit
+Créateur `common`, `footer`, `createur`, `voyage`, `itineraire`, `sport` ; k15ze `common`, `footer`, `sport`. Un composant ne lit
 que les espaces de l'univers où il est monté ; en développement, lire un autre espace lève une erreur claire.
 Un nouvel espace s'ajoute à son univers dans `universeMessages`.
 

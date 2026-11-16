@@ -75,6 +75,7 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `voyage.html` : arrivée (la bille), dernière vidéo, mes séries (la bille suit la liste), le vrai prix, « Tu pars en Chine ? », me suivre, retour | `app/(createur)/createur/(terre)/voyage/page.tsx` + sections dans `features/voyage/` ; la bille vient du mode `bille` de `features/terre/` (agent 4) | 5 |
 | `voyage.html` `#marques` : Marques & collaborations (marque / budget / idée) | `features/marques/` → `POST /api/contact` (`type: "marques"`) | 5 |
 | `sport.html` : la promesse, ce que je partage (`K15ZE_TOPICS`), mes courses, me suivre (YouTube), retour | `app/(createur)/createur/sport/page.tsx` + `features/sport/page.ts` + `features/courses/` | 5 |
+| Ancien site (`main`), `/itineraire/chine` : l'itinéraire jour par jour (hors maquette, porté dans la DA Terre). Arrivée, calendrier (villes, date de départ, export `.ics`), jour ouvert (`#jour-5`, flèches, glissé), carte du trajet en SVG, barre des jours, infos pratiques et checklist, vidéo, porte « abonnés » sur l'honneur | `app/(createur)/createur/(terre)/itineraire/[slug]/page.tsx` + `features/itineraire/` ; données `content/itineraries.ts` ; l'ancienne adresse redirige (308) ; le bouton de la carte « Tu pars en Chine ? » (`CHINA_GUIDE`) y mène, avec la transition Passage | 5 |
 | `shared/courses.*` : compositions en parallaxe, fiche détail (`Dialog`), scènes animées HYROX, Spartan et Boxe | `features/courses/` | 5 |
 
 ## Passages (agent 6)
@@ -93,7 +94,6 @@ L'agent 6 peut monter son composant racine dans `app/_components/universe-shell.
 - `shared/revue.js` (outil de revue)
 - `maquettes/v6/index.html` (sommaire des maquettes)
 - Les portes de test `?clair` / `?sombre` et `?test-code` : retirées de la production. Pour tester un mode, utiliser le bouton ou les DevTools.
-- `voyage.html` `#guide`, le bouton de la carte « Tu pars en Chine ? » : la maquette affiche « Ouvrir l'itinéraire » vers `https://kenzenbien.fr/itineraire/chine`, une page qui n'existe pas encore (404). Le site affiche donc « Voir l'itinéraire en vidéo » vers la vidéo YouTube du même itinéraire. Le libellé et le lien de la maquette reviennent d'eux-mêmes quand la page est en ligne : passer `CHINA_GUIDE.page.online` à `true` dans `content/series.ts`. **À valider par Kenz.**
 
 ## Contenu typé (`content/`) et dictionnaires
 
@@ -104,6 +104,7 @@ L'agent 6 peut monter son composant racine dans `app/_components/universe-shell.
 | `content/startup-weekend.ts` | Faits et médias des 54 h | 2 |
 | `content/ia.ts` | Les 4 cas, « Et chez vous ? » (`IA_NEEDS`), la méthode | 3 |
 | `content/series.ts` | Bloc `ESCALES` ; séries, dernière vidéo, vrai prix, guide Chine | `ESCALES` : 4 ; le reste : 5 |
+| `content/itineraries.ts` | Les itinéraires jour par jour (Chine, 14 jours) : villes, jours, activités, prix, astuces, infos pratiques, checklist | 5 |
 | `content/courses.ts` | Courses, scènes 3D, `K15ZE_TOPICS`, `CREATEUR_COURSE_IDS` | 5 |
 | `content/contact.ts` | Contrat des formulaires (besoins, budgets, limites, réponse de l'API) | Fondations (demander à l'orchestrateur) |
 | `content/site.ts`, `content/socials.ts`, `content/types.ts` | Routes, couleurs des passages, images de partage, réseaux | Fondations (demander à l'orchestrateur) |
@@ -114,6 +115,6 @@ Dictionnaires : `i18n/dictionaries/{fr,en}/<espace>.ts`. Chaque agent n'édite q
 - 2 : `apps`, `victoire`
 - 3 : `agents`
 - 4 : `createur` (le bloc `chapters` sert à la nav)
-- 5 : `voyage`, `sport`
+- 5 : `voyage`, `itineraire`, `sport`
 - 6 : `common.passages`
 - `common` et `footer` : fondations

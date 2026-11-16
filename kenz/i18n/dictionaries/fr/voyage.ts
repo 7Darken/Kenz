@@ -38,8 +38,6 @@ export const voyage = {
   guide: {
     title: "Tu pars en *Chine* ?",
     bases: "Les trois bases",
-    /** Le bouton, tant que la page de l'itinéraire n'est pas en ligne : la vidéo du même itinéraire */
-    watch: "Voir l’itinéraire en vidéo",
     soon: "D’autres guides arrivent.",
   },
   marques: {

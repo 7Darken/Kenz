@@ -34,11 +34,14 @@ const config = {
       ['/createur/sport', 0.8],
     ]);
 
+    // Les itinéraires jour par jour (/createur/itineraire/<pays>) : des guides, au rang des pages d'univers.
+    const isItinerary = path.startsWith('/createur/itineraire/');
+
     return {
       // Laisser le chemin relatif permet à next-sitemap de préfixer automatiquement avec siteUrl.
       loc: path,
       changefreq: config.changefreq ?? 'weekly',
-      priority: priorityOverrides.get(path) ?? config.priority ?? 0.7,
+      priority: priorityOverrides.get(path) ?? (isItinerary ? 0.8 : undefined) ?? config.priority ?? 0.7,
       lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
       alternateRefs: config.alternateRefs ?? [],
     };
