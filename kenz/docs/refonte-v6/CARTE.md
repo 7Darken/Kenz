@@ -37,7 +37,7 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | Sélecteur de langue | `language-toggle.tsx` | Compact, en texte (« FR · EN »), dans la barre du bas du pied de page. |
 | Porte de retour des pages d'univers (`.retour`), matière des cartes (`.bezel`), briques des pages d'univers | `design-system/components/return-door.tsx`, `design-system/styles/bezel.module.css`, `design-system/styles/univers-page.module.css` | Partagés par voyage, sport et marques. |
 | Page 404 | `app/not-found.tsx` | Hors univers ; le retour mène à l'accueil de l'univers de l'adresse. |
-| `.nav` + variantes de `pro`, `app`, `agents`, `createur` (barre « stories »), `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
+| `.nav` + variantes de `pro`, `app`, `agents`, `createur`, `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
 | `shared/footer.*` | `features/footer/footer.tsx` | Variantes pro, createur, k15ze. |
 | Lenis, GSAP, ScrollTrigger, ancres | `design-system/motion/*` | `useMotion()`, `useGsap()`, `useInView()`, `useReducedMotion()`, `useMediaQuery()`. |
 | Niveaux de qualité (appareils moins puissants) | `design-system/motion/quality.ts`, `quality-script.ts`, `use-quality.ts` | `<html data-quality>`, `useQuality()`, `getQuality()` / `subscribeQuality()`, `noteFrame(t)` ; voir `CONVENTIONS.md` §5. |

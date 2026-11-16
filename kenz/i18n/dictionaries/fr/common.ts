@@ -15,7 +15,6 @@ export const common = {
   },
   nav: {
     contact: "Me contacter",
-    chapters: "Chapitres",
     tryApp: "Essayer",
     /** « Essayer {app} » : nom accessible du bouton de l'app dans la nav ; il commence par le texte visible (`tryApp`) */
     tryAppLabel: "Essayer {app}",

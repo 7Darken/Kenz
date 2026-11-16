@@ -17,7 +17,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 
 import type { NavApp } from "@/content/apps";
 import { passageAttributes, ROUTES, type Universe } from "@/content/site";
@@ -29,7 +29,6 @@ import { usePageEntrance } from "@/features/passages";
 import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import styles from "./nav.module.css";
-import { StoryBar, type StoryChapter } from "./story-bar";
 
 interface NavProps {
   variant: Universe;
@@ -38,8 +37,6 @@ interface NavProps {
   /** Pro : les apps (nom, type, icône), passées par le layout serveur pour ne pas embarquer content/apps. */
   apps?: Readonly<Record<string, NavApp>>;
 }
-
-const STORY_IDS = ["top", "voyage", "sport", "suivre"] as const;
 
 /** Le fondu d'arrivée de la barre : `app` (1,4 s après l'arrivée), `page` (0,2 s après), ou aucun (accueils). */
 type NavFade = "app" | "page" | null;
@@ -66,7 +63,6 @@ export function Nav({ variant, dot, apps }: NavProps) {
   const pathname = usePathname();
   const { t } = useLanguage();
   const scrolled = useScrolled();
-  const [chapterIndex, setChapterIndex] = useState(0);
 
   const isCreateurHome = variant === "createur" && pathname === ROUTES.createur;
   const appSlug = variant === "pro" ? pathname.match(/^\/apps\/([^/]+)/)?.[1] : undefined;
@@ -74,11 +70,6 @@ export function Nav({ variant, dot, apps }: NavProps) {
   const fade = navFade(variant, pathname, !!app);
   // L'entrée vaut pour le chemin : la barre apparaît une image après l'arrivée, et disparaît d'un coup à la page suivante.
   const { entered, via, ready } = usePageEntrance({ enabled: fade !== null });
-  // Les chapitres de l'accueil Créateur : seul cet univers reçoit l'espace `createur` du dictionnaire.
-  const storyChapters = useMemo<StoryChapter[]>(
-    () => (variant === "createur" ? STORY_IDS.map((id) => ({ id, label: t.createur.chapters[id] })) : []),
-    [t, variant],
-  );
 
   // Le logo : sur la page d'accueil de l'univers, il remonte en haut ; ailleurs, il y mène.
   const homeHref = variant === "pro" ? ROUTES.home : ROUTES.createur;
@@ -91,19 +82,14 @@ export function Nav({ variant, dot, apps }: NavProps) {
     </>
   );
 
-  const cls = [styles.nav, isCreateurHome && styles.withStory].filter(Boolean).join(" ");
-
   return (
     <header
-      className={cls}
+      className={styles.nav}
       data-scrolled={scrolled ? "" : undefined}
       data-fade={fade ?? undefined}
       data-in={fade && entered ? "" : undefined}
       data-arriving={via && !ready ? "" : undefined}
     >
-      {isCreateurHome ? (
-        <StoryBar chapters={storyChapters} label={t.common.nav.chapters} onChapterChange={setChapterIndex} />
-      ) : null}
       <div className={styles.inner}>
         {logoHref === "#top" ? (
           // Sur l'accueil, une ancre simple : MotionProvider remonte en douceur (next/link prendrait le clic).
@@ -115,14 +101,6 @@ export function Nav({ variant, dot, apps }: NavProps) {
             {logo}
           </Link>
         )}
-
-        {isCreateurHome ? (
-          <p className={styles.chapter} aria-hidden="true">
-            <span key={chapterIndex} className={styles.chapterText}>
-              {storyChapters[chapterIndex]?.label}
-            </span>
-          </p>
-        ) : null}
 
         {variant !== "pro" && !isCreateurHome ? (
           <Link className={styles.back} href={ROUTES.createur} {...passageAttributes("createur")}>

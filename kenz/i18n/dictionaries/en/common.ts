@@ -13,7 +13,6 @@ export const common: CommonDictionary = {
   },
   nav: {
     contact: "Get in touch",
-    chapters: "Chapters",
     tryApp: "Try",
     tryAppLabel: "Try {app}",
     seeSite: "See the site",

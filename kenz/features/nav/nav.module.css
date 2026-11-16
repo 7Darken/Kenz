@@ -334,52 +334,10 @@
   }
 }
 
-/* Accueil Créateur : la barre « stories » au-dessus, une nav plus basse */
-.withStory .inner {
-  height: 58px;
-}
-
-/* Le nom du chapitre en cours (Instrument Serif), remplacé en glissant */
-.chapter {
-  display: flex;
-  align-items: center;
-  height: 30px;
-  overflow: hidden;
-  font-family: var(--f-word);
-  font-style: italic;
-  font-size: 19px;
-  line-height: 1.3;
-  color: rgb(var(--fg-rgb) / .86);
-}
-
-.chapterText {
-  display: block;
-  white-space: nowrap;
-  animation: chapterIn .8s var(--expo) both;
-}
-
-@keyframes chapterIn {
-  from {
-    transform: translateY(110%);
-    filter: blur(4px);
-    opacity: 0;
-  }
-
-  to {
-    transform: none;
-    filter: none;
-    opacity: 1;
-  }
-}
-
 @media (max-width: 600px) {
   .inner {
     height: 64px;
     gap: 6px;
-  }
-
-  .withStory .inner {
-    height: 54px;
   }
 
   .logo {
@@ -403,26 +361,6 @@
     height: var(--target);
     padding-right: 16px;
     font-size: 13.5px;
-  }
-
-  .chapter {
-    font-size: 17px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .chapterText {
-    animation-name: chapterFade;
-  }
-
-  @keyframes chapterFade {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
   }
 }
 
