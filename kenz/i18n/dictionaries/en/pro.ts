@@ -17,6 +17,11 @@ export const pro: ProDictionary = {
     portraitAlt: "Kenz",
     hint: "Touch a star.",
     explore: "Explore",
+    users: {
+      amount: "{n}+",
+      label: "users across all my apps",
+      full: "More than {n} users across all my apps",
+    },
     scene: {
       example: "example",
       budget: "Budget",

@@ -8,7 +8,7 @@
  * les autres captures (et la mini-animation de Zenko) à la première ouverture.
  */
 import Image from "next/image";
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { flushSync } from "react-dom";
 
 import type { AppSpaceCard, MobileAppSlug } from "@/content/apps";
@@ -18,7 +18,8 @@ import { Icon } from "@/design-system/components/icon";
 import { Rich } from "@/design-system/components/rich";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
-import { startSpace } from "./space-engine";
+import { AppsTotal } from "./apps-total";
+import { ENSEMBLE_EVENT, startSpace } from "./space-engine";
 import { ZenkoScene } from "./zenko-scene";
 import styles from "./apps-space.module.css";
 
@@ -36,6 +37,8 @@ interface SpaceSceneProps {
   code: readonly number[];
   portrait: ImageAsset;
   titleId: string;
+  /** Le total des utilisateurs, toutes apps confondues (sous l'en-tête). */
+  users: number;
 }
 
 /** Les mini-animations (sans captures App Store) ; Zenko est la seule. */
@@ -58,7 +61,7 @@ const DUST = [
 
 const vars = (v: Record<string, string | number>) => v as CSSProperties;
 
-export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
+export function SpaceScene({ apps, code, portrait, titleId, users }: SpaceSceneProps) {
   const { lang, t } = useLanguage();
   const s = t.pro.space;
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -83,6 +86,10 @@ export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
   }, [apps, code]);
 
   const describedBy = (k: number) => `${uid}-d${k}`;
+  // Le total est monté : le moteur allume l'ensemble des astres.
+  const lightAll = useCallback(() => {
+    sceneRef.current?.dispatchEvent(new Event(ENSEMBLE_EVENT));
+  }, []);
 
   return (
     <div ref={sceneRef} className={styles.scene}>
@@ -122,6 +129,7 @@ export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
               <Rich text={s.sub} />
             </p>
           </div>
+          <AppsTotal value={users} onDone={lightAll} />
         </div>
 
         <div className={styles.astres} data-layer="dock">
@@ -155,21 +163,22 @@ export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
             );
           })}
 
+          {/* Les dégradés portent les couleurs de la nuit ; en mode clair, le CSS les repeint (classes grad…). */}
           <svg className={styles.fils} data-viewbox="" aria-hidden="true" focusable="false">
             <defs>
               {apps.slice(0, -1).map((a, i) => (
-                <linearGradient key={a.slug} id={`${uid}-f${i}`} gradientUnits="userSpaceOnUse" data-fil-grad="">
+                <linearGradient key={a.slug} id={`${uid}-f${i}`} className={styles.gradFil} gradientUnits="userSpaceOnUse" data-fil-grad="">
                   <stop offset="0" stopColor={a.color} stopOpacity=".6" />
                   <stop offset=".5" stopColor="#F4EFE6" stopOpacity=".12" />
                   <stop offset="1" stopColor={apps[i + 1].color} stopOpacity=".6" />
                 </linearGradient>
               ))}
-              <radialGradient id={`${uid}-ph`}>
+              <radialGradient id={`${uid}-ph`} className={styles.gradLueur}>
                 <stop offset="0" stopColor="#FFF8EC" stopOpacity=".95" />
                 <stop offset=".3" stopColor="#FFE6BC" stopOpacity=".3" />
                 <stop offset="1" stopColor="#FFE6BC" stopOpacity="0" />
               </radialGradient>
-              <linearGradient id={`${uid}-pt`} gradientUnits="userSpaceOnUse" data-photon-trail="">
+              <linearGradient id={`${uid}-pt`} className={styles.gradTrainee} gradientUnits="userSpaceOnUse" data-photon-trail="">
                 <stop offset="0" stopColor="#FFF1D6" stopOpacity="0" />
                 <stop offset="1" stopColor="#FFF6E6" stopOpacity=".95" />
               </linearGradient>
@@ -188,13 +197,13 @@ export function SpaceScene({ apps, code, portrait, titleId }: SpaceSceneProps) {
 
           <svg className={styles.trace} data-viewbox="" aria-hidden="true" focusable="false">
             <defs>
-              <radialGradient id={`${uid}-br`}>
+              <radialGradient id={`${uid}-br`} className={styles.gradBraise}>
                 <stop offset="0" stopColor="#FFF1CC" stopOpacity=".92" />
                 <stop offset=".16" stopColor="#FFC56A" stopOpacity=".52" />
                 <stop offset=".46" stopColor="#F2A040" stopOpacity=".15" />
                 <stop offset="1" stopColor="#F2A040" stopOpacity="0" />
               </radialGradient>
-              <radialGradient id={`${uid}-tp`}>
+              <radialGradient id={`${uid}-tp`} className={styles.gradLueur}>
                 <stop offset="0" stopColor="#FFF8EC" stopOpacity=".9" />
                 <stop offset=".32" stopColor="#FFE6BC" stopOpacity=".22" />
                 <stop offset="1" stopColor="#FFE6BC" stopOpacity="0" />

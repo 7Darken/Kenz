@@ -18,10 +18,16 @@
  * Mouvement réduit : ciel fixe sans scintillement, pas de caméra, des fondus.
  */
 import { CSS_EASE } from "@/design-system/motion/easings";
+import { noteFrame, subscribeQuality } from "@/design-system/motion/quality";
+import { getTheme } from "@/design-system/theme/theme-store";
 import { openPassage } from "@/features/passages";
+import { SKY_PALETTES } from "./space-palette";
 import { createSky, type Zone } from "./space-sky";
 import { playAnimation, playGallery, type PreviewController } from "./space-preview";
 import { createTrace, TRACE_FADE_MS, TRACE_THRESHOLD, type StarPoint } from "./space-trace";
+
+/** Événement DOM sur la scène : le total des utilisateurs a fini de monter, tous les astres s'allument ensemble. */
+export const ENSEMBLE_EVENT = "kz-apps:ensemble";
 
 interface SpaceEngineApp {
   color: string;
@@ -119,6 +125,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   const reduced = () => mqReduced.matches;
   const now = () => performance.now();
   const sky = createSky(canvas, layers[0]);
+  /** Les couleurs du mode (clair : le ciel d'aube) ; suivies à chaque bascule. */
+  let palette = SKY_PALETTES[getTheme()];
   const cleanups: (() => void)[] = [];
   let dead = false;
   /** Un écouteur, retiré au démontage. Le type d'événement est celui annoncé par le gestionnaire. */
@@ -237,6 +245,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
       extraZones: box ? [{ x: box.x - 40, y: box.y - 40, w: ficheW + 80, h: ficheH + 80 }] : [],
       W,
       H,
+      palette,
     });
   }
 
@@ -300,13 +309,31 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     const m = strong ? 2.3 : 1.7;
     const timing = { duration: strong ? 1200 : 950, easing: IOS };
     aig?.animate([{ transform: "scale(1)" }, { transform: `scale(${m})`, offset: 0.28 }, { transform: "scale(1)" }], timing);
+    const { rest, peak } = palette.flash;
     hal?.animate(
       [
-        { transform: "scale(1)", filter: "brightness(1)" },
-        { transform: `scale(${strong ? 1.5 : 1.25})`, filter: "brightness(1.9)", offset: 0.25 },
-        { transform: "scale(1)", filter: "brightness(1)" },
+        { transform: "scale(1)", filter: rest },
+        { transform: `scale(${strong ? 1.5 : 1.25})`, filter: peak, offset: 0.25 },
+        { transform: "scale(1)", filter: rest },
       ],
       timing,
+    );
+  }
+
+  /* ---------- L'ensemble : le total des utilisateurs est monté, tous les astres s'allument une fois ensemble ----------
+     Après l'arrivée des astres (sinon il l'attend) ; pas en mouvement réduit, ni pendant un départ ou un tracé. */
+  let ensembleDue = false;
+  function ensemble() {
+    if (!skyReady) {
+      ensembleDue = true;
+      return;
+    }
+    ensembleDue = false;
+    if (reduced() || leaving || trace.isActive()) return;
+    astres.forEach((_, i) => flash(i, true));
+    // Les fils s'avivent en même temps : la constellation entière, d'un seul éclat.
+    filLines.forEach((line) =>
+      line.animate([{ opacity: 0.6 }, { opacity: 1, offset: 0.3 }, { opacity: 0.6 }], { duration: 1200, easing: IOS }),
     );
   }
 
@@ -314,9 +341,12 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   function loop(t: number) {
     raf = 0;
     if (!active) return;
+    noteFrame(t);
     const rm = reduced();
     const vh = window.innerHeight || 1;
+    // Toutes les lectures de mise en page avant les écritures de l'image (pas de mise en page forcée).
     const r = scene.getBoundingClientRect();
+    const iconBox = shown >= 0 && mode === "float" ? astres[shown]?.querySelector("img")?.getBoundingClientRect() : undefined;
     const sp = rm ? 0 : clamp((r.top + r.height / 2 - vh / 2) / vh, -1, 1);
     const boost = open >= 0 ? 1.6 : 1;
     layers.forEach((layer, i) => {
@@ -331,7 +361,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     glintStep(t);
     if (shown >= 0) {
       moveFiche(t);
-      drawLegend();
+      drawLegend(iconBox && { scene: r, icon: iconBox });
     }
     if (!rm || plunge) raf = requestAnimationFrame(loop);
   }
@@ -535,18 +565,20 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   }
 
   /** La légende de HUD : un fil de lumière de l'astre au bord le plus proche de la fiche (il suit l'astre pendant la
-   *  parallaxe, et la fiche pendant qu'elle glisse). La feuille n'en a pas : l'astre visé est mis en avant. */
-  function drawLegend() {
+   *  parallaxe, et la fiche pendant qu'elle glisse). La feuille n'en a pas : l'astre visé est mis en avant.
+   *  `boxes` : la scène et l'icône déjà mesurées (la boucle les lit avant d'écrire) ; la fiche se déduit de sa place. */
+  function drawLegend(boxes?: { scene: DOMRect; icon: DOMRect }) {
     if (mode !== "float") return;
     const icon = astres[shown]?.querySelector("img");
     if (!icon) return;
-    const r = scene.getBoundingClientRect();
-    const b = icon.getBoundingClientRect();
-    const f = fiche.getBoundingClientRect();
+    const r = boxes?.scene ?? scene.getBoundingClientRect();
+    const b = boxes?.icon ?? icon.getBoundingClientRect();
     const ax = b.left - r.left + b.width / 2;
     const ay = b.top - r.top + b.height / 2;
     const R = b.width * 0.82;
-    const F = { x: f.left - r.left, y: f.top - r.top, w: f.width, h: f.height };
+    // La fiche est posée par sa translation (moveFiche) : sa boîte s'en déduit sans la mesurer.
+    const [pdx, pdy] = parallax[2];
+    const F = { x: pos.x + pdx, y: pos.y + pdy, w: ficheW, h: ficheH };
     const outX = Math.max(F.x - ax, 0, ax - F.x - F.w);
     const outY = Math.max(F.y - ay, 0, ay - F.y - F.h);
     let ex: number;
@@ -585,6 +617,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     arrivalTimers.forEach(window.clearTimeout);
     arrivalTimers.length = 0;
     skyReady = true;
+    if (ensembleDue) ensemble();
   }
 
   /** Ouvre la fiche de l'astre k. Si elle est déjà là (ouverte, ou en train de s'éteindre), elle ne se rouvre pas :
@@ -966,6 +999,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     const done = () => {
       skyReady = true;
       glint.next = now() + 1600;
+      if (ensembleDue) ensemble();
     };
     const t0 = rm ? 0 : 650;
     const step = rm ? 0 : 150;
@@ -1017,11 +1051,19 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
   io.observe(scene);
   listen(document, "visibilitychange", setActive);
   const ro = new ResizeObserver(() => measure());
+  // Une baisse du niveau de qualité : le ciel se ressème (moins d'étoiles, canevas moins fin).
+  const unsubscribeQuality = subscribeQuality(() => measure());
   ro.observe(scene);
   // La fiche et les noms changent de taille avec la langue : la place de la fiche se recalcule, le ciel ne bouge pas.
   const roFiche = new ResizeObserver(() => refit());
   [fiche, ...scene.querySelectorAll("[data-nom]")].forEach((el) => roFiche.observe(el));
   listen(window, "resize", measure);
+  listen(scene, ENSEMBLE_EVENT, ensemble);
+  // Le mode change (bouton, système) : le même ciel, redessiné dans l'autre palette, sans recharger la page.
+  listen(document, "kz-theme:change", () => {
+    palette = SKY_PALETTES[getTheme()];
+    if (reduced() || !active) drawSky(now());
+  });
   void document.fonts?.ready.then(() => {
     if (!dead) measure();
   });
@@ -1033,6 +1075,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     io.disconnect();
     ro.disconnect();
     roFiche.disconnect();
+    unsubscribeQuality();
     cleanups.forEach((fn) => fn());
     if (raf) cancelAnimationFrame(raf);
     [ficheTimer, hoverDelay, restoreTimer, ...arrivalTimers].forEach(window.clearTimeout);

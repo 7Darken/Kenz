@@ -1,9 +1,16 @@
 /**
  * Le ciel lointain de la scène des apps, dessiné dans un canvas (shared/apps.js : semerEtoiles, dessinerCiel,
- * filante). 260 à 520 étoiles (blanc chaud, bleu pâle, quelques dorées), chacune son rythme ; les plus vives ont
- * des aigrettes. Une étoile filante discrète toutes les 10 à 16 s, sur un trajet qui ne croise aucun texte.
+ * filante). 260 à 520 étoiles en trois tons (la nuit : blanc chaud, bleu pâle, quelques dorées ; l'aube : encre, bleu
+ * nuit, Lagon), chacune son rythme ; les plus vives ont des aigrettes. Les couleurs viennent de la palette du mode
+ * (./space-palette), passée à chaque image : changer de mode redessine le même ciel. Une étoile filante discrète
+ * toutes les 10 à 16 s, sur un trajet qui ne croise aucun texte.
  * À l'arrivée, les étoiles s'allument depuis le centre ; à la plongée, elles filent vers l'extérieur.
+ * Niveau de qualité (design-system/motion/quality) : moins d'étoiles et un canevas moins fin en `medium` et `low` ;
+ * en `low`, ni scintillement ni étoile filante : le ciel posé n'est redessiné que s'il change (arrivée, plongée, mode).
  */
+
+import { getQuality, type Quality } from "@/design-system/motion/quality";
+import type { SkyPalette } from "./space-palette";
 
 export interface Zone {
   x: number;
@@ -17,7 +24,8 @@ interface Star {
   y: number;
   r: number;
   a: number;
-  col: string;
+  /** Son ton, index de SkyPalette.tones. */
+  tone: number;
   w: number;
   ph: number;
   aig: number;
@@ -51,21 +59,27 @@ interface SkyFrame {
   /** Taille de la scène. */
   W: number;
   H: number;
+  /** Les couleurs du mode. */
+  palette: SkyPalette;
 }
 
-const COLORS = ["#FFF3E2", "#FFF3E2", "#FFF3E2", "#FFF3E2", "#D3E1FF", "#D3E1FF", "#FFD596"];
+/** Le tirage des tons : quatre étoiles sur sept prennent le troisième, deux le premier, une le deuxième. */
+const TONE_DRAW = [2, 2, 2, 2, 0, 0, 1];
 const TAU = 6.2832;
+/** La part des étoiles semées, et la finesse du canevas, selon le niveau de qualité. */
+const STAR_SHARE: Record<Quality, number> = { high: 1, medium: 0.65, low: 0.4 };
+const SKY_DPR: Record<Quality, number> = { high: 1.5, medium: 1.25, low: 1 };
 
-/** Une lueur douce, dessinée une fois, pour les étoiles vives et l'étoile filante. */
-function makeSprite(): HTMLCanvasElement | null {
+/** Une lueur douce, dessinée une fois par palette, pour les étoiles vives et l'étoile filante. */
+function makeSprite([c0, c1, c2]: NonNullable<SkyPalette["glow"]>): HTMLCanvasElement | null {
   const sprite = document.createElement("canvas");
   sprite.width = sprite.height = 32;
   const g = sprite.getContext("2d");
   if (!g) return null;
   const rg = g.createRadialGradient(16, 16, 0, 16, 16, 16);
-  rg.addColorStop(0, "rgba(255,248,236,1)");
-  rg.addColorStop(0.22, "rgba(255,238,212,.38)");
-  rg.addColorStop(1, "rgba(255,238,212,0)");
+  rg.addColorStop(0, c0);
+  rg.addColorStop(0.22, c1);
+  rg.addColorStop(1, c2);
   g.fillStyle = rg;
   g.fillRect(0, 0, 32, 32);
   return sprite;
@@ -73,7 +87,8 @@ function makeSprite(): HTMLCanvasElement | null {
 
 export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
   const ctx = canvas.getContext("2d");
-  const sprite = makeSprite();
+  let sprite: HTMLCanvasElement | null = null;
+  let spriteOf: SkyPalette | null = null;
   let stars: Star[] = [];
   let zones: Zone[] = [];
   let cw = 0;
@@ -83,6 +98,8 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
   let dpr = 1;
   let shooting: Shooting | null = null;
   let nextShooting = 0;
+  /** Le ciel posé (sans scintillement) déjà dessiné, avec cette palette : rien à redessiner. */
+  let drawnStill: SkyPalette | null = null;
 
   /** Graines fixes : le même ciel à chaque visite. */
   function seed() {
@@ -91,7 +108,7 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
       s = (s * 16807) % 2147483647;
       return (s - 1) / 2147483646;
     };
-    const count = Math.round(Math.max(260, Math.min(520, (cw * ch) / 2600)));
+    const count = Math.round(Math.max(260, Math.min(520, (cw * ch) / 2600)) * STAR_SHARE[getQuality()]);
     const cx = cw / 2;
     const cy = ch / 2;
     const dm = Math.sqrt(cx * cx + cy * cy) || 1;
@@ -106,15 +123,15 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
         y,
         r: bright ? 1.15 + z * 0.8 : 0.38 + z * z * 1.05,
         a: bright ? 1 : 0.3 + rnd() * 0.65,
-        col: COLORS[Math.floor(rnd() * COLORS.length)] ?? COLORS[0],
+        tone: TONE_DRAW[Math.floor(rnd() * TONE_DRAW.length)] ?? 2,
         w: TAU / (0.6 + rnd() * 2.4),
         ph: rnd() * TAU,
         aig: bright ? 5 + rnd() * 8 : 0,
         n: (Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) / dm) * 1100,
       });
     }
-    // Groupées par couleur : moins de changements de style au dessin.
-    stars.sort((a, b) => (a.col < b.col ? -1 : a.col > b.col ? 1 : 0));
+    // Groupées par ton : moins de changements de style au dessin.
+    stars.sort((a, b) => a.tone - b.tone);
   }
 
   /** Remesure le calque (il déborde de la scène de 6 %) et ressème ; `textZones` en repère de la scène. */
@@ -123,7 +140,8 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
     oy = layer.offsetTop;
     cw = layer.clientWidth;
     ch = layer.clientHeight;
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    dpr = Math.min(window.devicePixelRatio || 1, SKY_DPR[getQuality()]);
+    drawnStill = null;
     canvas.width = Math.round(cw * dpr);
     canvas.height = Math.round(ch * dpr);
     zones = textZones;
@@ -166,12 +184,13 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
     const b = Math.max(0, e - 0.34);
     const tx = shooting.x + shooting.dx * b;
     const ty = shooting.y + shooting.dy * b;
+    const { from, to, alpha, width } = f.palette.shooting;
     const gradient = ctx.createLinearGradient(tx, ty, hx, hy);
-    gradient.addColorStop(0, "rgba(255,244,228,0)");
-    gradient.addColorStop(1, `rgba(255,250,240,${(0.85 * q).toFixed(3)})`);
+    gradient.addColorStop(0, `rgba(${from},0)`);
+    gradient.addColorStop(1, `rgba(${to},${(alpha * q).toFixed(3)})`);
     ctx.globalAlpha = 1;
     ctx.strokeStyle = gradient;
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = width;
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(tx, ty);
@@ -192,19 +211,30 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
     const pe = pl * pl * 0.2;
     const fx = f.plungeX - ox;
     const fy = f.plungeY - oy;
-    let col = "";
+    const { tones, alpha, twinkle, spikes } = f.palette;
+    /* sans scintillement (mouvement réduit, qualité basse), un ciel posé ne se redessine pas */
+    const calm = reduced || getQuality() === "low";
+    const settled = calm && age > 1700 && !pe && !shooting;
+    if (settled && drawnStill === f.palette) return;
+    drawnStill = settled ? f.palette : null;
+    if (spriteOf !== f.palette) {
+      spriteOf = f.palette;
+      sprite = f.palette.glow ? makeSprite(f.palette.glow) : null;
+    }
+    let tone = -1;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cw, ch);
     for (const s of stars) {
       const na = age > 1700 ? 1 : Math.max(0, Math.min(1, (age - s.n) / 480));
       if (na <= 0) continue;
-      const sn = reduced ? 0.55 : Math.sin(ta * s.w + s.ph);
-      const a = s.a * (0.58 + 0.42 * sn) * na;
+      const sn = calm ? 0.55 : Math.sin(ta * s.w + s.ph);
+      const a = s.a * (twinkle.base + twinkle.amp * sn) * na * alpha;
       const rr = s.r * (0.86 + 0.14 * sn);
-      if (s.col !== col) {
-        col = s.col;
-        ctx.fillStyle = col;
-        ctx.strokeStyle = col;
+      if (s.tone !== tone) {
+        tone = s.tone;
+        const c = tones[tone] ?? tones[2];
+        ctx.fillStyle = c;
+        ctx.strokeStyle = c;
       }
       ctx.globalAlpha = a;
       if (pe) {
@@ -221,9 +251,9 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
       ctx.arc(s.x, s.y, rr, 0, TAU);
       ctx.fill();
       if (s.aig) {
-        const L = s.aig * (reduced ? 1 : 0.62 + 0.38 * Math.sin(ta * s.w * 1.27 + s.ph * 2));
-        ctx.globalAlpha = a * 0.5;
-        ctx.lineWidth = 0.6;
+        const L = s.aig * (calm ? 1 : 0.62 + 0.38 * Math.sin(ta * s.w * 1.27 + s.ph * 2));
+        ctx.globalAlpha = a * spikes.alpha;
+        ctx.lineWidth = spikes.width;
         ctx.beginPath();
         ctx.moveTo(s.x - L, s.y);
         ctx.lineTo(s.x + L, s.y);
@@ -236,7 +266,7 @@ export function createSky(canvas: HTMLCanvasElement, layer: HTMLElement) {
         }
       }
     }
-    if (!reduced && f.shooting) drawShooting(t, f);
+    if (!calm && f.shooting) drawShooting(t, f);
     else shooting = null;
     ctx.globalAlpha = 1;
   }

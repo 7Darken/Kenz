@@ -2,7 +2,7 @@
  * Le chapitre « Mes apps » (pro.html A1) : six apps, six astres dans une nuit plein cadre.
  * Composant serveur : il lit le contenu (content/apps.ts) et le passe à la scène (client).
  */
-import { apps, CONSTELLATION_CODE, SPACE_ORDER } from "@/content/apps";
+import { apps, APPS_TOTAL_USERS, CONSTELLATION_CODE, SPACE_ORDER } from "@/content/apps";
 import { PORTRAITS } from "@/content/site";
 import { Section } from "@/design-system/components/section";
 import { SpaceScene, type SpaceApp } from "./space-scene";
@@ -20,7 +20,7 @@ export function AppsSpace() {
 
   return (
     <Section id="apps" aura="calme" className={styles.space} tabIndex={-1} aria-labelledby={TITLE_ID}>
-      <SpaceScene apps={items} code={code} portrait={PORTRAITS.pro} titleId={TITLE_ID} />
+      <SpaceScene apps={items} code={code} portrait={PORTRAITS.pro} titleId={TITLE_ID} users={APPS_TOTAL_USERS.value} />
     </Section>
   );
 }

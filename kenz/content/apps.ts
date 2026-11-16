@@ -25,6 +25,16 @@ const STORY_ORDER: readonly MobileAppSlug[] = ["oshii", "sago", "wado", "croc", 
 /** Le code secret : les astres à relier sans lâcher, dans cet ordre (seul passage Pro → Créateur). */
 export const CONSTELLATION_CODE: readonly MobileAppSlug[] = ["zenko", "oshii", "sago", "miru", "wado", "croc"];
 
+/** Le total des utilisateurs, toutes apps confondues (accueil Pro : sous l'en-tête de la scène des apps, jamais près
+ *  d'un astre). Un chiffre déclaré, pas une mesure publique : `statut` et `source` le disent. */
+export interface AppsUserTotal {
+  value: number;
+  statut: "déclaré" | "mesuré";
+  source: string;
+}
+
+export const APPS_TOTAL_USERS: AppsUserTotal = { value: 13000, statut: "déclaré", source: "Kenz, 16/11/2026" };
+
 /** Jour du relevé des versions : au-delà de 60 jours, la maquette donne la date plutôt que « il y a … ». */
 export const RELEASES_CHECKED_ON: IsoDate = "2026-11-11";
 

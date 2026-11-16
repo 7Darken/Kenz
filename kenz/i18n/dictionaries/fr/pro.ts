@@ -22,6 +22,13 @@ export const pro = {
     portraitAlt: "Kenz",
     hint: "Touche une étoile.",
     explore: "Explorer",
+    /** Le total des utilisateurs (sous l'en-tête) : `{n}` est le nombre, formaté selon la langue. `full` est la
+     *  phrase lue par les lecteurs d'écran (le chiffre qui monte ne l'est pas). */
+    users: {
+      amount: "+ de {n}",
+      label: "utilisateurs, toutes apps confondues",
+      full: "Plus de {n} utilisateurs, toutes apps confondues",
+    },
     /** La mini-animation de la fiche (données d'exemple). */
     scene: {
       example: "exemple",

@@ -1,6 +1,7 @@
 /* ==========================================================================
-   Les apps de Kenz, dans l'espace (shared/apps.css). La section est une nuit plein cadre dans les deux modes ;
-   ses bords haut et bas fondent dans la page (masque en dégradé long) : aucune ligne avec les voisines.
+   Les apps de Kenz, dans l'espace (shared/apps.css). La section est une nuit plein cadre en mode sombre, un ciel
+   d'aube en mode clair (dernier bloc avant les écrans) ; ses bords haut et bas fondent dans la page (masque en
+   dégradé long) : aucune ligne avec les voisines.
    Couches, de la plus lointaine à la plus proche : étoiles (canvas), nébuleuses, astres, poussière.
    La parallaxe passe par `translate` (posée par le moteur), la caméra par `transform`.
    États posés par le moteur (attributs) : sur la scène data-vu, data-actif, data-arrive, data-saut,
@@ -16,7 +17,7 @@
   min-height: 600px;
 }
 
-/* ---------- Jetons : la nuit, dans les deux modes ---------- */
+/* ---------- Jetons : la nuit (le mode clair les redéfinit, voir « Le mode clair ») ---------- */
 .scene {
   --ink: #F4EFE6;
   --muted-ink: rgba(244, 239, 230, .74);
@@ -125,15 +126,17 @@
   height: 100%;
 }
 
-/* La signature : Kenz, « Mes apps », et ce que Kenz en fait (encre sur le papier en mode clair) */
+/* La signature : Kenz, « Mes apps », et ce que Kenz en fait (encre sur le papier en mode clair) ; dessous, aligné
+   sur le texte, le total des utilisateurs */
 .sig {
   position: absolute;
   z-index: 6;
   top: var(--haut);
   left: var(--gutter);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto;
   align-items: center;
-  gap: 11px;
+  gap: 8px 11px;
   margin: 0;
   text-shadow: 0 0 16px rgba(3, 4, 12, .9);
   transition: opacity .35s var(--ios);
@@ -189,20 +192,64 @@
   color: var(--accent);
 }
 
+/* Le total des utilisateurs, toutes apps confondues : un grand chiffre (la police des titres) et sa légende en petit.
+   Pendant le compte (data-run, posé par apps-total), le total rendu réserve la largeur et le chiffre qui monte se
+   pose dessus : rien ne bouge autour. */
+.total {
+  grid-column: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+}
+
+.totalVal {
+  flex: none;
+  font-family: var(--f-title);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  color: var(--ink);
+  font-variant-numeric: lining-nums tabular-nums;     /* comme le compteur des 54 h ; la largeur ne bouge pas */
+}
+
+/* « + de », « + » : en petit, dans la police du texte, pour que le chiffre domine */
+.totalAff {
+  font-family: var(--f-text);
+  font-weight: 500;
+  font-size: max(12px, .4em);
+  letter-spacing: 0;
+}
+
+.totalNum {
+  display: inline-grid;
+}
+
+.totalFin,
+.totalRun {
+  grid-area: 1 / 1;
+}
+
+.totalRun,
+.total[data-run] .totalFin {
+  visibility: hidden;
+}
+
+.total[data-run] .totalRun {
+  visibility: visible;
+}
+
+.totalLeg {
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--muted-ink);
+  text-wrap: balance;
+}
+
 :global(html[data-theme="light"]) .sig {
   text-shadow: none;
-}
-
-:global(html[data-theme="light"]) .titre {
-  color: #1A1918;
-}
-
-:global(html[data-theme="light"]) .sous {
-  color: #4B4743;
-}
-
-:global(html[data-theme="light"]) .sous :global(.word) {
-  color: #0F5D6B;
 }
 
 :global(html[data-theme="light"]) .moi {
@@ -942,15 +989,223 @@
 .scene[data-arrive][data-saut] .neb,
 .scene[data-arrive][data-saut] .pous { transition: transform .76s var(--cam); }
 
+/* ---------- Le mode clair : un ciel d'aube (le mode sombre ne change pas) ----------
+   Plus un morceau de nuit : une carte du ciel imprimée sur le papier de la page. Le fond part de la crème de la page,
+   passe par une lavande et un bleu-gris très pâles au centre et y revient (avec le masque des bords : ni bloc ni
+   bande) ; les nébuleuses sont des voiles pastel en multiplication ; poussière, fils, photon et tracé sont à l'encre
+   ou au Lagon ; les astres sont des icônes posées sur le papier (ombre douce de leur teinte, liseré fin) ; la fiche
+   est un verre clair. Tout part de ces jetons ; le canvas lit les siens dans ./space-palette. */
+:global(html[data-theme="light"]) .scene {
+  --ink: var(--encre);
+  --muted-ink: #4B4743;                                /* AA large sur l'aube et sur la fiche (≥ 7:1) */
+  --accent: var(--lagon);
+  --aube-coeur: #E8E4F2;                               /* lavande très pâle, au cœur de la scène */
+  --aube-ciel: #E4E9EF;                                /* bleu-gris très pâle, autour */
+  --aube-voile: #FFF2E8;                               /* le blanc pêche qui fait des nébuleuses des pastels */
+  --aube-nuit: 42 59 102;                              /* le bleu nuit (r g b) : une poussière sur trois */
+  --aube-trait: var(--lagon);                          /* les fils, le photon, sa lueur */
+  --aube-or: #B07A10;                                  /* le code : l'or foncé, visible sur le clair */
+}
+
+:global(html[data-theme="light"]) .espace {
+  background:
+    radial-gradient(60% 48% at 50% 46%, var(--aube-coeur) 0%, transparent 72%),
+    radial-gradient(130% 95% at 50% 50%, var(--aube-ciel) 0%, color-mix(in srgb, var(--aube-ciel) 55%, var(--bg)) 58%, var(--bg) 100%);
+}
+
+/* Les nébuleuses : leur teinte de nuit, fondue en pastel (lilas, bleu pâle, pêche, Lagon clair), en multiplication */
+:global(html[data-theme="light"]) .neb {
+  mix-blend-mode: multiply;
+}
+
+:global(html[data-theme="light"]) .nebula {
+  --nl: color-mix(in oklab, var(--nc) 34%, var(--aube-voile));
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--nl) 70%, transparent), color-mix(in srgb, var(--nl) 26%, transparent) 46%, transparent);
+  opacity: calc(var(--na) * .7);
+}
+
+/* La poussière : des touches d'encre, une sur trois en bleu nuit */
+:global(html[data-theme="light"]) .pous i {
+  --pl: var(--fg-rgb);
+  background: radial-gradient(closest-side, rgb(var(--pl) / calc(var(--pa) * .9 + .1)), rgb(var(--pl) / 0));
+}
+
+:global(html[data-theme="light"]) .pous i:nth-child(3n) {
+  --pl: var(--aube-nuit);
+}
+
+/* Les astres : plus de lumière, une ombre douce de leur teinte et un liseré fin */
+:global(html[data-theme="light"]) .hal {
+  width: 190%;
+  translate: -50% -40%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 34%, transparent), color-mix(in srgb, var(--c) 12%, transparent) 50%, transparent);
+  opacity: .75;
+}
+
+:global(html[data-theme="light"]) .hal::before,
+:global(html[data-theme="light"]) .aig {
+  display: none;
+}
+
+:global(html[data-theme="light"]) .orb {
+  border-color: color-mix(in srgb, var(--c) 55%, rgb(var(--fg-rgb) / .3));
+  box-shadow: none;
+}
+
+:global(html[data-theme="light"]) .puce img {
+  box-shadow:
+    0 0 0 1px rgb(var(--fg-rgb) / .08),
+    0 1px 2px rgb(var(--fg-rgb) / .08),
+    0 12px 26px -10px color-mix(in srgb, var(--c) 72%, transparent);
+}
+
+:global(html[data-theme="light"]) .puce::after {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / .3);
+}
+
+:global(html[data-theme="light"]) .astres[data-survol] .astre:not([data-vise]) {
+  filter: saturate(.7);
+}
+
+/* Les noms et l'invitation : à l'encre, détachés des étoiles par un halo de papier */
+:global(html[data-theme="light"]) .etiq {
+  text-shadow: 0 0 12px var(--bg), 0 0 4px var(--bg);
+}
+
+:global(html[data-theme="light"]) .etiq em {
+  color: var(--muted-ink);
+}
+
+:global(html[data-theme="light"]) .indice {
+  color: var(--muted-ink);
+  text-shadow: 0 0 12px var(--bg);
+}
+
+/* Les fils et le photon : au Lagon, fins (les dégradés de la nuit sont repeints) */
+:global(html[data-theme="light"]) .gradFil stop {
+  stop-color: var(--aube-trait);
+  stop-opacity: .55;
+}
+
+:global(html[data-theme="light"]) .gradFil stop:nth-child(2) {
+  stop-color: var(--encre);
+  stop-opacity: .14;
+}
+
+:global(html[data-theme="light"]) .gradLueur stop {
+  stop-color: var(--aube-trait);
+  stop-opacity: 0;
+}
+
+:global(html[data-theme="light"]) .gradLueur stop:first-child { stop-opacity: .34; }
+:global(html[data-theme="light"]) .gradLueur stop:nth-child(2) { stop-opacity: .1; }
+
+:global(html[data-theme="light"]) .gradTrainee stop {
+  stop-color: var(--aube-trait);
+  stop-opacity: 0;
+}
+
+:global(html[data-theme="light"]) .gradTrainee stop:last-child { stop-opacity: .8; }
+
+:global(html[data-theme="light"]) .photonC,
+:global(html[data-theme="light"]) .tracePt {
+  fill: var(--aube-trait);
+}
+
+/* Le fil de la fiche */
+:global(html[data-theme="light"]) .legende {
+  filter: none;
+}
+
+:global(html[data-theme="light"]) .legL {
+  stroke: color-mix(in srgb, var(--c, var(--lagon)) 50%, var(--encre));
+  opacity: .55;
+}
+
+:global(html[data-theme="light"]) .legP {
+  fill: color-mix(in srgb, var(--c, var(--lagon)) 50%, var(--encre));
+}
+
+/* Le tracé : à l'encre ; le code s'allume en or foncé */
+:global(html[data-theme="light"]) .segF { stroke: rgb(var(--fg-rgb) / .62); }
+:global(html[data-theme="light"]) .segH { stroke: color-mix(in srgb, var(--lagon) 12%, transparent); }
+:global(html[data-theme="light"]) .vif .segF { stroke: rgb(var(--fg-rgb) / .42); }
+:global(html[data-theme="light"]) .vif .segH { stroke: color-mix(in srgb, var(--lagon) 7%, transparent); }
+:global(html[data-theme="light"]) .seg[data-feu] .segF { stroke: var(--aube-or); }
+:global(html[data-theme="light"]) .seg[data-feu] .segH { stroke: color-mix(in srgb, var(--aube-or) 22%, transparent); }
+:global(html[data-theme="light"]) .astre[data-feu] .hal { filter: saturate(1.3); }
+
+:global(html[data-theme="light"]) .astre[data-feu] .puce img {
+  box-shadow: 0 0 0 1.5px var(--aube-or), 0 12px 28px -8px color-mix(in srgb, var(--aube-or) 60%, transparent);
+}
+
+:global(html[data-theme="light"]) .gradBraise stop {
+  stop-color: var(--aube-or);
+  stop-opacity: 0;
+}
+
+:global(html[data-theme="light"]) .gradBraise stop:nth-child(1) { stop-color: color-mix(in oklab, var(--aube-or) 55%, #FFD98A); stop-opacity: .5; }
+:global(html[data-theme="light"]) .gradBraise stop:nth-child(2) { stop-opacity: .3; }
+:global(html[data-theme="light"]) .gradBraise stop:nth-child(3) { stop-opacity: .1; }
+
+/* La fiche : un verre clair, crème, texte à l'encre ; le téléphone garde son cadre sombre */
+:global(html[data-theme="light"]) .fiche {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--c) 9%, rgb(255 255 255 / .8)), color-mix(in srgb, var(--bg) 86%, transparent) 72%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c) 26%, rgb(var(--fg-rgb) / .08)),
+    inset 0 1px 0 rgb(255 255 255 / .9),
+    0 2px 6px -2px rgb(var(--fg-rgb) / .1),
+    0 26px 50px -26px color-mix(in srgb, var(--c) 40%, rgb(var(--fg-rgb) / .45));
+}
+
+:global(html[data-theme="light"]) .fiche::before {
+  background: repeating-linear-gradient(180deg, rgb(var(--fg-rgb) / .018) 0 1px, transparent 1px 3px);
+}
+
+:global(html[data-theme="light"]) .ficheScan {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--c) 70%, var(--encre)) 50%, transparent);
+  box-shadow: 0 0 10px 1px color-mix(in srgb, var(--c) 35%, transparent);
+}
+
+:global(html[data-theme="light"]) .ficheCadre {
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / .16),
+    0 0 0 3px rgb(var(--fg-rgb) / .9),
+    0 14px 26px -14px rgb(var(--fg-rgb) / .5),
+    0 0 26px -12px color-mix(in srgb, var(--c) 55%, transparent);
+}
+
+:global(html[data-theme="light"]) .ficheNom {
+  text-shadow: none;
+}
+
+:global(html[data-theme="light"]) .ficheDom {
+  color: color-mix(in oklab, var(--c) 58%, var(--encre));
+}
+
+:global(html[data-theme="light"]) .ficheLigne {
+  color: var(--muted-ink);
+}
+
+:global(html[data-theme="light"]) .ficheCta {
+  color: var(--creme);
+  background: var(--encre);
+  box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--c) 60%, rgb(var(--fg-rgb) / .5));
+}
+
 /* ---------- Mobile : une constellation de poche (trois colonnes, deux rangs en zigzag), qui laisse sous elle la
    place de la feuille. Les rangs se placent en pixels sous la signature, et respirent sur les grands écrans. ---------- */
 @media (max-width: 599px) {
   .scene {
-    --zt: calc(var(--haut) + 84px);                    /* le centre du premier rang, sous la signature */
+    --zt: calc(var(--haut) + 132px);                   /* le centre du premier rang, sous la signature et le total */
     --dz: clamp(40px, 7%, 64px);                       /* le zigzag */
     --rg: calc(var(--dz) + clamp(132px, 17%, 190px));  /* d'un rang à l'autre (le nom du dessus passe) */
   }
   .astre { top: calc(var(--zt) + var(--ry) * var(--rg) + var(--zy) * var(--dz)); }
+  /* Le total, plus petit, sa légende sur deux lignes : la signature reste au-dessus du premier rang */
+  .total { align-items: center; gap: 8px; }
+  .totalVal { font-size: 26px; }
+  .totalLeg { max-width: 14em; font-size: 12px; }
   .astre:nth-child(1) { --x: 20; --ry: 0; --zy: 0; }
   .astre:nth-child(2) { --x: 50; --ry: 0; --zy: 1; }
   .astre:nth-child(3) { --x: 80; --ry: 0; --zy: 0; }
@@ -962,17 +1217,22 @@
 /* ---------- Tablette ---------- */
 @media (min-width: 600px) and (max-width: 899px) {
   .scene { --st: 64px; }
+  .astre { top: calc(var(--y) * 1% + 44px); }          /* sous la signature et le total */
   .astre:nth-child(odd) { --x: 32; }
   .astre:nth-child(even) { --x: 68; }
 }
 
 /* ---------- Ordinateur ---------- */
 @media (min-width: 900px) {
+  /* Assez haute pour que le total, sous l'en-tête, passe au-dessus du nom du premier astre */
+  .space { min-height: 700px; }
   .scene {
     --haut: 100px;
     --fondu: clamp(160px, 28svh, 300px);
     --st: clamp(62px, 4.8vw, 76px);
   }
+  .totalVal { font-size: 40px; }
+  .totalLeg { font-size: 14px; }
   .etiq b { font-size: 15.5px; }
   .etiq em { font-size: 17px; }
   .aig::after { height: calc(var(--st) * 3); }
@@ -984,6 +1244,13 @@
   .astre:nth-child(5) { --x: 71; --y: 34; }
   .astre:nth-child(6) { --x: 85; --y: 60; }
   .astre:nth-child(odd) .etiq { top: auto; bottom: calc(100% + 18px); }
+}
+
+/* ---------- Ordinateur, écran bas : le total plus compact ---------- */
+@media (min-width: 900px) and (max-height: 760px) {
+  .sig { row-gap: 6px; }
+  .totalVal { font-size: 30px; }
+  .totalLeg { font-size: 13px; }
 }
 
 /* ---------- Mouvement réduit : ciel fixe sans scintillement, pas de caméra, des fondus ---------- */
