@@ -89,9 +89,10 @@ export const startupWeekend: StartupWeekend = {
       },
     },
     win: {
-      src: "/assets/img/startup-weekend-2.webp",
-      width: 1280,
-      height: 854,
+      // L'original de la photographe (2 000 px), au lieu de la copie LinkedIn
+      src: "/assets/img/startup-weekend-victoire.jpg",
+      width: 2000,
+      height: 1333,
       quality: 90,
       alt: {
         fr: "Kenz, en t-shirt vert, les deux poings levés au moment de l’annonce de la première place, à côté d’un coéquipier qui lève le poing, au milieu du public qui applaudit.",
