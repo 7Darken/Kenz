@@ -104,9 +104,8 @@
   font-weight: 500;
   white-space: nowrap;
   opacity: 0;
-  filter: blur(4px);
   transform: translateX(-12px);
-  transition: opacity .4s var(--expo), filter .5s var(--expo), transform .85s var(--expo);
+  transition: opacity .4s var(--expo), transform .85s var(--expo);
 }
 
 .link:hover .play,
@@ -121,7 +120,6 @@
 .link:hover .playLabel,
 .link:focus-visible .playLabel {
   opacity: 1;
-  filter: none;
   transform: none;
   transition-delay: .06s;
 }
@@ -140,7 +138,6 @@
 
   .playLabel {
     opacity: 1;
-    filter: none;
     transform: none;
     font-size: 14px;
   }

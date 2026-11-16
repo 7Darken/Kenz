@@ -253,9 +253,6 @@
   opacity: 0;
 }
 
-.card[data-spin] .slot {
-  filter: blur(1.2px);
-}
 
 .times {
   position: relative;

@@ -2,7 +2,7 @@
 
 /**
  * L'arrivée de /createur/voyage (voyage.html, `.vh`) : la bille de cristal en petit (l'emplacement libre, l'Asie
- * face à nous), « Kenz en Asie » qui se découvre avec son fantôme flou, la phrase mot par mot, puis
+ * face à nous), « Kenz en Asie » qui se découvre, la phrase mot par mot, puis
  * « Voir la dernière vidéo ».
  */
 import { Container } from "@/design-system/components/container";
@@ -39,9 +39,6 @@ export function VoyageHero() {
         <div>
           <h1 id="voyage-hero-title" className={styles.title}>
             <span className={`${styles.ttl} ${styles.main}`}>{title}</span>
-            <span className={`${styles.ttl} ${styles.ghost}`} aria-hidden="true">
-              {title}
-            </span>
           </h1>
           <Words
             as="p"

@@ -38,14 +38,6 @@
   display: block;
 }
 
-.ghost {
-  position: absolute;
-  inset: 0;
-  filter: blur(14px);
-  opacity: 0;
-  pointer-events: none;
-}
-
 .line {
   display: block;
 }
@@ -130,19 +122,7 @@
   }
 }
 
-/* L'entrée : le titre se découvre (et son fantôme flou), la phrase mot par mot, puis le lien */
-@keyframes appear {
-  from {
-    opacity: 0;
-    filter: blur(8px);
-  }
-
-  to {
-    opacity: 1;
-    filter: none;
-  }
-}
-
+/* L'entrée : le titre se découvre, la phrase mot par mot, puis le lien ; sans flou */
 @keyframes fade {
   from {
     opacity: 0;
@@ -153,32 +133,20 @@
   }
 }
 
+/* Le bord du balayage reste doux : le titre part en fondu */
 @keyframes titleMain {
   0% {
     clip-path: inset(-25% 100% -30% -8%);
-    filter: blur(10px);
-  }
-
-  100% {
-    clip-path: inset(-25% -8% -30% -8%);
-    filter: none;
-  }
-}
-
-@keyframes titleGhost {
-  0% {
-    clip-path: inset(-25% 100% -30% -8%);
-    opacity: .9;
-  }
-
-  65% {
-    clip-path: inset(-25% -8% -30% -8%);
-    opacity: .45;
-  }
-
-  100% {
-    clip-path: inset(-25% -8% -30% -8%);
     opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: 1;
   }
 }
 
@@ -188,10 +156,6 @@
 
 .hero[data-played] .main {
   animation: titleMain 1.7s var(--expo) var(--td, .5s) both;
-}
-
-.hero[data-played] .ghost {
-  animation: titleGhost 1.5s var(--expo) calc(var(--td, .5s) - .18s) both;
 }
 
 .hero[data-porte] .title {
@@ -204,7 +168,7 @@
 
 .hero[data-played] .anim {
   opacity: 1;
-  animation: appear 1s var(--expo) both;
+  animation: fade 1s var(--expo) both;
   animation-delay: var(--ad, 1.6s);
 }
 
@@ -221,10 +185,6 @@
   .hero[data-played] .main,
   .hero[data-played] .anim {
     animation-name: fade !important;
-  }
-
-  .ghost {
-    display: none;
   }
 
   .down,

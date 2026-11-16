@@ -148,13 +148,13 @@ export const buildEscapades: SceneBuilder = (el) => {
   const route = one(el, "route");
   const chips = all(el, "chip");
   const checks = all(el, "agency").map(checkParts);
-  gsap.set(question, { opacity: 0, y: 14, filter: "blur(0px)" });
+  gsap.set(question, { opacity: 0, y: 14 });
   gsap.set(bars, { scaleX: 0.25 });
   gsap.set(dots, { scale: 0, opacity: 0 });
   gsap.set(pick, { scale: 0, opacity: 0 });
-  gsap.set(profile, { opacity: 0, y: 34, yPercent: 0, scale: 0.965, filter: "blur(0px)" });
+  gsap.set(profile, { opacity: 0, y: 34, yPercent: 0, scale: 0.965 });
   gsap.set(pin, { strokeDasharray: 1, strokeDashoffset: 1 });
-  gsap.set(name, { opacity: 0, y: 8, filter: "blur(5px)" });
+  gsap.set(name, { opacity: 0, y: 8 });
   gsap.set(me, { opacity: 0, scale: 0.4 });
   gsap.set(travelers, { opacity: 0, xPercent: (i: number) => [-70, 70, -60, 60][i] ?? 0, scale: 0.8 });
   gsap.set(links, { strokeDashoffset: 1 });
@@ -169,11 +169,11 @@ export const buildEscapades: SceneBuilder = (el) => {
     .to(bars, { scaleX: 1, duration: 0.8, stagger: 0.1 }, 0.15)
     .to(pick, { scale: 1, opacity: 1, duration: 0.45 }, 0.5)
     .to(dots, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.055 }, 0.45)
-    .to(question, { opacity: 0, y: -10, filter: "blur(6px)", duration: 0.24, ease: "power2.in" }, 1.24)
+    .to(question, { opacity: 0, y: -10, duration: 0.24, ease: "power2.in" }, 1.24)
     .to(profile, { opacity: 1, y: 0, scale: 1, duration: 1 }, 1.45)
     .to(pin, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 1.6)
-    .to(name, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 }, 1.62)
-    .to(profile, { opacity: 0, scale: 0.3, yPercent: -24, filter: "blur(4px)", duration: 0.42, ease: "power3.in" }, 2.6)
+    .to(name, { opacity: 1, y: 0, duration: 0.7 }, 1.62)
+    .to(profile, { opacity: 0, scale: 0.3, yPercent: -24, duration: 0.42, ease: "power3.in" }, 2.6)
     .to(me, { opacity: 1, scale: 1, duration: 0.8 }, 2.92)
     .to(travelers, { opacity: 1, xPercent: 0, scale: 1, duration: 0.9, stagger: 0.07 }, 2.98)
     .to(links, { strokeDashoffset: 0, duration: 0.7, ease: "power2.out", stagger: 0.04 }, 3.1)

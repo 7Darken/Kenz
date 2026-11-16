@@ -15,14 +15,12 @@
 
 :global(.js) .fade {
   opacity: 0;
-  filter: blur(6px);
-  transition: opacity .24s var(--out), filter .24s var(--out);
+  transition: opacity .24s var(--out);
 }
 
 :global(.js) .fade[data-in] {
   opacity: 1;
-  filter: none;
-  transition: opacity 1s var(--expo), filter 1s var(--expo);
+  transition: opacity 1s var(--expo);
   transition-delay: calc(var(--wd, 0s) + var(--d, 0) * 90ms);
 }
 
@@ -30,11 +28,5 @@
   :global(.js) .card,
   :global(.js) .fade {
     transform: none !important;
-    filter: none !important;
   }
-}
-
-/* Qualité basse : un fondu sans flou */
-:global(html.js[data-quality="low"]) .fade {
-  filter: none;
 }

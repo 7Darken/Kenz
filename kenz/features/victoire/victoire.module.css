@@ -1481,7 +1481,7 @@
 }
 
 .root[data-mode="flow"] .w {
-  transition: opacity 1s var(--expo), filter 1s var(--expo), transform 1.2s var(--expo);
+  transition: opacity 1s var(--expo), transform 1.2s var(--expo);
   transition-delay: calc(.12s + var(--i) * 60ms);
 }
 
@@ -1491,7 +1491,6 @@
 
 .root[data-mode="flow"] .t:not([data-in]) .w {
   opacity: 0;
-  filter: blur(12px);
   transform: translateY(.2em);
 }
 
@@ -1561,7 +1560,6 @@
 
 .root[data-mode="flow"] .t3:not([data-zero]) .hLive .w {
   opacity: 0;
-  filter: blur(12px);
   transform: translateY(.2em);
 }
 
@@ -1603,7 +1601,6 @@
 
 .root[data-mode="flow"][data-rm] :is(.dg, .w, .mini, .date, .acts, .t2 .box, .blkIn) {
   transform: none !important;
-  filter: none !important;
 }
 
 .root[data-mode="flow"][data-rm] .lines1 {
@@ -1912,8 +1909,3 @@
   box-shadow: 0 0 0 1.5px var(--kv-av-ring);
 }
 
-/* Qualité moyenne ou basse : les mots apparaissent en fondu, sans flou (comme les tweens de victoire-timelines) */
-:global(html:not([data-quality="high"])) .root[data-mode="flow"] .t:not([data-in]) .w,
-:global(html:not([data-quality="high"])) .root[data-mode="flow"] .t3:not([data-zero]) .hLive .w {
-  filter: none;
-}

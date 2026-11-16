@@ -166,14 +166,6 @@
   display: block;
 }
 
-.ttlGhost {
-  position: absolute;
-  inset: 0;
-  filter: blur(14px);
-  opacity: 0;
-  pointer-events: none;
-}
-
 .dot {
   display: inline-block;
   width: .1em;
@@ -346,16 +338,11 @@
 
 /* ---------- L'arrivée ----------
    Jouée en CSS dès le premier affichage, sans attendre React. Le portrait (l'élément du LCP : le paysage, plein
-   écran, n'est pas retenu) part de 1 % d'opacité sous son flou, invisible à l'œil : il est peint tout de suite, et
-   non à la fin de son fondu. Pendant un passage, HeroDirector pose data-hold avant l'affichage : tout attend
+   écran, n'est pas retenu) part de 1 % d'opacité, invisible à l'œil : il est peint tout de suite, et non à la fin
+   de son fondu. Aucun flou : des fondus, une montée et un balayage, nets. Pendant un passage, HeroDirector pose data-hold avant l'affichage : tout attend
    data-in (le voile levé).
    La phrase, le fil de l'arche et les objets 3D suivent React : --hero-lag (le temps déjà écoulé de l'arrivée)
    retire ce retard de leurs délais. */
-@keyframes kzIn {
-  from { opacity: 0; filter: blur(8px); }
-  to { opacity: 1; filter: none; }
-}
-
 @keyframes kzFade {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -367,8 +354,8 @@
 }
 
 @keyframes heroStage {
-  from { opacity: .01; filter: blur(10px); }
-  to { opacity: 1; filter: none; }
+  from { opacity: .01; }
+  to { opacity: 1; }
 }
 
 @keyframes heroRise {
@@ -376,15 +363,11 @@
   to { transform: none; }
 }
 
+/* Le titre se découvre de gauche à droite, en fondu au départ : le bord du balayage reste doux, sans flou */
 @keyframes ttlMain {
-  0% { clip-path: inset(-25% 100% -30% -8%); filter: blur(10px); }
-  100% { clip-path: inset(-25% -8% -30% -8%); filter: none; }
-}
-
-@keyframes ttlGhost {
-  0% { clip-path: inset(-25% 100% -30% -8%); opacity: .9; }
-  65% { clip-path: inset(-25% -8% -30% -8%); opacity: .45; }
-  100% { clip-path: inset(-25% -8% -30% -8%); opacity: 0; }
+  0% { clip-path: inset(-25% 100% -30% -8%); opacity: 0; }
+  35% { opacity: 1; }
+  100% { clip-path: inset(-25% -8% -30% -8%); opacity: 1; }
 }
 
 :global(.js) .bgIn {
@@ -404,24 +387,18 @@
   animation: ttlMain 1.7s var(--expo) var(--td, .6s) both;
 }
 
-:global(.js) .ttlGhost {
-  animation: ttlGhost 1.5s var(--expo) calc(var(--td, .6s) - .18s) both;
-}
-
 :global(.js) .down {
-  animation: kzIn 1s var(--expo) var(--ad, 1.85s) both;
+  animation: kzFade 1s var(--expo) var(--ad, 1.85s) both;
 }
 
 /* Retenue : un passage (data-hold), ou une page rechargée par un passage (data-kz-arrive, posé avant l'affichage) */
 .hero[data-hold]:not([data-in]) .bgIn,
 .hero[data-hold]:not([data-in]) .stage,
 .hero[data-hold]:not([data-in]) .ttlMain,
-.hero[data-hold]:not([data-in]) .ttlGhost,
 .hero[data-hold]:not([data-in]) .down,
 :global(html[data-kz-arrive]) .hero:not([data-in]) .bgIn,
 :global(html[data-kz-arrive]) .hero:not([data-in]) .stage,
 :global(html[data-kz-arrive]) .hero:not([data-in]) .ttlMain,
-:global(html[data-kz-arrive]) .hero:not([data-in]) .ttlGhost,
 :global(html[data-kz-arrive]) .hero:not([data-in]) .down {
   animation-play-state: paused;
 }
@@ -444,17 +421,11 @@
   :global(.js) .bgIn,
   :global(.js) .stage {
     transform: none !important;
-    filter: none !important;
   }
 
   :global(.js) .ttlMain,
-  :global(.js) .ttlGhost,
   :global(.js) .down {
     animation-name: kzFade !important;
-  }
-
-  .ttlGhost {
-    display: none;
   }
 
   .downIco svg {

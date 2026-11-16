@@ -302,26 +302,22 @@
 
 :global(.js) .art {
   clip-path: inset(-6% 100% -6% -6%);
-  filter: blur(6px);
-  transition: clip-path .2s var(--out), filter .2s var(--out);
+  transition: clip-path .2s var(--out);
 }
 
 :global(.js) .ticket[data-in] .art {
   clip-path: inset(-6% -6% -6% -6%);
-  filter: none;
-  transition: clip-path 1.3s var(--expo) .16s, filter 1s var(--expo) .16s;
+  transition: clip-path 1.3s var(--expo) .16s;
 }
 
 :global(.js) .num {
   transform: translateY(110%);
-  filter: blur(6px);
-  transition: transform .2s var(--out), filter .2s var(--out);
+  transition: transform .2s var(--out);
 }
 
 :global(.js) .ticket[data-in] .num {
   transform: none;
-  filter: none;
-  transition: transform 1.15s var(--expo) .36s, filter .9s var(--expo) .36s;
+  transition: transform 1.15s var(--expo) .36s;
 }
 
 :global(.js) .pre,
@@ -495,7 +491,6 @@
   :global(.js) .strike,
   .deck {
     transform: none !important;
-    filter: none !important;
     clip-path: none !important;
   }
 

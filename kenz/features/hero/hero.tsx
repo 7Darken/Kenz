@@ -59,10 +59,6 @@ export function Hero({ variant, behind }: HeroProps) {
                 <T k={config.title} />
                 <span className={styles.dot} aria-hidden="true" />
               </span>
-              <span className={`${styles.ttl} ${styles.ttlGhost}`} aria-hidden="true">
-                <T k={config.title} />
-                <span className={styles.dot} />
-              </span>
             </h1>
             <HeroLine textKey={config.line} className={styles.line} />
             <a className={styles.down} href={`#${config.next}`} data-hero-avoid="">

@@ -653,12 +653,12 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     if (there) {
       // Rattrapée pendant qu'elle s'éteignait : elle revient de là où elle en était.
       const cs = getComputedStyle(fiche);
-      const from = { opacity: cs.opacity, filter: cs.filter === "none" ? "blur(0px)" : cs.filter };
+      const from = { opacity: cs.opacity };
       cancelFicheAnims();
       moveFiche(now());
       drawLegend();
       if (Number(from.opacity) < 0.999)
-        ficheAnims.push(fiche.animate([from, { opacity: 1, filter: "blur(0px)" }], { duration: 200, easing: IOS }));
+        ficheAnims.push(fiche.animate([from, { opacity: 1 }], { duration: 200, easing: IOS }));
       if (!rm && !again)
         ficheAnims.push(
           legendLine.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 300, easing: IOS }),
@@ -677,7 +677,7 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     fiche.style.transformOrigin = "";
     moveFiche(now());
     drawLegend();
-    // Apparition holographique : un balayage la dessine de haut en bas, du flou au net, une très légère
+    // Apparition holographique : un balayage la dessine de haut en bas, nette, une très légère
     // aberration de couleur sur les bords, à l'arrivée seulement.
     ficheAnims.push(
       fiche.animate(
@@ -687,18 +687,18 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
               {
                 opacity: 0.35,
                 clipPath: "inset(0% 0% 100% 0% round 20px)",
-                filter: "blur(7px) drop-shadow(3px 0px 0px rgba(255,64,120,.65)) drop-shadow(-3px 0px 0px rgba(64,214,255,.65))",
+                filter: "drop-shadow(3px 0px 0px rgba(255,64,120,.65)) drop-shadow(-3px 0px 0px rgba(64,214,255,.65))",
               },
               {
                 opacity: 0.95,
                 clipPath: "inset(0% 0% 0% 0% round 20px)",
-                filter: "blur(1.5px) drop-shadow(1.5px 0px 0px rgba(255,64,120,.3)) drop-shadow(-1.5px 0px 0px rgba(64,214,255,.3))",
+                filter: "drop-shadow(1.5px 0px 0px rgba(255,64,120,.3)) drop-shadow(-1.5px 0px 0px rgba(64,214,255,.3))",
                 offset: 0.72,
               },
               {
                 opacity: 1,
                 clipPath: "inset(0% 0% 0% 0% round 20px)",
-                filter: "blur(0px) drop-shadow(0px 0px 0px rgba(255,64,120,0)) drop-shadow(0px 0px 0px rgba(64,214,255,0))",
+                filter: "drop-shadow(0px 0px 0px rgba(255,64,120,0)) drop-shadow(0px 0px 0px rgba(64,214,255,0))",
               },
             ],
         { duration: rm ? 200 : 340, easing: IOS },
@@ -741,8 +741,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
     }
     const out = fiche.animate(
       [
-        { opacity: 1, filter: "blur(0px)", transform: "scale(1)" },
-        { opacity: 0, filter: "blur(4px)", transform: "scale(.985)" },
+        { opacity: 1, transform: "scale(1)" },
+        { opacity: 0, transform: "scale(.985)" },
       ],
       { duration: FADE_MS, easing: "cubic-bezier(.55,0,.8,.2)", fill: "forwards" },
     );
@@ -793,8 +793,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
       fiche.style.transformOrigin = "50% 50%";
       const fold = fiche.animate(
         [
-          { transform: "translate(0px,0px) scale(1)", opacity: 1, filter: "blur(0px)" },
-          { transform: `translate(${px(tx)},${px(ty)}) scale(.06)`, opacity: 0, filter: "blur(3px)" },
+          { transform: "translate(0px,0px) scale(1)", opacity: 1 },
+          { transform: `translate(${px(tx)},${px(ty)}) scale(.06)`, opacity: 0 },
         ],
         { duration: 320, easing: "cubic-bezier(.7,0,.2,1)", fill: "forwards" },
       );
@@ -1009,8 +1009,8 @@ export function startSpace(scene: HTMLElement, options: SpaceEngineOptions): () 
           rm
             ? [{ opacity: 0 }, { opacity: 1 }]
             : [
-                { opacity: 0, scale: ".15", filter: "brightness(3) blur(4px)" },
-                { opacity: 1, scale: "1", filter: "brightness(1) blur(0px)" },
+                { opacity: 0, scale: ".15", filter: "brightness(3)" },
+                { opacity: 1, scale: "1", filter: "brightness(1)" },
               ],
           { duration: rm ? 200 : 950, delay: t0 + i * step, easing: CSS_EASE.expo, fill: "backwards" },
         ),

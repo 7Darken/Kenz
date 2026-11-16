@@ -152,7 +152,7 @@
   margin-top: auto;
 }
 
-/* Chaque réponse monte, ligne après ligne, et sort du flou */
+/* Chaque réponse monte, ligne après ligne, en fondu */
 .answerCore[data-in] > * {
   animation: answerFade .8s var(--expo) both, answerRise 1s var(--expo) both;
 }
@@ -176,7 +176,6 @@
 @keyframes answerFade {
   from {
     opacity: 0;
-    filter: blur(4px);
   }
 }
 

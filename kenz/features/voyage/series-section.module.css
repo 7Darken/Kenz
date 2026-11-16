@@ -232,13 +232,11 @@
 @keyframes countryIn {
   from {
     transform: translateY(40%);
-    filter: blur(4px);
     opacity: 0;
   }
 
   to {
     transform: none;
-    filter: none;
     opacity: 1;
   }
 }

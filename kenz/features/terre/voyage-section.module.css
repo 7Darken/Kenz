@@ -261,9 +261,8 @@
   align-self: end;
   opacity: 0;
   transform: translate3d(0, 28px, 0);
-  filter: blur(8px);
   pointer-events: none;
-  transition: opacity .3s var(--out), transform .45s var(--out), filter .35s var(--out);
+  transition: opacity .3s var(--out), transform .45s var(--out);
 }
 
 .voyage[data-pin] .stop[data-before] {
@@ -273,9 +272,8 @@
 .voyage[data-pin] .stop[data-on] {
   opacity: 1;
   transform: none;
-  filter: none;
   pointer-events: auto;
-  transition: opacity .8s var(--expo) .1s, transform 1.1s var(--expo) .1s, filter .8s var(--expo) .1s;
+  transition: opacity .8s var(--expo) .1s, transform 1.1s var(--expo) .1s;
 }
 
 .voyage[data-pin] .door {
@@ -445,13 +443,11 @@
   from {
     opacity: 0;
     transform: translate3d(0, 14px, 0);
-    filter: blur(6px);
   }
 
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
 

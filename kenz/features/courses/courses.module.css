@@ -399,14 +399,12 @@
   :global(.js) .course .name {
     opacity: 0;
     clip-path: inset(-10% 100% -20% 0);
-    filter: blur(8px);
   }
 
   :global(.js) .course[data-in] .name {
     opacity: 1;
     clip-path: inset(-10% -4% -20% -4%);
-    filter: none;
-    transition: opacity .4s var(--expo) calc(var(--i, 0) * .12s + .3s), clip-path 1.3s var(--expo) calc(var(--i, 0) * .12s + .3s), filter 1s var(--expo) calc(var(--i, 0) * .12s + .3s);
+    transition: opacity .4s var(--expo) calc(var(--i, 0) * .12s + .3s), clip-path 1.3s var(--expo) calc(var(--i, 0) * .12s + .3s);
   }
 
   :global(.js) .course .text > * {

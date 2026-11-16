@@ -88,7 +88,7 @@ export const buildCroc: SceneBuilder = (el) => {
   gsap.set(roll, { y: 0, yPercent: 0 });
   gsap.set(flat, { opacity: 1 });
   gsap.set(smile, { opacity: 0 });
-  gsap.set(bravo, { opacity: 0, y: 10, filter: "blur(6px)" });
+  gsap.set(bravo, { opacity: 0, y: 10 });
   const tl = gsap.timeline({ paused: true, defaults: { ease: "expo.out" } });
   const check = (box: Element | undefined, t: number, duration = 0.6) => {
     if (!box) return;
@@ -109,7 +109,7 @@ export const buildCroc: SceneBuilder = (el) => {
   return tl
     .to(flat, { opacity: 0, duration: 0.2 }, 3)
     .to(smile, { opacity: 1, duration: 0.3 }, 3)
-    .to(bravo, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.9 }, 3.05);
+    .to(bravo, { opacity: 1, y: 0, duration: 0.9 }, 3.05);
 };
 
 /** « Comment ça marche » de Croc, monté autour de son écran (chargé à part : ./registry). */

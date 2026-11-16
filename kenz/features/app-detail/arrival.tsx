@@ -174,9 +174,6 @@ export function Arrival({ app }: { app: App }) {
           )}
           <h1 className={web ? `${styles.name} ${styles.webName}` : styles.name} id={NAME_ID} tabIndex={-1}>
             <span className={`${styles.title} ${styles.main}`}>{nameText}</span>
-            <span className={`${styles.title} ${styles.ghost}`} aria-hidden="true">
-              {nameText}
-            </span>
           </h1>
           <Words className={web ? `${styles.line} ${styles.webLine}` : styles.line} text={app.story.hook} delay={1.3} play={arrived} />
         </div>

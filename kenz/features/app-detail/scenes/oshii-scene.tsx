@@ -135,12 +135,12 @@ export const buildOshii: SceneBuilder = (el) => {
   const items = all(el, "ingredient");
   const nums = all(el, "qty");
   const steps = one(el, "steps");
-  gsap.set(video, { opacity: 1, scale: 1, filter: "blur(0px)" });
+  gsap.set(video, { opacity: 1, scale: 1 });
   gsap.set(bar, { scaleX: 0 });
   gsap.set(sheet, { y: 0, yPercent: 105 });
   gsap.set(tap, { opacity: 0, scale: 0.5 });
   gsap.set(recipe, { opacity: 0, y: 26, scale: 0.94, clipPath: "inset(0% 0% 100% 0% round 18px)" });
-  gsap.set([head, ...items, steps], { opacity: 0, y: 10, filter: "blur(4px)" });
+  gsap.set([head, ...items, steps], { opacity: 0, y: 10 });
   gsap.set(nums, { yPercent: 110 });
   return gsap
     .timeline({ paused: true, defaults: { ease: "expo.out" } })
@@ -150,13 +150,13 @@ export const buildOshii: SceneBuilder = (el) => {
     .to(icon, { scale: 0.9, duration: 0.12, ease: "power2.out" }, 1.2)
     .to(icon, { scale: 1, duration: 0.5 }, 1.32)
     .to(tap, { opacity: 0, scale: 1.3, duration: 0.4, ease: "power2.out" }, 1.45)
-    .to(video, { scale: 0.08, opacity: 0, filter: "blur(8px)", duration: 0.6, ease: "power3.in" }, 1.5)
+    .to(video, { scale: 0.08, opacity: 0, duration: 0.6, ease: "power3.in" }, 1.5)
     .to(sheet, { yPercent: 105, duration: 0.3, ease: "power2.in" }, 2.15)
     .to(recipe, { opacity: 1, y: 0, scale: 1, clipPath: "inset(0% 0% 0% 0% round 18px)", duration: 1 }, 2.3)
-    .to(head, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 }, 2.45)
-    .to(items, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, stagger: 0.16 }, 2.6)
+    .to(head, { opacity: 1, y: 0, duration: 0.7 }, 2.45)
+    .to(items, { opacity: 1, y: 0, duration: 0.7, stagger: 0.16 }, 2.6)
     .to(nums, { yPercent: 0, duration: 0.9, stagger: 0.16 }, 2.68)
-    .to(steps, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7 }, 3.3);
+    .to(steps, { opacity: 1, y: 0, duration: 0.7 }, 3.3);
 };
 
 /** « Comment ça marche » de Oshii, monté autour de son écran (chargé à part : ./registry). */

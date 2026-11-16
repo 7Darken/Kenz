@@ -24,7 +24,6 @@ import {
   seqTriumph,
   seqWall,
   setClock,
-  soft,
   tilt,
   type BeamGeometry,
   type PhotoFrame,
@@ -219,15 +218,15 @@ export function pinMode(R: VictoireRefs, photo: PhotoFrame, lenis: () => Lenis |
       root.toggleAttribute("data-live", tl.time() > tLive);
     },
   });
-  const blurIn = (els: HTMLElement[], at: number, stagger = 0.05, duration = 0.4) =>
-    tl.fromTo(els, { opacity: 0, y: 20, ...soft(12) }, { opacity: 1, y: 0, ...soft(0), duration, stagger, ease: "power2.out" }, at);
+  const riseIn = (els: HTMLElement[], at: number, stagger = 0.05, duration = 0.4) =>
+    tl.fromTo(els, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration, stagger, ease: "power2.out" }, at);
 
   // 0. Pendant que la section arrive : le titre, le drapeau, la date, le compteur (rien de tout ça une fois vue).
   const prep = seen
     ? null
     : gsap
         .timeline({ defaults: { ease: "none" }, scrollTrigger: { trigger: root, start: "top 85%", end: "top 8%", scrub: 0.8 } })
-        .fromTo(R.titleWords, { opacity: 0, y: 26, ...soft(14) }, { opacity: 1, y: 0, ...soft(0), duration: 0.5, stagger: 0.12, ease: "power2.out" }, 0)
+        .fromTo(R.titleWords, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: "power2.out" }, 0)
         .fromTo(R.date, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.35)
         .fromTo(R.digits.clock, { yPercent: 110 }, { yPercent: 0, duration: 0.45, stagger: 0.04, ease: "power3.out" }, 0.3)
         .fromTo(R.seps, { opacity: 0 }, { opacity: 0.5, duration: 0.3 }, 0.45);
@@ -254,7 +253,7 @@ export function pinMode(R: VictoireRefs, photo: PhotoFrame, lenis: () => Lenis |
     { opacity: 0, scale: 0.96, duration: 0.25, ease: "power2.in" },
     t3,
   );
-  blurIn(R.dayWords, t3 + 0.12);
+  riseIn(R.dayWords, t3 + 0.12);
   const corridorDuration = 1.45;
   tl.to(clock, { s: 0, duration: corridorDuration, ease: "power2.in" }, t3 + 0.05);
   const tZ = seqCorridor(tl, R, t3 + 0.05, corridorDuration, () => geo.k);
@@ -265,7 +264,7 @@ export function pinMode(R: VictoireRefs, photo: PhotoFrame, lenis: () => Lenis |
   seqFirst(tl, R, tZ + 0.72, 1);
   seqPodium(tl, R, tZ + 0.95, 1);
   seqPrints(tl, R, tZ + 1.75, 1);
-  blurIn(R.liveWords, tZ + 2.05, 0.06);
+  riseIn(R.liveWords, tZ + 2.05, 0.06);
   tl.fromTo(R.acts, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, tZ + 2.3);
   tLive = tZ + 2.35;
   tl.to({}, { duration: 0.45 }, tZ + 2.65);

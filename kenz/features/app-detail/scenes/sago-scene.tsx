@@ -1,6 +1,6 @@
 "use client";
 
-/** Sago : une phrase japonaise floue ; chaque mot prend une image (un chat, un cœur), puis la phrase prend son sens. */
+/** Sago : une phrase japonaise, d'abord pâle ; chaque mot prend une image (un chat, un cœur), puis la phrase prend son sens. */
 import { Fragment } from "react";
 
 import type { App } from "@/content/apps";
@@ -61,21 +61,21 @@ export const buildSago: SceneBuilder = (el) => {
   const heart = all<SVGPathElement>(el, "heart");
   const words = all(el, "fr-word");
   const rule = one(el, "rule");
-  gsap.set(kana, { opacity: 0.3, filter: "blur(9px)" });
+  gsap.set(kana, { opacity: 0.3 });
   gsap.set([...cat, ...heart], { strokeDasharray: 1, strokeDashoffset: 1 });
-  gsap.set(words, { opacity: 0, filter: "blur(8px)", y: 6 });
+  gsap.set(words, { opacity: 0, y: 6 });
   gsap.set(rule, { scaleX: 0 });
   return gsap
     .timeline({ paused: true, defaults: { ease: "expo.out" } })
     .to(cat[0] ?? [], { strokeDashoffset: 0, duration: 1, ease: "power2.inOut" }, 0.2)
     .to(cat.slice(1, 3), { strokeDashoffset: 0, duration: 0.35, ease: "power2.out", stagger: 0.1 }, 1.05)
     .to(cat[3] ?? [], { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" }, 1.25)
-    .to(kana[0] ?? [], { opacity: 1, filter: "blur(0px)", duration: 0.9 }, 0.95)
+    .to(kana[0] ?? [], { opacity: 1, duration: 0.9 }, 0.95)
     .to(heart, { strokeDashoffset: 0, duration: 0.9, ease: "power2.inOut" }, 1.45)
-    .to(kana[2] ?? [], { opacity: 1, filter: "blur(0px)", duration: 0.9 }, 2.05)
-    .to(kana[1] ?? [], { opacity: 1, filter: "blur(0px)", duration: 0.9 }, 2.2)
+    .to(kana[2] ?? [], { opacity: 1, duration: 0.9 }, 2.05)
+    .to(kana[1] ?? [], { opacity: 1, duration: 0.9 }, 2.2)
     .to(rule, { scaleX: 1, duration: 0.9 }, 2.35)
-    .to(words, { opacity: 1, filter: "blur(0px)", y: 0, duration: 0.8, stagger: 0.07 }, 2.5);
+    .to(words, { opacity: 1, y: 0, duration: 0.8, stagger: 0.07 }, 2.5);
 };
 
 /** « Comment ça marche » de Sago, monté autour de son écran (chargé à part : ./registry). */

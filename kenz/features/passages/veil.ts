@@ -1,6 +1,6 @@
 /**
  * Le passage coloré entre deux pages (port de maquettes/v6/shared/passage.js).
- * Départ : le rectangle de la source grandit jusqu'à l'écran entier, dans la couleur du lien (≈ 700 ms, léger flou) ;
+ * Départ : le rectangle de la source grandit jusqu'à l'écran entier, dans la couleur du lien (≈ 700 ms) ;
  *   avec l'élément partagé (l'icône d'une app), la couleur s'étend en cercle depuis la source pendant que l'icône se
  *   pose au centre (≈ 740 ms). Puis la navigation (routeur Next) ; le voile reste en place, dans <body>.
  * Arrivée : le voile se contracte vers le centre et s'efface (≈ 800 ms). Avec l'icône, elle vole jusqu'à
@@ -154,7 +154,6 @@ export function openPassage(source: Element | null, href: string, options: OpenP
     const q = 1 - k;
     v.inner.style.clipPath = `inset(${px(top * q)} ${px(right * q)} ${px(bottom * q)} ${px(left * q)} round ${px(radius * q)})`;
   }, { onComplete: depart });
-  v.track.fromTo(v.root, { filter: "blur(10px)" }, { filter: "blur(0px)", duration: 0.42, ease: "power2.out", clearProps: "filter" });
   return true;
 }
 

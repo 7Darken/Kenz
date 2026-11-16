@@ -147,14 +147,9 @@ export function playAnimation(panel: Element, reduced: boolean): PreviewControll
   const end = 0.15 + sceneTl.duration();
   if (capture) {
     // La scène sort, puis la vraie capture entre ; elle ressort entièrement avant que la scène ne reparte.
-    tl.to(views, { opacity: 0, filter: "blur(5px)", duration: 0.18, ease: "power2.in" }, end + 0.3)
-      .fromTo(
-        capture,
-        { opacity: 0, filter: "blur(6px)" },
-        { opacity: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out", immediateRender: false },
-        end + 0.5,
-      )
-      .to(capture, { opacity: 0, filter: "blur(6px)", duration: 0.24, ease: "power2.in" }, end + 2.3);
+    tl.to(views, { opacity: 0, duration: 0.18, ease: "power2.in" }, end + 0.3)
+      .fromTo(capture, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "expo.out", immediateRender: false }, end + 0.5)
+      .to(capture, { opacity: 0, duration: 0.24, ease: "power2.in" }, end + 2.3);
   } else {
     tl.to({}, { duration: 1.6 }, end);
   }

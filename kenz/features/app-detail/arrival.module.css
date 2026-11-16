@@ -157,14 +157,6 @@
   display: block;
 }
 
-.ghost {
-  position: absolute;
-  inset: 0;
-  filter: blur(14px);
-  opacity: 0;
-  pointer-events: none;
-}
-
 .line {
   max-width: 31ch;
   font-size: clamp(18px, 1.6vw, 23px);
@@ -231,32 +223,20 @@
   }
 }
 
+/* Le nom se découvre de gauche à droite, en fondu au départ : le bord du balayage reste doux, sans flou */
 @keyframes titleIn {
   0% {
     clip-path: inset(-25% 100% -30% -8%);
-    filter: blur(10px);
-  }
-
-  100% {
-    clip-path: inset(-25% -8% -30% -8%);
-    filter: none;
-  }
-}
-
-@keyframes ghostIn {
-  0% {
-    clip-path: inset(-25% 100% -30% -8%);
-    opacity: .9;
-  }
-
-  65% {
-    clip-path: inset(-25% -8% -30% -8%);
-    opacity: .45;
-  }
-
-  100% {
-    clip-path: inset(-25% -8% -30% -8%);
     opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    clip-path: inset(-25% -8% -30% -8%);
+    opacity: 1;
   }
 }
 
@@ -300,10 +280,6 @@
   animation: titleIn 1.6s var(--expo) 1s both;
 }
 
-:global(.js) .arrival[data-arrived] .ghost {
-  animation: ghostIn 1.4s var(--expo) .86s both;
-}
-
 :global(.js) .cue {
   opacity: 0;
 }
@@ -342,10 +318,6 @@
 
   :global(.js) .arrival[data-arrived] .main {
     animation: fade 1s var(--expo) .3s both;
-  }
-
-  .ghost {
-    display: none;
   }
 
   :global(.js) .arrival[data-arrived] .icon {
