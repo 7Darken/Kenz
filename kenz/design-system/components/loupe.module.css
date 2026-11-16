@@ -1,5 +1,5 @@
 /* La loupe : une lentille de verre légèrement teinté, ×1,1, qui suit la souris (shared/theme.css §10).
-   Jamais au toucher ni en mouvement réduit. */
+   Montée seulement à la souris et hors mouvement réduit (loupe.tsx), dans un portail sur <body>. */
 .loupe {
   position: fixed;
   inset: 0;
@@ -24,39 +24,52 @@
   will-change: transform;
 }
 
+/* Le disque s'ouvre en iris et en fondu, se referme plus vite */
 .disc {
   position: absolute;
   inset: 0;
   overflow: hidden;
   border-radius: 50%;
+  opacity: 0;
   clip-path: circle(0% at 50% 50%);
-  transition: clip-path .28s var(--out);
+  transition: clip-path .28s var(--out), opacity .28s var(--out);
 }
 
 .loupe[data-on] .disc {
+  opacity: 1;
   clip-path: circle(50% at 50% 50%);
-  transition: clip-path .7s var(--expo);
+  transition: clip-path .7s var(--expo), opacity .4s var(--out);
 }
 
-.inner {
+/* Le plateau : le repère de la fenêtre, grossi autour du centre de la lentille (placé par loupe.tsx) */
+.stage {
   position: absolute;
-  inset: 0;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
 }
 
-/* Le clone de l'élément agrandi : ses propres transformations sont neutralisées */
-.clone {
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
-  margin: 0 !important;
-  transform-origin: 50% 50% !important;
-  translate: none !important;
-  rotate: none !important;
-  scale: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+/* Le cadre : l'ancêtre qui rogne l'élément dans la page (sa place, sa taille et ses coins, posés par loupe.tsx) */
+.frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.frame[data-clip] {
+  overflow: hidden;
+}
+
+/* L'image grossie : la même image, en fond, cadrée comme l'élément (object-fit et object-position) */
+.plate {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  transform-origin: 50% 50%;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-clip: content-box;
 }
 
 /* Le verre : une teinte de la lumière, un reflet, un bord plus dense */
@@ -95,8 +108,3 @@
   cursor: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .loupe {
-    display: none;
-  }
-}
