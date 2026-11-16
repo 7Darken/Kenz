@@ -25,7 +25,6 @@ import { useContactSubmit } from "@/design-system/lib/use-contact-submit";
 import { useMotion } from "@/design-system/motion/motion-provider";
 import { useInView } from "@/design-system/motion/use-in-view";
 import bezel from "@/design-system/styles/bezel.module.css";
-import { format } from "@/i18n/format";
 import { useLanguage } from "@/i18n/language-provider";
 import { localize } from "@/i18n/localize";
 import styles from "./brand-form.module.css";
@@ -75,7 +74,6 @@ export function BrandForm({ labelledBy }: { labelledBy: string }) {
     if (field === "besoin") return m.errors.budget;
     if (error === "tooLong") return m.errors.tooLong;
     if (field === "contact") {
-      if (error === "tooShort") return format(m.errors.replyShort, { min: CONTACT_LIMITS.handleMin });
       return error === "invalid" ? m.errors.replyInvalid : m.errors.reply;
     }
     return field === "nom" ? m.errors.brand : m.errors.idea;
@@ -152,10 +150,9 @@ export function BrandForm({ labelledBy }: { labelledBy: string }) {
               ref={contactRef}
               id={ids.contact}
               name="contact"
-              type="text"
+              type="email"
               inputMode="email"
-              // Un @pseudo n'est pas une adresse : le navigateur ne propose alors plus d'e-mail enregistré.
-              autoComplete={contact.trimStart().startsWith("@") ? "off" : "email"}
+              autoComplete="email"
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}

@@ -46,8 +46,8 @@ export const pro: ProDictionary = {
       placeholder: "First and last name",
     },
     reply: {
-      label: "Your email or @",
-      placeholder: "name@domain.com or @handle",
+      label: "Your email",
+      placeholder: "name@domain.com",
     },
     need: "What you need",
     message: "Your message",
@@ -55,9 +55,8 @@ export const pro: ProDictionary = {
     errors: {
       name: "Please enter your name.",
       nameTooLong: "That name is a little long ({max} characters max).",
-      reply: "Please enter an email or an @handle so I can get back to you.",
-      replyInvalid: "Enter a full email address, or a handle starting with @.",
-      replyShort: "An @handle needs at least {min} characters.",
+      reply: "Please enter your email so I can get back to you.",
+      replyInvalid: "Enter a full email address, for example name@domain.com.",
       replyTooLong: "That’s a little long ({max} characters max).",
       need: "Pick what brings you here.",
       message: "A few more words, please ({min} characters minimum).",

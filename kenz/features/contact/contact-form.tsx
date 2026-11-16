@@ -72,8 +72,6 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<Errors>({});
   const { submit, again, sending, failed, okShown, sent, okRef, okTitleRef } = useContactSubmit({ focusDelay: 700 });
-  // Un @pseudo n'est pas une adresse : le navigateur ne propose alors plus d'e-mail enregistré.
-  const [handle, setHandle] = useState(false);
 
   const ids = { nom: `${id}-nom`, contact: `${id}-contact`, besoin: `${id}-besoin`, message: `${id}-msg` };
   const errorId = (field: Field) => `${ids[field]}-err`;
@@ -84,7 +82,6 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
     if (field === "besoin") return c.errors.need;
     if (field === "nom") return code === "tooLong" ? format(c.errors.nameTooLong, { max: CONTACT_LIMITS.nameMax }) : c.errors.name;
     if (field === "contact") {
-      if (code === "tooShort") return format(c.errors.replyShort, { min: CONTACT_LIMITS.handleMin });
       if (code === "tooLong") return format(c.errors.replyTooLong, { max: CONTACT_LIMITS.contactMax });
       return code === "invalid" ? c.errors.replyInvalid : c.errors.reply;
     }
@@ -126,7 +123,6 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
 
   function writeAgain() {
     setErrors({});
-    setHandle(false);
     formRef.current?.reset();
     again(() => formRef.current?.querySelector<HTMLInputElement>('input[name="nom"]')?.focus());
   }
@@ -162,9 +158,9 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
             <Input
               id={ids.contact}
               name="contact"
-              type="text"
+              type="email"
               inputMode="email"
-              autoComplete={handle ? "off" : "email"}
+              autoComplete="email"
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
@@ -172,7 +168,6 @@ export function ContactForm({ variant, labelledBy }: ContactFormProps) {
               maxLength={CONTACT_LIMITS.contactMax}
               aria-invalid={errors.contact ? true : undefined}
               aria-describedby={errorId("contact")}
-              onChange={(event) => setHandle(event.target.value.trimStart().startsWith("@"))}
             />
           </FormField>
 

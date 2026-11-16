@@ -45,10 +45,8 @@ export const BRAND_BUDGET_LABELS: Readonly<Record<BrandBudget, Localized<string>
 export const CONTACT_LIMITS = {
   nameMin: 2,
   nameMax: 120,
-  /** « Votre e-mail ou @ » : 254 caractères, la plus longue adresse e-mail possible. */
+  /** « Votre e-mail » : 254 caractères, la plus longue adresse e-mail possible. */
   contactMax: 254,
-  /** Le pseudo après le @. */
-  handleMin: 3,
   messageMin: 10,
   /** Telegram accepte 4 096 caractères par message : au-delà de l'en-tête, l'API envoie la suite à part. */
   messageMax: 4000,
@@ -58,7 +56,7 @@ export const CONTACT_LIMITS = {
 export interface ContactRequest {
   type: ContactType;
   nom: string;
-  /** Pour que Kenz puisse répondre : une adresse e-mail ou un @pseudo de réseau (voir `checkContact`). */
+  /** Pour que Kenz puisse répondre par e-mail : une adresse e-mail (voir `checkContact`). */
   contact: string;
   besoin?: ContactNeed | BrandBudget;
   message: string;
@@ -67,8 +65,7 @@ export interface ContactRequest {
 
 /**
  * Erreurs de champ renvoyées par l'API (codes, que l'interface traduit). Pour `contact` :
- * `required` (vide), `invalid` (ni une adresse ni un @pseudo), `tooShort` (pseudo de moins de 3 caractères),
- * `tooLong` (plus de 254 caractères).
+ * `required` (vide), `invalid` (pas une adresse e-mail), `tooLong` (plus de 254 caractères).
  */
 export type ContactFieldError = "required" | "tooShort" | "tooLong" | "invalid";
 
@@ -91,9 +88,6 @@ const EMAIL_LABEL = String.raw`[^\s@"(),:;<>[\]\\.]`;
 
 /** Une adresse e-mail complète, mais souple : +, sous-domaines, accents, extensions récentes ou en punycode. */
 const EMAIL = new RegExp(`^${EMAIL_CHAR}+@(?:${EMAIL_LABEL}+\\.)+${EMAIL_LABEL}{2,}$`, "u");
-
-/** Un @pseudo : lettres (toutes écritures), chiffres, « . », « _ », « - » ; le serveur en option (Mastodon). */
-const HANDLE = /^@([\p{L}\p{M}\p{N}._-]+)(?:@(?:[\p{L}\p{M}\p{N}-]+\.)+[\p{L}\p{M}\p{N}-]{2,})?$/u;
 
 /** Un texte obligatoire (nom, message) : assez long, pas trop. `null` si la valeur convient. */
 export function checkText(value: unknown, min: number, max: number): ContactFieldError | null {
@@ -123,12 +117,10 @@ export function validateContact(body: Readonly<Record<string, unknown>>): Contac
   return fields;
 }
 
-/** « Votre e-mail ou @ » : la même règle côté client et côté serveur. `null` si la valeur convient. */
+/** « Votre e-mail » : la même règle côté client et côté serveur. `null` si la valeur convient. */
 export function checkContact(value: unknown): ContactFieldError | null {
   if (typeof value !== "string" || !value.trim()) return "required";
   const contact = value.trim();
   if (contact.length > CONTACT_LIMITS.contactMax) return "tooLong";
-  const handle = HANDLE.exec(contact);
-  if (handle) return handle[1].length < CONTACT_LIMITS.handleMin ? "tooShort" : null;
   return EMAIL.test(contact) ? null : "invalid";
 }

@@ -53,10 +53,10 @@ export const pro = {
       label: "Votre nom",
       placeholder: "Prénom et nom",
     },
-    /** Pour pouvoir répondre : une adresse e-mail ou un pseudo de réseau. */
+    /** Pour pouvoir répondre par e-mail. */
     reply: {
-      label: "Votre e-mail ou @",
-      placeholder: "nom@domaine.fr ou @pseudo",
+      label: "Votre e-mail",
+      placeholder: "nom@domaine.fr",
     },
     need: "Votre besoin",
     message: "Votre message",
@@ -64,10 +64,8 @@ export const pro = {
     errors: {
       name: "Indiquez votre nom.",
       nameTooLong: "Ce nom est un peu long ({max} caractères au plus).",
-      reply: "Indiquez un e-mail ou un @pseudo, pour que je puisse vous répondre.",
-      replyInvalid: "Entrez un e-mail complet ou un pseudo précédé de @.",
-      /** `{min}` : la longueur minimale du pseudo, après le @ (content/contact.ts). */
-      replyShort: "Un @pseudo compte au moins {min} caractères.",
+      reply: "Indiquez votre e-mail, pour que je puisse vous répondre.",
+      replyInvalid: "Entrez une adresse e-mail complète, par exemple nom@domaine.fr.",
       replyTooLong: "C’est un peu long ({max} caractères au plus).",
       need: "Choisissez ce qui vous amène.",
       /** `{min}` : la longueur minimale (content/contact.ts). */
