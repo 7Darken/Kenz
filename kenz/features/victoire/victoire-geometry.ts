@@ -125,6 +125,8 @@ export interface Star {
   /** Rang d'allumage. */
   k: number;
   kind: "" | "haut" | "feuille";
+  /** La feuille extérieure de droite : en mode épinglé, la gouttière est plus étroite qu'elle, elle y est retirée. */
+  outer?: true;
 }
 
 export const CROWN: { stars: readonly Star[]; links: readonly (readonly [number, number])[] } = (() => {
@@ -134,8 +136,10 @@ export const CROWN: { stars: readonly Star[]; links: readonly (readonly [number,
   const left: number[] = [];
   const right: number[] = [];
   const uv: { u: number; v: number }[] = [];
-  const point = (u: number, v: number, k: number, kind: Star["kind"] = "") => {
-    stars.push({ x: ((u - CROWN_BOX.u0) / CROWN_BOX.du) * CROWN_BOX.w, y: ((v - CROWN_BOX.v0) / CROWN_BOX.dv) * CROWN_BOX.h, k, kind });
+  const point = (u: number, v: number, k: number, kind: Star["kind"] = "", outer = false) => {
+    const x = ((u - CROWN_BOX.u0) / CROWN_BOX.du) * CROWN_BOX.w;
+    const y = ((v - CROWN_BOX.v0) / CROWN_BOX.dv) * CROWN_BOX.h;
+    stars.push(outer ? { x, y, k, kind, outer } : { x, y, k, kind });
     uv.push({ u, v });
     return stars.length - 1;
   };
@@ -158,7 +162,7 @@ export const CROWN: { stars: readonly Star[]; links: readonly (readonly [number,
     const du = 0.06 * Math.cos(t);
     const dv = 0.09 * Math.sin(t);
     links.push([left[n], point(u + du, v + dv, n + 0.5, "feuille")]);
-    links.push([right[n], point(1 - u - du, v + dv, n + 0.54, "feuille")]);
+    links.push([right[n], point(1 - u - du, v + dv, n + 0.54, "feuille", n === 1)]);
   });
   return { stars, links };
 })();

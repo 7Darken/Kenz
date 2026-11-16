@@ -63,7 +63,8 @@
   --kv-m-sd: #11161F;
   --kv-m-ink: rgba(246, 238, 225, .66);
   --kv-floor: rgba(0, 0, 0, .55);
-  --kv-u: 1;
+  /* L'unité du podium (une longueur : 1px à la taille de la maquette) ; tout le podium s'y mesure */
+  --kv-pu: 1px;
   --kv-g: clamp(16px, 4vw, 56px);
   --kv-gl: max(var(--kv-g), env(safe-area-inset-left));
   --kv-gr: max(var(--kv-g), env(safe-area-inset-right));
@@ -894,15 +895,20 @@
   margin-inline: auto;
 }
 
+/* Le podium se mesure à la largeur de la colonne (requête de conteneur) : .7px à 390 px de large, comme la
+   maquette ; plus petit sur un écran étroit, plus grand sur tablette. La colonne de la grille ne s'élargit
+   jamais à sa mesure (minmax) : l'arche reste dans les gouttières. */
 .t3 .box {
   --kv-aw: min(100%, 720px);
-  --kv-u: .7;
+  --kv-pu: clamp(.6px, 100cqw / 512, .86px);
   order: 2;
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   width: 100%;
   margin-top: clamp(48px, 12vw, 80px);
+  container-type: inline-size;
 }
 
 .t3 .cons {
@@ -1249,18 +1255,18 @@
 .pod {
   position: relative;
   z-index: 4;
-  width: calc(480px * var(--kv-u));
-  height: calc(330px * var(--kv-u));
+  width: calc(480 * var(--kv-pu));
+  height: calc(330 * var(--kv-pu));
   margin-top: 34px;
-  margin-bottom: calc(70px * var(--kv-u));
-  perspective: calc(1100px * var(--kv-u));
+  margin-bottom: calc(70 * var(--kv-pu));
+  perspective: calc(1100 * var(--kv-pu));
   perspective-origin: 50% 0%;
 }
 
 .p3 {
   position: absolute;
   left: 50%;
-  bottom: calc(30px * var(--kv-u));
+  bottom: calc(30 * var(--kv-pu));
   width: 0;
   height: 0;
   transform-style: preserve-3d;
@@ -1269,38 +1275,38 @@
 
 .floor {
   position: absolute;
-  left: calc(-340px * var(--kv-u));
-  top: calc(-210px * var(--kv-u));
-  width: calc(680px * var(--kv-u));
-  height: calc(420px * var(--kv-u));
+  left: calc(-340 * var(--kv-pu));
+  top: calc(-210 * var(--kv-pu));
+  width: calc(680 * var(--kv-pu));
+  height: calc(420 * var(--kv-pu));
   transform: rotateX(90deg);
   pointer-events: none;
   background: radial-gradient(closest-side, var(--kv-floor), transparent 72%), radial-gradient(30% 34% at 50% 50%, rgba(227, 162, 26, .28), transparent);
 }
 
 .blk {
-  --kv-d: calc(110px * var(--kv-u));
+  --kv-d: calc(110 * var(--kv-pu));
   position: absolute;
   bottom: 0;
   transform-style: preserve-3d;
 }
 
 .blk1 {
-  left: calc(-82px * var(--kv-u));
-  width: calc(164px * var(--kv-u));
-  height: calc(214px * var(--kv-u));
+  left: calc(-82 * var(--kv-pu));
+  width: calc(164 * var(--kv-pu));
+  height: calc(214 * var(--kv-pu));
 }
 
 .blk2 {
-  left: calc(-224px * var(--kv-u));
-  width: calc(136px * var(--kv-u));
-  height: calc(112px * var(--kv-u));
+  left: calc(-224 * var(--kv-pu));
+  width: calc(136 * var(--kv-pu));
+  height: calc(112 * var(--kv-pu));
 }
 
 .blk3 {
-  left: calc(88px * var(--kv-u));
-  width: calc(136px * var(--kv-u));
-  height: calc(76px * var(--kv-u));
+  left: calc(88 * var(--kv-pu));
+  width: calc(136 * var(--kv-pu));
+  height: calc(76 * var(--kv-pu));
 }
 
 .blkIn {
@@ -1322,10 +1328,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: calc(6px * var(--kv-u));
+  gap: calc(6 * var(--kv-pu));
   width: 100%;
   height: 100%;
-  padding-top: calc(16px * var(--kv-u));
+  padding-top: calc(16 * var(--kv-pu));
   transform: translateZ(calc(var(--kv-d) / 2));
   background: var(--kv-m-fr);
   color: var(--kv-m-ink);
@@ -1352,7 +1358,7 @@
 .rank {
   font-family: var(--kz-title, var(--f-title));
   font-weight: 600;
-  font-size: calc(46px * var(--kv-u));
+  font-size: calc(46 * var(--kv-pu));
   line-height: 1;
 }
 
@@ -1371,13 +1377,13 @@
 }
 
 .rank1 {
-  font-size: calc(96px * var(--kv-u));
+  font-size: calc(96 * var(--kv-pu));
   line-height: .9;
   white-space: nowrap;
 }
 
 .blkName {
-  font-size: calc(15px * var(--kv-u));
+  font-size: calc(15 * var(--kv-pu));
   font-weight: 700;
   letter-spacing: .01em;
   color: rgba(18, 26, 43, .82);
@@ -1445,7 +1451,7 @@
 
   .root:not([data-mode="pin"]) .t3 .box {
     --kv-aw: 380px;
-    --kv-u: .86;
+    --kv-pu: .86px;
   }
 }
 
@@ -1652,6 +1658,8 @@
   --kv-top: clamp(96px, calc(50svh - 190px), 280px);
   --kv-cl: calc(var(--kv-gl) + clamp(0px, 3.6vw - 14px, 48px));
   --kv-cw: min(36vw, 520px);
+  /* La colonne du temps 3 (le « 1re », le texte, les boutons) */
+  --kv-t3w: min(29vw, 400px);
   --kv-ww: min(48vw, 700px);
   --kv-wbar: 34px;
   --kv-wx: calc(100% - var(--kv-gr) - var(--kv-ww) - clamp(0px, 2vw, 36px));
@@ -1758,7 +1766,7 @@
 
 .root[data-mode="pin"] .t3 .col {
   display: block;
-  width: min(29vw, 400px);
+  width: var(--kv-t3w);
 }
 
 .root[data-mode="pin"] .swap {
@@ -1815,10 +1823,18 @@
   pointer-events: auto;
 }
 
+/* L'arche, sa couronne et le podium tiennent dans la scène épinglée, à toute taille :
+   - largeur de l'arche : 61vw comme la maquette, bornée par la hauteur et, sous 1300 px de large, par la place
+     que lui laisse la colonne de texte (les étoiles de gauche dépassent de l'arche : on leur garde de l'air) ;
+   - le podium se mesure à l'arche (--kv-pu : 1px pour une arche de 878 px, celle de 1440 × 900) ;
+   - en perspective, ses blocs occupent x 21 → 475 et y 70 → 384 unités de sa boîte (480 × 330) : il est centré
+     sur son dessin (248), et son bas (le bloc 3 en avant et son ombre) reste au-dessus du bas de la scène ;
+     il remonte un peu devant le bas de la photo plutôt que d'être rogné. */
 .root[data-mode="pin"] .t3 .box {
-  --kv-aw: min(61vw, 1200px, calc((100svh - 250px) * 1.5));
+  --kv-aw: min(61vw, 1200px, calc((100svh - 250px) * 1.5), calc(100vw - var(--kv-cl) - var(--kv-t3w) - var(--kv-gr) - clamp(0px, 260px - 20vw, 60px)));
   --kv-ah: calc(var(--kv-aw) / 1.5);
-  --kv-u: 1;
+  --kv-pu: clamp(.5px, calc(var(--kv-aw) / 878), 1px);
+  --kv-pb: min(50% + var(--kv-ah) / 2 + 4svh + 80 * var(--kv-pu), 100% - 56 * var(--kv-pu) - clamp(10px, 1.5svh, 16px));
   position: absolute;
   z-index: 2;
   inset: 0;
@@ -1831,22 +1847,26 @@
   transform: none;
 }
 
+/* La feuille extérieure de droite tomberait hors de l'écran (la gouttière est plus étroite que la couronne) */
+.root[data-mode="pin"] [data-outer] {
+  display: none;
+}
+
+/* Le chèque, un peu plus haut : le podium, qui remonte, ne vient pas sur son coin */
+.root[data-mode="pin"] .printCheck {
+  top: 64%;
+}
+
 .root[data-mode="pin"] .portal {
   position: absolute;
   left: calc(100% - var(--kv-gr) - var(--kv-aw));
   top: calc(50% - var(--kv-ah) / 2 + 4svh);
 }
 
-@media (max-height: 820px) {
-  .root[data-mode="pin"] .t3 .box {
-    --kv-u: .84;
-  }
-}
-
 .root[data-mode="pin"] .pod {
   position: absolute;
-  left: calc(100% - var(--kv-gr) - var(--kv-aw) / 2 - 240px * var(--kv-u));
-  top: calc(50% + var(--kv-ah) / 2 + 4svh + 80px - 330px * var(--kv-u));
+  left: calc(100% - var(--kv-gr) - var(--kv-aw) / 2 - 248 * var(--kv-pu));
+  top: calc(var(--kv-pb) - 330 * var(--kv-pu));
   margin: 0;
 }
 

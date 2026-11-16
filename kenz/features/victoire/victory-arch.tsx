@@ -57,7 +57,15 @@ export function VictoryArch({ win, team, check, credit }: VictoryArchProps) {
             const from = CROWN.stars[a];
             const to = CROWN.stars[b];
             return from && to ? (
-              <line key={i} pathLength={1} x1={from.x.toFixed(2)} y1={from.y.toFixed(2)} x2={to.x.toFixed(2)} y2={to.y.toFixed(2)} />
+              <line
+                key={i}
+                pathLength={1}
+                x1={from.x.toFixed(2)}
+                y1={from.y.toFixed(2)}
+                x2={to.x.toFixed(2)}
+                y2={to.y.toFixed(2)}
+                data-outer={to.outer ? "" : undefined}
+              />
             ) : null;
           })}
         </svg>
@@ -66,6 +74,7 @@ export function VictoryArch({ win, team, check, credit }: VictoryArchProps) {
             key={n}
             className={STAR_CLASS[star.kind]}
             data-kv="star"
+            data-outer={star.outer ? "" : undefined}
             style={
               {
                 left: `${((star.x / CROWN_BOX.w) * 100).toFixed(2)}%`,
