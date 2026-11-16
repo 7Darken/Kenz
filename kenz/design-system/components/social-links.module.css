@@ -143,3 +143,13 @@
     transition: none !important;
   }
 }
+
+/* Qualité basse : sans flou d'arrière-plan */
+:global(html[data-quality="low"]) .glass .link {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:global(html[data-quality="low"]:not([data-theme="light"])) .glass .link {
+  background: rgba(10, 17, 23, .62);
+}

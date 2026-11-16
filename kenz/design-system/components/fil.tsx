@@ -28,6 +28,8 @@ export function Fil() {
     let nodes: HTMLElement[] = [];
     let starts: number[] = [];
     let traits: HTMLElement[] = [];
+    /** Haut (dans la page) et hauteur de chaque trait, mesurés avec les chapitres : rien à lire pendant le défilement. */
+    let traitBoxes: { top: number; height: number }[] = [];
     let drawn: number[] = [];
     let raf = 0;
 
@@ -36,10 +38,11 @@ export function Fil() {
       raf = 0;
       const vh = window.innerHeight;
       let moving = false;
+      const y = window.scrollY;
       traits.forEach((trait, index) => {
-        const rect = trait.getBoundingClientRect();
-        if (!rect.height) return;
-        const target = clamp01((vh * 0.94 - rect.top) / (vh * 0.46 + rect.height));
+        const box = traitBoxes[index];
+        if (!box?.height) return;
+        const target = clamp01((vh * 0.94 - (box.top - y)) / (vh * 0.46 + box.height));
         let value = reduced.matches ? target : drawn[index] + (target - drawn[index]) * 0.2;
         if (Math.abs(target - value) < 0.002) value = target;
         else moving = true;
@@ -65,6 +68,7 @@ export function Fil() {
         );
         nodes = Array.from(nodesBox.children) as HTMLElement[];
         rail.toggleAttribute("data-on", boxes.length > 1);
+        traitBoxes = [];
         traits = boxes.flatMap((box, index) => {
           const trait = box.el.querySelector<HTMLElement>(":scope > [data-fil-trait]");
           if (!trait) return [];
@@ -72,7 +76,10 @@ export function Fil() {
           // Le trait se place par rapport à son chapitre : on retire le décalage du chapitre dans l'écran,
           // pour qu'il tombe sur --fil-x, dans l'axe exact du rail.
           trait.style.setProperty("--fil-offset", `${box.el.getBoundingClientRect().left}px`);
-          return index === 0 ? [] : [trait];
+          if (index === 0) return [];
+          // Sa place dans la page : le haut du chapitre (son espaceur s'il est épinglé) plus son décalage dans le chapitre.
+          traitBoxes.push({ top: box.top + trait.offsetTop, height: trait.offsetHeight });
+          return [trait];
         });
         drawn = traits.map((_, index) => drawn[index] ?? (reduced.matches ? 1 : 0));
       },

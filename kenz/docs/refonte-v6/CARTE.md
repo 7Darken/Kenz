@@ -40,6 +40,7 @@ Chaque section ou module de la maquette (`maquettes/v6`), avec son emplacement d
 | `.nav` + variantes de `pro`, `app`, `agents`, `createur` (barre « stories »), `voyage`, `sport` | `features/nav/nav.tsx`, `story-bar.tsx` | Choix automatique selon l'univers et le chemin. |
 | `shared/footer.*` | `features/footer/footer.tsx` | Variantes pro, createur, k15ze. |
 | Lenis, GSAP, ScrollTrigger, ancres | `design-system/motion/*` | `useMotion()`, `useGsap()`, `useInView()`, `useReducedMotion()`, `useMediaQuery()`. |
+| Niveaux de qualité (appareils moins puissants) | `design-system/motion/quality.ts`, `quality-script.ts`, `use-quality.ts` | `<html data-quality>`, `useQuality()`, `getQuality()` / `subscribeQuality()`, `noteFrame(t)` ; voir `CONVENTIONS.md` §5. |
 | Polices : Melodrama (data URI), Inter, Instrument Serif, Anton | `app/fonts.ts`, `app/fonts/Melodrama-Variable.woff2` | Jetons `--f-title`, `--f-text`, `--f-word`, `--f-num`. |
 | Données en tête des modules `shared/*.js` | `content/*.ts` | Voir la dernière section. |
 | Assets référencés | `public/assets/` | Voir `CONVENTIONS.md`, section « Images ». |

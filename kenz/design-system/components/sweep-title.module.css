@@ -35,3 +35,8 @@
     transition: opacity 1s var(--expo);
   }
 }
+
+/* Qualité basse : le balayage seul, sans flou */
+:global(html.js[data-quality="low"]) .sweep {
+  filter: none;
+}

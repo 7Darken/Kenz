@@ -1654,6 +1654,9 @@
    Couches : lueur 0 · scènes 2 · foule 3 · textes 4 · arche et podium 2-4 · compteur 10 · éclat 11
    ========================================================= */
 .root[data-mode="pin"] {
+  /* La scène découpe déjà (overflow: hidden) : sans clip sur la racine épinglée, Chrome ne compte plus chaque bascule
+     en position fixe comme un décalage de mise en page (CLS de 1 à l'entrée et à la sortie de l'épinglage). */
+  overflow: visible;
   --kv-mfs: clamp(30px, 2.6vw, 42px);
   --kv-top: clamp(96px, calc(50svh - 190px), 280px);
   --kv-cl: calc(var(--kv-gl) + clamp(0px, 3.6vw - 14px, 48px));
@@ -1879,4 +1882,38 @@
   .twinkle {
     animation: none;
   }
+}
+
+/* =========================================================
+   Qualité basse (design-system/motion/quality) : des ombres courtes (les grandes ombres floues coûtent au rendu de
+   chaque calque qui bouge), un seul ombrage par post-it et par avatar. La mise en page et le récit ne changent pas.
+   ========================================================= */
+:global(html[data-quality="low"]) .root {
+  --kv-shadow: 0 1px 1px rgba(0, 0, 0, .22), 0 16px 30px -18px rgba(0, 0, 0, .6);
+  --kv-win-sh: 0 1px 1px rgba(0, 0, 0, .3), 0 28px 44px -26px rgba(0, 0, 0, .7);
+  --kv-bubble-sh: inset 0 0 0 1px rgba(244, 239, 230, .1), 0 24px 40px -26px rgba(0, 0, 0, .75);
+}
+
+:global(html[data-quality="low"][data-theme="light"]) .root {
+  --kv-shadow: 0 1px 1px rgba(40, 28, 16, .08), 0 16px 30px -18px rgba(40, 28, 16, .3);
+  --kv-win-sh: 0 0 0 1px rgba(26, 25, 24, .05), 0 22px 40px -22px rgba(26, 25, 24, .24);
+  --kv-bubble-sh: 0 0 0 1px rgba(26, 25, 24, .06), 0 22px 40px -24px rgba(26, 25, 24, .26);
+}
+
+:global(html[data-quality="low"]) .piIn {
+  box-shadow: 0 6px 10px -6px rgba(0, 0, 0, .45);
+}
+
+:global(html[data-quality="low"]) .ours .piIn {
+  box-shadow: 0 6px 10px -6px rgba(0, 0, 0, .45), 0 0 calc(var(--kv-on) * 40px) rgb(227 162 26 / calc(var(--kv-on) * .7));
+}
+
+:global(html[data-quality="low"]) .av {
+  box-shadow: 0 0 0 1.5px var(--kv-av-ring);
+}
+
+/* Qualité moyenne ou basse : les mots apparaissent en fondu, sans flou (comme les tweens de victoire-timelines) */
+:global(html:not([data-quality="high"])) .root[data-mode="flow"] .t:not([data-in]) .w,
+:global(html:not([data-quality="high"])) .root[data-mode="flow"] .t3:not([data-zero]) .hLive .w {
+  filter: none;
 }

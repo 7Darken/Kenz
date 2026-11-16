@@ -93,3 +93,16 @@
     transform: none;
   }
 }
+
+/* Qualité moyenne ou basse : pas de flou sur tout l'écran derrière la fiche, un voile plus sombre */
+:global(html[data-quality="medium"]) .dialog[open]::backdrop,
+:global(html[data-quality="low"]) .dialog[open]::backdrop {
+  background: rgb(0 0 0 / .62);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:global(html[data-quality="medium"][data-theme="light"]) .dialog[open]::backdrop,
+:global(html[data-quality="low"][data-theme="light"]) .dialog[open]::backdrop {
+  background: rgb(26 25 24 / .4);
+}

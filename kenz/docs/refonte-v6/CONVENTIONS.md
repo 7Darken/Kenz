@@ -231,6 +231,14 @@ Les couleurs en « r g b » s'emploient ainsi : `rgb(var(--lum) / .5)`.
 - **L'univers** est sur le conteneur `[data-univers]`. Ses jetons s'appliquent à `:root` grâce à `:has()`, donc partout : `<dialog>`, calques fixes, voile des passages. Un module n'a pas à connaître l'univers : il lit `var(--lum)`, et cela suffit.
 - **Variables propres à une page** (`--land-f`, `--hero-shade`…) : à déclarer dans le CSS Module de la section, pas dans `tokens.css`.
 
+### Niveaux de qualité (appareils moins puissants)
+
+- **Le niveau** est sur `<html data-quality="high|medium|low">` (`design-system/motion/quality*`). Un script inline le pose avant l'affichage d'après l'appareil (mémoire, cœurs, réseau, téléphone) ; la mesure des images (une sonde au démarrage, puis le défilement et les boucles lourdes) ne fait que le baisser, avec hystérésis, et le garde pour la session.
+- **`high` ne change rien** : c'est le rendu de la maquette. `medium` et `low` allègent les effets, jamais la mise en page ni le sens.
+- **En CSS** : `:global(html[data-quality="low"]) .x {…}` (flou d'arrière-plan, grain, filtres, grandes ombres).
+- **En JS** : `useQuality()` dans un composant, `getQuality()` / `subscribeQuality()` dans un moteur (le niveau peut baisser en cours de route). Une boucle `requestAnimationFrame` lourde appelle `noteFrame(t)` : ses images comptent dans la mesure.
+- **Calcul lourd au chargement** : en tranches (`runSliced` de `features/terre/engine/world`), jamais une tâche de plus de 50 ms.
+
 ## 6. Images
 
 - **`next/image`** pour tout le contenu :

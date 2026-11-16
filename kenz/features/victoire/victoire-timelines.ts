@@ -6,10 +6,19 @@
  * Les éléments sont trouvés par leurs ancres `data-kv` (le style, lui, vit dans victoire.module.css).
  */
 import { gsap } from "@/design-system/motion/gsap";
+import { getQuality } from "@/design-system/motion/quality";
 
 import { CROWN, DOORS, GAP, OURS, PERSPECTIVE, SPARKS, WALL } from "./victoire-geometry";
 
 type El = HTMLElement;
+
+/**
+ * Le flou d'une apparition (`px` au départ, 0 à l'arrivée) : un filtre animé image par image, gardé au niveau de
+ * qualité `high` ; plus bas, l'apparition est un simple fondu qui monte.
+ */
+export function soft(px: number): { filter?: string } {
+  return getQuality() === "high" ? { filter: `blur(${px}px)` } : {};
+}
 
 /** Les éléments animés de la séquence. */
 export interface VictoireRefs {
@@ -293,7 +302,7 @@ export function measureBeam(R: VictoireRefs, g: BeamGeometry) {
 export function seqWall(tl: gsap.core.Timeline, R: VictoireRefs, t0: number, s: number, g: () => BeamGeometry) {
   const T = (u: number) => t0 + u * s;
   const wordIn = (els: El[], at: number) =>
-    tl.fromTo(els, { opacity: 0, y: 18, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.38 * s, stagger: 0.045 * s, ease: "power2.out" }, at);
+    tl.fromTo(els, { opacity: 0, y: 18, ...soft(10) }, { opacity: 1, y: 0, ...soft(0), duration: 0.38 * s, stagger: 0.045 * s, ease: "power2.out" }, at);
   const wordOut = (els: El[], at: number) => tl.to(els, { opacity: 0, y: -12, duration: 0.16 * s, ease: "power2.in" }, at);
   const order = R.postIts.slice().sort((a, b) => (WALL.postIts[R.postIts.indexOf(a)]?.order ?? 0) - (WALL.postIts[R.postIts.indexOf(b)]?.order ?? 0));
 
@@ -341,7 +350,7 @@ export function seqWall(tl: gsap.core.Timeline, R: VictoireRefs, t0: number, s: 
 export function seqRole(tl: gsap.core.Timeline, R: VictoireRefs, t0: number, s: number, onHours: (h: number) => void) {
   const T = (u: number) => t0 + u * s;
   const wordIn = (els: El[], at: number) =>
-    tl.fromTo(els, { opacity: 0, y: 18, filter: "blur(10px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.4 * s, stagger: 0.05 * s, ease: "power2.out" }, at);
+    tl.fromTo(els, { opacity: 0, y: 18, ...soft(10) }, { opacity: 1, y: 0, ...soft(0), duration: 0.4 * s, stagger: 0.05 * s, ease: "power2.out" }, at);
   const wordOut = (els: El[], at: number) => tl.to(els, { opacity: 0, y: -12, duration: 0.18 * s, ease: "power2.in" }, at);
 
   // J'écoute la cliente.
@@ -441,7 +450,7 @@ export function seqTriumph(tl: gsap.core.Timeline, R: VictoireRefs, tZ: number, 
 
 /** Le « 1re » or se lève, puis le nom du projet et sa mention. */
 export function seqFirst(tl: gsap.core.Timeline, R: VictoireRefs, at: number, s: number) {
-  tl.fromTo(R.uneGlyph, { opacity: 0, y: 60, filter: "blur(14px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.45 * s, ease: "power3.out" }, at).fromTo(
+  tl.fromTo(R.uneGlyph, { opacity: 0, y: 60, ...soft(14) }, { opacity: 1, y: 0, ...soft(0), duration: 0.45 * s, ease: "power3.out" }, at).fromTo(
     [R.uneName, R.uneLabel],
     { opacity: 0, y: 12 },
     { opacity: 1, y: 0, duration: 0.3 * s, stagger: 0.1 * s, ease: "power2.out" },

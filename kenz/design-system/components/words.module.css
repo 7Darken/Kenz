@@ -24,3 +24,8 @@
     filter: none !important;
   }
 }
+
+/* Qualité basse : les mots montent en fondu, sans sortir du flou (un filtre par mot à recalculer à chaque image) */
+:global(html.js[data-quality="low"]) .words .word {
+  filter: none;
+}

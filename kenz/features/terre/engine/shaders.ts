@@ -116,7 +116,7 @@ void main(){
 export const FRAG_INNER = /* glsl */ `
 ${GLSL_STUDIO}
 ${GLSL_NEON}
-uniform sampler2D uMasque; uniform sampler2D uTexJ; uniform vec3 uSoleil; uniform float uLod; uniform float uTemps;
+uniform sampler2D uMasque; uniform sampler2D uTexJ; uniform vec3 uSoleil; uniform float uLod; uniform float uTemps; uniform float uCaus;
 varying vec2 vUv; varying vec3 vN; varying vec3 vV; varying vec3 vR; varying vec3 vObj;
 float bruit(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 float doux(vec2 p){ vec2 i = floor(p), f = fract(p), u = f * f * (3.0 - 2.0 * f);
@@ -139,10 +139,13 @@ void main(){
   vec3 lagon = mix(vec3(0.06, 0.5, 0.56), vec3(0.24, 0.72, 0.74), uJour);
   vec3 mer = mix(profond, lagon, peu);
   mer *= 0.85 + 0.3 * dot(photo, vec3(0.3, 0.59, 0.11));
-  vec2 cq = vUv * vec2(320.0, 160.0);
-  float n1 = doux(cq + vec2(uTemps * 0.22, uTemps * 0.13)), n2 = doux(cq * 1.3 - vec2(uTemps * 0.17, -uTemps * 0.2));
-  float caus = pow(1.0 - abs(n1 - n2), 9.0) * peu;
-  mer += mix(vec3(0.5, 0.9, 0.95), vec3(0.85, 1.0, 1.0), uJour) * caus * 0.22;
+  /* les caustiques (deux bruits par pixel) : coupées au niveau de qualité bas (uCaus = 0) */
+  if (uCaus > 0.5) {
+    vec2 cq = vUv * vec2(320.0, 160.0);
+    float n1 = doux(cq + vec2(uTemps * 0.22, uTemps * 0.13)), n2 = doux(cq * 1.3 - vec2(uTemps * 0.17, -uTemps * 0.2));
+    float caus = pow(1.0 - abs(n1 - n2), 9.0) * peu;
+    mer += mix(vec3(0.5, 0.9, 0.95), vec3(0.85, 1.0, 1.0), uJour) * caus * 0.22;
+  }
   mer *= lum * (0.78 + 0.3 * nvr);
   mer *= 1.0 - clamp(pied * 1.5, 0.0, 1.0) * (1.0 - terre) * mix(0.42, 0.2, uJour);
   /* les terres : la vraie couleur, teintée dans la masse ; les flancs et le biseau plus clairs */

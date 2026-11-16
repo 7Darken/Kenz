@@ -72,3 +72,12 @@
     transition-duration: .01s;
   }
 }
+
+/* Qualité basse : ni grain (un calque plein écran de plus à composer à chaque image), ni calques réservés aux halos */
+:global(html[data-quality="low"]) .grain {
+  display: none;
+}
+
+:global(html[data-quality="low"]) .halo {
+  will-change: auto;
+}

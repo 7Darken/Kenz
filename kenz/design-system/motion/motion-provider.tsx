@@ -2,7 +2,9 @@
 
 /**
  * Le mouvement du site : une seule instance Lenis (défilement doux, souris seulement), synchronisée avec
- * GSAP et ScrollTrigger (enregistrés une fois dans ./gsap). Mouvement réduit : pas de Lenis.
+ * GSAP et ScrollTrigger (enregistrés une fois dans ./gsap). Mouvement réduit : pas de Lenis. Niveau de qualité
+ * `low` (./quality) : pas de Lenis non plus, le défilement natif reste fluide même quand le fil principal peine.
+ * Lance aussi la mesure du niveau de qualité (une fois).
  * Gère aussi les ancres internes (#contact, #top) en douceur, et lève le garde-fou du script de thème.
  *
  * API (useMotion) : scrollTo(cible), stop() / start() (dialogues, passages), lenis() (instance ou null).
@@ -12,6 +14,8 @@ import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { gsap, ScrollTrigger } from "./gsap";
+import { startQualityMonitor } from "./quality";
+import { useQuality } from "./use-quality";
 import { useReducedMotion } from "./use-reduced-motion";
 
 type ScrollTarget = number | string | HTMLElement;
@@ -44,6 +48,7 @@ function resolveY(target: ScrollTarget, offset = 0): number {
 
 export function MotionProvider({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
+  const lowQuality = useQuality() === "low";
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
 
@@ -65,14 +70,15 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     [],
   );
 
-  // L'application a démarré : on lève le garde-fou du script de thème.
+  // L'application a démarré : on lève le garde-fou du script de thème, et on mesure la fluidité.
   useEffect(() => {
     window.clearTimeout(window.__kzBoot);
+    return startQualityMonitor();
   }, []);
 
-  // Lenis : ordinateur (pointeur fin) et sans mouvement réduit, piloté par le ticker de GSAP.
+  // Lenis : ordinateur (pointeur fin), sans mouvement réduit ni qualité basse, piloté par le ticker de GSAP.
   useEffect(() => {
-    if (reduced || !window.matchMedia("(pointer: fine)").matches) return;
+    if (reduced || lowQuality || !window.matchMedia("(pointer: fine)").matches) return;
     const lenis = new Lenis({ lerp: 0.1, autoRaf: false });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
@@ -85,7 +91,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, [reduced]);
+  }, [reduced, lowQuality]);
 
   // Nouvelle page : Lenis remesure la hauteur, ScrollTrigger recalcule ses déclencheurs.
   useEffect(() => {

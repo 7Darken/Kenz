@@ -7,6 +7,7 @@
 import { useId, useRef, useState } from "react";
 
 import { COURSES, isCourseId, type CourseId } from "@/content/courses";
+import { useQuality } from "@/design-system/motion/use-quality";
 import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { CourseDialog, type CourseDetail } from "./course-dialog";
 import { CourseItem, type CourseHeadingLevel } from "./course-item";
@@ -29,7 +30,9 @@ export function Courses({ ids, variant, headingLevel = "h3" }: CoursesProps) {
   const [open, setOpen] = useState(false);
   const list = ids.filter(isCourseId);
 
-  useParallax(rootRef, !reduced, list.length);
+  // Qualité basse : les calques restent posés (un ScrollTrigger de moins par photo).
+  const lowQuality = useQuality() === "low";
+  useParallax(rootRef, !reduced && !lowQuality, list.length);
 
   const openDetail = (id: CourseId, source: HTMLImageElement | null, trigger: HTMLButtonElement) => {
     // Le bouton prend le focus avant l'ouverture : la fiche le lui rendra en se fermant.

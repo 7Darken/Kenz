@@ -1,7 +1,7 @@
 /**
  * Le moteur de la profondeur (shared/profondeur.js, poser) : quels objets montrer, quand, et comment ils bougent.
- * - Choix : dans l'ordre de la liste, les objets chargés qui ne gênent rien (6 au plus sur ordinateur, 3 sur
- *   mobile). Jamais sur le visage (fractions du portrait), ni sur le titre, la phrase ou le lien : l'emprise
+ * - Choix : dans l'ordre de la liste, les objets chargés qui ne gênent rien (`max` : 6 au plus sur ordinateur, 3 sur
+ *   mobile, moins aux niveaux de qualité plus bas). Jamais sur le visage (fractions du portrait), ni sur le titre, la phrase ou le lien : l'emprise
  *   de l'objet, sa marge de mouvement (souris, flottaison) et son trajet au défilement sont vérifiés à chaque
  *   mise en page ; un objet qui gênerait n'est pas montré. Un fichier absent : l'objet est retiré, sans bruit.
  * - Entrée : 1,05 s après celle du hero, du fond vers l'avant (on attend 3,2 s au plus les images lentes).
@@ -27,7 +27,8 @@ interface Box {
 interface DepthEngineOptions {
   /** Les objets placés dans le mode en cours, dans l'ordre de la liste (même ordre que les éléments). */
   placed: readonly PlacedObject[];
-  desktop: boolean;
+  /** Le nombre d'objets montrés au plus. */
+  max: number;
   reduced: boolean;
   /** La souris peut piloter la parallaxe (ordinateur, pointeur fin). */
   mouse: boolean;
@@ -60,7 +61,7 @@ function rest(el: Element): Box {
 const overlaps = (a: Box, b: Box) => a.l < b.r && a.r > b.l && a.t < b.b && a.b > b.t;
 
 export function startDepth(container: HTMLElement, options: DepthEngineOptions): () => void {
-  const { placed, desktop, reduced, mouse, fade } = options;
+  const { placed, reduced, mouse, fade } = options;
   const hero = container.closest("section") ?? container.parentElement ?? container;
   const elements = Array.from(container.querySelectorAll<HTMLElement>("[data-depth-item]"));
   const items = placed.map((p, i) => {
@@ -118,7 +119,7 @@ export function startDepth(container: HTMLElement, options: DepthEngineOptions):
   function choose() {
     if (dead) return;
     const g = measure();
-    const max = desktop ? 6 : 3;
+    const { max } = options;
     let count = 0;
     const shown: typeof items = [];
     items.forEach((item) => {
@@ -167,7 +168,11 @@ export function startDepth(container: HTMLElement, options: DepthEngineOptions):
       settle();
     };
     if (img.complete && img.naturalWidth) item.status = "ok";
-    else if (img.complete && img.currentSrc) onError();
+    else if (img.complete && img.currentSrc) {
+      /* déjà en erreur : seulement l'état (le départ, plus bas, choisira) */
+      item.status = "absent";
+      item.el?.setAttribute("data-absent", "");
+    }
     img.addEventListener("load", onLoad);
     img.addEventListener("error", onError);
     cleanups.push(() => {
@@ -197,10 +202,6 @@ export function startDepth(container: HTMLElement, options: DepthEngineOptions):
       later(reveal, WAIT_MS + 50);
     }, DELAY_S * 1000);
   }
-  if (revealed) choose();
-  else if (options.ready) startCountdown();
-  else later(startCountdown, FALLBACK_MS - DELAY_S * 1000);
-
   /* ---------- Le défilement : chaque plan à sa vitesse, puis l'effacement au départ du hero ---------- */
   function startMotion() {
     container.toggleAttribute("data-fixe", reduced);
@@ -264,6 +265,11 @@ export function startDepth(container: HTMLElement, options: DepthEngineOptions):
     if (!onScreen) rest0();
   });
   io.observe(hero);
+
+  /* ---------- Le départ : après toutes les déclarations (une remise en place déjà révélée choisit tout de suite) ---------- */
+  if (revealed) choose();
+  else if (options.ready) startCountdown();
+  else later(startCountdown, FALLBACK_MS - DELAY_S * 1000);
 
   /* ---------- Mise en page : remesurer (redimensionnement, polices) ---------- */
   let resizeTimer = 0;

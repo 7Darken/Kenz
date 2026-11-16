@@ -575,3 +575,10 @@
     transition: none !important;
   }
 }
+
+/* Qualité moyenne ou basse : sans flou d'arrière-plan, un verre plus dense */
+:global(html[data-quality="medium"]) .pill,
+:global(html[data-quality="low"]) .pill {
+  background: rgba(28, 27, 26, .8);
+  backdrop-filter: none;
+}

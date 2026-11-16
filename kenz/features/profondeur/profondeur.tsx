@@ -10,7 +10,9 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useSyncExternalStore, type CSSProperties } from "react";
 
 import { Polaroid } from "@/design-system/components/polaroid";
+import type { Quality } from "@/design-system/motion/quality";
 import { useMediaQuery } from "@/design-system/motion/use-media-query";
+import { useQuality } from "@/design-system/motion/use-quality";
 import { useReducedMotion } from "@/design-system/motion/use-reduced-motion";
 import { startDepth } from "./depth-engine";
 import { PLANS, place, type PlacedObject } from "./profondeur-planes";
@@ -29,6 +31,8 @@ export interface ProfondeurProps {
 
 /** Le visage, en fractions du portrait : x0, y0, x1, y1. */
 const FACE = [0.27, 0.06, 0.73, 0.46] as const;
+/** Le nombre d'objets montrés au plus [ordinateur, mobile], selon le niveau de qualité. */
+const MAX_SHOWN: Record<Quality, readonly [number, number]> = { high: [6, 3], medium: [5, 3], low: [3, 2] };
 
 const noop = () => () => {};
 /** Vrai une fois l'application démarrée (faux au rendu serveur et à l'hydratation). */
@@ -95,6 +99,7 @@ export function Profondeur({
   const desktop = useMediaQuery("(min-width: 861px)");
   const mouse = useMediaQuery("(min-width: 861px) and (hover: hover) and (pointer: fine)");
   const reduced = useReducedMotion();
+  const quality = useQuality();
   const config = DEPTH_SERIES[series];
   // Une liste stable : le moteur n'est remis en place que si les objets ou leurs places changent.
   const placed = useMemo(
@@ -111,9 +116,10 @@ export function Profondeur({
     if (!container || !placed.length) return;
     return startDepth(container, {
       placed,
-      desktop,
+      max: MAX_SHOWN[quality][desktop ? 0 : 1],
       reduced,
-      mouse,
+      // Qualité basse : pas de parallaxe à la souris (une mise à jour de style par image).
+      mouse: mouse && quality !== "low",
       ready,
       revealed: revealedRef.current,
       onReveal: () => {
@@ -124,7 +130,7 @@ export function Profondeur({
       face: FACE,
       avoidSelector,
     });
-  }, [placed, desktop, reduced, mouse, ready, config.fade, figSelector, avoidSelector]);
+  }, [placed, desktop, quality, reduced, mouse, ready, config.fade, figSelector, avoidSelector]);
 
   return (
     <div ref={containerRef} className={styles.prof} aria-hidden="true">

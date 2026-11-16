@@ -423,3 +423,15 @@
     }
   }
 }
+
+/* Qualité basse : sans flou d'arrière-plan (recalculé à chaque image du défilement), un voile plus couvrant */
+:global(html[data-quality="low"]) .nav::before {
+  background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:global(html[data-quality="low"]) .cta {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

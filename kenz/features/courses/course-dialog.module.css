@@ -368,3 +368,22 @@ dialog.sheet.flight[open] {
     transition: none !important;
   }
 }
+
+/* Qualité moyenne ou basse : pas de flou sur tout l'écran derrière la fiche, un voile plus couvrant */
+:global(html[data-quality="medium"]) dialog.sheet[open]::backdrop,
+:global(html[data-quality="low"]) dialog.sheet[open]::backdrop {
+  background: rgba(5, 7, 6, .78);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:global(html[data-quality="medium"][data-theme="light"]) dialog.sheet[open]::backdrop,
+:global(html[data-quality="low"][data-theme="light"]) dialog.sheet[open]::backdrop {
+  background: rgba(232, 236, 230, .86);
+}
+
+:global(html[data-quality="low"]) .zoomClose {
+  background: rgba(13, 15, 14, .8);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

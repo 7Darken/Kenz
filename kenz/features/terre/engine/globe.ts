@@ -6,8 +6,15 @@
  * repli (sans WebGL, contexte perdu, texture illisible, ou mouvement réduit). L'API reste la même en repli : `frame()`
  * déplace l'image ; `aim()`, `arc()`, `light()` ne font rien.
  *
- * Performance : DPR ≤ 1,5 ; une seule boucle, en pause hors écran (IntersectionObserver sur `observe`), onglet caché,
- * calque à 0 ou cadre absent. `destroy()` libère tout (géométries, matériaux, textures, contexte WebGL).
+ * Performance : une seule boucle, en pause hors écran (IntersectionObserver sur `observe`), onglet caché, calque à 0 ou
+ * cadre absent ; la préparation du monde intérieur et des néons se fait en tranches (aucune tâche longue). Le niveau de
+ * qualité (design-system/motion/quality) règle le reste :
+ * - `high` : textures 4096 (2048 sur mobile), sphères denses, DPR ≤ 1,5, lueur et caustiques ;
+ * - `medium` : le jeu « mobile » partout (textures 2048, sphères moins denses), DPR ≤ 1,25 ;
+ * - `low` : DPR 1, sans anticrénelage, sans lueur des néons ni caustiques, 30 i/s quand le globe ne suit pas la page ;
+ *   en dernier recours (moins de 20 i/s soutenus), l'image de repli.
+ * Une baisse en cours de route s'applique tout de suite (DPR, lueur, caustiques, cadence) ; les géométries restent.
+ * `destroy()` libère tout (géométries, matériaux, textures, contexte WebGL).
  */
 import {
   AdditiveBlending,
@@ -38,6 +45,7 @@ import {
 } from "three";
 
 import type { EscaleId } from "@/content/series";
+import { getQuality, noteFrame, subscribeQuality, type Quality } from "@/design-system/motion/quality";
 import {
   FRAG_ARC,
   FRAG_GLOW,
@@ -51,7 +59,17 @@ import {
   VERT_POINTS,
   VERT_SHELL,
 } from "./shaders";
-import { arcCurve, buildEmission, buildInnerGeometry, latLonToVector, loadCanvas, type LatLon } from "./world";
+import {
+  arcCurve,
+  buildEmission,
+  buildInnerGeometry,
+  latLonToVector,
+  loadCanvas,
+  runSliced,
+  yieldToMain,
+  type InnerDetail,
+  type LatLon,
+} from "./world";
 
 export type { LatLon };
 export type GlobeTheme = "day" | "night";
@@ -137,6 +155,55 @@ const TEX = {
   fallbackNight: "/assets/terre/globe-nuit.webp",
 } as const;
 
+/** La finesse du globe : textures, monde intérieur, néons (largeur de l'émission), sphères de la coque et de la lueur. */
+interface Detail {
+  tex: "full" | "small";
+  texMax: number;
+  reliefMax: number;
+  inner: InnerDetail;
+  emission: number;
+  shell: readonly [number, number];
+  glow: readonly [number, number] | null;
+}
+const DETAIL_FULL: Detail = {
+  tex: "full",
+  texMax: 4096,
+  reliefMax: 2048,
+  inner: { grid: 1024, segments: [512, 256] },
+  emission: 2048,
+  shell: [160, 112],
+  glow: [128, 64],
+};
+const DETAIL_SMALL: Detail = {
+  tex: "small",
+  texMax: 2048,
+  reliefMax: 2048,
+  inner: { grid: 512, segments: [256, 128] },
+  emission: 1024,
+  shell: [96, 64],
+  glow: [128, 64],
+};
+const DETAIL_LOW: Detail = {
+  tex: "small",
+  texMax: 2048,
+  reliefMax: 512,
+  inner: { grid: 256, segments: [160, 80] },
+  emission: 1024,
+  shell: [72, 48],
+  glow: null,
+};
+function detailFor(quality: Quality, small: boolean): Detail {
+  if (quality === "low") return DETAIL_LOW;
+  return quality === "high" && !small ? DETAIL_FULL : DETAIL_SMALL;
+}
+const DPR_MAX: Record<Quality, number> = { high: 1.5, medium: 1.25, low: 1 };
+/** ms : au niveau bas, l'intervalle minimal entre deux rendus quand le globe ne suit pas la page (30 i/s). */
+const LOW_STEP = 30;
+/** ms : un cadre déplacé il y a moins de ce temps, le globe suit la page à pleine cadence. */
+const FOLLOW_MS = 250;
+/** Dernier recours au niveau bas : une médiane d'intervalles au-delà (moins de 20 i/s), sur 60 images. */
+const FALLBACK_MEDIAN = 50;
+
 const DISC = 0.42; /* image de repli : rayon du disque / côté de l'image */
 const FOV = 30;
 const RAD = Math.PI / 180;
@@ -194,7 +261,10 @@ interface ArcState {
 
 export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
   const small = window.matchMedia("(max-width: 899px), (pointer: coarse)").matches;
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  let quality = getQuality();
+  const detail = detailFor(quality, small);
+  const dprFor = (q: Quality) => Math.min(window.devicePixelRatio || 1, DPR_MAX[q]);
+  let dpr = dprFor(quality);
   const cls = options.classNames;
   let mode: GlobeMode = !options.reduced && webglAvailable() ? "3d" : "fallback";
 
@@ -224,6 +294,11 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
     activeId: null as string | null,
     pointsHidden: false,
     maskWidth: 4096,
+    /** Le dernier déplacement du cadre (le globe suit alors la page à pleine cadence). */
+    movedAt: 0,
+    /** Le rappel précédent de la boucle, et les intervalles mesurés au niveau bas (dernier recours). */
+    prevT: 0,
+    lowIntervals: [] as number[],
   };
 
   /* ---------- L'ombre portée douce et la caustique, sous la sphère (seulement quand elle est entière à l'écran) ---------- */
@@ -301,7 +376,7 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
     canvas.className = cls.canvas;
     host.appendChild(canvas);
     try {
-      renderer = new WebGLRenderer({ canvas, antialias: !small, alpha: true, powerPreference: "high-performance" });
+      renderer = new WebGLRenderer({ canvas, antialias: !small && quality !== "low", alpha: true, powerPreference: "high-performance" });
     } catch {
       canvas.remove();
       return false;
@@ -334,8 +409,9 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
       uActifCos: { value: new Vector2(1, 1) },
       uActifK: { value: 0 },
       uZoom: { value: 0 },
+      uCaus: { value: quality === "low" ? 0 : 1 },
     };
-    const seg = small ? [96, 64] : [160, 112];
+    const seg = detail.shell;
     /* la coque de verre (transparente) ; le monde intérieur et la lueur viendront avec le masque */
     shell = new Mesh(
       new SphereGeometry(1, seg[0], seg[1]),
@@ -396,21 +472,17 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
     group.add(points);
   }
 
-  /** Le monde intérieur et la lueur des néons, une fois le masque chargé. */
-  function buildInner(mask: HTMLCanvasElement, relief: HTMLCanvasElement | null) {
+  /** Le monde intérieur et la lueur des néons (sauf au niveau bas), une fois le masque préparé. */
+  function buildInner(geometry: BufferGeometry, emission: Texture) {
     if (!group || !renderer || !shell) return;
-    const emission = buildEmission(mask, small, renderer.capabilities.getMaxAnisotropy());
-    textures.push(emission);
     uShell.uEmi.value = emission;
-    inner = new Mesh(
-      buildInnerGeometry(mask, relief, small),
-      new ShaderMaterial({ uniforms: uShell, vertexShader: VERT_INNER, fragmentShader: FRAG_INNER }),
-    );
+    inner = new Mesh(geometry, new ShaderMaterial({ uniforms: uShell, vertexShader: VERT_INNER, fragmentShader: FRAG_INNER }));
     inner.renderOrder = 0;
     group.add(inner);
+    if (!detail.glow) return;
     /* additif sur la couleur seulement : l'alpha du canevas ne bouge pas (sinon un anneau noir sur la crème, au clair) */
     glow = new Mesh(
-      new SphereGeometry(0.95, 128, 64),
+      new SphereGeometry(0.95, detail.glow[0], detail.glow[1]),
       new ShaderMaterial({
         uniforms: uShell,
         vertexShader: VERT_SHELL,
@@ -425,6 +497,7 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
       }),
     );
     glow.renderOrder = 1;
+    glow.visible = quality !== "low";
     group.add(glow);
   }
 
@@ -447,20 +520,45 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
     return texture;
   }
 
-  /** Le masque (terre / mer, pays filmés), le relief (calculé une fois, pas de texture) et le jour (la couleur). */
+  /**
+   * Le masque (terre / mer, pays filmés), le relief (calculé une fois, pas de texture) et le jour (la couleur) ; puis,
+   * en tranches, les néons et le monde intérieur.
+   */
   async function loadTextures() {
-    const [max, size] = small ? ([2048, "small"] as const) : ([4096, "full"] as const);
     const [mask, relief, day] = await Promise.all([
-      loadCanvas(TEX.mask[size], max),
-      loadCanvas(TEX.relief, 2048),
-      loadCanvas(TEX.day[size], max),
+      loadCanvas(TEX.mask[detail.tex], detail.texMax),
+      loadCanvas(TEX.relief, detail.reliefMax),
+      loadCanvas(TEX.day[detail.tex], detail.texMax),
     ]);
-    if (S.dead || mode !== "3d") return;
-    uShell.uMasque.value = makeTexture(mask, 4);
-    uShell.uTexJ.value = makeTexture(day, 8);
+    const live = () => !S.dead && mode === "3d" && !!renderer;
+    if (!live() || !renderer) return;
+    const emission = await runSliced(buildEmission(mask, detail.emission, renderer.capabilities.getMaxAnisotropy()));
+    if (!live()) {
+      emission.dispose();
+      return;
+    }
+    textures.push(emission);
+    const geometry = await runSliced(buildInnerGeometry(mask, relief, detail.inner));
+    if (!live()) {
+      geometry.dispose();
+      return;
+    }
+    const maskTexture = makeTexture(mask, 4);
+    const dayTexture = makeTexture(day, 8);
+    uShell.uMasque.value = maskTexture;
+    uShell.uTexJ.value = dayTexture;
     S.maskWidth = mask.width;
-    buildInner(mask, relief);
+    buildInner(geometry, emission);
     colors();
+    /* l'envoi des textures et la compilation des shaders, chacun dans sa tâche, avant la première image */
+    for (const texture of [maskTexture, dayTexture, emission]) {
+      if (!live() || !renderer) return;
+      renderer.initTexture(texture);
+      await yieldToMain();
+    }
+    if (!live() || !renderer || !scene || !camera) return;
+    await renderer.compileAsync(scene, camera).catch(() => undefined);
+    if (!live()) return;
     S.texturesOk = true;
     resume();
   }
@@ -498,6 +596,7 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
   function resume() {
     if (!S.raf && alive() && S.frameTarget) {
       S.last = 0;
+      S.prevT = 0;
       S.raf = requestAnimationFrame(loop);
     }
   }
@@ -508,6 +607,25 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
   function loop(t: number) {
     S.raf = 0;
     if (!alive() || !renderer || !scene || !camera || !group || !S.frameTarget) return;
+    noteFrame(t);
+    if (quality === "low") {
+      /* le dernier recours : moins de 20 i/s soutenus même au niveau bas, l'image de repli prend le relais */
+      if (S.prevT && t - S.prevT < 600) S.lowIntervals.push(t - S.prevT);
+      S.prevT = t;
+      if (S.lowIntervals.length >= 60) {
+        const sorted = S.lowIntervals.sort((a, b) => a - b);
+        S.lowIntervals = [];
+        if ((sorted[30] ?? 0) > FALLBACK_MEDIAN) {
+          toFallback();
+          return;
+        }
+      }
+      /* 30 i/s quand le globe ne suit pas la page (la rotation lente reste douce) */
+      if (S.last && t - S.last < LOW_STEP && t - S.movedAt > FOLLOW_MS) {
+        S.raf = requestAnimationFrame(loop);
+        return;
+      }
+    }
     const dt = S.last ? Math.min(0.05, (t - S.last) / 1000) : 0.016;
     S.last = t;
     S.time += dt;
@@ -718,6 +836,25 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
   });
   ro.observe(host);
 
+  /* Une baisse du niveau de qualité en cours de route : DPR, lueur, caustiques et cadence (les géométries restent) */
+  const unsubscribeQuality = subscribeQuality(() => {
+    const next = getQuality();
+    if (next === quality) return;
+    quality = next;
+    S.lowIntervals = [];
+    dpr = dprFor(quality);
+    headUniforms.uDpr.value = dpr;
+    if (uPoints.uDpr) uPoints.uDpr.value = dpr;
+    if (uShell.uCaus) uShell.uCaus.value = quality === "low" ? 0 : 1;
+    if (glow) glow.visible = quality !== "low";
+    if (renderer) {
+      renderer.setPixelRatio(dpr);
+      S.W = 0;
+      measure();
+    }
+    resume();
+  });
+
   /* ---------- Démarrage ---------- */
   if (mode === "3d" && build()) {
     measure();
@@ -737,6 +874,7 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
       const n = { x: next.x, y: next.y, r: Math.max(4, next.r) };
       const a = S.frame;
       const o = S.frameTarget;
+      if (!o || o.x !== n.x || o.y !== n.y || o.r !== n.r) S.movedAt = performance.now();
       if (opts?.jump) S.frame = { ...n };
       else if (opts?.follow && a && o) {
         a.x += n.x - o.x;
@@ -811,6 +949,7 @@ export function createGlobe(host: HTMLElement, options: GlobeOptions): Globe {
       io.disconnect();
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
+      unsubscribeQuality();
       disposeScene();
       floor.remove();
       fallback?.remove();

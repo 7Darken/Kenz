@@ -1,6 +1,7 @@
 /**
- * Layout racine : polices, jetons et base du design system, script de thème (avant l'affichage, sans éclair),
- * providers (langue, thème, mouvement). Chaque univers a ensuite son layout (groupes (pro) et (createur)).
+ * Layout racine : polices, jetons et base du design system, scripts du thème et du niveau de qualité (avant
+ * l'affichage, sans éclair), providers (langue, thème, mouvement). Chaque univers a ensuite son layout
+ * (groupes (pro) et (createur)).
  */
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
@@ -8,6 +9,7 @@ import type { ReactNode } from "react";
 import "@/design-system/tokens.css";
 import "@/design-system/base.css";
 import { SITE_NAME, SITE_URL } from "@/content/site";
+import { qualityScript } from "@/design-system/motion/quality-script";
 import { themeScript } from "@/design-system/theme/theme-script";
 import { getDictionary } from "@/i18n/server";
 import { fontVariables } from "./fonts";
@@ -36,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang="fr" className={fontVariables} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: qualityScript }} />
       </head>
       <body>
         <Providers>{children}</Providers>

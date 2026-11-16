@@ -138,6 +138,22 @@
   opacity: calc(var(--neon-strength) * .55);
 }
 
+/* Qualité moyenne : sans flou de profondeur (un filtre de flou par objet coûte au rendu) ; les ombres restent */
+:global(html[data-quality="medium"]) .item,
+:global(html[data-quality="low"]) .item {
+  --flou: 0px;
+}
+
+/* Qualité basse : une ombre courte, ni halo ni néon (des filtres en moins sur chaque objet) */
+:global(html[data-quality="low"]) .item {
+  --ombre: drop-shadow(0 10px 10px rgb(var(--prof-ombre) / .3));
+  --halo-o: drop-shadow(0 0 0 transparent);
+}
+
+:global(html[data-quality="low"]) .neon > .neonGlow {
+  display: none;
+}
+
 /* Mouvement réduit : les objets restent fixes (un simple fondu à l'arrivée) */
 .prof[data-fixe] .float {
   translate: none;

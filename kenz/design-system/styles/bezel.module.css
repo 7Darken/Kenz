@@ -23,3 +23,11 @@
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16);
   color: var(--creme);
 }
+
+/* Qualité moyenne ou basse : le flou d'arrière-plan d'une grande surface coûte à chaque image ; un verre plus dense */
+:global(html[data-quality="medium"]) .glass,
+:global(html[data-quality="low"]) .glass {
+  background: rgba(28, 27, 26, .8);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
