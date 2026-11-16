@@ -23,7 +23,7 @@ export const SPACE_ORDER: readonly MobileAppSlug[] = ["oshii", "wado", "sago", "
 const STORY_ORDER: readonly MobileAppSlug[] = ["oshii", "sago", "wado", "croc", "miru", "zenko"];
 
 /** Le code secret : les astres à relier sans lâcher, dans cet ordre (seul passage Pro → Créateur). */
-export const CONSTELLATION_CODE: readonly MobileAppSlug[] = ["wado", "oshii", "sago", "croc"];
+export const CONSTELLATION_CODE: readonly MobileAppSlug[] = ["zenko", "oshii", "sago", "miru", "wado", "croc"];
 
 /** Jour du relevé des versions : au-delà de 60 jours, la maquette donne la date plutôt que « il y a … ». */
 export const RELEASES_CHECKED_ON: IsoDate = "2026-11-11";
